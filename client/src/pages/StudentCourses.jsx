@@ -1,258 +1,292 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/UIHelper/Card';
-import { BarChartComponent } from '../components/UIHelper/Chart';
+import Button from '../components/UIHelper/Button';
+import Badge from '../components/UIHelper/Badge';
+import Progress from '../components/UIHelper/Progress';
 import { formatGrade } from '../lib/utils';
 
 const StudentCourses = () => {
   const navigate = useNavigate();
+  
   const [courses, setCourses] = useState([
     {
       id: 1,
-      code: 'MATH201',
-      title: 'Advanced Mathematics',
-      instructor: 'Dr. Ali Hassan',
-      credits: 3,
-      semester: 'Spring 2024',
+      code: 'MATH101',
+      name: 'Calculus I',
+      instructor: 'Dr. Ahmed Hassan',
+      credits: 4,
+      semester: 'Fall 2023',
       status: 'active',
       progress: 75,
-      grade: 85,
-      assignmentsCompleted: 4,
-      assignmentsTotal: 5,
-      color: 'bg-blue-500'
+      grade: { score: 85, letter: 'B', gpa: 3.3 },
+      schedule: 'Mon/Wed 09:00-10:30 AM',
+      location: 'Room 201'
     },
     {
       id: 2,
-      code: 'ARAB101',
-      title: 'Arabic Language Fundamentals',
-      instructor: 'Prof. Fatima Ahmed',
-      credits: 4,
-      semester: 'Spring 2024',
+      code: 'PHYS101',
+      name: 'General Physics I',
+      instructor: 'Prof. Sarah Ali',
+      credits: 3,
+      semester: 'Fall 2023',
       status: 'active',
       progress: 90,
-      grade: 92,
-      assignmentsCompleted: 6,
-      assignmentsTotal: 6,
-      color: 'bg-green-500'
+      grade: { score: 92, letter: 'A-', gpa: 3.7 },
+      schedule: 'Tue/Thu 11:00-12:30 PM',
+      location: 'Room 305'
     },
     {
       id: 3,
-      code: 'ISLM202',
-      title: 'Islamic Jurisprudence',
-      instructor: 'Sheikh Omar Farooq',
+      code: 'CHEM101',
+      name: 'General Chemistry I',
+      instructor: 'Dr. Mohammed Khan',
       credits: 3,
-      semester: 'Spring 2024',
+      semester: 'Fall 2023',
       status: 'active',
       progress: 60,
-      grade: 78,
-      assignmentsCompleted: 3,
-      assignmentsTotal: 5,
-      color: 'bg-purple-500'
+      grade: { score: 78, letter: 'C+', gpa: 2.3 },
+      schedule: 'Mon/Wed 02:00-03:30 PM',
+      location: 'Room 402'
     },
     {
       id: 4,
-      code: 'ENG102',
-      title: 'English Composition',
-      instructor: 'Ms. Sarah Johnson',
-      credits: 3,
-      semester: 'Spring 2024',
+      code: 'ARAB101',
+      name: 'Arabic Language I',
+      instructor: 'Dr. Fatima Al-Rashid',
+      credits: 2,
+      semester: 'Fall 2023',
       status: 'active',
       progress: 85,
-      grade: 88,
-      assignmentsCompleted: 5,
-      assignmentsTotal: 5,
-      color: 'bg-yellow-500'
+      grade: { score: 95, letter: 'A', gpa: 4.0 },
+      schedule: 'Tue/Thu 09:00-10:00 AM',
+      location: 'Room 105'
     },
     {
       id: 5,
-      code: 'PHYS101',
-      title: 'Physics Fundamentals',
-      instructor: 'Dr. Muhammad Khan',
-      credits: 4,
-      semester: 'Spring 2024',
-      status: 'active',
-      progress: 70,
-      grade: 82,
-      assignmentsCompleted: 4,
-      assignmentsTotal: 6,
-      color: 'bg-red-500'
+      code: 'HIST101',
+      name: 'Islamic History',
+      instructor: 'Dr. Omar Farooq',
+      credits: 3,
+      semester: 'Fall 2023',
+      status: 'completed',
+      progress: 100,
+      grade: { score: 88, letter: 'B+', gpa: 3.3 },
+      schedule: 'Mon/Wed 10:30-12:00 PM',
+      location: 'Room 210'
     }
   ]);
 
-  // Mock data for performance chart
-  const performanceData = courses.map(course => ({
-    name: course.code,
-    grade: course.grade
-  }));
+  const [filter, setFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+
+  const filteredCourses = courses
+    .filter(course => {
+      if (filter === 'all') return true;
+      return course.status === filter;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name);
+      } else if (sortBy === 'grade') {
+        return (b.grade?.score || 0) - (a.grade?.score || 0);
+      } else if (sortBy === 'progress') {
+        return b.progress - a.progress;
+      }
+      return 0;
+    });
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active':
+        return 'primary';
+      case 'completed':
+        return 'success';
+      case 'dropped':
+        return 'danger';
+      default:
+        return 'default';
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'active':
+        return 'Active';
+      case 'completed':
+        return 'Completed';
+      case 'dropped':
+        return 'Dropped';
+      default:
+        return status;
+    }
+  };
 
   const handleViewCourse = (courseId) => {
-    // In a real app, this would navigate to the course details page
-    console.log(`Viewing course ${courseId}`);
+    navigate(`/courses/${courseId}`);
+  };
+
+  const handleViewSyllabus = (courseId) => {
+    // Navigate to syllabus view
+    navigate(`/courses/${courseId}/syllabus`);
+  };
+
+  const handleViewGrades = (courseId) => {
+    // Navigate to grades view
+    navigate(`/courses/${courseId}/grades`);
   };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">My Courses</h1>
-        <p className="text-gray-600">Track your enrolled courses and academic progress</p>
+        <p className="text-gray-600">View and manage your enrolled courses</p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="bg-blue-50 border-blue-100">
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-blue-100 mr-4">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Courses</p>
-              <p className="text-2xl font-bold text-gray-900">{courses.length}</p>
-            </div>
-          </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card className="text-center">
+          <div className="text-3xl font-bold text-blue-600">{courses.length}</div>
+          <div className="text-sm text-gray-600">Total Courses</div>
         </Card>
-
-        <Card className="bg-green-50 border-green-100">
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-100 mr-4">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Avg. Grade</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {Math.round(courses.reduce((sum, course) => sum + course.grade, 0) / courses.length)}%
-              </p>
-            </div>
+        
+        <Card className="text-center">
+          <div className="text-3xl font-bold text-green-600">
+            {courses.filter(c => c.status === 'active').length}
           </div>
+          <div className="text-sm text-gray-600">Active Courses</div>
         </Card>
-
-        <Card className="bg-yellow-50 border-yellow-100">
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-yellow-100 mr-4">
-              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Assignments</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {courses.reduce((sum, course) => sum + course.assignmentsCompleted, 0)}/
-                {courses.reduce((sum, course) => sum + course.assignmentsTotal, 0)}
-              </p>
-            </div>
+        
+        <Card className="text-center">
+          <div className="text-3xl font-bold text-purple-600">
+            {courses.reduce((sum, course) => sum + course.credits, 0)}
           </div>
+          <div className="text-sm text-gray-600">Total Credits</div>
         </Card>
-
-        <Card className="bg-purple-50 border-purple-100">
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-purple-100 mr-4">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Progress</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {Math.round(courses.reduce((sum, course) => sum + course.progress, 0) / courses.length)}%
-              </p>
-            </div>
+        
+        <Card className="text-center">
+          <div className="text-3xl font-bold text-yellow-600">
+            {courses.filter(c => c.status === 'completed').length}
           </div>
+          <div className="text-sm text-gray-600">Completed</div>
         </Card>
       </div>
 
-      {/* Performance Chart */}
-      <div className="mb-8">
-        <Card title="Overall Performance">
-          <BarChartComponent 
-            data={performanceData} 
-            dataKey="grade" 
-            nameKey="name" 
-            title="Grade Distribution Across Courses"
-            height={300}
-          />
-        </Card>
+      {/* Filters and Sort */}
+      <div className="flex flex-wrap items-center justify-between mb-6">
+        <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              filter === 'all'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter('active')}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              filter === 'active'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Active
+          </button>
+          <button
+            onClick={() => setFilter('completed')}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              filter === 'completed'
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Completed
+          </button>
+        </div>
+        
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="name">Sort by Name</option>
+          <option value="grade">Sort by Grade</option>
+          <option value="progress">Sort by Progress</option>
+        </select>
       </div>
 
-      {/* Courses List */}
-      <div className="space-y-6">
-        <Card title="Enrolled Courses">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Course
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Instructor
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Progress
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Grade
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {courses.map((course) => (
-                  <tr key={course.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className={`w-3 h-3 rounded-full ${course.color} mr-3`}></div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{course.code}</div>
-                          <div className="text-sm text-gray-500">{course.title}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {course.instructor}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-16 bg-gray-200 rounded-full h-2.5 mr-2">
-                          <div 
-                            className={`h-2.5 rounded-full ${course.color}`} 
-                            style={{ width: `${course.progress}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-sm text-gray-500">{course.progress}%</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${formatGrade(course.grade).color}`}>
-                        {course.grade}% ({formatGrade(course.grade).letter})
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Active
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleViewCourse(course.id)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+      {/* Courses Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredCourses.map((course) => (
+          <Card key={course.id} className="hover:shadow-md transition-shadow">
+            <div className="p-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{course.name}</h3>
+                  <p className="text-sm text-gray-600">{course.code}</p>
+                </div>
+                <Badge variant={getStatusColor(course.status)}>
+                  {getStatusText(course.status)}
+                </Badge>
+              </div>
+              
+              <div className="mt-4">
+                <p className="text-sm text-gray-600">Instructor: {course.instructor}</p>
+                <p className="text-sm text-gray-600">Credits: {course.credits}</p>
+                <p className="text-sm text-gray-600">Semester: {course.semester}</p>
+              </div>
+              
+              {course.grade && (
+                <div className="mt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Grade:</span>
+                    <span className="text-lg font-semibold text-gray-900">
+                      {course.grade.score} ({course.grade.letter})
+                    </span>
+                  </div>
+                  <Progress 
+                    value={course.progress} 
+                    max={100} 
+                    label="Progress" 
+                    className="mt-2" 
+                  />
+                </div>
+              )}
+              
+              <div className="mt-4">
+                <p className="text-sm text-gray-600">Schedule: {course.schedule}</p>
+                <p className="text-sm text-gray-600">Location: {course.location}</p>
+              </div>
+              
+              <div className="mt-6 flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleViewCourse(course.id)}
+                >
+                  View Details
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleViewSyllabus(course.id)}
+                >
+                  Syllabus
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleViewGrades(course.id)}
+                >
+                  Grades
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ))}
       </div>
     </div>
   );

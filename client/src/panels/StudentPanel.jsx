@@ -25,14 +25,12 @@ const StudentPanel = () => {
     {
       id: 'dashboard',
       label: 'Dashboard',
-      icon: '📊',
       path: '/',
       type: 'link'
     },
     {
       id: 'academic',
       label: 'Academic',
-      icon: '📚',
       type: 'dropdown',
       items: [
         { id: 'courses', label: 'My Courses', path: '/courses' },
@@ -45,14 +43,12 @@ const StudentPanel = () => {
     {
       id: 'assignments',
       label: 'Assignments',
-      icon: '📝',
       path: '/assignments',
       type: 'link'
     },
     {
       id: 'library',
       label: 'Library',
-      icon: '📖',
       type: 'dropdown',
       items: [
         { id: 'resources', label: 'Learning Resources', path: '/resources' },
@@ -63,7 +59,6 @@ const StudentPanel = () => {
     {
       id: 'finance',
       label: 'Finance',
-      icon: '💰',
       type: 'dropdown',
       items: [
         { id: 'fees', label: 'Fees & Payments', path: '/fees' },
@@ -73,23 +68,20 @@ const StudentPanel = () => {
     {
       id: 'communications',
       label: 'Communications',
-      icon: '💬',
       type: 'dropdown',
       items: [
-        { id: 'messages', label: 'Messages', path: '/messages' },
-        { id: 'announcements', label: 'Announcements', path: '/announcements' },
+        { id: 'messages', label: 'Messages', path: '/communications' },
+        { id: 'complaints', label: 'Complaints', path: '/complaints' },
         { id: 'feedback', label: 'Feedback', path: '/feedback' },
       ]
     },
+    /* Removed feedback as separate menu item */
     {
       id: 'profile',
       label: 'Profile',
-      icon: '👤',
       type: 'dropdown',
       items: [
         { id: 'personal', label: 'Personal Info', path: '/profile' },
-        { id: 'settings', label: 'Settings', path: '/settings' },
-        { id: 'security', label: 'Security', path: '/security' },
       ]
     },
   ];
@@ -140,8 +132,7 @@ const StudentPanel = () => {
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <span className="text-lg">{item.icon}</span>
-                    {sidebarOpen && <span className="ml-3">{item.label}</span>}
+                    {sidebarOpen && <span>{item.label}</span>}
                   </button>
                 ) : (
                   <div>
@@ -154,8 +145,7 @@ const StudentPanel = () => {
                       }`}
                     >
                       <div className="flex items-center">
-                        <span className="text-lg">{item.icon}</span>
-                        {sidebarOpen && <span className="ml-3">{item.label}</span>}
+                        {sidebarOpen && <span>{item.label}</span>}
                       </div>
                       {sidebarOpen && (
                         <svg
@@ -213,40 +203,40 @@ const StudentPanel = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Navigation */}
-        <header className="bg-white shadow-sm">
-          <div className="flex items-center justify-between px-6 py-4">
+        <header className="bg-white shadow-sm border-b border-gray-200">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-3">
             <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="text-gray-500 hover:text-gray-700 mr-4"
+                className="text-gray-500 hover:text-gray-700 mr-3 sm:mr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-1"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
               </button>
-              <h2 className="text-xl font-semibold text-gray-800 capitalize">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 capitalize">
                 {location.pathname.split('/')[1] || 'Dashboard'}
               </h2>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 sm:space-x-4">
               {/* Notifications */}
-              <button className="relative p-1 text-gray-500 hover:text-gray-700">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
-                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                <span className="absolute top-1 right-1 sm:top-1 sm:right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               
               {/* Logout */}
               <button
                 onClick={handleLogout}
-                className="flex items-center text-sm text-gray-700 hover:text-gray-900"
+                className="flex items-center text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                 </svg>
-                Logout
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           </div>

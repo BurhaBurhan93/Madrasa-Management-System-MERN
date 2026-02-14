@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChartComponent, LineChartComponent } from '../components/UIHelper/Chart';
 import Card from '../components/UIHelper/Card';
+import Avatar from '../components/UIHelper/Avatar';
+import Progress from '../components/UIHelper/Progress';
 import { formatDate, formatGrade, calculatePercentage } from '../lib/utils';
 
 const StudentDashboard = () => {
@@ -52,13 +54,28 @@ const StudentDashboard = () => {
         <p className="text-gray-600">Welcome back! Here's what's happening with your studies.</p>
       </div>
 
+      {/* Student Header */}
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 mb-8 text-white">
+        <div className="flex items-center">
+          <Avatar alt="Ahmed Mohamed" size="xl" className="mr-4" />
+          <div>
+            <h2 className="text-2xl font-bold">Ahmed Mohamed</h2>
+            <p className="text-blue-100">Student ID: STU2024001</p>
+            <div className="mt-2 flex items-center space-x-4">
+              <span className="bg-blue-400 bg-opacity-30 px-3 py-1 rounded-full text-sm">Active</span>
+              <span className="bg-blue-400 bg-opacity-30 px-3 py-1 rounded-full text-sm">Fall 2023</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card className="bg-blue-50 border-blue-100">
+        <Card>
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-blue-100 mr-4">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.247 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
               </svg>
             </div>
             <div>
@@ -68,7 +85,7 @@ const StudentDashboard = () => {
           </div>
         </Card>
 
-        <Card className="bg-green-50 border-green-100">
+        <Card>
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-green-100 mr-4">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,12 +94,15 @@ const StudentDashboard = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">Attendance Rate</p>
-              <p className="text-2xl font-bold text-gray-900">{quickStats.attendanceRate}%</p>
+              <div className="mt-1">
+                <p className="text-2xl font-bold text-gray-900">{quickStats.attendanceRate}%</p>
+                <Progress value={quickStats.attendanceRate} max={100} className="mt-2" />
+              </div>
             </div>
           </div>
         </Card>
 
-        <Card className="bg-yellow-50 border-yellow-100">
+        <Card>
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-yellow-100 mr-4">
               <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +116,7 @@ const StudentDashboard = () => {
           </div>
         </Card>
 
-        <Card className="bg-purple-50 border-purple-100">
+        <Card>
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-purple-100 mr-4">
               <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

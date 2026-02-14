@@ -13,6 +13,23 @@ import StudentCourses from './pages/StudentCourses';
 import StudentAttendance from './pages/StudentAttendance';
 import StudentAssignments from './pages/StudentAssignments';
 import StudentResults from './pages/StudentResults';
+import StudentSchedule from './pages/StudentSchedule';
+import StudentExams from './pages/StudentExams';
+import StudentFees from './pages/StudentFees';
+import StudentLibrary from './pages/StudentLibrary';
+import StudentComplaints from './pages/StudentComplaints';
+
+// Import Library Components
+import LearningResources from './components/library/LearningResources';
+import BorrowedBooks from './components/library/BorrowedBooks';
+import PurchaseHistory from './components/library/PurchaseHistory';
+
+// Import Finance Components
+import TransactionHistory from './components/finance/TransactionHistory';
+
+// Import additional components
+import Communications from './components/communications/Communications';
+import Security from './components/profile/Security';
 
 // Import Panels
 import StudentPanel from './panels/StudentPanel';
@@ -54,18 +71,18 @@ function App() {
             <Route path="attendance" element={<StudentAttendance />} />
             <Route path="assignments" element={<StudentAssignments />} />
             <Route path="results" element={<StudentResults />} />
-            <Route path="schedule" element={<div className="p-6">Schedule page coming soon</div>} />
-            <Route path="exams" element={<div className="p-6">Exams page coming soon</div>} />
-            <Route path="resources" element={<div className="p-6">Resources page coming soon</div>} />
-            <Route path="borrowed" element={<div className="p-6">Borrowed books page coming soon</div>} />
-            <Route path="purchase" element={<div className="p-6">Purchase history page coming soon</div>} />
-            <Route path="fees" element={<div className="p-6">Fees & payments page coming soon</div>} />
-            <Route path="transactions" element={<div className="p-6">Transaction history page coming soon</div>} />
-            <Route path="messages" element={<div className="p-6">Messages page coming soon</div>} />
-            <Route path="announcements" element={<div className="p-6">Announcements page coming soon</div>} />
-            <Route path="feedback" element={<div className="p-6">Feedback page coming soon</div>} />
-            <Route path="settings" element={<div className="p-6">Settings page coming soon</div>} />
-            <Route path="security" element={<div className="p-6">Security page coming soon</div>} />
+            <Route path="schedule" element={<StudentSchedule />} />
+            <Route path="exams" element={<StudentExams />} />
+            <Route path="fees" element={<StudentFees />} />
+            <Route path="library" element={<StudentLibrary />} />
+            <Route path="resources" element={<LearningResources />} />
+            <Route path="borrowed" element={<BorrowedBooks />} />
+            <Route path="purchase" element={<PurchaseHistory />} />
+            <Route path="transactions" element={<TransactionHistory />} />
+            <Route path="complaints" element={<StudentComplaints />} />
+            <Route path="communications" element={<Communications />} />
+            <Route path="feedback" element={<Communications />} />
+            <Route path="settings" element={<StudentProfile />} />
           </Route>
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
           <Route path="/register" element={<Register />} />

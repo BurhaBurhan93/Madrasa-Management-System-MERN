@@ -11,6 +11,12 @@ app.use(express.json()); // parse JSON body
 
 connectDB();           // connect to MongoDB
 
+// Import routes
+const studentRoutes = require('./routes/studentRoutes');
+
+// Use routes
+app.use('/api/student', studentRoutes);
+
 app.get('/', (req, res) => {
   res.send('Backend connected to MongoDB (madrasa-mis)!');
 });
