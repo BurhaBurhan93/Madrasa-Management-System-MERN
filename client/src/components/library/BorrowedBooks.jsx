@@ -76,7 +76,7 @@ const BorrowedBooks = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="w-full p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Borrowed Books</h1>
         <p className="text-gray-600">Manage your borrowed books and renewal requests</p>

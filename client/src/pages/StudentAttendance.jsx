@@ -70,52 +70,56 @@ const StudentAttendance = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="mb-8">
+    <div className="w-full bg-gray-50 min-h-screen">
+      <div className="px-4 sm:px-6 md:px-8 py-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Attendance Records</h1>
         <p className="text-gray-600">Track your attendance history and performance</p>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
-        <Card className="text-center">
-          <div className="text-2xl sm:text-3xl font-bold text-blue-600">{stats.totalDays}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Total Days</div>
-        </Card>
-        
-        <Card className="text-center">
-          <div className="text-2xl sm:text-3xl font-bold text-green-600">{stats.present}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Present</div>
-        </Card>
-        
-        <Card className="text-center">
-          <div className="text-2xl sm:text-3xl font-bold text-red-600">{stats.absent}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Absent</div>
-        </Card>
-        
-        <Card className="text-center">
-          <div className="text-2xl sm:text-3xl font-bold text-yellow-600">{stats.late}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Late</div>
-        </Card>
-        
-        <Card className="text-center">
-          <div className="text-2xl sm:text-3xl font-bold text-purple-600">{stats.attendanceRate}%</div>
-          <div className="text-xs sm:text-sm text-gray-600">Rate</div>
-        </Card>
+      <div className="px-4 sm:px-6 md:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+          <Card className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-blue-600">{stats.totalDays}</div>
+            <div className="text-xs sm:text-sm text-gray-600">Total Days</div>
+          </Card>
+          
+          <Card className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-green-600">{stats.present}</div>
+            <div className="text-xs sm:text-sm text-gray-600">Present</div>
+          </Card>
+          
+          <Card className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-red-600">{stats.absent}</div>
+            <div className="text-xs sm:text-sm text-gray-600">Absent</div>
+          </Card>
+          
+          <Card className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-yellow-600">{stats.late}</div>
+            <div className="text-xs sm:text-sm text-gray-600">Late</div>
+          </Card>
+          
+          <Card className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-purple-600">{stats.attendanceRate}%</div>
+            <div className="text-xs sm:text-sm text-gray-600">Rate</div>
+          </Card>
+        </div>
       </div>
 
       {/* Attendance Chart */}
-      <Card title="Monthly Attendance Trend" className="mb-8">
-        <BarChartComponent 
-          data={monthlyStats} 
-          dataKey="present" 
-          nameKey="month" 
-          title="Attendance by Month"
-        />
-      </Card>
+      <div className="px-4 sm:px-6 md:px-8 mb-8">
+        <Card title="Monthly Attendance Trend">
+          <BarChartComponent 
+            data={monthlyStats} 
+            dataKey="present" 
+            nameKey="month" 
+            title="Attendance by Month"
+          />
+        </Card>
+      </div>
 
       {/* Filter Controls */}
-      <div className="flex flex-wrap items-center justify-between mb-6">
+      <div className="px-4 sm:px-6 md:px-8 flex flex-wrap items-center justify-between mb-6">
         <div className="flex space-x-2 mb-4 md:mb-0">
           <button
             onClick={() => setFilter('all')}
@@ -161,7 +165,8 @@ const StudentAttendance = () => {
       </div>
 
       {/* Attendance Table */}
-      <Card>
+      <div className="px-4 sm:px-6 md:px-8 pb-8">
+        <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -195,6 +200,7 @@ const StudentAttendance = () => {
           </table>
         </div>
       </Card>
+      </div>
     </div>
   );
 };

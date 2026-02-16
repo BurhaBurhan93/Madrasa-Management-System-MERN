@@ -76,12 +76,13 @@ const Finance = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="mb-8">
+    <div className="w-full bg-gray-50 min-h-screen">
+      <div className="px-4 sm:px-6 md:px-8 py-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Fees & Payments</h1>
         <p className="text-gray-600">Manage your fee payments and view payment history</p>
       </div>
 
+      <div className="px-4 sm:px-6 md:px-8">
       {/* Financial Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card className="text-center">
@@ -272,6 +273,7 @@ const Finance = () => {
             </div>
           </div>
         </Card>
+      </div>
       </div>
     </div>
   );

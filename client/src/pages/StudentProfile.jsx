@@ -223,12 +223,13 @@ const StudentProfile = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="mb-8">
+    <div className="w-full bg-gray-50 min-h-screen">
+      <div className="px-4 sm:px-6 md:px-8 py-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Student Profile</h1>
         <p className="text-gray-600">Manage your personal information and preferences</p>
       </div>
 
+      <div className="px-4 sm:px-6 md:px-8">
       <div className="space-y-6">
         {/* Profile Picture and Basic Info */}
         <div className="flex flex-col sm:flex-col md:flex-row gap-6">
@@ -588,6 +589,7 @@ const StudentProfile = () => {
             </div>
           )}
         </Card>
+      </div>
       </div>
     </div>
   );

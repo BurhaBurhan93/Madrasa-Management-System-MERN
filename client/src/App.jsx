@@ -27,6 +27,9 @@ import PurchaseHistory from './components/library/PurchaseHistory';
 // Import Finance Components
 import TransactionHistory from './components/finance/TransactionHistory';
 
+// Import Assignment Components
+import HomeworkSubmission from './components/assignments/HomeworkSubmission';
+
 // Import additional components
 import Communications from './components/communications/Communications';
 import Security from './components/profile/Security';
@@ -70,6 +73,7 @@ function App() {
             <Route path="courses" element={<StudentCourses />} />
             <Route path="attendance" element={<StudentAttendance />} />
             <Route path="assignments" element={<StudentAssignments />} />
+            <Route path="homework-submission" element={<HomeworkSubmission />} />
             <Route path="results" element={<StudentResults />} />
             <Route path="schedule" element={<StudentSchedule />} />
             <Route path="exams" element={<StudentExams />} />
