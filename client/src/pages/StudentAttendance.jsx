@@ -71,13 +71,13 @@ const StudentAttendance = () => {
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
-      <div className="px-4 sm:px-6 md:px-8 py-6 mb-8">
+      <div className="py-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Attendance Records</h1>
         <p className="text-gray-600">Track your attendance history and performance</p>
       </div>
 
       {/* Quick Stats */}
-      <div className="px-4 sm:px-6 md:px-8">
+      <div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
           <Card className="text-center">
             <div className="text-2xl sm:text-3xl font-bold text-blue-600">{stats.totalDays}</div>
@@ -107,7 +107,7 @@ const StudentAttendance = () => {
       </div>
 
       {/* Attendance Chart */}
-      <div className="px-4 sm:px-6 md:px-8 mb-8">
+      <div className="mb-8">
         <Card title="Monthly Attendance Trend">
           <BarChartComponent 
             data={monthlyStats} 
@@ -119,7 +119,7 @@ const StudentAttendance = () => {
       </div>
 
       {/* Filter Controls */}
-      <div className="px-4 sm:px-6 md:px-8 flex flex-wrap items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between mb-6">
         <div className="flex space-x-2 mb-4 md:mb-0">
           <button
             onClick={() => setFilter('all')}
@@ -165,7 +165,7 @@ const StudentAttendance = () => {
       </div>
 
       {/* Attendance Table */}
-      <div className="px-4 sm:px-6 md:px-8 pb-8">
+      <div className="pb-8">
         <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">

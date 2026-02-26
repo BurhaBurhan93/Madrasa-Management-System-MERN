@@ -103,7 +103,7 @@ const TeacherSubjects = () => {
   const totalHours = subjects.reduce((sum, s) => sum + s.weeklyHours, 0);
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen p-6">
+    <div className="w-full bg-gray-50 min-h-screen">
 
       {/* HEADER */}
       <div className="mb-8">

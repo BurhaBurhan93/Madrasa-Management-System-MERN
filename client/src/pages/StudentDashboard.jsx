@@ -49,12 +49,12 @@ const StudentDashboard = () => {
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
-      <div className="px-4 sm:px-6 md:px-8 py-6 mb-8">
+      <div className="py-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Student Dashboard</h1>
         <p className="text-gray-600">Welcome back! Here's what's happening with your studies.</p>
       </div>
 
-      <div className="px-4 sm:px-6 md:px-8">
+      <div>
       {/* Student Header */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 mb-8 text-white">
         <div className="flex items-center">

@@ -63,7 +63,7 @@ const TeacherAttendance = () => {
   };
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen p-6 pb-28">
+    <div className="w-full bg-gray-50 min-h-screen pb-28">
 
       {/* HEADER */}
       <div className="mb-6">

@@ -106,7 +106,7 @@ const TeacherExams = () => {
   }));
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen p-6">
+    <div className="w-full bg-gray-50 min-h-screen">
 
       {/* Header */}
       <div className="mb-6">

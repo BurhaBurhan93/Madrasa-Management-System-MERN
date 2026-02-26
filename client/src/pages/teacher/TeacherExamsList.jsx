@@ -139,7 +139,7 @@ const TeacherExamsList = () => {
   ];
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen p-6">
+    <div className="w-full bg-gray-50 min-h-screen">
 
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">

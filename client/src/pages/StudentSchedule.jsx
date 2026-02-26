@@ -92,12 +92,12 @@ const StudentSchedule = () => {
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
-      <div className="px-4 sm:px-6 md:px-8 py-6 mb-8">
+      <div className="py-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Class Schedule</h1>
         <p className="text-gray-600">View and manage your class schedule</p>
       </div>
 
-      <div className="px-4 sm:px-6 md:px-8">
+      <div>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
           <h2 className="text-2xl font-bold text-gray-800">Class Schedule</h2>

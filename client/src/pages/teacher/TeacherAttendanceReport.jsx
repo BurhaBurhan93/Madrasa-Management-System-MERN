@@ -65,7 +65,7 @@ const TeacherAttendanceReports = () => {
   const uniqueCourses = [...new Set(attendanceData.map(d => d.course))];
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen p-6">
+    <div className="w-full bg-gray-50 min-h-screen">
 
       {/* HEADER */}
       <div className="mb-8">

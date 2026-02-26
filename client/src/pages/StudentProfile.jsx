@@ -5,7 +5,6 @@ import Input from '../components/UIHelper/Input';
 import Button from '../components/UIHelper/Button';
 import Avatar from '../components/UIHelper/Avatar';
 import Badge from '../components/UIHelper/Badge';
-import { validateEmail, validatePhone } from '../lib/utils';
 
 const StudentProfile = () => {
   const navigate = useNavigate();
@@ -22,20 +21,18 @@ const StudentProfile = () => {
   });
 
   const [editMode, setEditMode] = useState(false);
-  const [showChangePassword, setShowChangePassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
   
-  const [passwordErrors, setPasswordErrors] = useState({});
   const [imagePreview, setImagePreview] = useState(null);
   
   // Security related state
   const [showSecurity, setShowSecurity] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [loginHistory, setLoginHistory] = useState([
+  const [loginHistory] = useState([
     { id: 1, date: '2024-02-10 10:30 AM', ip: '192.168.1.100', location: 'Local', status: 'Success' },
     { id: 2, date: '2024-02-09 3:45 PM', ip: '203.0.113.45', location: 'Remote', status: 'Success' },
     { id: 3, date: '2024-02-08 8:15 AM', ip: '198.51.100.23', location: 'Remote', status: 'Failed' }
@@ -81,22 +78,6 @@ const StudentProfile = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-    }
-  };
-
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    setPasswordData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear error when user starts typing
-    if (passwordErrors[name]) {
-      setPasswordErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
     }
   };
 
@@ -158,78 +139,22 @@ const StudentProfile = () => {
     alert(`Two-factor authentication ${twoFactorEnabled ? 'disabled' : 'enabled'} successfully!`);
   };
 
-  const validatePasswordForm = () => {
-    const errors = {};
-    
-    if (!passwordData.currentPassword) {
-      errors.currentPassword = 'Current password is required';
-    }
-    
-    if (!passwordData.newPassword) {
-      errors.newPassword = 'New password is required';
-    } else if (passwordData.newPassword.length < 6) {
-      errors.newPassword = 'Password must be at least 6 characters';
-    }
-    
-    if (!passwordData.confirmPassword) {
-      errors.confirmPassword = 'Please confirm your new password';
-    } else if (passwordData.newPassword !== passwordData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-    }
-    
-    setPasswordErrors(errors);
-    return Object.keys(errors).length === 0;
+  // legacy validatePasswordForm removed (unused)
+
+  // legacy password handlers and status helpers removed (unused)
+  const handleLogout = () => {
+    localStorage.removeItem('studentToken');
+    navigate('/');
   };
 
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault();
-    
-    if (validatePasswordForm()) {
-      // In a real app, you would send to the backend
-      alert('Password changed successfully!');
-      setShowChangePassword(false);
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-    }
-  };
-
-  const handleShowChangePassword = () => {
-    setShowChangePassword(!showChangePassword);
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Success':
-        return 'success';
-      case 'Failed':
-        return 'danger';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'Success':
-        return 'Success';
-      case 'Failed':
-        return 'Failed';
-      default:
-        return status;
-    }
-  };
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
-      <div className="px-4 sm:px-6 md:px-8 py-6 mb-8">
+      <div className="py-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Student Profile</h1>
         <p className="text-gray-600">Manage your personal information and preferences</p>
       </div>
 
-      <div className="px-4 sm:px-6 md:px-8">
       <div className="space-y-6">
         {/* Profile Picture and Basic Info */}
         <div className="flex flex-col sm:flex-col md:flex-row gap-6">
@@ -590,6 +515,24 @@ const StudentProfile = () => {
           )}
         </Card>
       </div>
+      <div className="bg-gray-50 border-t p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-semibold">
+            {(userData.firstName?.[0] || 'S')}
+          </div>
+          <div>
+            <p className="font-medium leading-tight text-gray-900">
+              {userData.firstName} {userData.lastName}
+            </p>
+            <p className="text-sm text-gray-500 leading-tight">ID: {userData.studentId}</p>
+          </div>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2"
+        >
+          Logout
+        </button>
       </div>
     </div>
   );

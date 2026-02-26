@@ -82,7 +82,7 @@ const PurchaseHistory = () => {
   };
 
   return (
-    <div className="w-full p-6 bg-gray-50 min-h-screen">
+    <div className="w-full bg-gray-50 min-h-screen">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Purchase History</h1>
         <p className="text-gray-600">View your book purchase history and manage shopping cart</p>
