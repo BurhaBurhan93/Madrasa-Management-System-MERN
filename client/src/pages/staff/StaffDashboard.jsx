@@ -29,12 +29,15 @@ const StaffDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
       // Fetch dashboard stats
-      const statsResponse = await axios.get('http://localhost:5000/api/staff/dashboard');
+      const statsResponse = await axios.get('http://localhost:5000/api/staff/dashboard', config);
       setStats(statsResponse.data);
 
       // Fetch recent activities
-      const activitiesResponse = await axios.get('http://localhost:5000/api/staff/activities');
+      const activitiesResponse = await axios.get('http://localhost:5000/api/staff/activities', config);
       setRecentActivities(activitiesResponse.data);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);

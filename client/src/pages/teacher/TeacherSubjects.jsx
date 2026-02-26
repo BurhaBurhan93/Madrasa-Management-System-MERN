@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../components/UIHelper/Card';
 import Button from '../../components/UIHelper/Button';
@@ -7,82 +8,38 @@ import Progress from '../../components/UIHelper/Progress';
 
 const TeacherSubjects = () => {
   const navigate = useNavigate();
-
-  const [subjects] = useState([
-    {
-      id: 1,
-      code: 'QUR101',
-      name: 'Quran Tafsir',
-      degree: 'Grade 10',
-      students: 35,
-      weeklyHours: 4,
-      schedule: 'Mon/Wed 08:00-09:30 AM',
-      room: 'Room A1',
-      status: 'active',
-      progress: 65,
-    },
-    {
-      id: 2,
-      code: 'HAD201',
-      name: 'Hadith Studies',
-      degree: 'Grade 9',
-      students: 28,
-      weeklyHours: 3,
-      schedule: 'Tue/Thu 11:00-12:30 PM',
-      room: 'Room B2',
-      status: 'active',
-      progress: 45,
-    },
-    {
-      id: 3,
-      code: 'FIQ301',
-      name: 'Fiqh',
-      degree: 'Grade 8',
-      students: 22,
-      weeklyHours: 2,
-      schedule: 'Mon/Wed 09:45-10:45 AM',
-      room: 'Room C1',
-      status: 'completed',
-      progress: 100,
-    },
-    {
-      id: 4,
-      code: 'HIS101',
-      name: 'Islamic History',
-      degree: 'Grade 7',
-      students: 30,
-      weeklyHours: 3,
-      schedule: 'Tue/Thu 09:00-10:00 AM',
-      room: 'Room D3',
-      status: 'upcoming',
-      progress: 15,
-    },
-    {
-      id: 5,
-      code: 'ARB101',
-      name: 'Arabic Grammar',
-      degree: 'Grade 6',
-      students: 40,
-      weeklyHours: 4,
-      schedule: 'Sun/Mon 01:00-02:00 PM',
-      room: 'Room A2',
-      status: 'active',
-      progress: 75,
-    },
-  ]);
-
+  const [loading, setLoading] = useState(true);
+  const [subjects, setSubjects] = useState([]);
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
+
+  useEffect(() => {
+    fetchSubjects();
+  }, []);
+
+  const fetchSubjects = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get('http://localhost:5000/api/teacher/subjects', config);
+      setSubjects(response.data || []);
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredSubjects = subjects
     .filter((sub) => {
       if (filter === 'all') return true;
-      return sub.status === filter;
+      return (sub.status || 'active') === filter;
     })
     .sort((a, b) => {
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      if (sortBy === 'students') return b.students - a.students;
-      if (sortBy === 'progress') return b.progress - a.progress;
+      if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
+      if (sortBy === 'students') return (b.students || 0) - (a.students || 0);
+      if (sortBy === 'progress') return (b.progress || 0) - (a.progress || 0);
       return 0;
     });
 
@@ -99,8 +56,19 @@ const TeacherSubjects = () => {
     }
   };
 
-  const totalStudents = subjects.reduce((sum, s) => sum + s.students, 0);
-  const totalHours = subjects.reduce((sum, s) => sum + s.weeklyHours, 0);
+  const totalStudents = subjects.reduce((sum, s) => sum + (s.students || 0), 0);
+  const totalHours = subjects.reduce((sum, s) => sum + (s.weeklyHours || 0), 0);
+
+  if (loading) {
+    return (
+      <div className="w-full bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading subjects...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
@@ -120,7 +88,7 @@ const TeacherSubjects = () => {
 
         <Card className="text-center">
           <div className="text-3xl font-bold text-green-600">
-            {subjects.filter(s => s.status === 'active').length}
+            {subjects.filter(s => (s.status || s.isActive) === 'active' || s.isActive === true).length}
           </div>
           <div className="text-sm text-gray-600">Active Classes</div>
         </Card>
@@ -167,52 +135,48 @@ const TeacherSubjects = () => {
 
       {/* SUBJECT CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredSubjects.map((subject) => (
-          <Card key={subject.id} className="hover:shadow-md transition-shadow">
+        {filteredSubjects.length > 0 ? filteredSubjects.map((subject) => (
+          <Card key={subject.id || subject._id} className="hover:shadow-md transition-shadow">
             <div className="p-4">
 
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-semibold">{subject.name}</h3>
-                  <p className="text-sm text-gray-500">{subject.code}</p>
+                  <h3 className="text-lg font-semibold">{subject.name || 'Unnamed Subject'}</h3>
+                  <p className="text-sm text-gray-500">{subject.code || 'N/A'}</p>
                 </div>
-                <Badge variant={getStatusVariant(subject.status)}>
-                  {subject.status}
+                <Badge variant={getStatusVariant(subject.status || 'active')}>
+                  {subject.status || (subject.isActive ? 'active' : 'inactive')}
                 </Badge>
               </div>
 
               <div className="mt-4 space-y-1 text-sm text-gray-600">
-                <p>Class: {subject.degree}</p>
-                <p>Students: {subject.students}</p>
-                <p>Weekly Hours: {subject.weeklyHours}</p>
-                <p>Schedule: {subject.schedule}</p>
-                <p>Room: {subject.room}</p>
+                <p>Credits: {subject.credits || 'N/A'}</p>
+                <p>Description: {subject.description || 'No description'}</p>
               </div>
 
               <div className="mt-4">
-                <Progress value={subject.progress} max={100} label="Syllabus Progress" />
+                <Progress value={subject.progress || 50} max={100} label="Syllabus Progress" />
               </div>
 
               <div className="mt-6 flex flex-wrap gap-2">
-                <Button size="sm" variant="outline"
-                  >
+                <Button size="sm" variant="outline">
                   Students
                 </Button>
-
-                <Button size="sm" variant="outline"
-                  >
+                <Button size="sm" variant="outline">
                   Attendance
                 </Button>
-
-                <Button size="sm" variant="outline"
-                  >
+                <Button size="sm" variant="outline">
                   Exams
                 </Button>
               </div>
 
             </div>
           </Card>
-        ))}
+        )) : (
+          <div className="col-span-3 text-center py-12 text-gray-500">
+            No subjects found
+          </div>
+        )}
       </div>
 
     </div>

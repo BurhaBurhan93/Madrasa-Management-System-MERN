@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { ExamProvider } from "./contexts/ExamContext";
 
 
@@ -85,21 +86,25 @@ function App() {
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    // Check if user is already authenticated (no database/token needed)
+    // Check if user is already authenticated
     const auth = localStorage.getItem('isAuthenticated');
     const role = localStorage.getItem('userRole');
+    const token = localStorage.getItem('token');
     
-    if (auth === 'true' && role) {
+    if (auth === 'true' && role && token) {
       setIsAuthenticated(true);
       setUserRole(role);
+      // Set axios default header
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
   }, []);
 
-  // Protected route wrapper component (no token check needed)
+  // Protected route wrapper component
   const ProtectedRoute = ({ children, allowedRoles }) => {
+    const token = localStorage.getItem('token');
     const role = localStorage.getItem('userRole');
     
-    if (!isAuthenticated) {
+    if (!token || !isAuthenticated) {
       return <Navigate to="/login" replace />;
     }
     if (allowedRoles && !allowedRoles.includes(role)) {

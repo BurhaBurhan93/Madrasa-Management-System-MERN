@@ -1,24 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { FiPackage, FiPlus, FiMinus, FiAlertTriangle, FiCheckCircle, FiSearch } from 'react-icons/fi';
 
 const StaffInventory = () => {
-  const [inventory] = useState([
-    { id: 1, name: 'Quran - Standard Edition', category: 'Religious', quantity: 150, minLevel: 20, location: 'Shelf A1' },
-    { id: 2, name: 'Arabic Grammar Book', category: 'Educational', quantity: 45, minLevel: 15, location: 'Shelf B2' },
-    { id: 3, name: 'Islamic History Vol. 1', category: 'Educational', quantity: 12, minLevel: 10, location: 'Shelf B3' },
-    { id: 4, name: 'Prayer Mats', category: 'Supplies', quantity: 200, minLevel: 50, location: 'Storage C1' },
-    { id: 5, name: 'Whiteboard Markers', category: 'Supplies', quantity: 8, minLevel: 20, location: 'Storage C2' },
-    { id: 6, name: 'Notebooks', category: 'Supplies', quantity: 500, minLevel: 100, location: 'Storage C3' },
-  ]);
-
+  const [inventory, setInventory] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  const fetchInventory = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get('http://localhost:5000/api/staff/inventory', config);
+      setInventory(response.data);
+    } catch (error) {
+      console.error('Error fetching inventory:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredInventory = inventory.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const lowStockItems = inventory.filter(item => item.quantity <= item.minLevel);
+  const lowStockItems = inventory.filter(item => item.quantity <= (item.minLevel || 10));
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

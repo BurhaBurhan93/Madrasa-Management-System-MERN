@@ -1,44 +1,102 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { BarChartComponent, LineChartComponent } from '../../components/UIHelper/Chart';
 import Card from '../../components/UIHelper/Card';
 import Avatar from '../../components/UIHelper/Avatar';
 import { formatDate } from '../../lib/utils';
 
 const TeacherDashboard = () => {
-
-  const [quickStats] = useState({
-    coursesTeaching: 4,
-    totalStudents: 120,
-    assignmentsToReview: 8,
-    todayClasses: 3
+  const [loading, setLoading] = useState(true);
+  const [quickStats, setQuickStats] = useState({
+    totalSubjects: 0,
+    totalStudents: 0,
+    pendingAssignments: 0,
+    totalClasses: 0
   });
+  const [classAttendanceData, setClassAttendanceData] = useState([]);
+  const [classPerformanceData, setClassPerformanceData] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [upcomingClasses, setUpcomingClasses] = useState([]);
 
-  const classAttendanceData = [
-    { month: 'Jan', rate: 92 },
-    { month: 'Feb', rate: 88 },
-    { month: 'Mar', rate: 94 },
-    { month: 'Apr', rate: 90 },
-    { month: 'May', rate: 93 }
-  ];
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  const classPerformanceData = [
-    { subject: 'Math', score: 78 },
-    { subject: 'Physics', score: 74 },
-    { subject: 'Arabic', score: 85 },
-    { subject: 'Islamic Studies', score: 88 }
-  ];
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
 
-  const recentActivity = [
-    { id:1, title:'Assignment Submitted', student:'Ali Ahmad', course:'Math', date:'2024-02-10'},
-    { id:2, title:'Attendance Marked', course:'Physics', date:'2024-02-09'},
-    { id:3, title:'New Exam Created', course:'Arabic', date:'2024-02-08'}
-  ];
+      const statsRes = await axios.get('http://localhost:5000/api/teacher/dashboard', config);
+      setQuickStats(statsRes.data);
 
-  const upcomingClasses = [
-    { id:1, title:'Math Class', date:'2024-02-15', time:'09:00 AM'},
-    { id:2, title:'Physics Lecture', date:'2024-02-15', time:'11:00 AM'},
-    { id:3, title:'Islamic Studies', date:'2024-02-16', time:'10:00 AM'}
-  ];
+      const assignmentsRes = await axios.get('http://localhost:5000/api/teacher/assignments', config);
+      const assignments = assignmentsRes.data || [];
+      
+      const examsRes = await axios.get('http://localhost:5000/api/teacher/exams', config);
+      const exams = examsRes.data || [];
+
+      const attendanceRes = await axios.get('http://localhost:5000/api/teacher/attendance', config);
+      const attendance = attendanceRes.data || [];
+
+      const monthlyAttendance = {};
+      attendance.forEach(record => {
+        const month = new Date(record.date).toLocaleString('default', { month: 'short' });
+        if (!monthlyAttendance[month]) {
+          monthlyAttendance[month] = { total: 0, present: 0 };
+        }
+        monthlyAttendance[month].total++;
+        if (record.status === 'present') monthlyAttendance[month].present++;
+      });
+      
+      const attendanceChart = Object.keys(monthlyAttendance).map(month => ({
+        month,
+        rate: Math.round((monthlyAttendance[month].present / monthlyAttendance[month].total) * 100)
+      }));
+      setClassAttendanceData(attendanceChart);
+
+      const activities = [
+        ...assignments.slice(0, 2).map(a => ({
+          id: a._id,
+          title: 'Assignment: ' + a.title,
+          course: a.subject?.name,
+          date: a.dueDate
+        })),
+        ...exams.slice(0, 1).map(e => ({
+          id: e._id,
+          title: 'Exam: ' + e.name,
+          course: e.subject?.name,
+          date: e.date
+        }))
+      ];
+      setRecentActivity(activities);
+
+      const upcoming = exams.filter(e => e.status === 'upcoming').slice(0, 3).map(e => ({
+        id: e._id,
+        title: e.name,
+        date: e.date,
+        time: '10:00 AM'
+      }));
+      setUpcomingClasses(upcoming);
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
@@ -73,8 +131,8 @@ const TeacherDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
           <Card>
-            <p className="text-gray-600">Courses Teaching</p>
-            <p className="text-2xl font-bold">{quickStats.coursesTeaching}</p>
+            <p className="text-gray-600">Total Subjects</p>
+            <p className="text-2xl font-bold">{quickStats.totalSubjects}</p>
           </Card>
 
           <Card>
@@ -83,13 +141,13 @@ const TeacherDashboard = () => {
           </Card>
 
           <Card>
-            <p className="text-gray-600">Assignments To Review</p>
-            <p className="text-2xl font-bold">{quickStats.assignmentsToReview}</p>
+            <p className="text-gray-600">Pending Assignments</p>
+            <p className="text-2xl font-bold">{quickStats.pendingAssignments}</p>
           </Card>
 
           <Card>
-            <p className="text-gray-600">Today's Classes</p>
-            <p className="text-2xl font-bold">{quickStats.todayClasses}</p>
+            <p className="text-gray-600">Total Classes</p>
+            <p className="text-2xl font-bold">{quickStats.totalClasses}</p>
           </Card>
 
         </div>

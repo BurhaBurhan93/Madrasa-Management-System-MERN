@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = ({ setIsAuthenticated }) => {
   const [selectedRole, setSelectedRole] = useState('student');
@@ -81,24 +82,24 @@ const Login = ({ setIsAuthenticated }) => {
 
     setIsLoading(true);
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Check credentials against demo credentials (no database)
-    const creds = demoCredentials[selectedRole];
-    if (formData.username === creds.username && formData.password === creds.password) {
-      // Create mock user data
-      const mockUser = {
-        id: `${selectedRole}_001`,
-        name: `${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} User`,
-        email: creds.username,
+    try {
+      // Call backend API for login
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email: formData.username,
+        password: formData.password,
         role: selectedRole
-      };
+      });
+
+      const { token, user } = response.data;
       
-      // Store user info (no JWT token needed for demo)
+      // Store token and user info
+      localStorage.setItem('token', token);
       localStorage.setItem('userRole', selectedRole);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('isAuthenticated', 'true');
+      
+      // Set axios default header for future requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
       if (setIsAuthenticated) {
         setIsAuthenticated(true);
@@ -121,13 +122,14 @@ const Login = ({ setIsAuthenticated }) => {
         default:
           navigate('/');
       }
-    } else {
+    } catch (error) {
+      console.error('Login error:', error);
       setErrors({ 
-        general: 'Invalid credentials. Please try again.' 
+        general: error.response?.data?.message || 'Invalid credentials. Please try again.' 
       });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const getRoleColor = () => {

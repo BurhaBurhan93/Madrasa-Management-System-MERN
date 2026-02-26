@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { BarChartComponent, LineChartComponent } from '../components/UIHelper/Chart';
 import Card from '../components/UIHelper/Card';
 import Avatar from '../components/UIHelper/Avatar';
@@ -8,44 +9,137 @@ import { formatDate, formatGrade, calculatePercentage } from '../lib/utils';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [studentProfile, setStudentProfile] = useState(null);
   const [quickStats, setQuickStats] = useState({
-    totalCourses: 5,
-    attendanceRate: 95,
-    assignmentsPending: 3,
-    upcomingExams: 2
+    totalCourses: 0,
+    attendanceRate: 0,
+    assignmentsPending: 0,
+    upcomingExams: 0
   });
   
-  const [recentActivity, setRecentActivity] = useState([
-    { id: 1, title: 'Assignment Submitted', course: 'Mathematics', date: '2024-02-10', type: 'assignment' },
-    { id: 2, title: 'Exam Result Published', course: 'Physics', grade: 'A-', date: '2024-02-09', type: 'exam' },
-    { id: 3, title: 'Fee Payment Made', amount: '$250', date: '2024-02-08', type: 'payment' },
-    { id: 4, title: 'Attendance Marked', date: '2024-02-07', type: 'attendance' }
-  ]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [performanceData, setPerformanceData] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
 
-  // Mock data for charts
-  const attendanceData = [
-    { month: 'Jan', rate: 98 },
-    { month: 'Feb', rate: 95 },
-    { month: 'Mar', rate: 92 },
-    { month: 'Apr', rate: 96 },
-    { month: 'May', rate: 94 },
-    { month: 'Jun', rate: 97 }
-  ];
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  const performanceData = [
-    { subject: 'Math', score: 85 },
-    { subject: 'Science', score: 78 },
-    { subject: 'English', score: 92 },
-    { subject: 'Arabic', score: 88 },
-    { subject: 'Islamic Studies', score: 95 }
-  ];
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+      // Fetch student profile
+      const profileRes = await axios.get('http://localhost:5000/api/student/profile', config);
+      setStudentProfile(profileRes.data);
 
-  const upcomingEvents = [
-    { id: 1, title: 'Mathematics Exam', date: '2024-02-15', time: '10:00 AM', type: 'exam' },
-    { id: 2, title: 'Assignment Submission', course: 'Physics', date: '2024-02-16', time: '11:59 PM', type: 'assignment' },
-    { id: 3, title: 'Islamic Studies Quiz', date: '2024-02-18', time: '2:00 PM', type: 'quiz' },
-    { id: 4, title: 'Parent-Teacher Meeting', date: '2024-02-20', time: '3:00 PM', type: 'meeting' }
-  ];
+      // Fetch courses
+      const coursesRes = await axios.get('http://localhost:5000/api/student/courses', config);
+      
+      // Fetch attendance
+      const attendanceRes = await axios.get('http://localhost:5000/api/student/attendance', config);
+      
+      // Fetch assignments
+      const assignmentsRes = await axios.get('http://localhost:5000/api/student/assignments', config);
+      
+      // Fetch exams
+      const examsRes = await axios.get('http://localhost:5000/api/student/exams', config);
+
+      // Calculate stats
+      const totalCourses = coursesRes.data?.length || 0;
+      const attendanceRecords = attendanceRes.data || [];
+      const presentCount = attendanceRecords.filter(r => r.status === 'present').length;
+      const attendanceRate = attendanceRecords.length > 0 
+        ? Math.round((presentCount / attendanceRecords.length) * 100) 
+        : 0;
+      const assignmentsPending = assignmentsRes.data?.filter(a => a.status === 'active').length || 0;
+      const upcomingExams = examsRes.data?.filter(e => e.status === 'upcoming').length || 0;
+
+      setQuickStats({
+        totalCourses,
+        attendanceRate,
+        assignmentsPending,
+        upcomingExams
+      });
+
+      // Set attendance chart data
+      const monthlyAttendance = {};
+      attendanceRecords.forEach(record => {
+        const month = new Date(record.date).toLocaleString('default', { month: 'short' });
+        if (!monthlyAttendance[month]) {
+          monthlyAttendance[month] = { total: 0, present: 0 };
+        }
+        monthlyAttendance[month].total++;
+        if (record.status === 'present') {
+          monthlyAttendance[month].present++;
+        }
+      });
+      
+      const attendanceChartData = Object.keys(monthlyAttendance).map(month => ({
+        month,
+        rate: Math.round((monthlyAttendance[month].present / monthlyAttendance[month].total) * 100)
+      }));
+      setAttendanceData(attendanceChartData);
+
+      // Set upcoming events from exams and assignments
+      const events = [
+        ...(examsRes.data || []).map(exam => ({
+          id: exam._id,
+          title: exam.name,
+          date: exam.date,
+          time: '10:00 AM',
+          type: 'exam'
+        })),
+        ...(assignmentsRes.data || []).map(assignment => ({
+          id: assignment._id,
+          title: assignment.title,
+          course: assignment.subject?.name,
+          date: assignment.dueDate,
+          time: '11:59 PM',
+          type: 'assignment'
+        }))
+      ].slice(0, 4);
+      setUpcomingEvents(events);
+
+      // Set recent activity
+      const activities = [
+        ...(assignmentsRes.data || []).slice(0, 2).map(a => ({
+          id: a._id,
+          title: 'Assignment: ' + a.title,
+          course: a.subject?.name,
+          date: a.dueDate,
+          type: 'assignment'
+        })),
+        ...(attendanceRecords || []).slice(0, 2).map(r => ({
+          id: r._id,
+          title: `Attendance: ${r.status}`,
+          date: r.date,
+          type: 'attendance'
+        }))
+      ];
+      setRecentActivity(activities);
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
@@ -56,15 +150,15 @@ const StudentDashboard = () => {
 
       <div>
       {/* Student Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 mb-8 text-white">
+      <div className="bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl p-6 mb-8 text-white">
         <div className="flex items-center">
-          <Avatar alt="Ahmed Mohamed" size="xl" className="mr-4" />
+          <Avatar alt={studentProfile?.userId?.name || 'Student'} size="xl" className="mr-4" />
           <div>
-            <h2 className="text-2xl font-bold">Ahmed Mohamed</h2>
-            <p className="text-blue-100">Student ID: STU2024001</p>
+            <h2 className="text-2xl font-bold">{studentProfile?.userId?.name || 'Student'}</h2>
+            <p className="text-blue-100">Student ID: {studentProfile?.studentId || 'N/A'}</p>
             <div className="mt-2 flex items-center space-x-4">
-              <span className="bg-blue-400 bg-opacity-30 px-3 py-1 rounded-full text-sm">Active</span>
-              <span className="bg-blue-400 bg-opacity-30 px-3 py-1 rounded-full text-sm">Fall 2023</span>
+              <span className="bg-white bg-opacity-30 px-3 py-1 rounded-full text-sm">{studentProfile?.status || 'Active'}</span>
+              <span className="bg-white bg-opacity-30 px-3 py-1 rounded-full text-sm">{studentProfile?.class || 'Class N/A'}</span>
             </div>
           </div>
         </div>

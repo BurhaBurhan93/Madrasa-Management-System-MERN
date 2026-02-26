@@ -8,6 +8,7 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   emailVerifiedAt: { type: Date, default: null },
   password: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'student', 'teacher', 'staff'], required: true },
   roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }],
   idNumber: { type: String, trim: true },
   permanentAddress: {
