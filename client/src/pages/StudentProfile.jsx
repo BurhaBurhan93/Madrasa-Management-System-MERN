@@ -1,33 +1,39 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/UIHelper/Card';
 import Input from '../components/UIHelper/Input';
 import Button from '../components/UIHelper/Button';
 import Avatar from '../components/UIHelper/Avatar';
 import Badge from '../components/UIHelper/Badge';
+import axios from 'axios';
 
 const StudentProfile = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({
-    firstName: 'Ahmed',
-    lastName: 'Mohamed',
-    email: 'ahmed.mohamed@example.com',
-    username: 'ahmed_mohamed',
-    studentId: 'STU2024001',
-    phoneNumber: '+1234567890',
-    dateOfBirth: '2000-05-15',
-    address: '123 Education Street, Knowledge City',
+    name: '',
+    fatherName: '',
+    email: '',
+    phone: '',
+    whatsapp: '',
+    dob: '',
+    bloodType: '',
+    idNumber: '',
+    permanentAddress: { province: '', district: '', village: '' },
+    currentAddress: { province: '', district: '', village: '' },
+    role: '',
+    status: '',
     profilePicture: null
   });
 
   const [editMode, setEditMode] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  
-  const [imagePreview, setImagePreview] = useState(null);
   
   // Security related state
   const [showSecurity, setShowSecurity] = useState(false);
@@ -39,8 +45,6 @@ const StudentProfile = () => {
   ]);
 
   const [securityErrors, setSecurityErrors] = useState({});
-  
-  const fileInputRef = useRef(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -54,15 +58,21 @@ const StudentProfile = () => {
     setEditMode(!editMode);
   };
 
-  const handleSave = () => {
-    // In a real app, you would save to the backend
-    setEditMode(false);
-    alert('Profile updated successfully!');
+  const handleSave = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      await axios.put(`http://localhost:5000/api/users/${userId}`, userData);
+      setEditMode(false);
+      alert('Profile updated successfully!');
+      fetchUserData();
+    } catch (error) {
+      alert('Error updating profile: ' + (error.response?.data?.message || error.message));
+    }
   };
 
   const handleCancel = () => {
-    // Reset to original data
     setEditMode(false);
+    fetchUserData();
   };
 
   const handleImageChange = (e) => {
@@ -148,6 +158,17 @@ const StudentProfile = () => {
   };
 
 
+  if (loading) {
+    return (
+      <div className="w-full bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-gray-50 min-h-screen">
       <div className="py-6 mb-8">
@@ -191,23 +212,27 @@ const StudentProfile = () => {
                 </div>
                 
                 <h2 className="mt-4 text-xl font-semibold text-gray-900">
-                  {userData.firstName} {userData.lastName}
+                  {userData.name}
                 </h2>
-                <p className="text-gray-600">Student ID: {userData.studentId}</p>
+                <p className="text-gray-600">{userData.email}</p>
                 
                 <div className="mt-6 space-y-2">
                   <div className="flex flex-col sm:flex-row justify-between gap-2">
                     <span className="text-gray-600">Role:</span>
-                    <span className="font-medium">Student</span>
+                    <span className="font-medium">{userData.role?.charAt(0).toUpperCase() + userData.role?.slice(1)}</span>
                   </div>
                   <div className="flex flex-col sm:flex-row justify-between gap-2">
                     <span className="text-gray-600">Status:</span>
-                    <Badge variant="success">Active</Badge>
+                    <Badge variant={userData.status === 'active' ? 'success' : 'danger'}>
+                      {userData.status?.charAt(0).toUpperCase() + userData.status?.slice(1)}
+                    </Badge>
                   </div>
-                  <div className="flex flex-col sm:flex-row justify-between gap-2">
-                    <span className="text-gray-600">Enrollment:</span>
-                    <span className="font-medium">Fall 2023</span>
-                  </div>
+                  {userData.phone && (
+                    <div className="flex flex-col sm:flex-row justify-between gap-2">
+                      <span className="text-gray-600">Phone:</span>
+                      <span className="font-medium">{userData.phone}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
@@ -239,109 +264,34 @@ const StudentProfile = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="First Name"
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  value={userData.firstName}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                />
-                
-                <Input
-                  label="Last Name"
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  value={userData.lastName}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                />
-                
-                <Input
-                  label="Email"
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={userData.email}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                />
-                
-                <Input
-                  label="Username"
-                  id="username"
-                  name="username"
-                  type="text"
-                  value={userData.username}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                />
-                
-                <Input
-                  label="Student ID"
-                  id="studentId"
-                  name="studentId"
-                  type="text"
-                  value={userData.studentId}
-                  onChange={handleInputChange}
-                  disabled={true} // Student ID is not editable
-                />
-                
-                <Input
-                  label="Phone Number"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  type="tel"
-                  value={userData.phoneNumber}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                />
-                
-                <Input
-                  label="Date of Birth"
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  type="date"
-                  value={userData.dateOfBirth}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                />
-              </div>
-              
-              <div className="mt-4">
-                <Input
-                  label="Address"
-                  id="address"
-                  name="address"
-                  type="textarea"
-                  value={userData.address}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                />
+                <Input label="Name" name="name" value={userData.name || ''} onChange={handleInputChange} disabled={!editMode} />
+                <Input label="Father Name" name="fatherName" value={userData.fatherName || ''} onChange={handleInputChange} disabled={!editMode} />
+                <Input label="Email" name="email" value={userData.email || ''} onChange={handleInputChange} disabled={!editMode} />
+                <Input label="Phone" name="phone" value={userData.phone || ''} onChange={handleInputChange} disabled={!editMode} />
+                <Input label="WhatsApp" name="whatsapp" value={userData.whatsapp || ''} onChange={handleInputChange} disabled={!editMode} />
+                <Input label="Date of Birth" type="date" name="dob" value={userData.dob || ''} onChange={handleInputChange} disabled={!editMode} />
+                <Input label="Blood Type" name="bloodType" value={userData.bloodType || ''} onChange={handleInputChange} disabled={!editMode} />
+                <Input label="ID Number" name="idNumber" value={userData.idNumber || ''} onChange={handleInputChange} disabled={!editMode} />
               </div>
             </Card>
 
-            {/* Academic Information */}
+            {/* Address Information */}
             <Card>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Academic Information</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Current Semester</label>
-                  <p className="text-gray-900">Fall 2023</p>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Address Information</h2>
+              <div className="mb-4">
+                <h3 className="font-medium text-gray-700 mb-2">Permanent Address</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Input label="Province" value={userData.permanentAddress?.province || ''} onChange={(e) => setUserData({...userData, permanentAddress: {...userData.permanentAddress, province: e.target.value}})} disabled={!editMode} />
+                  <Input label="District" value={userData.permanentAddress?.district || ''} onChange={(e) => setUserData({...userData, permanentAddress: {...userData.permanentAddress, district: e.target.value}})} disabled={!editMode} />
+                  <Input label="Village" value={userData.permanentAddress?.village || ''} onChange={(e) => setUserData({...userData, permanentAddress: {...userData.permanentAddress, village: e.target.value}})} disabled={!editMode} />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">GPA</label>
-                  <p className="text-gray-900">3.7</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Credits Completed</label>
-                  <p className="text-gray-900">45</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Expected Graduation</label>
-                  <p className="text-gray-900">Spring 2025</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-700 mb-2">Current Address</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Input label="Province" value={userData.currentAddress?.province || ''} onChange={(e) => setUserData({...userData, currentAddress: {...userData.currentAddress, province: e.target.value}})} disabled={!editMode} />
+                  <Input label="District" value={userData.currentAddress?.district || ''} onChange={(e) => setUserData({...userData, currentAddress: {...userData.currentAddress, district: e.target.value}})} disabled={!editMode} />
+                  <Input label="Village" value={userData.currentAddress?.village || ''} onChange={(e) => setUserData({...userData, currentAddress: {...userData.currentAddress, village: e.target.value}})} disabled={!editMode} />
                 </div>
               </div>
             </Card>
@@ -518,13 +468,13 @@ const StudentProfile = () => {
       <div className="bg-gray-50 border-t p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-semibold">
-            {(userData.firstName?.[0] || 'S')}
+            {userData.name?.[0] || 'S'}
           </div>
           <div>
             <p className="font-medium leading-tight text-gray-900">
-              {userData.firstName} {userData.lastName}
+              {userData.name}
             </p>
-            <p className="text-sm text-gray-500 leading-tight">ID: {userData.studentId}</p>
+            <p className="text-sm text-gray-500 leading-tight">{userData.email}</p>
           </div>
         </div>
         <button

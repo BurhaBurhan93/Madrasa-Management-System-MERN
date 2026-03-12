@@ -13,12 +13,29 @@ const StaffPanel = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useLocalStorage('staffSidebarOpen', true);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [user] = useLocalStorage('staffUser', {
-    name: 'Staff User',
-    role: 'Staff',
-    employeeId: 'STF2024001',
-    email: 'staff@example.com',
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        const res = await fetch(`http://localhost:5000/api/users/${userId}`);
+        const data = await res.json();
+        if (data.success) {
+          setUser(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -261,7 +278,7 @@ const StaffPanel = () => {
               </button>
               <div>
                 <h1 className="text-xl font-bold text-gray-800">
-                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600">{user.name}</span>!
+                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600">{user?.name || 'Staff'}</span>!
                 </h1>
                 <p className="text-sm text-gray-500">Manage library and complaints efficiently</p>
               </div>
@@ -286,15 +303,17 @@ const StaffPanel = () => {
               </button>
 
               {/* User Profile */}
-              <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-semibold text-gray-700">{user.name}</p>
-                  <p className="text-xs text-gray-500">{user.role}</p>
+              {user && (
+                <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-sm font-semibold text-gray-700">{user.name}</p>
+                    <p className="text-xs text-gray-500">{user.role}</p>
+                  </div>
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-cyan-200 to-cyan-400 text-white flex items-center justify-center text-sm font-bold shadow-md">
+                    {user.name?.[0] || 'S'}
+                  </div>
                 </div>
-                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-cyan-200 to-cyan-400 text-white flex items-center justify-center text-sm font-bold shadow-md">
-                  {user.name?.[0] || 'S'}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </header>

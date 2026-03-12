@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const TransactionSchema = new Schema({
-  transactionCode: { type: String, unique: true, required: true, trim: true },
+  transactionCode: { type: String, required: true, trim: true },
   account: { type: Schema.Types.ObjectId, ref: 'Account', required: true },
   transactionType: { type: String, enum: ['income','expense'], required: true },
   amount: { type: Number, required: true },

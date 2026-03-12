@@ -94,16 +94,14 @@ const seedDatabase = async () => {
 
     const createdStudents = [];
     for (let i = 0; i < Math.min(studentUsers.length, studentData.length); i++) {
-      const existing = await Student.findOne({ userId: studentUsers[i]._id });
+      const existing = await Student.findOne({ user: studentUsers[i]._id });
       if (!existing) {
         const student = await Student.create({
-          userId: studentUsers[i]._id,
-          ...studentData[i],
-          enrollmentDate: new Date(2024, 0, 15),
+          user: studentUsers[i]._id,
+          studentCode: studentData[i].studentId,
+          admissionDate: new Date(2024, 0, 15),
           status: 'active',
-          guardianName: `Guardian ${i + 1}`,
-          guardianPhone: `+123456789${i}`,
-          address: `Address ${i + 1}, City`
+          guardianPhone: `+123456789${i}`
         });
         createdStudents.push(student);
       }
@@ -128,15 +126,18 @@ const seedDatabase = async () => {
 
     const createdEmployees = [];
     for (let i = 0; i < Math.min(employeeUsers.length, employeeData.length); i++) {
-      const existing = await Employee.findOne({ userId: employeeUsers[i]._id });
+      const existing = await Employee.findOne({ user: employeeUsers[i]._id });
       if (!existing) {
         const employee = await Employee.create({
-          userId: employeeUsers[i]._id,
-          ...employeeData[i],
-          joinDate: new Date(2023, 5, 1),
+          user: employeeUsers[i]._id,
+          employeeCode: employeeData[i].employeeId,
+          fullName: employeeUsers[i].name,
+          employeeType: employeeData[i].type === 'teacher' ? 'teacher' : 'support',
+          designation: employeeData[i].designation,
+          department: employeeData[i].department,
+          joiningDate: new Date(2023, 5, 1),
           status: 'active',
-          salary: 50000 + (i * 5000),
-          phone: `+987654321${i}`
+          baseSalary: 50000 + (i * 5000)
         });
         createdEmployees.push(employee);
       }

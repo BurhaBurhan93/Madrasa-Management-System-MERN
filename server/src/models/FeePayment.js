@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const FeePaymentSchema = new Schema({
   studentFee: { type: Schema.Types.ObjectId, ref: 'StudentFee', required: true },
-  receiptNo: { type: String, unique: true, required: true, trim: true },
+  receiptNo: { type: String, required: true, trim: true },
   paymentDate: { type: Date, default: Date.now },
   paidAmount: { type: Number, required: true },
   paymentMethod: { type: String, enum: ['cash','card'], default: 'cash' },

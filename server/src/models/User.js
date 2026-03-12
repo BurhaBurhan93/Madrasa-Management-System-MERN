@@ -5,7 +5,7 @@ const UserSchema = new Schema({
   name: { type: String, required: true, trim: true },
   fatherName: { type: String, trim: true },
   grandfatherName: { type: String, trim: true },
-  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  email: { type: String, required: true, lowercase: true, trim: true },
   emailVerifiedAt: { type: Date, default: null },
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'student', 'teacher', 'staff'], required: true },

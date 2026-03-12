@@ -10,6 +10,7 @@ import { formatDate, formatGrade, calculatePercentage } from '../lib/utils';
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [studentProfile, setStudentProfile] = useState(null);
   const [quickStats, setQuickStats] = useState({
     totalCourses: 0,
@@ -24,8 +25,23 @@ const StudentDashboard = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
 
   useEffect(() => {
+    fetchUserData();
     fetchDashboardData();
   }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        const res = await axios.get(`http://localhost:5000/api/users/${userId}`);
+        if (res.data.success) {
+          setUser(res.data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -150,19 +166,29 @@ const StudentDashboard = () => {
 
       <div>
       {/* Student Header */}
-      <div className="bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl p-6 mb-8 text-white">
-        <div className="flex items-center">
-          <Avatar alt={studentProfile?.userId?.name || 'Student'} size="xl" className="mr-4" />
-          <div>
-            <h2 className="text-2xl font-bold">{studentProfile?.userId?.name || 'Student'}</h2>
-            <p className="text-blue-100">Student ID: {studentProfile?.studentId || 'N/A'}</p>
-            <div className="mt-2 flex items-center space-x-4">
-              <span className="bg-white bg-opacity-30 px-3 py-1 rounded-full text-sm">{studentProfile?.status || 'Active'}</span>
-              <span className="bg-white bg-opacity-30 px-3 py-1 rounded-full text-sm">{studentProfile?.class || 'Class N/A'}</span>
+      {user && (
+        <div className="bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl p-6 mb-8 text-white">
+          <div className="flex items-center">
+            <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold mr-4">
+              {user.name?.split(' ').map(n => n[0]).join('') || 'S'}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">{user.name}</h2>
+              <p className="text-blue-100">{user.email}</p>
+              <div className="mt-2 flex items-center space-x-4">
+                <span className="bg-white bg-opacity-30 px-3 py-1 rounded-full text-sm">
+                  {user.role?.charAt(0).toUpperCase() + user.role?.slice(1)}
+                </span>
+                {user.phone && (
+                  <span className="bg-white bg-opacity-30 px-3 py-1 rounded-full text-sm">
+                    📞 {user.phone}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Quick Stats */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

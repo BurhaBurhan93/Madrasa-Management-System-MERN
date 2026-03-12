@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const EmployeeSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  employeeCode: { type: String, unique: true, trim: true },
+  employeeCode: { type: String, trim: true },
   fullName: { type: String, required: true, trim: true },
   employeeType: { type: String, enum: ['teacher','admin','support'], default: 'support' },
   designation: { type: String, trim: true },

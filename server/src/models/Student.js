@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const StudentSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  studentCode: { type: String, unique: true, trim: true },
+  studentCode: { type: String, trim: true },
   guardianPhone: { type: String, trim: true },
   admissionDate: { type: Date },
   currentClass: { type: Schema.Types.ObjectId, ref: 'Class' },

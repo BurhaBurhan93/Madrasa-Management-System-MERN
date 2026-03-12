@@ -19,6 +19,10 @@ import StaffPanel from './panels/StaffPanel';
 
 // ================= ADMIN PAGES =================
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
+import UserIndex from './pages/admin/users/UserIndex';
+import UserRegister from './pages/admin/users/UserRegister';
+import UserEdit from './pages/admin/users/UserEdit';
 
 // ================= STUDENT PAGES =================
 import StudentDashboard from './pages/StudentDashboard';
@@ -82,27 +86,33 @@ import StaffComplaintReports from './pages/staff/complaints/Reports';
 
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
+  const [userRole, setUserRole] = useState(() => {
+    return localStorage.getItem('userRole');
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already authenticated
+    const token = localStorage.getItem('token');
     const auth = localStorage.getItem('isAuthenticated');
     const role = localStorage.getItem('userRole');
-    const token = localStorage.getItem('token');
     
     if (auth === 'true' && role && token) {
       setIsAuthenticated(true);
       setUserRole(role);
-      // Set axios default header
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
+    setLoading(false);
   }, []);
 
   // Protected route wrapper component
   const ProtectedRoute = ({ children, allowedRoles }) => {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('userRole');
+    
+    if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
     
     if (!token || !isAuthenticated) {
       return <Navigate to="/login" replace />;
@@ -132,7 +142,9 @@ function App() {
           }>
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="users" element={<div className="p-6"><h1 className="text-2xl font-bold">All Users</h1><p className="text-gray-600 mt-2">User management page coming soon...</p></div>} />
+            <Route path="users" element={<UserIndex />} />
+            <Route path="users/register" element={<UserRegister />} />
+            <Route path="users/edit/:id" element={<UserEdit />} />
             <Route path="users/students" element={<div className="p-6"><h1 className="text-2xl font-bold">Students</h1><p className="text-gray-600 mt-2">Student management page coming soon...</p></div>} />
             <Route path="users/teachers" element={<div className="p-6"><h1 className="text-2xl font-bold">Teachers</h1><p className="text-gray-600 mt-2">Teacher management page coming soon...</p></div>} />
             <Route path="users/staff" element={<div className="p-6"><h1 className="text-2xl font-bold">Staff</h1><p className="text-gray-600 mt-2">Staff management page coming soon...</p></div>} />

@@ -94,6 +94,7 @@ const Login = ({ setIsAuthenticated }) => {
       
       // Store token and user info
       localStorage.setItem('token', token);
+      localStorage.setItem('userId', user._id);
       localStorage.setItem('userRole', selectedRole);
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('isAuthenticated', 'true');

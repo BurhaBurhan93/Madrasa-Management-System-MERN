@@ -1,18 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChartComponent, LineChartComponent, PieChartComponent } from '../../components/UIHelper/Chart';
 import Card from '../../components/UIHelper/Card';
 import Avatar from '../../components/UIHelper/Avatar';
 import { formatDate } from '../../lib/utils';
+import axios from 'axios';
 
 const AdminDashboard = () => {
-  const [quickStats] = useState({
-    totalStudents: 450,
-    totalTeachers: 32,
-    totalStaff: 18,
+  const [quickStats, setQuickStats] = useState({
+    totalStudents: 0,
+    totalTeachers: 0,
+    totalStaff: 0,
     totalCourses: 48,
     monthlyRevenue: 125000,
     pendingComplaints: 12
   });
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/users');
+      const users = res.data.data;
+      setQuickStats(prev => ({
+        ...prev,
+        totalStudents: users.filter(u => u.role === 'student').length,
+        totalTeachers: users.filter(u => u.role === 'teacher').length,
+        totalStaff: users.filter(u => u.role === 'staff').length
+      }));
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
 
   const enrollmentData = [
     { month: 'Jan', students: 380 },
@@ -33,9 +53,9 @@ const AdminDashboard = () => {
   ];
 
   const userDistributionData = [
-    { name: 'Students', value: 450, color: '#3B82F6' },
-    { name: 'Teachers', value: 32, color: '#10B981' },
-    { name: 'Staff', value: 18, color: '#8B5CF6' },
+    { name: 'Students', value: quickStats.totalStudents, color: '#3B82F6' },
+    { name: 'Teachers', value: quickStats.totalTeachers, color: '#10B981' },
+    { name: 'Staff', value: quickStats.totalStaff, color: '#8B5CF6' },
     { name: 'Admins', value: 5, color: '#EF4444' }
   ];
 

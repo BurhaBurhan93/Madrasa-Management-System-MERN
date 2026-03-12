@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const FeeStructureSchema = new Schema({
-  feeCode: { type: String, unique: true, required: true, trim: true },
+  feeCode: { type: String, required: true, trim: true },
   feeName: { type: String, required: true, trim: true },
   class: { type: Schema.Types.ObjectId, ref: 'Class' },
   feeType: { type: String, enum: ['tuition','admission','other'], default: 'tuition' },

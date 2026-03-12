@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const ClassSchema = new Schema({
-  code: { type: String, unique: true, trim: true },
+  code: { type: String, trim: true },
   name: { type: String, required: true, trim: true },
   type: { type: String, enum: ['boys','girls','mixed'], default: 'mixed' },
   teacher: { type: Schema.Types.ObjectId, ref: 'User' },

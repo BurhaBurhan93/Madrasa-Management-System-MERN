@@ -13,12 +13,29 @@ const TeacherPanel = () => {
 
   const [sidebarOpen, setSidebarOpen] = useLocalStorage('teacherSidebarOpen', true);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [user] = useLocalStorage('teacherUser', {
-    name: 'Ustad Abdul Rahman',
-    role: 'Teacher',
-    employeeId: 'TCH2024001',
-    email: 'teacher@example.com',
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        const res = await fetch(`http://localhost:5000/api/users/${userId}`);
+        const data = await res.json();
+        if (data.success) {
+          setUser(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* ================= RESIZE HANDLER ================= */
   useEffect(() => {
@@ -225,6 +242,21 @@ const TeacherPanel = () => {
 
         {/* Bottom - Profile & Logout */}
         <div className="p-3 border-t border-gray-100">
+          {user && (
+            <div className={`mb-2 ${sidebarOpen ? 'px-3 py-2' : 'px-2 py-2'} bg-cyan-50 rounded-lg`}>
+              {sidebarOpen ? (
+                <div>
+                  <div className="text-sm font-semibold text-gray-800 truncate">{user.name}</div>
+                  <div className="text-xs text-gray-500 truncate">{user.email}</div>
+                  <div className="text-xs text-cyan-600 mt-1">Role: {user.role}</div>
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  <FiUser size={20} className="text-cyan-600" />
+                </div>
+              )}
+            </div>
+          )}
           <button
             onClick={() => handleNavigation('profile')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 mb-2 ${
@@ -277,7 +309,7 @@ const TeacherPanel = () => {
               </button>
               <div>
                 <h1 className="text-xl font-bold text-gray-800">
-                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600">{user.name}</span>!
+                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600">{user?.name || 'Teacher'}</span>!
                 </h1>
                 <p className="text-sm text-gray-500">Manage your classes and students efficiently</p>
               </div>
@@ -302,15 +334,17 @@ const TeacherPanel = () => {
               </button>
 
               {/* User Profile */}
-              <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-semibold text-gray-700">{user.name}</p>
-                  <p className="text-xs text-gray-500">{user.role}</p>
+              {user && (
+                <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-sm font-semibold text-gray-700">{user.name}</p>
+                    <p className="text-xs text-gray-500">{user.role}</p>
+                  </div>
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-cyan-200 to-cyan-400 text-white flex items-center justify-center text-sm font-bold shadow-md">
+                    {user.name?.split(' ').map(n => n[0]).join('') || 'T'}
+                  </div>
                 </div>
-                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-cyan-200 to-cyan-400 text-white flex items-center justify-center text-sm font-bold shadow-md">
-                  {user.name?.split(' ').map(n => n[0]).join('') || 'T'}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </header>
