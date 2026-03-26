@@ -1,7 +1,6 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+﻿const bcrypt = require('bcryptjs');
 
-// Import all models
+// Import models
 const User = require('./models/User');
 const Student = require('./models/Student');
 const Employee = require('./models/Employee');
@@ -10,527 +9,485 @@ const Subject = require('./models/Subject');
 const Book = require('./models/Book');
 const BookCategory = require('./models/BookCategory');
 const BorrowedBook = require('./models/BorrowedBook');
-const Complaint = require('./models/Complaint');
 const FeeStructure = require('./models/FeeStructure');
+const StudentFee = require('./models/StudentFee');
 const FeePayment = require('./models/FeePayment');
 const Exam = require('./models/Exam');
 const ExamType = require('./models/ExamType');
+const AttendanceSession = require('./models/AttendanceSession');
 const AttendanceRecord = require('./models/AttendanceRecord');
 const Assignment = require('./models/Assignment');
+const Complaint = require('./models/Complaint');
 const Transaction = require('./models/Transaction');
 const Expense = require('./models/Expense');
+const Account = require('./models/Account');
+const SalaryStructure = require('./models/SalaryStructure');
+const SalaryPayment = require('./models/SalaryPayment');
+const SalaryDeduction = require('./models/SalaryDeduction');
+const SalaryAdvance = require('./models/SalaryAdvance');
 const Role = require('./models/Role');
 const Permission = require('./models/Permission');
 
 const seedDatabase = async () => {
   try {
-    console.log('🌱 Starting database seeding...\n');
+    console.log('Starting database seeding...');
 
-    // Clear existing data to avoid conflicts
-    console.log('🗑️  Clearing existing users...');
-    await User.deleteMany({});
-    await Student.deleteMany({});
-    await Employee.deleteMany({});
-    console.log('✅ Existing data cleared\n');
+    // Clear existing data
+    await Promise.all([
+      User.deleteMany({}),
+      Student.deleteMany({}),
+      Employee.deleteMany({}),
+      Class.deleteMany({}),
+      Subject.deleteMany({}),
+      BookCategory.deleteMany({}),
+      Book.deleteMany({}),
+      BorrowedBook.deleteMany({}),
+      FeeStructure.deleteMany({}),
+      StudentFee.deleteMany({}),
+      FeePayment.deleteMany({}),
+      Exam.deleteMany({}),
+      ExamType.deleteMany({}),
+      AttendanceSession.deleteMany({}),
+      AttendanceRecord.deleteMany({}),
+      Assignment.deleteMany({}),
+      Complaint.deleteMany({}),
+      Account.deleteMany({}),
+      Transaction.deleteMany({}),
+      Expense.deleteMany({}),
+      SalaryStructure.deleteMany({}),
+      SalaryPayment.deleteMany({}),
+      SalaryDeduction.deleteMany({}),
+      SalaryAdvance.deleteMany({}),
+      Role.deleteMany({}),
+      Permission.deleteMany({})
+    ]);
 
-    // ========== 1. ROLES & PERMISSIONS ==========
-    console.log('📋 Seeding Roles and Permissions...');
-    const roles = ['admin', 'student', 'teacher', 'staff'];
-    for (let i = 0; i < roles.length; i++) {
-      await Role.findOneAndUpdate(
-        { name: roles[i] },
-        { name: roles[i], description: `${roles[i]} role` },
-        { upsert: true }
-      );
-    }
-    console.log('✅ Roles created\n');
+    // Permissions & Roles
+    const permissions = await Permission.insertMany([
+      { name: 'view_finance', description: 'View finance data' },
+      { name: 'manage_finance', description: 'Manage finance data' },
+      { name: 'manage_library', description: 'Manage library data' },
+      { name: 'manage_students', description: 'Manage students data' }
+    ]);
 
-    // ========== 2. USERS (10 records) ==========
-    console.log('👥 Seeding Users...');
-    const userData = [
+    const roleMap = {
+      admin: permissions.map(p => p._id),
+      staff: permissions.map(p => p._id),
+      teacher: [permissions[0]._id],
+      student: []
+    };
+
+    await Role.insertMany([
+      { name: 'admin', description: 'Admin role', permissions: roleMap.admin },
+      { name: 'staff', description: 'Staff role', permissions: roleMap.staff },
+      { name: 'teacher', description: 'Teacher role', permissions: roleMap.teacher },
+      { name: 'student', description: 'Student role', permissions: roleMap.student }
+    ]);
+
+    // Users
+    const usersData = [
       { name: 'Admin User', email: 'admin@gmail.com', password: 'admin1234', role: 'admin' },
-      { name: 'Student Demo', email: 'student@gmail.com', password: 'student1234', role: 'student' },
+      { name: 'Student One', email: 'student@gmail.com', password: 'student1234', role: 'student' },
       { name: 'Student Two', email: 'student2@gmail.com', password: 'student1234', role: 'student' },
-      { name: 'Student Three', email: 'student3@gmail.com', password: 'student1234', role: 'student' },
-      { name: 'Teacher Demo', email: 'teacher@gmail.com', password: 'teacher1234', role: 'teacher' },
+      { name: 'Teacher One', email: 'teacher@gmail.com', password: 'teacher1234', role: 'teacher' },
       { name: 'Teacher Two', email: 'teacher2@gmail.com', password: 'teacher1234', role: 'teacher' },
-      { name: 'Staff Demo', email: 'staff@gmail.com', password: 'staff1234', role: 'staff' },
-      { name: 'Staff Two', email: 'staff2@gmail.com', password: 'staff1234', role: 'staff' },
-      { name: 'Student Four', email: 'student4@gmail.com', password: 'student1234', role: 'student' },
-      { name: 'Teacher Three', email: 'teacher3@gmail.com', password: 'teacher1234', role: 'teacher' }
+      { name: 'Staff One', email: 'staff@gmail.com', password: 'staff1234', role: 'staff' },
+      { name: 'Staff Two', email: 'staff2@gmail.com', password: 'staff1234', role: 'staff' }
     ];
 
     const createdUsers = [];
-    for (const user of userData) {
-      const existing = await User.findOne({ email: user.email });
-      if (!existing) {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
-        const newUser = await User.create({
-          ...user,
-          password: hashedPassword
-        });
-        createdUsers.push(newUser);
-      } else {
-        createdUsers.push(existing);
-      }
+    for (const u of usersData) {
+      const hashed = await bcrypt.hash(u.password, 10);
+      const user = await User.create({ ...u, password: hashed });
+      createdUsers.push(user);
     }
-    console.log(`✅ ${createdUsers.length} Users created\n`);
 
-    // ========== 3. STUDENTS (10 records) ==========
-    console.log('🎓 Seeding Students...');
-    const studentUsers = createdUsers.filter(u => u.role === 'student');
-    const studentData = [
-      { studentId: 'STU2024001', class: 'Class 10', section: 'A', rollNumber: '101' },
-      { studentId: 'STU2024002', class: 'Class 9', section: 'B', rollNumber: '102' },
-      { studentId: 'STU2024003', class: 'Class 10', section: 'A', rollNumber: '103' },
-      { studentId: 'STU2024004', class: 'Class 8', section: 'C', rollNumber: '104' },
-      { studentId: 'STU2024005', class: 'Class 11', section: 'A', rollNumber: '105' },
-      { studentId: 'STU2024006', class: 'Class 9', section: 'A', rollNumber: '106' },
-      { studentId: 'STU2024007', class: 'Class 10', section: 'B', rollNumber: '107' },
-      { studentId: 'STU2024008', class: 'Class 12', section: 'A', rollNumber: '108' },
-      { studentId: 'STU2024009', class: 'Class 8', section: 'B', rollNumber: '109' },
-      { studentId: 'STU2024010', class: 'Class 11', section: 'B', rollNumber: '110' }
-    ];
+    const adminUser = createdUsers.find(u => u.role === 'admin');
 
-    const createdStudents = [];
-    for (let i = 0; i < Math.min(studentUsers.length, studentData.length); i++) {
-      const existing = await Student.findOne({ user: studentUsers[i]._id });
-      if (!existing) {
-        const student = await Student.create({
-          user: studentUsers[i]._id,
-          studentCode: studentData[i].studentId,
-          admissionDate: new Date(2024, 0, 15),
-          status: 'active',
-          guardianPhone: `+123456789${i}`
-        });
-        createdStudents.push(student);
-      }
-    }
-    console.log(`✅ ${createdStudents.length} Students created\n`);
-
-    // ========== 4. EMPLOYEES (Teachers & Staff - 10 records) ==========
-    console.log('👔 Seeding Employees...');
-    const employeeUsers = createdUsers.filter(u => u.role === 'teacher' || u.role === 'staff');
-    const employeeData = [
-      { employeeId: 'EMP2024001', department: 'Mathematics', designation: 'Senior Teacher', type: 'teacher' },
-      { employeeId: 'EMP2024002', department: 'Science', designation: 'Teacher', type: 'teacher' },
-      { employeeId: 'EMP2024003', department: 'Library', designation: 'Librarian', type: 'staff' },
-      { employeeId: 'EMP2024004', department: 'Administration', designation: 'Admin Staff', type: 'staff' },
-      { employeeId: 'EMP2024005', department: 'English', designation: 'Teacher', type: 'teacher' },
-      { employeeId: 'EMP2024006', department: 'Accounts', designation: 'Accountant', type: 'staff' },
-      { employeeId: 'EMP2024007', department: 'IT', designation: 'IT Staff', type: 'staff' },
-      { employeeId: 'EMP2024008', department: 'Physics', designation: 'Teacher', type: 'teacher' },
-      { employeeId: 'EMP2024009', department: 'Administration', designation: 'Office Staff', type: 'staff' },
-      { employeeId: 'EMP2024010', department: 'Chemistry', designation: 'Teacher', type: 'teacher' }
-    ];
-
-    const createdEmployees = [];
-    for (let i = 0; i < Math.min(employeeUsers.length, employeeData.length); i++) {
-      const existing = await Employee.findOne({ user: employeeUsers[i]._id });
-      if (!existing) {
-        const employee = await Employee.create({
-          user: employeeUsers[i]._id,
-          employeeCode: employeeData[i].employeeId,
-          fullName: employeeUsers[i].name,
-          employeeType: employeeData[i].type === 'teacher' ? 'teacher' : 'support',
-          designation: employeeData[i].designation,
-          department: employeeData[i].department,
-          joiningDate: new Date(2023, 5, 1),
-          status: 'active',
-          baseSalary: 50000 + (i * 5000)
-        });
-        createdEmployees.push(employee);
-      }
-    }
-    console.log(`✅ ${createdEmployees.length} Employees created\n`);
-
-    // ========== 5. CLASSES (10 records) ==========
-    console.log('🏫 Seeding Classes...');
+    // Classes
     const classData = [
-      { name: 'Class 6', section: 'A', capacity: 40 },
-      { name: 'Class 6', section: 'B', capacity: 40 },
-      { name: 'Class 7', section: 'A', capacity: 40 },
-      { name: 'Class 8', section: 'A', capacity: 40 },
-      { name: 'Class 8', section: 'B', capacity: 40 },
-      { name: 'Class 9', section: 'A', capacity: 45 },
-      { name: 'Class 10', section: 'A', capacity: 45 },
-      { name: 'Class 10', section: 'B', capacity: 45 },
-      { name: 'Class 11', section: 'A', capacity: 35 },
-      { name: 'Class 12', section: 'A', capacity: 35 }
+      { code: 'CLS-6A', name: 'Class 6', type: 'mixed', maxStudents: 40 },
+      { code: 'CLS-6B', name: 'Class 6', type: 'mixed', maxStudents: 40 },
+      { code: 'CLS-7A', name: 'Class 7', type: 'mixed', maxStudents: 40 },
+      { code: 'CLS-8A', name: 'Class 8', type: 'mixed', maxStudents: 40 }
     ];
 
     const createdClasses = [];
     for (let i = 0; i < classData.length; i++) {
-      const existing = await Class.findOne({ name: classData[i].name, section: classData[i].section });
-      if (!existing) {
-        const newClass = await Class.create({
-          ...classData[i],
-          academicYear: '2024-2025',
-          classTeacher: createdEmployees[i % createdEmployees.length]?._id
-        });
-        createdClasses.push(newClass);
-      }
+      const teacherUser = createdUsers.find(u => u.role === 'teacher');
+      const newClass = await Class.create({
+        ...classData[i],
+        teacher: teacherUser?._id
+      });
+      createdClasses.push(newClass);
     }
-    console.log(`✅ ${createdClasses.length} Classes created\n`);
 
-    // ========== 6. SUBJECTS (10 records) ==========
-    console.log('📚 Seeding Subjects...');
-    const subjectData = [
-      { name: 'Mathematics', code: 'MATH101', description: 'Basic Mathematics' },
-      { name: 'Physics', code: 'PHY101', description: 'General Physics' },
-      { name: 'Chemistry', code: 'CHEM101', description: 'General Chemistry' },
-      { name: 'Biology', code: 'BIO101', description: 'General Biology' },
-      { name: 'English', code: 'ENG101', description: 'English Language' },
-      { name: 'Urdu', code: 'URD101', description: 'Urdu Language' },
-      { name: 'Islamic Studies', code: 'ISL101', description: 'Islamic Education' },
-      { name: 'Computer Science', code: 'CS101', description: 'Computer Studies' },
-      { name: 'History', code: 'HIS101', description: 'World History' },
-      { name: 'Geography', code: 'GEO101', description: 'World Geography' }
-    ];
+    // Subjects
+    const subjects = await Subject.insertMany([
+      { name: 'Mathematics', field: 'Science' },
+      { name: 'Physics', field: 'Science' },
+      { name: 'Chemistry', field: 'Science' },
+      { name: 'Biology', field: 'Science' },
+      { name: 'English', field: 'Arts' }
+    ]);
 
-    const createdSubjects = [];
-    for (const subj of subjectData) {
-      const existing = await Subject.findOne({ code: subj.code });
-      if (!existing) {
-        const newSubject = await Subject.create({
-          ...subj,
-          credits: 3,
-          isActive: true
-        });
-        createdSubjects.push(newSubject);
-      }
+    // Students
+    const studentUsers = createdUsers.filter(u => u.role === 'student');
+    const createdStudents = [];
+    for (let i = 0; i < studentUsers.length; i++) {
+      const student = await Student.create({
+        user: studentUsers[i]._id,
+        studentCode: `STU-${2024000 + i + 1}`,
+        guardianPhone: `+12345678${i}`,
+        admissionDate: new Date(),
+        currentClass: createdClasses[i % createdClasses.length]?._id,
+        status: 'active'
+      });
+      createdStudents.push(student);
     }
-    console.log(`✅ ${createdSubjects.length} Subjects created\n`);
 
-    // ========== 7. BOOK CATEGORIES (10 records) ==========
-    console.log('📂 Seeding Book Categories...');
-    const categoryData = [
-      { name: 'Islamic Studies', description: 'Quran, Hadith, Fiqh books' },
-      { name: 'Science', description: 'Physics, Chemistry, Biology' },
-      { name: 'Mathematics', description: 'Math textbooks and references' },
-      { name: 'Literature', description: 'English and Urdu literature' },
-      { name: 'History', description: 'Islamic and World history' },
-      { name: 'Computer Science', description: 'Programming and IT books' },
-      { name: 'Reference', description: 'Dictionaries and encyclopedias' },
-      { name: 'Fiction', description: 'Novels and stories' },
-      { name: 'Biography', description: 'Life stories of notable people' },
-      { name: 'Academic', description: 'General academic resources' }
-    ];
-
-    const createdCategories = [];
-    for (const cat of categoryData) {
-      const existing = await BookCategory.findOne({ name: cat.name });
-      if (!existing) {
-        const newCat = await BookCategory.create(cat);
-        createdCategories.push(newCat);
-      }
+    // Employees
+    const employeeUsers = createdUsers.filter(u => u.role === 'teacher' || u.role === 'staff');
+    const createdEmployees = [];
+    for (let i = 0; i < employeeUsers.length; i++) {
+      const employee = await Employee.create({
+        user: employeeUsers[i]._id,
+        employeeCode: `EMP-${2024000 + i + 1}`,
+        fullName: employeeUsers[i].name,
+        employeeType: employeeUsers[i].role === 'teacher' ? 'teacher' : 'support',
+        designation: employeeUsers[i].role === 'teacher' ? 'Teacher' : 'Staff',
+        department: employeeUsers[i].role === 'teacher' ? 'Academics' : 'Administration',
+        joiningDate: new Date(),
+        baseSalary: 40000 + i * 1000
+      });
+      createdEmployees.push(employee);
     }
-    console.log(`✅ ${createdCategories.length} Book Categories created\n`);
 
-    // ========== 8. BOOKS (10 records) ==========
-    console.log('📖 Seeding Books...');
-    const bookData = [
-      { title: 'Sahih Bukhari', author: 'Imam Bukhari', isbn: '978-1234567890', quantity: 5 },
-      { title: 'Physics for Class 10', author: 'Dr. Ahmed Khan', isbn: '978-1234567891', quantity: 20 },
-      { title: 'Mathematics Part I', author: 'Prof. Rahim', isbn: '978-1234567892', quantity: 25 },
-      { title: 'English Grammar', author: 'John Smith', isbn: '978-1234567893', quantity: 15 },
-      { title: 'Islamic History', author: 'Dr. Fatima Ali', isbn: '978-1234567894', quantity: 10 },
-      { title: 'Computer Programming', author: 'David Johnson', isbn: '978-1234567895', quantity: 12 },
-      { title: 'Oxford Dictionary', author: 'Oxford Press', isbn: '978-1234567896', quantity: 8 },
-      { title: 'Urdu Poetry Collection', author: 'Mirza Ghalib', isbn: '978-1234567897', quantity: 15 },
-      { title: 'Chemistry Lab Manual', author: 'Dr. Sarah Ahmad', isbn: '978-1234567898', quantity: 18 },
-      { title: 'Biology Textbook', author: 'Prof. Michael Chen', isbn: '978-1234567899', quantity: 22 }
-    ];
-
-    const createdBooks = [];
-    for (let i = 0; i < bookData.length; i++) {
-      const existing = await Book.findOne({ isbn: bookData[i].isbn });
-      if (!existing) {
-        const newBook = await Book.create({
-          ...bookData[i],
-          category: createdCategories[i % createdCategories.length]._id,
-          publisher: 'Madrasa Publications',
-          publishYear: 2023,
-          available: bookData[i].quantity
-        });
-        createdBooks.push(newBook);
+    // Payroll: Salary Structures
+    const salaryStructures = await SalaryStructure.insertMany([
+      {
+        employeeType: 'teacher',
+        basicSalary: 45000,
+        allowanceAmount: 5000,
+        housingAllowance: 3000,
+        foodAllowance: 2000,
+        transportAllowance: 1500,
+        overtimeRate: 200,
+        deductionType: 'tax',
+        taxPercentage: 5,
+        effectiveFrom: new Date('2024-01-01'),
+        status: 'active'
+      },
+      {
+        employeeType: 'support',
+        basicSalary: 35000,
+        allowanceAmount: 3000,
+        housingAllowance: 2000,
+        foodAllowance: 1500,
+        transportAllowance: 1000,
+        overtimeRate: 150,
+        deductionType: 'tax',
+        taxPercentage: 3,
+        effectiveFrom: new Date('2024-01-01'),
+        status: 'active'
       }
-    }
-    console.log(`✅ ${createdBooks.length} Books created\n`);
+    ]);
 
-    // ========== 9. BORROWED BOOKS (10 records) ==========
-    console.log('📤 Seeding Borrowed Books...');
-    const borrowData = [
-      { studentId: 0, bookId: 0, daysAgo: 5 },
-      { studentId: 1, bookId: 1, daysAgo: 10 },
-      { studentId: 2, bookId: 2, daysAgo: 3 },
-      { studentId: 3, bookId: 3, daysAgo: 15 },
-      { studentId: 0, bookId: 4, daysAgo: 7 },
-      { studentId: 1, bookId: 5, daysAgo: 12 },
-      { studentId: 2, bookId: 6, daysAgo: 2 },
-      { studentId: 3, bookId: 7, daysAgo: 20 },
-      { studentId: 0, bookId: 8, daysAgo: 8 },
-      { studentId: 1, bookId: 9, daysAgo: 4 }
-    ];
-
-    let borrowedCount = 0;
-    for (const borrow of borrowData) {
-      if (createdStudents[borrow.studentId] && createdBooks[borrow.bookId]) {
-        const existing = await BorrowedBook.findOne({
-          student: createdStudents[borrow.studentId]._id,
-          book: createdBooks[borrow.bookId]._id,
-          status: 'borrowed'
-        });
-        if (!existing) {
-          await BorrowedBook.create({
-            student: createdStudents[borrow.studentId]._id,
-            book: createdBooks[borrow.bookId]._id,
-            borrowDate: new Date(Date.now() - borrow.daysAgo * 24 * 60 * 60 * 1000),
-            dueDate: new Date(Date.now() + (14 - borrow.daysAgo) * 24 * 60 * 60 * 1000),
-            status: 'borrowed'
-          });
-          borrowedCount++;
-        }
-      }
-    }
-    console.log(`✅ ${borrowedCount} Borrowed Books created\n`);
-
-    // ========== 10. FEE STRUCTURE (10 records) ==========
-    console.log('💰 Seeding Fee Structure...');
-    const feeData = [
-      { className: 'Class 6', tuitionFee: 2000, admissionFee: 5000, examFee: 1000 },
-      { className: 'Class 7', tuitionFee: 2200, admissionFee: 5500, examFee: 1100 },
-      { className: 'Class 8', tuitionFee: 2400, admissionFee: 6000, examFee: 1200 },
-      { className: 'Class 9', tuitionFee: 2600, admissionFee: 6500, examFee: 1300 },
-      { className: 'Class 10', tuitionFee: 2800, admissionFee: 7000, examFee: 1400 },
-      { className: 'Class 11', tuitionFee: 3000, admissionFee: 7500, examFee: 1500 },
-      { className: 'Class 12', tuitionFee: 3200, admissionFee: 8000, examFee: 1600 },
-      { className: 'Hifz Program', tuitionFee: 1500, admissionFee: 4000, examFee: 800 },
-      { className: 'Qiraat Course', tuitionFee: 1800, admissionFee: 4500, examFee: 900 },
-      { className: 'Alim Course', tuitionFee: 2500, admissionFee: 6000, examFee: 1200 }
-    ];
-
-    const createdFeeStructures = [];
-    for (const fee of feeData) {
-      const existing = await FeeStructure.findOne({ className: fee.className, academicYear: '2024-2025' });
-      if (!existing) {
-        const newFee = await FeeStructure.create({
-          ...fee,
-          academicYear: '2024-2025',
-          totalFee: fee.tuitionFee * 12 + fee.admissionFee + fee.examFee
-        });
-        createdFeeStructures.push(newFee);
-      }
-    }
-    console.log(`✅ ${createdFeeStructures.length} Fee Structures created\n`);
-
-    // ========== 11. FEE PAYMENTS (10 records) ==========
-    console.log('💳 Seeding Fee Payments...');
-    const paymentStatuses = ['paid', 'pending', 'partial'];
-    for (let i = 0; i < 10; i++) {
-      if (createdStudents[i]) {
-        const existing = await FeePayment.findOne({ student: createdStudents[i]._id, month: (i % 12) + 1 });
-        if (!existing) {
-          await FeePayment.create({
-            student: createdStudents[i]._id,
-            amount: 2000 + (i * 100),
-            month: (i % 12) + 1,
-            year: 2024,
-            status: paymentStatuses[i % 3],
-            paymentDate: i % 3 === 0 ? new Date() : null,
-            paymentMethod: i % 3 === 0 ? 'cash' : null
-          });
-        }
-      }
-    }
-    console.log(`✅ Fee Payments created\n`);
-
-    // ========== 12. EXAM TYPES (5 records) ==========
-    console.log('📝 Seeding Exam Types...');
-    const examTypes = [
-      { name: 'Midterm Exam', description: 'Mid-year examination' },
-      { name: 'Final Exam', description: 'End of year examination' },
-      { name: 'Quiz', description: 'Weekly quiz test' },
-      { name: 'Unit Test', description: 'Chapter-wise test' },
-      { name: 'Practical', description: 'Lab practical exam' }
-    ];
-
-    const createdExamTypes = [];
-    for (const type of examTypes) {
-      const existing = await ExamType.findOne({ name: type.name });
-      if (!existing) {
-        const newType = await ExamType.create(type);
-        createdExamTypes.push(newType);
-      }
-    }
-    console.log(`✅ ${createdExamTypes.length} Exam Types created\n`);
-
-    // ========== 13. EXAMS (10 records) ==========
-    console.log('🧪 Seeding Exams...');
-    const examData = [
-      { name: 'Midterm 2024', type: 0 },
-      { name: 'Final Exam 2024', type: 1 },
-      { name: 'Math Quiz 1', type: 2 },
-      { name: 'Physics Practical', type: 4 },
-      { name: 'Chemistry Unit Test', type: 3 },
-      { name: 'English Quiz', type: 2 },
-      { name: 'Biology Practical', type: 4 },
-      { name: 'Urdu Test', type: 3 },
-      { name: 'Islamic Studies Quiz', type: 2 },
-      { name: 'Computer Science Test', type: 0 }
-    ];
-
-    const createdExams = [];
-    for (let i = 0; i < examData.length; i++) {
-      const existing = await Exam.findOne({ name: examData[i].name });
-      if (!existing) {
-        const newExam = await Exam.create({
-          name: examData[i].name,
-          examType: createdExamTypes[examData[i].type]?._id,
-          subject: createdSubjects[i % createdSubjects.length]._id,
-          class: createdClasses[i % createdClasses.length]._id,
-          date: new Date(2024, i % 12, 15 + (i % 15)),
-          totalMarks: 100,
-          duration: 120,
-          status: i < 5 ? 'completed' : 'upcoming'
-        });
-        createdExams.push(newExam);
-      }
-    }
-    console.log(`✅ ${createdExams.length} Exams created\n`);
-
-    // ========== 14. ASSIGNMENTS (10 records) ==========
-    console.log('📋 Seeding Assignments...');
-    const assignmentData = [
-      { title: 'Math Problem Set 1', subject: 0 },
-      { title: 'Physics Lab Report', subject: 1 },
-      { title: 'Chemistry Equations', subject: 2 },
-      { title: 'Biology Diagram Drawing', subject: 3 },
-      { title: 'English Essay Writing', subject: 4 },
-      { title: 'Urdu Poetry Analysis', subject: 5 },
-      { title: 'Islamic Studies Research', subject: 6 },
-      { title: 'Programming Exercise', subject: 7 },
-      { title: 'History Timeline', subject: 8 },
-      { title: 'Geography Map Work', subject: 9 }
-    ];
-
-    for (let i = 0; i < assignmentData.length; i++) {
-      const existing = await Assignment.findOne({ title: assignmentData[i].title });
-      if (!existing) {
-        await Assignment.create({
-          title: assignmentData[i].title,
-          subject: createdSubjects[assignmentData[i].subject]._id,
-          class: createdClasses[i % createdClasses.length]._id,
-          teacher: createdEmployees[i % createdEmployees.length]._id,
-          description: `Complete the ${assignmentData[i].title}`,
-          dueDate: new Date(Date.now() + (i + 1) * 24 * 60 * 60 * 1000),
-          totalMarks: 20 + (i * 2),
-          status: 'active'
-        });
-      }
-    }
-    console.log(`✅ Assignments created\n`);
-
-    // ========== 15. ATTENDANCE RECORDS (10 records) ==========
-    console.log('📅 Seeding Attendance Records...');
-    const attendanceStatuses = ['present', 'absent', 'late', 'excused'];
-    for (let i = 0; i < 10; i++) {
-      if (createdStudents[i]) {
-        await AttendanceRecord.create({
-          student: createdStudents[i]._id,
-          class: createdClasses[i % createdClasses.length]._id,
-          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000),
-          status: attendanceStatuses[i % 4],
-          subject: createdSubjects[i % createdSubjects.length]._id
-        });
-      }
-    }
-    console.log(`✅ Attendance Records created\n`);
-
-    // ========== 16. COMPLAINTS (10 records) ==========
-    console.log('📢 Seeding Complaints...');
-    const complaintData = [
-      { title: 'Library book not available', category: 'Library', priority: 'medium' },
-      { title: 'Classroom AC not working', category: 'Facilities', priority: 'high' },
-      { title: 'Fee payment issue', category: 'Finance', priority: 'high' },
-      { title: 'Teacher absent frequently', category: 'Academic', priority: 'medium' },
-      { title: 'Canteen food quality', category: 'Facilities', priority: 'low' },
-      { title: 'Bus timing issue', category: 'Transport', priority: 'medium' },
-      { title: 'Exam schedule conflict', category: 'Academic', priority: 'high' },
-      { title: 'Sports equipment needed', category: 'Facilities', priority: 'low' },
-      { title: 'Internet connectivity', category: 'IT', priority: 'medium' },
-      { title: 'Cleanliness issue', category: 'Facilities', priority: 'low' }
-    ];
-
-    const complaintStatuses = ['pending', 'in-progress', 'resolved'];
-    for (let i = 0; i < complaintData.length; i++) {
-      const existing = await Complaint.findOne({ title: complaintData[i].title });
-      if (!existing) {
-        await Complaint.create({
-          ...complaintData[i],
-          description: `This is a complaint about ${complaintData[i].title}`,
-          submittedBy: createdStudents[i % createdStudents.length]?._id || createdUsers[0]._id,
-          status: complaintStatuses[i % 3],
-          submittedDate: new Date(Date.now() - i * 24 * 60 * 60 * 1000)
-        });
-      }
-    }
-    console.log(`✅ Complaints created\n`);
-
-    // ========== 17. TRANSACTIONS (10 records) ==========
-    console.log('💵 Seeding Transactions...');
-    const transactionTypes = ['income', 'expense'];
-    const transactionCategories = ['Fee Collection', 'Salary', 'Books', 'Maintenance', 'Utilities', 'Equipment'];
-    for (let i = 0; i < 10; i++) {
-      await Transaction.create({
-        type: transactionTypes[i % 2],
-        category: transactionCategories[i % 6],
-        amount: 10000 + (i * 5000),
-        description: `Transaction ${i + 1} for ${transactionCategories[i % 6]}`,
-        date: new Date(Date.now() - i * 24 * 60 * 60 * 1000),
-        status: 'completed'
+    // Payroll: Salary Payments
+    for (let i = 0; i < createdEmployees.length; i++) {
+      const emp = createdEmployees[i];
+      const grossSalary = emp.baseSalary || (emp.employeeType === 'teacher' ? 45000 : 35000);
+      const totalAllowance = emp.employeeType === 'teacher' ? 6500 : 4500;
+      const totalDeduction = i % 2 === 0 ? 1200 : 800;
+      const netSalary = grossSalary + totalAllowance - totalDeduction;
+      await SalaryPayment.create({
+        employee: emp._id,
+        salaryMonth: 3,
+        salaryYear: 2026,
+        grossSalary,
+        totalAllowance,
+        totalDeduction,
+        netSalary,
+        paymentDate: new Date(),
+        paymentMethod: 'cash',
+        transactionReference: `SAL-${Date.now()}-${i}`,
+        paymentStatus: 'paid',
+        approvedBy: adminUser?._id,
+        paidBy: adminUser?._id
       });
     }
-    console.log(`✅ Transactions created\n`);
 
-    // ========== 18. EXPENSES (10 records) ==========
-    console.log('📊 Seeding Expenses...');
-    const expenseCategories = ['Salaries', 'Utilities', 'Maintenance', 'Books', 'Stationery', 'Events', 'Transport', 'Medical', 'Miscellaneous'];
-    for (let i = 0; i < 10; i++) {
-      await Expense.create({
-        category: expenseCategories[i % 9],
-        amount: 5000 + (i * 3000),
-        description: `Expense for ${expenseCategories[i % 9]}`,
-        date: new Date(Date.now() - i * 24 * 60 * 60 * 1000),
-        approvedBy: createdEmployees[i % createdEmployees.length]?._id,
+    // Payroll: Salary Deductions
+    for (let i = 0; i < createdEmployees.length; i++) {
+      const emp = createdEmployees[i];
+      await SalaryDeduction.create({
+        employee: emp._id,
+        deductionType: 'Late Attendance',
+        deductionReason: 'Late arrival',
+        deductionAmount: 200 + i * 20,
+        deductionMonth: 3,
+        deductionYear: 2026,
+        appliedBy: adminUser?._id,
+        approvedBy: adminUser?._id,
         status: i % 3 === 0 ? 'pending' : 'approved'
       });
     }
-    console.log(`✅ Expenses created\n`);
 
-    console.log('🎉 Database seeding completed successfully!');
-    console.log('\n📊 Summary:');
-    console.log('  - Roles: 4');
-    console.log('  - Users: 10');
-    console.log('  - Students: 10');
-    console.log('  - Employees: 10');
-    console.log('  - Classes: 10');
-    console.log('  - Subjects: 10');
-    console.log('  - Book Categories: 10');
-    console.log('  - Books: 10');
-    console.log('  - Borrowed Books: 10');
-    console.log('  - Fee Structures: 10');
-    console.log('  - Fee Payments: 10');
-    console.log('  - Exam Types: 5');
-    console.log('  - Exams: 10');
-    console.log('  - Assignments: 10');
-    console.log('  - Attendance Records: 10');
-    console.log('  - Complaints: 10');
-    console.log('  - Transactions: 10');
-    console.log('  - Expenses: 10');
+    // Payroll: Salary Advances
+    for (let i = 0; i < createdEmployees.length; i++) {
+      const emp = createdEmployees[i];
+      await SalaryAdvance.create({
+        employee: emp._id,
+        advanceAmount: 1000 + i * 200,
+        requestDate: new Date(Date.now() - i * 86400000),
+        approvalDate: new Date(),
+        approvedBy: adminUser?._id,
+        repaymentStartMonth: 4,
+        monthlyDeductionAmount: 150 + i * 10,
+        remainingBalance: 800 + i * 150,
+        advanceStatus: i % 2 === 0 ? 'approved' : 'pending'
+      });
+    }
 
+    // Accounts
+    const mainAccount = await Account.create({
+      accountCode: 'MAIN',
+      accountName: 'Main Account',
+      accountType: 'cash',
+      openingBalance: 0,
+      currentBalance: 0,
+      currency: 'USD',
+      status: 'active',
+      createdBy: adminUser?._id
+    });
+
+    // Book Categories & Books
+    const categories = await BookCategory.insertMany([
+      { name: 'Islamic Studies', description: 'Quran and Hadith' },
+      { name: 'Science', description: 'Physics, Chemistry, Biology' },
+      { name: 'Literature', description: 'English and Urdu' }
+    ]);
+
+    const books = await Book.insertMany([
+      {
+        title: 'Sahih Bukhari',
+        category: categories[0]._id,
+        pages: 1200,
+        publisher: 'Madrasa Publications',
+        publisherYear: 2022,
+        stock: 5,
+        purchasePrice: 20,
+        salePrice: 25,
+        addedBy: adminUser?._id
+      },
+      {
+        title: 'Physics for Class 10',
+        category: categories[1]._id,
+        pages: 320,
+        publisher: 'Edu Press',
+        publisherYear: 2023,
+        stock: 10,
+        purchasePrice: 8,
+        salePrice: 12,
+        addedBy: adminUser?._id
+      },
+      {
+        title: 'English Grammar',
+        category: categories[2]._id,
+        pages: 250,
+        publisher: 'Language House',
+        publisherYear: 2021,
+        stock: 8,
+        purchasePrice: 6,
+        salePrice: 10,
+        addedBy: adminUser?._id
+      }
+    ]);
+
+    // Borrowed Books
+    for (let i = 0; i < Math.min(createdStudents.length, books.length); i++) {
+      await BorrowedBook.create({
+        borrower: createdStudents[i]._id,
+        book: books[i]._id,
+        borrowedAt: new Date(Date.now() - i * 86400000),
+        returnDate: new Date(Date.now() + (7 + i) * 86400000),
+        status: 'borrowed'
+      });
+    }
+
+    // Fee Structures
+    const feeStructures = [];
+    for (let i = 0; i < createdClasses.length; i++) {
+      const tuition = await FeeStructure.create({
+        feeCode: `FEE-TUIT-${i + 1}`,
+        feeName: `Tuition Fee ${createdClasses[i].name}`,
+        class: createdClasses[i]._id,
+        feeType: 'tuition',
+        amount: 2000 + i * 200,
+        frequency: 'monthly'
+      });
+      feeStructures.push(tuition);
+
+      const admission = await FeeStructure.create({
+        feeCode: `FEE-ADM-${i + 1}`,
+        feeName: `Admission Fee ${createdClasses[i].name}`,
+        class: createdClasses[i]._id,
+        feeType: 'admission',
+        amount: 5000 + i * 300,
+        frequency: 'one-time'
+      });
+      feeStructures.push(admission);
+    }
+
+    // Student Fees
+    const studentFees = [];
+    for (let i = 0; i < createdStudents.length; i++) {
+      const fee = await StudentFee.create({
+        student: createdStudents[i]._id,
+        feeStructure: feeStructures[i % feeStructures.length]._id,
+        academicYear: '2024-2025',
+        totalAmount: 2000,
+        discountAmount: 0,
+        payableAmount: 2000,
+        dueDate: new Date(Date.now() + 15 * 86400000),
+        paymentStatus: 'pending',
+        createdBy: adminUser?._id
+      });
+      studentFees.push(fee);
+    }
+
+    // Fee Payments
+    for (let i = 0; i < studentFees.length; i++) {
+      await FeePayment.create({
+        studentFee: studentFees[i]._id,
+        receiptNo: `RCPT-${Date.now()}-${i}`,
+        paidAmount: 2000,
+        paymentMethod: 'cash',
+        paymentStatus: i % 2 === 0 ? 'completed' : 'pending',
+        receivedBy: adminUser?._id,
+        verifiedBy: adminUser?._id,
+        verificationStatus: i % 2 === 0 ? 'verified' : 'pending',
+        remarks: 'Seed payment'
+      });
+    }
+
+    // Exam Types & Exams
+    const examTypes = await ExamType.insertMany([
+      { name: 'Midterm' },
+      { name: 'Final' },
+      { name: 'Quiz' }
+    ]);
+
+    for (let i = 0; i < examTypes.length; i++) {
+      await Exam.create({
+        title: `${examTypes[i].name} Exam 2024`,
+        examType: examTypes[i]._id,
+        academicYear: '2024-2025',
+        startDate: new Date(Date.now() + i * 86400000),
+        endDate: new Date(Date.now() + (i + 1) * 86400000),
+        status: 'scheduled'
+      });
+    }
+
+    // Assignments
+    for (let i = 0; i < subjects.length; i++) {
+      await Assignment.create({
+        title: `${subjects[i].name} Assignment`,
+        description: `Complete the ${subjects[i].name} assignment`,
+        courseId: subjects[i]._id,
+        dueDate: new Date(Date.now() + (i + 7) * 86400000),
+        maxPoints: 100
+      });
+    }
+
+    // Attendance Sessions & Records
+    const sessions = [];
+    for (let i = 0; i < createdClasses.length; i++) {
+      const session = await AttendanceSession.create({
+        class: createdClasses[i]._id,
+        teacher: createdUsers.find(u => u.role === 'teacher')?._id,
+        sessionDate: new Date(Date.now() - i * 86400000),
+        sessionType: 'lecture',
+        period: i + 1
+      });
+      sessions.push(session);
+    }
+
+    for (let i = 0; i < createdStudents.length; i++) {
+      await AttendanceRecord.create({
+        session: sessions[i % sessions.length]._id,
+        student: createdStudents[i]._id,
+        status: i % 3 === 0 ? 'absent' : 'present',
+        markedBy: adminUser?._id,
+        markedAt: new Date()
+      });
+    }
+
+    // Complaints
+    for (let i = 0; i < createdStudents.length; i++) {
+      await Complaint.create({
+        complaintCode: `CMP-${Date.now()}-${i}`,
+        complainantType: 'student',
+        complainant: createdStudents[i]._id,
+        complaintCategory: 'General',
+        subject: 'Service issue',
+        description: 'Seeded complaint for testing',
+        priorityLevel: i % 3 === 0 ? 'high' : 'medium',
+        complaintStatus: i % 2 === 0 ? 'open' : 'in_progress'
+      });
+    }
+
+    // Transactions
+    const transactionTypes = ['income', 'expense'];
+    const references = ['Fee Collection', 'Salary', 'Books', 'Maintenance'];
+    let runningBalance = 0;
+    for (let i = 0; i < 10; i++) {
+      const amount = 1000 + i * 250;
+      const tType = transactionTypes[i % 2];
+      const impact = tType === 'income' ? amount : -amount;
+      runningBalance += impact;
+      await Transaction.create({
+        transactionCode: `TXN-SEED-${Date.now()}-${i}`,
+        account: mainAccount._id,
+        transactionType: tType,
+        amount,
+        transactionDate: new Date(Date.now() - i * 86400000),
+        referenceType: references[i % references.length],
+        balanceAfter: runningBalance,
+        performedBy: adminUser?._id,
+        verifiedBy: adminUser?._id,
+        verificationStatus: i % 3 === 0 ? 'pending' : 'verified',
+        description: `Seeded transaction ${i + 1}`
+      });
+    }
+    mainAccount.currentBalance = runningBalance;
+    await mainAccount.save();
+
+    // Expenses
+    for (let i = 0; i < 10; i++) {
+      await Expense.create({
+        expenseCode: `EXP-${Date.now()}-${i}`,
+        category: 'Operations',
+        title: `Expense ${i + 1}`,
+        amount: 500 + i * 100,
+        expenseDate: new Date(Date.now() - i * 86400000),
+        paymentMethod: 'cash',
+        referenceNo: `REF-${i + 1}`,
+        paidTo: 'Vendor',
+        approvedBy: adminUser?._id,
+        approvalStatus: i % 2 === 0 ? 'approved' : 'pending',
+        remarks: 'Seed expense'
+      });
+    }
+
+    console.log('Database seeding completed successfully.');
+    console.log('Login credentials:');
+    console.log('  Admin: admin@gmail.com / admin1234');
+    console.log('  Student: student@gmail.com / student1234');
+    console.log('  Teacher: teacher@gmail.com / teacher1234');
+    console.log('  Staff: staff@gmail.com / staff1234');
   } catch (error) {
-    console.error('❌ Error seeding database:', error);
+    console.error('Error seeding database:', error);
   }
 };
 

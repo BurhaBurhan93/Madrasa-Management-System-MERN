@@ -12,7 +12,8 @@ const TransactionSchema = new Schema({
   balanceAfter: { type: Number },
   performedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   verifiedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-  verificationStatus: { type: String, enum: ['pending','verified'], default: 'verified' }
+  verificationStatus: { type: String, enum: ['pending','verified','rejected'], default: 'verified' },
+  description: { type: String, trim: true }
 }, { timestamps: true });
 
 // Indexes

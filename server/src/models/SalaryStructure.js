@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const SalaryStructureSchema = new Schema({
-  employeeType: { type: String, required: true, unique: true },
+  employeeType: { type: String, enum: ['teacher','staff','admin','support'], required: true },
   basicSalary: { type: Number, required: true },
   allowanceAmount: { type: Number, default: 0 },
   housingAllowance: { type: Number, default: 0 },
@@ -11,11 +11,10 @@ const SalaryStructureSchema = new Schema({
   overtimeRate: { type: Number, default: 0 },
   deductionType: { type: String, trim: true },
   taxPercentage: { type: Number, default: 0 },
-  effectiveFrom: { type: Date },
-  status: { type: String, enum: ['active','inactive'], default: 'active' },
-  deletedAt: { type: Date, default: null, index: true }
+  effectiveFrom: { type: Date, required: true },
+  status: { type: String, enum: ['active','inactive'], default: 'active' }
 }, { timestamps: true });
 
-SalaryStructureSchema.index({ employeeType: 1 }, { unique: true });
+SalaryStructureSchema.index({ employeeType: 1, effectiveFrom: -1 });
 
 module.exports = mongoose.model('SalaryStructure', SalaryStructureSchema);

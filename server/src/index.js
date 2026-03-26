@@ -21,6 +21,8 @@ const authRoutes = require('./modules/auth/authRoutes');
 const studentRoutes = require('./modules/students/studentRoutes');
 const staffRoutes = require('./modules/staff/staffRoutes');
 const teacherRoutes = require('./modules/teachers/teacherRoutes');
+const financeRoutes = require('./modules/finance/financeRoutes');
+const payrollRoutes = require('./modules/payroll/payrollRoutes');
 
 // Load user routes with error handling
 let userRoutes;
@@ -37,6 +39,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/teacher', teacherRoutes);
+app.use('/api/finance', financeRoutes);
+app.use('/api/payroll', payrollRoutes);
 
 if (userRoutes) {
   app.use('/api/users', userRoutes);

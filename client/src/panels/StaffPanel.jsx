@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   FiHome, FiBookOpen, FiInbox, FiUser, FiMenu, FiLogOut, 
   FiSearch, FiBell, FiFolder, FiBook, FiClipboard, 
   FiShoppingCart, FiTrendingUp, FiBarChart2, FiChevronDown,
-  FiUsers, FiPackage, FiSettings
+  FiUsers, FiPackage, FiSettings, FiDollarSign, FiUserPlus
 } from 'react-icons/fi';
 import useLocalStorage from '../hooks/useLocalStorage';
 
@@ -59,6 +59,16 @@ const StaffPanel = () => {
       label: 'Dashboard',
       type: 'link'
     },
+    {
+      id: 'users',
+      icon: <FiUserPlus size={20} />,
+      label: 'User Management',
+      type: 'dropdown',
+      items: [
+        { id: 'users-list', label: 'All Users', path: 'users' },
+        { id: 'users-register', label: 'Register User', path: 'users/register' },
+      ]
+    },
     { 
       id: 'students', 
       icon: <FiUsers size={20} />, 
@@ -97,6 +107,33 @@ const StaffPanel = () => {
         { id: 'actions', label: 'Actions', path: 'complaints/actions' },
         { id: 'feedback', label: 'Feedback', path: 'complaints/feedback' },
         { id: 'reports', label: 'Reports', path: 'complaints/reports' },
+      ]
+    },
+    {
+      id: 'finance',
+      icon: <FiTrendingUp size={20} />,
+      label: 'Finance',
+      type: 'dropdown',
+      items: [
+        { id: 'transactions', label: 'Transactions', path: 'finance/transactions' },
+        { id: 'accounts', label: 'Accounts', path: 'finance/accounts' },
+        { id: 'fee-structures', label: 'Fee Structures', path: 'finance/fee-structures' },
+        { id: 'student-fees', label: 'Student Fees', path: 'finance/student-fees' },
+        { id: 'fee-payments', label: 'Fee Payments', path: 'finance/fee-payments' },
+        { id: 'expenses', label: 'Expenses', path: 'finance/expenses' },
+        { id: 'reports', label: 'Financial Reports', path: 'finance/reports' }
+      ]
+    },
+    {
+      id: 'payroll',
+      icon: <FiDollarSign size={20} />,
+      label: 'Payroll',
+      type: 'dropdown',
+      items: [
+        { id: 'salary-structures', label: 'Salary Structures', path: 'payroll/salary-structures' },
+        { id: 'salary-payments', label: 'Salary Payments', path: 'payroll/salary-payments' },
+        { id: 'salary-deductions', label: 'Salary Deductions', path: 'payroll/salary-deductions' },
+        { id: 'salary-advances', label: 'Salary Advances', path: 'payroll/salary-advances' }
       ]
     },
   ];
@@ -328,3 +365,4 @@ const StaffPanel = () => {
 };
 
 export default StaffPanel;
+

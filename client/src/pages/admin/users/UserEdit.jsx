@@ -44,7 +44,7 @@ const UserEdit = () => {
       if (!updateData.password) delete updateData.password;
       await axios.put(`http://localhost:5000/api/users/${id}`, updateData);
       alert('User updated successfully');
-      navigate('/admin/users');
+      navigate('/staff/users');
     } catch (error) {
       alert(error.response?.data?.message || 'Error updating user');
     }
@@ -55,7 +55,7 @@ const UserEdit = () => {
   return (
     <div className="w-full bg-gray-50 min-h-screen p-6">
       <div className="mb-6">
-        <button onClick={() => navigate('/admin/users')} className="text-blue-600 hover:text-blue-800 mb-4">
+        <button onClick={() => navigate('/staff/users')} className="text-blue-600 hover:text-blue-800 mb-4">
           ← Back to Users
         </button>
         <h1 className="text-3xl font-bold text-gray-900">✏️ Edit User</h1>
@@ -201,7 +201,7 @@ const UserEdit = () => {
             <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold">
               💾 Update User
             </button>
-            <button type="button" onClick={() => navigate('/admin/users')} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold">
+            <button type="button" onClick={() => navigate('/staff/users')} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold">
               ❌ Cancel
             </button>
           </div>

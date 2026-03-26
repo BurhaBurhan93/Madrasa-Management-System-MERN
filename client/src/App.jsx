@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+﻿import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ExamProvider } from "./contexts/ExamContext";
@@ -19,7 +19,8 @@ import StaffPanel from './panels/StaffPanel';
 
 // ================= ADMIN PAGES =================
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminUsers from './pages/admin/AdminUsers';
+
+// ================= STAFF USER MANAGEMENT =================
 import UserIndex from './pages/admin/users/UserIndex';
 import UserRegister from './pages/admin/users/UserRegister';
 import UserEdit from './pages/admin/users/UserEdit';
@@ -83,6 +84,41 @@ import StaffComplaintsList from './pages/staff/complaints/ComplaintsList';
 import StaffComplaintActions from './pages/staff/complaints/Actions';
 import StaffComplaintFeedback from './pages/staff/complaints/Feedback';
 import StaffComplaintReports from './pages/staff/complaints/Reports';
+import StaffFinanceIndex from './pages/staff/finance/Finance';
+import StaffFinanceTransactions from './pages/staff/finance/Transactions';
+import StaffFinanceAccounts from './pages/staff/finance/Accounts';
+import StaffFinanceFeeStructures from './pages/staff/finance/FeeStructures';
+import StaffFinanceStudentFees from './pages/staff/finance/StudentFees';
+import StaffFinanceFeePayments from './pages/staff/finance/FeePayments';
+import StaffFinanceExpenses from './pages/staff/finance/Expenses';
+import StaffFinanceReports from './pages/staff/finance/FinancialReports';
+import StaffFinanceTransactionsCreate from './pages/staff/finance/TransactionsCreate';
+import StaffFinanceTransactionsEdit from './pages/staff/finance/TransactionsEdit';
+import StaffFinanceAccountsCreate from './pages/staff/finance/AccountsCreate';
+import StaffFinanceAccountsEdit from './pages/staff/finance/AccountsEdit';
+import StaffFinanceFeeStructuresCreate from './pages/staff/finance/FeeStructuresCreate';
+import StaffFinanceFeeStructuresEdit from './pages/staff/finance/FeeStructuresEdit';
+import StaffFinanceStudentFeesCreate from './pages/staff/finance/StudentFeesCreate';
+import StaffFinanceStudentFeesEdit from './pages/staff/finance/StudentFeesEdit';
+import StaffFinanceFeePaymentsCreate from './pages/staff/finance/FeePaymentsCreate';
+import StaffFinanceFeePaymentsEdit from './pages/staff/finance/FeePaymentsEdit';
+import StaffFinanceExpensesCreate from './pages/staff/finance/ExpensesCreate';
+import StaffFinanceExpensesEdit from './pages/staff/finance/ExpensesEdit';
+import StaffFinanceReportsCreate from './pages/staff/finance/FinancialReportsCreate';
+import StaffFinanceReportsEdit from './pages/staff/finance/FinancialReportsEdit';
+import StaffPayrollIndex from './pages/staff/payroll/Payroll';
+import StaffPayrollSalaryStructures from './pages/staff/payroll/SalaryStructures';
+import StaffPayrollSalaryPayments from './pages/staff/payroll/SalaryPayments';
+import StaffPayrollSalaryDeductions from './pages/staff/payroll/SalaryDeductions';
+import StaffPayrollSalaryAdvances from './pages/staff/payroll/SalaryAdvances';
+import StaffPayrollSalaryStructuresCreate from './pages/staff/payroll/SalaryStructuresCreate';
+import StaffPayrollSalaryStructuresEdit from './pages/staff/payroll/SalaryStructuresEdit';
+import StaffPayrollSalaryPaymentsCreate from './pages/staff/payroll/SalaryPaymentsCreate';
+import StaffPayrollSalaryPaymentsEdit from './pages/staff/payroll/SalaryPaymentsEdit';
+import StaffPayrollSalaryDeductionsCreate from './pages/staff/payroll/SalaryDeductionsCreate';
+import StaffPayrollSalaryDeductionsEdit from './pages/staff/payroll/SalaryDeductionsEdit';
+import StaffPayrollSalaryAdvancesCreate from './pages/staff/payroll/SalaryAdvancesCreate';
+import StaffPayrollSalaryAdvancesEdit from './pages/staff/payroll/SalaryAdvancesEdit';
 
 
 function App() {
@@ -142,12 +178,6 @@ function App() {
           }>
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="users" element={<UserIndex />} />
-            <Route path="users/register" element={<UserRegister />} />
-            <Route path="users/edit/:id" element={<UserEdit />} />
-            <Route path="users/students" element={<div className="p-6"><h1 className="text-2xl font-bold">Students</h1><p className="text-gray-600 mt-2">Student management page coming soon...</p></div>} />
-            <Route path="users/teachers" element={<div className="p-6"><h1 className="text-2xl font-bold">Teachers</h1><p className="text-gray-600 mt-2">Teacher management page coming soon...</p></div>} />
-            <Route path="users/staff" element={<div className="p-6"><h1 className="text-2xl font-bold">Staff</h1><p className="text-gray-600 mt-2">Staff management page coming soon...</p></div>} />
             <Route path="academic/classes" element={<div className="p-6"><h1 className="text-2xl font-bold">Classes</h1><p className="text-gray-600 mt-2">Class management page coming soon...</p></div>} />
             <Route path="academic/subjects" element={<div className="p-6"><h1 className="text-2xl font-bold">Subjects</h1><p className="text-gray-600 mt-2">Subject management page coming soon...</p></div>} />
             <Route path="academic/exams" element={<div className="p-6"><h1 className="text-2xl font-bold">Exams</h1><p className="text-gray-600 mt-2">Exam management page coming soon...</p></div>} />
@@ -204,6 +234,9 @@ function App() {
           <Route path="/staff/*" element={<StaffPanel />}>
             <Route index element={<StaffDashboard />} />
             <Route path="dashboard" element={<StaffDashboard />} />
+            <Route path="users" element={<UserIndex />} />
+            <Route path="users/register" element={<UserRegister />} />
+            <Route path="users/edit/:id" element={<UserEdit />} />
             <Route path="students" element={<StaffStudents />} />
             <Route path="inventory" element={<StaffInventory />} />
             <Route path="library/categories" element={<StaffLibraryCategories />} />
@@ -216,6 +249,41 @@ function App() {
             <Route path="complaints/actions" element={<StaffComplaintActions />} />
             <Route path="complaints/feedback" element={<StaffComplaintFeedback />} />
             <Route path="complaints/reports" element={<StaffComplaintReports />} />
+            <Route path="finance" element={<StaffFinanceIndex />} />
+            <Route path="finance/transactions" element={<StaffFinanceTransactions />} />
+            <Route path="finance/transactions/create" element={<StaffFinanceTransactionsCreate />} />
+            <Route path="finance/transactions/edit/:id" element={<StaffFinanceTransactionsEdit />} />
+            <Route path="finance/accounts" element={<StaffFinanceAccounts />} />
+            <Route path="finance/accounts/create" element={<StaffFinanceAccountsCreate />} />
+            <Route path="finance/accounts/edit/:id" element={<StaffFinanceAccountsEdit />} />
+            <Route path="finance/fee-structures" element={<StaffFinanceFeeStructures />} />
+            <Route path="finance/fee-structures/create" element={<StaffFinanceFeeStructuresCreate />} />
+            <Route path="finance/fee-structures/edit/:id" element={<StaffFinanceFeeStructuresEdit />} />
+            <Route path="finance/student-fees" element={<StaffFinanceStudentFees />} />
+            <Route path="finance/student-fees/create" element={<StaffFinanceStudentFeesCreate />} />
+            <Route path="finance/student-fees/edit/:id" element={<StaffFinanceStudentFeesEdit />} />
+            <Route path="finance/fee-payments" element={<StaffFinanceFeePayments />} />
+            <Route path="finance/fee-payments/create" element={<StaffFinanceFeePaymentsCreate />} />
+            <Route path="finance/fee-payments/edit/:id" element={<StaffFinanceFeePaymentsEdit />} />
+            <Route path="finance/expenses" element={<StaffFinanceExpenses />} />
+            <Route path="finance/expenses/create" element={<StaffFinanceExpensesCreate />} />
+            <Route path="finance/expenses/edit/:id" element={<StaffFinanceExpensesEdit />} />
+            <Route path="finance/reports" element={<StaffFinanceReports />} />
+            <Route path="finance/reports/create" element={<StaffFinanceReportsCreate />} />
+            <Route path="finance/reports/edit/:id" element={<StaffFinanceReportsEdit />} />
+            <Route path="payroll" element={<StaffPayrollIndex />} />
+            <Route path="payroll/salary-structures" element={<StaffPayrollSalaryStructures />} />
+            <Route path="payroll/salary-structures/create" element={<StaffPayrollSalaryStructuresCreate />} />
+            <Route path="payroll/salary-structures/edit/:id" element={<StaffPayrollSalaryStructuresEdit />} />
+            <Route path="payroll/salary-payments" element={<StaffPayrollSalaryPayments />} />
+            <Route path="payroll/salary-payments/create" element={<StaffPayrollSalaryPaymentsCreate />} />
+            <Route path="payroll/salary-payments/edit/:id" element={<StaffPayrollSalaryPaymentsEdit />} />
+            <Route path="payroll/salary-deductions" element={<StaffPayrollSalaryDeductions />} />
+            <Route path="payroll/salary-deductions/create" element={<StaffPayrollSalaryDeductionsCreate />} />
+            <Route path="payroll/salary-deductions/edit/:id" element={<StaffPayrollSalaryDeductionsEdit />} />
+            <Route path="payroll/salary-advances" element={<StaffPayrollSalaryAdvances />} />
+            <Route path="payroll/salary-advances/create" element={<StaffPayrollSalaryAdvancesCreate />} />
+            <Route path="payroll/salary-advances/edit/:id" element={<StaffPayrollSalaryAdvancesEdit />} />
           </Route>
 
           {/* ================= STUDENT ================= */}
@@ -254,3 +322,4 @@ function App() {
 }
 
 export default App;
+
