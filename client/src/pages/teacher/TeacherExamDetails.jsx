@@ -1,203 +1,143 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useExam } from "../../contexts/ExamContext";
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Card from '../../components/UIHelper/Card';
+import Button from '../../components/UIHelper/Button';
+
+const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+
+const statusColors = { draft: 'bg-yellow-100 text-yellow-700', published: 'bg-green-100 text-green-700', finished: 'bg-gray-100 text-gray-700' };
 
 const TeacherExamDetails = () => {
   const { examId } = useParams();
   const navigate = useNavigate();
-  const {
-    getExamById,
-    publishExam,
-    closeExam,
-    deleteQuestion,
-  } = useExam();
+  const [exam, setExam] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const exam = getExamById(examId);
+  useEffect(() => { fetchExam(); }, [examId]);
 
-  if (!exam) {
-    return (
-      <div className="p-6 text-red-500">
-        Exam not found.
-      </div>
-    );
-  }
-
-  const handleDelete = (questionId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this question?"
-    );
-    if (!confirmDelete) return;
-
-    deleteQuestion(exam.id, questionId);
+  const fetchExam = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`http://localhost:5000/api/teacher/exams/${examId}`, api());
+      if (res.data.success) {
+        setExam(res.data.data);
+        setQuestions(res.data.data.questions || []);
+      }
+    } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
-  const renderQuestion = (q, index) => {
-    return (
-      <div
-        key={q.id}
-        className="border rounded p-4 bg-gray-50 space-y-2"
-      >
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="font-medium">
-              {index + 1}. {q.text}
-            </p>
-            <span className="text-sm text-gray-600">
-              {q.marks} marks
-            </span>
-          </div>
-
-          {/* Edit & Delete فقط در Draft */}
-          {exam.status === "draft" && (
-            <div className="flex gap-3 text-sm">
-              <button
-                onClick={() =>
-                  navigate(
-                    `/teacher/exams/${exam.id}/edit-question/${q.id}`
-                  )
-                }
-                className="text-blue-600 hover:underline"
-              >
-                Edit
-              </button>
-
-              <button
-                onClick={() => handleDelete(q.id)}
-                className="text-red-600 hover:underline"
-              >
-                Delete
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* MCQ */}
-        {q.type === "mcq" && (
-          <>
-            <ul className="ml-5 list-disc text-sm">
-              {q.options.map((opt, i) => (
-                <li key={i}>{opt}</li>
-              ))}
-            </ul>
-            <p className="text-green-600 text-sm">
-              Correct: {q.correctAnswer}
-            </p>
-          </>
-        )}
-
-        {/* True/False */}
-        {q.type === "truefalse" && (
-          <p className="text-green-600 text-sm">
-            Correct: {q.correctAnswer}
-          </p>
-        )}
-
-        {/* Short Answer */}
-        {q.type === "short" && (
-          <p className="text-gray-500 text-sm italic">
-            Short answer question
-          </p>
-        )}
-
-        {/* Essay */}
-        {q.type === "essay" && (
-          <p className="text-gray-500 text-sm italic">
-            Essay / Descriptive question
-          </p>
-        )}
-      </div>
-    );
+  const handlePublish = async () => {
+    try {
+      const res = await axios.put(`http://localhost:5000/api/teacher/exams/${examId}/publish`, {}, api());
+      if (res.data.success) { alert('Exam published!'); fetchExam(); }
+    } catch (e) { alert(e.response?.data?.message || 'Failed to publish'); }
   };
+
+  const handleClose = async () => {
+    try {
+      await axios.put(`http://localhost:5000/api/teacher/exams/${examId}/close`, {}, api());
+      fetchExam();
+    } catch (e) { alert('Failed to close'); }
+  };
+
+  const handleDeleteQuestion = async (qId) => {
+    if (!window.confirm('Delete this question?')) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/teacher/exams/${examId}/questions/${qId}`, api());
+      fetchExam();
+    } catch (e) { alert('Failed to delete question'); }
+  };
+
+  if (loading) return <div className="p-8 text-center text-gray-500">Loading...</div>;
+  if (!exam) return <div className="p-6 text-red-500">Exam not found</div>;
 
   return (
     <div className="p-6 space-y-6">
-
       {/* Header */}
-<div className="flex justify-between items-center flex-wrap gap-3">
-  <div>
-    <h1 className="text-2xl font-bold">{exam.title}</h1>
-    <p className="text-gray-500">
-      {exam.subject} | Class: {exam.className}
-    </p>
-  </div>
+      <div className="flex justify-between items-start flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">{exam.title}</h1>
+          <p className="text-gray-500">{exam.subject?.name} {exam.class ? `| ${exam.class.name} ${exam.class.section}` : ''}</p>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {exam.status === 'draft' && (
+            <>
+              <Button onClick={() => navigate(`/teacher/exams/${examId}/add-question`)}>+ Add Question</Button>
+              <Button onClick={handlePublish} className="bg-green-600 hover:bg-green-700 text-white">Publish</Button>
+            </>
+          )}
+          {exam.status === 'published' && (
+            <>
+              <Button onClick={() => navigate(`/teacher/exams/${examId}/submissions`)} className="bg-purple-600 hover:bg-purple-700 text-white">View Submissions</Button>
+              <Button onClick={handleClose} variant="danger">Close Exam</Button>
+            </>
+          )}
+          {exam.status === 'finished' && (
+            <Button onClick={() => navigate(`/teacher/exams/${examId}/submissions`)} className="bg-purple-600 hover:bg-purple-700 text-white">View Submissions</Button>
+          )}
+        </div>
+      </div>
 
-  <div className="flex gap-2 flex-wrap">
-
-    {/* Add Question */}
-    {exam.status === "draft" && (
-      <button
-        onClick={() =>
-          navigate(`/teacher/exams/${exam.id}/add-question`)
-        }
-        className="bg-blue-600 text-white px-4 py-2 rounded"
-      >
-        Add Question
-      </button>
-    )}
-
-    {/* Publish */}
-    {exam.status === "draft" && (
-      <button
-        onClick={() => publishExam(exam.id)}
-        className="bg-green-600 text-white px-4 py-2 rounded"
-      >
-        Publish
-      </button>
-    )}
-
-    {/* Close */}
-    {exam.status === "published" && (
-      <button
-        onClick={() => closeExam(exam.id)}
-        className="bg-red-600 text-white px-4 py-2 rounded"
-      >
-        Close
-      </button>
-    )}
-
-    {/* ✅ View Submissions */}
-    {(exam.status === "published" || exam.status === "closed") && (
-      <button
-        onClick={() =>
-          navigate(`/teacher/exams/${exam.id}/submissions`)
-        }
-        className="bg-purple-600 text-white px-4 py-2 rounded"
-      >
-        View Submissions
-      </button>
-    )}
-
-  </div>
-</div>
-
-
-      {/* Exam Info */}
-      <div className="bg-white shadow rounded p-4 space-y-2">
-        <p><strong>Duration:</strong> {exam.duration} minutes</p>
-        <p><strong>Total Marks:</strong> {exam.totalMarks}</p>
-        <p><strong>Status:</strong> {exam.status}</p>
-        <p><strong>Questions:</strong> {exam.questions.length}</p>
+      {/* Info */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Status', value: <span className={`px-2 py-1 text-xs rounded-full font-medium ${statusColors[exam.status]}`}>{exam.status}</span> },
+          { label: 'Duration', value: `${exam.duration} min` },
+          { label: 'Total Marks', value: exam.totalMarks },
+          { label: 'Questions', value: questions.length },
+        ].map(c => (
+          <Card key={c.label} className="text-center">
+            <div className="text-sm text-gray-500">{c.label}</div>
+            <div className="font-bold mt-1">{c.value}</div>
+          </Card>
+        ))}
       </div>
 
       {/* Questions */}
-      <div className="bg-white shadow rounded p-4">
-        <h2 className="text-lg font-semibold mb-4">
-          Questions
-        </h2>
-
-        {exam.questions.length === 0 ? (
-          <p className="text-gray-500">
-            No questions added yet.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {exam.questions.map((q, index) =>
-              renderQuestion(q, index)
-            )}
-          </div>
-        )}
-      </div>
-
+      <Card>
+        <div className="p-4">
+          <h2 className="text-lg font-semibold mb-4">Questions</h2>
+          {questions.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">No questions yet. {exam.status === 'draft' && 'Click "Add Question" to start.'}</p>
+          ) : (
+            <div className="space-y-4">
+              {questions.map((q, i) => (
+                <div key={q._id} className="border rounded-lg p-4 bg-gray-50">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="font-medium">{i + 1}. {q.question}</p>
+                      <div className="flex gap-2 mt-1">
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{q.questionType}</span>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{q.marks} marks</span>
+                      </div>
+                    </div>
+                    {exam.status === 'draft' && (
+                      <div className="flex gap-2 ml-4">
+                        <button onClick={() => navigate(`/teacher/exams/${examId}/edit-question/${q._id}`)} className="text-blue-600 hover:text-blue-800 text-sm">Edit</button>
+                        <button onClick={() => handleDeleteQuestion(q._id)} className="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                      </div>
+                    )}
+                  </div>
+                  {q.questionType === 'mcq' && q.options?.length > 0 && (
+                    <ul className="mt-2 ml-4 space-y-1">
+                      {q.options.map((opt, j) => (
+                        <li key={j} className={`text-sm ${opt === q.correctAnswer ? 'text-green-600 font-medium' : 'text-gray-600'}`}>
+                          {String.fromCharCode(65 + j)}. {opt} {opt === q.correctAnswer && '✓'}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {q.questionType === 'truefalse' && (
+                    <p className="text-sm text-green-600 mt-1">Correct: {q.correctAnswer}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </Card>
     </div>
   );
 };

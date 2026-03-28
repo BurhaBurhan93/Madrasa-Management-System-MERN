@@ -1,184 +1,150 @@
-import React, { useMemo, useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import Card from '../../components/UIHelper/Card';
-import Badge from '../../components/UIHelper/Badge';
-import Button from '../../components/UIHelper/Button';
 import { BarChartComponent } from '../../components/UIHelper/Chart';
-import { formatDate } from '../../lib/utils';
+
+const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const TeacherAttendanceReports = () => {
+  const [summary, setSummary] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [filters, setFilters] = useState({ classId: '', month: new Date().getMonth() + 1, year: new Date().getFullYear() });
+  const [loading, setLoading] = useState(false);
 
-  /* ================= RAW SESSION DATA ================= */
+  useEffect(() => { fetchClasses(); }, []);
+  useEffect(() => { fetchReport(); }, [filters]);
 
-  const attendanceData = [
-    { id: 1, date: '2024-02-01', course: 'Mathematics', status: 'present', time: '09:00 AM' },
-    { id: 2, date: '2024-02-01', course: 'Physics', status: 'present', time: '10:30 AM' },
-    { id: 3, date: '2024-02-01', course: 'Chemistry', status: 'absent', time: '12:00 PM' },
-    { id: 4, date: '2024-02-02', course: 'Mathematics', status: 'present', time: '09:00 AM' },
-    { id: 5, date: '2024-02-02', course: 'Physics', status: 'late', time: '10:45 AM' },
-    { id: 6, date: '2024-02-02', course: 'Chemistry', status: 'present', time: '12:00 PM' },
-    { id: 7, date: '2024-02-03', course: 'Mathematics', status: 'present', time: '09:00 AM' },
-    { id: 8, date: '2024-02-03', course: 'Physics', status: 'present', time: '10:30 AM' },
-    { id: 9, date: '2024-02-03', course: 'Chemistry', status: 'present', time: '12:00 PM' },
-  ];
-
-  const [filterCourse, setFilterCourse] = useState('all');
-
-  /* ================= FILTER ================= */
-
-  const filteredData = useMemo(() => {
-    if (filterCourse === 'all') return attendanceData;
-    return attendanceData.filter(r => r.course === filterCourse);
-  }, [filterCourse]);
-
-  /* ================= SUMMARY CALC ================= */
-
-  const summary = useMemo(() => {
-    const total = filteredData.length;
-    const present = filteredData.filter(r => r.status === 'present').length;
-    const absent = filteredData.filter(r => r.status === 'absent').length;
-    const late = filteredData.filter(r => r.status === 'late').length;
-
-    const rate = total > 0 ? Math.round((present / total) * 100) : 0;
-
-    return { total, present, absent, late, rate };
-  }, [filteredData]);
-
-  /* ================= MONTHLY TREND ================= */
-
-  const monthlyTrend = [
-    { month: 'Jan', attendance: 92 },
-    { month: 'Feb', attendance: 95 },
-    { month: 'Mar', attendance: 90 },
-    { month: 'Apr', attendance: 96 },
-    { month: 'May', attendance: 88 },
-  ];
-
-  const getStatusVariant = (status) => {
-    switch (status) {
-      case 'present': return 'success';
-      case 'absent': return 'danger';
-      case 'late': return 'warning';
-      default: return 'default';
-    }
+  const fetchClasses = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/teacher/classes', api());
+      if (res.data.success) setClasses(res.data.data);
+    } catch (e) { console.error(e); }
   };
 
-  const uniqueCourses = [...new Set(attendanceData.map(d => d.course))];
+  const fetchReport = async () => {
+    setLoading(true);
+    try {
+      const { classId, month, year } = filters;
+      const params = new URLSearchParams({ month, year, ...(classId && { classId }) });
+      const res = await axios.get(`http://localhost:5000/api/teacher/attendance/report?${params}`, api());
+      if (res.data.success) setSummary(res.data.data);
+    } catch (e) { console.error(e); } finally { setLoading(false); }
+  };
+
+  const getCount = (statuses, status) => statuses?.find(s => s.status === status)?.count || 0;
+
+  const chartData = summary.map(row => ({
+    name: row.user?.name?.split(' ')[0] || 'N/A',
+    present: getCount(row.statuses, 'present'),
+    absent: getCount(row.statuses, 'absent'),
+    late: getCount(row.statuses, 'late'),
+  }));
+
+  const totals = summary.reduce((acc, row) => ({
+    present: acc.present + getCount(row.statuses, 'present'),
+    absent: acc.absent + getCount(row.statuses, 'absent'),
+    late: acc.late + getCount(row.statuses, 'late'),
+  }), { present: 0, absent: 0, late: 0 });
+
+  const totalSessions = totals.present + totals.absent + totals.late;
+  const rate = totalSessions > 0 ? Math.round((totals.present / totalSessions) * 100) : 0;
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
-
-      {/* HEADER */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold">Attendance Reports</h1>
-        <p className="text-gray-600">
-          Class-level attendance analytics and performance overview
-        </p>
+        <p className="text-gray-500">Monthly attendance analytics for your classes</p>
       </div>
 
-      {/* FILTER BAR */}
+      {/* Filters */}
       <Card className="mb-6">
-        <div className="flex justify-between items-center flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 items-end">
           <div>
-            <label className="text-sm text-gray-600">Course</label>
-            <select
-              value={filterCourse}
-              onChange={(e) => setFilterCourse(e.target.value)}
-              className="block mt-1 border rounded px-3 py-2"
-            >
-              <option value="all">All Courses</option>
-              {uniqueCourses.map(course => (
-                <option key={course} value={course}>{course}</option>
-              ))}
+            <label className="text-sm text-gray-600 block mb-1">Class</label>
+            <select value={filters.classId} onChange={e => setFilters({ ...filters, classId: e.target.value })} className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500">
+              <option value="">All Classes</option>
+              {classes.map(c => <option key={c._id} value={c._id}>{c.name} {c.section}</option>)}
             </select>
           </div>
-
-          <Button variant="outline">
-            Export CSV
-          </Button>
+          <div>
+            <label className="text-sm text-gray-600 block mb-1">Month</label>
+            <select value={filters.month} onChange={e => setFilters({ ...filters, month: e.target.value })} className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500">
+              {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-sm text-gray-600 block mb-1">Year</label>
+            <input type="number" value={filters.year} onChange={e => setFilters({ ...filters, year: e.target.value })} className="border rounded-lg px-3 py-2 w-24 outline-none focus:ring-2 focus:ring-green-500" />
+          </div>
         </div>
       </Card>
 
-      {/* SUMMARY CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-
-        <Card className="text-center">
-          <div className="text-xl font-bold">{summary.total}</div>
-          <div className="text-xs text-gray-600">Total Sessions</div>
-        </Card>
-
-        <Card className="text-center">
-          <div className="text-xl font-bold text-green-600">{summary.present}</div>
-          <div className="text-xs text-gray-600">Present</div>
-        </Card>
-
-        <Card className="text-center">
-          <div className="text-xl font-bold text-red-600">{summary.absent}</div>
-          <div className="text-xs text-gray-600">Absent</div>
-        </Card>
-
-        <Card className="text-center">
-          <div className="text-xl font-bold text-yellow-600">{summary.late}</div>
-          <div className="text-xs text-gray-600">Late</div>
-        </Card>
-
-        <Card className="text-center">
-          <div className="text-xl font-bold text-purple-600">{summary.rate}%</div>
-          <div className="text-xs text-gray-600">Attendance Rate</div>
-        </Card>
-
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {[
+          { label: 'Total Sessions', value: totalSessions, color: 'text-gray-700' },
+          { label: 'Present', value: totals.present, color: 'text-green-600' },
+          { label: 'Absent', value: totals.absent, color: 'text-red-600' },
+          { label: 'Attendance Rate', value: `${rate}%`, color: 'text-purple-600' },
+        ].map(c => (
+          <Card key={c.label} className="text-center">
+            <div className={`text-2xl font-bold ${c.color}`}>{c.value}</div>
+            <div className="text-xs text-gray-500 mt-1">{c.label}</div>
+          </Card>
+        ))}
       </div>
 
-      {/* TREND CHART */}
-      <div className="mb-8">
-        <Card title="Monthly Attendance Trend">
-          <BarChartComponent
-            data={monthlyTrend}
-            dataKey="attendance"
-            nameKey="month"
-            title="Attendance Trend"
-          />
+      {/* Chart */}
+      {chartData.length > 0 && (
+        <Card className="mb-6" title="Student Attendance Overview">
+          <BarChartComponent data={chartData} dataKey="present" nameKey="name" />
         </Card>
-      </div>
+      )}
 
-      {/* SESSION TABLE */}
-      <Card title="Session Records">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-
-            <thead className="bg-gray-100">
+      {/* Table */}
+      <Card>
+        {loading ? <div className="p-8 text-center text-gray-500">Loading...</div> : (
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase">Course</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase">Time</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase">Status</th>
+                <th className="p-3 text-left">Student</th>
+                <th className="p-3 text-left">Code</th>
+                <th className="p-3 text-center text-green-600">Present</th>
+                <th className="p-3 text-center text-red-600">Absent</th>
+                <th className="p-3 text-center text-yellow-600">Late</th>
+                <th className="p-3 text-center text-blue-600">Excused</th>
+                <th className="p-3 text-center">Rate</th>
               </tr>
             </thead>
-
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredData.map(record => (
-                <tr key={record.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm">
-                    {formatDate(record.date)}
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    {record.course}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {record.time}
-                  </td>
-                  <td className="px-6 py-4">
-                    <Badge variant={getStatusVariant(record.status)}>
-                      {record.status}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
+            <tbody>
+              {summary.length === 0 ? (
+                <tr><td colSpan="7" className="p-8 text-center text-gray-500">No attendance data for this period</td></tr>
+              ) : summary.map(row => {
+                const p = getCount(row.statuses, 'present');
+                const a = getCount(row.statuses, 'absent');
+                const l = getCount(row.statuses, 'late');
+                const e = getCount(row.statuses, 'excused');
+                const total = p + a + l + e;
+                const rowRate = total > 0 ? Math.round((p / total) * 100) : 0;
+                return (
+                  <tr key={row._id} className="border-t hover:bg-gray-50">
+                    <td className="p-3 font-medium">{row.user?.name}</td>
+                    <td className="p-3 text-gray-500">{row.student?.studentCode}</td>
+                    <td className="p-3 text-center font-semibold text-green-600">{p}</td>
+                    <td className="p-3 text-center font-semibold text-red-600">{a}</td>
+                    <td className="p-3 text-center font-semibold text-yellow-600">{l}</td>
+                    <td className="p-3 text-center font-semibold text-blue-600">{e}</td>
+                    <td className="p-3 text-center">
+                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${rowRate >= 75 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{rowRate}%</span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
-
           </table>
-        </div>
+        )}
       </Card>
-
     </div>
   );
 };

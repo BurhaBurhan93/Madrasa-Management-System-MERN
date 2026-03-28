@@ -1,214 +1,149 @@
-import React, { useMemo, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useExam } from '../../contexts/ExamContext';
+import axios from 'axios';
 import Card from '../../components/UIHelper/Card';
 import Button from '../../components/UIHelper/Button';
-import Badge from '../../components/UIHelper/Badge';
-import DataTable from '../../components/UIHelper/DataTable';
 
-/* ================= MOCK DATA (Fallback) ================= */
+const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
-const mockExams = [
-  {
-    id: '1',
-    title: 'Midterm Mathematics',
-    subject: 'Mathematics',
-    className: 'Grade 10 - A',
-    duration: 60,
-    status: 'published'
-  },
-  {
-    id: '2',
-    title: 'Physics Final Exam',
-    subject: 'Physics',
-    className: 'Grade 11 - B',
-    duration: 90,
-    status: 'draft'
-  },
-  {
-    id: '3',
-    title: 'Chemistry Quiz',
-    subject: 'Chemistry',
-    className: 'Grade 9 - C',
-    duration: 45,
-    status: 'published'
-  },
-  {
-    id: '4',
-    title: 'Biology Practical',
-    subject: 'Biology',
-    className: 'Grade 12 - A',
-    duration: 120,
-    status: 'draft'
-  }
-];
+const statusColors = {
+  draft: 'bg-yellow-100 text-yellow-700',
+  published: 'bg-green-100 text-green-700',
+  finished: 'bg-gray-100 text-gray-700',
+  cancelled: 'bg-red-100 text-red-700',
+};
 
 const TeacherExamsList = () => {
   const navigate = useNavigate();
-  const { exams = [], deleteExam } = useExam(); // 👈 default empty array
-
+  const [exams, setExams] = useState([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleDelete = (id) => {
-    const confirmDelete = window.confirm(
-      'Are you sure you want to delete this exam?'
-    );
-    if (!confirmDelete) return;
-    deleteExam(id);
+  useEffect(() => { fetchExams(); }, []);
+
+  const fetchExams = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get('http://localhost:5000/api/teacher/exams', api());
+      if (res.data.success) setExams(res.data.data);
+    } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
-  /* ================= DATA SOURCE ================= */
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this exam?')) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/teacher/exams/${id}`, api());
+      fetchExams();
+    } catch (e) { alert('Failed to delete'); }
+  };
 
-  const dataSource = exams.length > 0 ? exams : mockExams;
+  const handlePublish = async (id) => {
+    try {
+      const res = await axios.put(`http://localhost:5000/api/teacher/exams/${id}/publish`, {}, api());
+      if (res.data.success) { alert('Exam published!'); fetchExams(); }
+    } catch (e) { alert(e.response?.data?.message || 'Failed to publish'); }
+  };
 
-  /* ================= FILTERED DATA ================= */
+  const handleClose = async (id) => {
+    try {
+      await axios.put(`http://localhost:5000/api/teacher/exams/${id}/close`, {}, api());
+      fetchExams();
+    } catch (e) { alert('Failed to close'); }
+  };
 
-  const filteredExams = useMemo(() => {
-    return dataSource.filter((exam) => {
-      const matchesSearch =
-        exam.title.toLowerCase().includes(search.toLowerCase());
+  const filtered = exams.filter(e => {
+    const matchSearch = e.title.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === '' || e.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
 
-      const matchesStatus =
-        statusFilter === '' || exam.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
-    });
-  }, [dataSource, search, statusFilter]);
-
-  /* ================= STATS ================= */
-
-  const stats = useMemo(() => {
-    const total = dataSource.length;
-    const published = dataSource.filter(e => e.status === 'published').length;
-    const draft = dataSource.filter(e => e.status === 'draft').length;
-
-    return { total, published, draft };
-  }, [dataSource]);
-
-  /* ================= TABLE COLUMNS ================= */
-
-  const columns = [
-    { key: 'title', header: 'Title' },
-    { key: 'subject', header: 'Subject' },
-    { key: 'className', header: 'Class' },
-    { key: 'duration', header: 'Duration (min)' },
-
-    {
-      key: 'status',
-      header: 'Status',
-      render: (value) => (
-        <Badge variant={value === 'draft' ? 'warning' : 'success'}>
-          {value}
-        </Badge>
-      )
-    },
-
-    {
-      key: 'actions',
-      header: 'Actions',
-      render: (_, row) => (
-        <div className="flex gap-2 flex-wrap">
-          <Button
-            size="sm"
-            onClick={() => navigate(`/teacher/exams/${row.id}`)}
-          >
-            View
-          </Button>
-
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() =>
-              navigate(`/teacher/exams/${row.id}/submissions`)
-            }
-          >
-            Submissions
-          </Button>
-
-          <Button
-            size="sm"
-            variant="danger"
-            onClick={() => handleDelete(row.id)}
-          >
-            Delete
-          </Button>
-        </div>
-      )
-    }
-  ];
+  const stats = {
+    total: exams.length,
+    published: exams.filter(e => e.status === 'published').length,
+    draft: exams.filter(e => e.status === 'draft').length,
+    finished: exams.filter(e => e.status === 'finished').length,
+  };
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
-
-      {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            My Exams
-          </h1>
-          <p className="text-sm text-gray-500">
-            Manage and monitor your exams
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">My Exams</h1>
+          <p className="text-sm text-gray-500">Manage and monitor your exams</p>
         </div>
-
-        <Button
-          onClick={() => navigate('/teacher/exams/create')}
-        >
-          Create Exam
-        </Button>
+        <Button onClick={() => navigate('/teacher/exams/create')}>+ Create Exam</Button>
       </div>
 
-      {/* KPI SECTION */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <p className="text-sm text-gray-500">Total Exams</p>
-          <p className="text-2xl font-bold">{stats.total}</p>
-        </Card>
-
-        <Card>
-          <p className="text-sm text-gray-500">Published</p>
-          <p className="text-2xl font-bold text-green-600">
-            {stats.published}
-          </p>
-        </Card>
-
-        <Card>
-          <p className="text-sm text-gray-500">Draft</p>
-          <p className="text-2xl font-bold text-yellow-600">
-            {stats.draft}
-          </p>
-        </Card>
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        {[
+          { label: 'Total', value: stats.total, color: 'text-gray-700' },
+          { label: 'Draft', value: stats.draft, color: 'text-yellow-600' },
+          { label: 'Published', value: stats.published, color: 'text-green-600' },
+          { label: 'Finished', value: stats.finished, color: 'text-blue-600' },
+        ].map(c => (
+          <Card key={c.label} className="text-center">
+            <div className={`text-2xl font-bold ${c.color}`}>{c.value}</div>
+            <div className="text-sm text-gray-500">{c.label}</div>
+          </Card>
+        ))}
       </div>
 
-      {/* FILTER SECTION */}
+      {/* Filters */}
       <Card className="mb-6">
-        <div className="flex flex-wrap gap-4 items-center">
-          <input
-            type="text"
-            placeholder="Search exam..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border rounded-lg px-3 py-2 w-64"
-          />
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border rounded-lg px-3 py-2"
-          >
+        <div className="flex gap-4 p-2">
+          <input type="text" placeholder="Search exam..." value={search} onChange={e => setSearch(e.target.value)} className="border rounded-lg px-3 py-2 flex-1 outline-none focus:ring-2 focus:ring-green-500" />
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500">
             <option value="">All Status</option>
-            <option value="published">Published</option>
             <option value="draft">Draft</option>
+            <option value="published">Published</option>
+            <option value="finished">Finished</option>
           </select>
         </div>
       </Card>
 
-      {/* TABLE */}
+      {/* Table */}
       <Card>
-        <DataTable columns={columns} data={filteredExams} />
+        {loading ? <div className="p-8 text-center text-gray-500">Loading...</div> : (
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="p-3 text-left">Title</th>
+                <th className="p-3 text-left">Subject</th>
+                <th className="p-3 text-left">Class</th>
+                <th className="p-3 text-left">Duration</th>
+                <th className="p-3 text-left">Total Marks</th>
+                <th className="p-3 text-left">Status</th>
+                <th className="p-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr><td colSpan="7" className="p-8 text-center text-gray-500">No exams found</td></tr>
+              ) : filtered.map(exam => (
+                <tr key={exam._id} className="border-t hover:bg-gray-50">
+                  <td className="p-3 font-medium">{exam.title}</td>
+                  <td className="p-3">{exam.subject?.name || '-'}</td>
+                  <td className="p-3">{exam.class?.name || '-'}</td>
+                  <td className="p-3">{exam.duration} min</td>
+                  <td className="p-3">{exam.totalMarks}</td>
+                  <td className="p-3"><span className={`px-2 py-1 text-xs rounded-full font-medium ${statusColors[exam.status]}`}>{exam.status}</span></td>
+                  <td className="p-3">
+                    <div className="flex gap-2 flex-wrap">
+                      <button onClick={() => navigate(`/teacher/exams/${exam._id}`)} className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200">View</button>
+                      {exam.status === 'draft' && <button onClick={() => handlePublish(exam._id)} className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200">Publish</button>}
+                      {exam.status === 'published' && <button onClick={() => handleClose(exam._id)} className="text-xs px-2 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200">Close</button>}
+                      {(exam.status === 'published' || exam.status === 'finished') && <button onClick={() => navigate(`/teacher/exams/${exam._id}/submissions`)} className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200">Submissions</button>}
+                      {exam.status === 'draft' && <button onClick={() => handleDelete(exam._id)} className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200">Delete</button>}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </Card>
-
     </div>
   );
 };

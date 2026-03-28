@@ -1,15 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authenticateToken = require('../../middleware/auth');
-const { getDashboardStats } = require('./teacherController');
-const Student = require('../../models/Student');
-const User = require('../../models/User');
-const Subject = require('../../models/Subject');
-const Class = require('../../models/Class');
-const Assignment = require('../../models/Assignment');
-const Exam = require('../../models/Exam');
-const AttendanceRecord = require('../../models/AttendanceRecord');
-const Complaint = require('../../models/Complaint');
+const ctrl = require('./teacherController');
 
 const ensureTeacher = (req, res, next) => {
   if (req.user.role !== 'teacher' && req.user.role !== 'admin') {
@@ -21,80 +13,50 @@ const ensureTeacher = (req, res, next) => {
 router.use(authenticateToken);
 router.use(ensureTeacher);
 
-// Get teacher dashboard stats
-router.get('/dashboard', getDashboardStats);
+// Dashboard
+router.get('/dashboard', ctrl.getDashboardStats);
 
-// Get all students
-router.get('/students', async (req, res) => {
-  try {
-    const students = await Student.find({ status: 'active' })
-      .populate('userId', 'name email')
-      .limit(10);
-    res.json(students);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// Students
+router.get('/students', ctrl.getStudents);
 
-// Get all subjects
-router.get('/subjects', async (req, res) => {
-  try {
-    const subjects = await Subject.find({ isActive: true }).limit(10);
-    res.json(subjects);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// Subjects
+router.get('/subjects', ctrl.getSubjects);
 
-// Get all assignments
-router.get('/assignments', async (req, res) => {
-  try {
-    const assignments = await Assignment.find()
-      .populate('subject', 'name')
-      .populate('class', 'name section')
-      .limit(10);
-    res.json(assignments);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// Classes
+router.get('/classes', ctrl.getClasses);
 
-// Get all exams
-router.get('/exams', async (req, res) => {
-  try {
-    const exams = await Exam.find()
-      .populate('subject', 'name')
-      .populate('class', 'name section')
-      .limit(10);
-    res.json(exams);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// Attendance Sessions
+router.get('/sessions', ctrl.getSessions);
+router.post('/sessions', ctrl.createSession);
 
-// Get attendance records
-router.get('/attendance', async (req, res) => {
-  try {
-    const attendance = await AttendanceRecord.find()
-      .populate('student', 'studentId')
-      .populate('subject', 'name')
-      .limit(10);
-    res.json(attendance);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// Attendance Records
+router.post('/attendance', ctrl.markAttendance);
+router.get('/attendance/session/:sessionId', ctrl.getAttendanceBySession);
+router.get('/attendance/report', ctrl.getAttendanceReport);
 
-// Get complaints assigned to teacher
-router.get('/complaints', async (req, res) => {
-  try {
-    const complaints = await Complaint.find()
-      .populate('submittedBy', 'name')
-      .limit(10);
-    res.json(complaints);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// Assignments
+router.get('/assignments', ctrl.getAssignments);
+router.post('/assignments', ctrl.createAssignment);
+router.put('/assignments/:id', ctrl.updateAssignment);
+router.delete('/assignments/:id', ctrl.deleteAssignment);
+
+// Exams
+router.get('/exams', ctrl.getExams);
+
+// Marks / Results
+router.get('/results', ctrl.getResults);
+router.post('/results/save-marks', ctrl.saveMarks);
+
+// Complaints
+router.get('/complaints', ctrl.getComplaints);
+router.put('/complaints/:id/status', ctrl.updateComplaintStatus);
+
+// Leave
+router.get('/leave-types', ctrl.getLeaveTypes);
+router.get('/leaves', ctrl.getMyLeaves);
+router.post('/leaves', ctrl.applyLeave);
+
+// Payslip
+router.get('/payslips', ctrl.getMyPayslips);
 
 module.exports = router;

@@ -1,9 +1,11 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const seedDatabase = require('./seedDatabase');
 
-require('dotenv').config();
+
 
 const app = express();
 
@@ -23,6 +25,9 @@ const staffRoutes = require('./modules/staff/staffRoutes');
 const teacherRoutes = require('./modules/teachers/teacherRoutes');
 const financeRoutes = require('./modules/finance/financeRoutes');
 const payrollRoutes = require('./modules/payroll/payrollRoutes');
+const hrRoutes = require('./modules/hr/hrRoutes');
+const kitchenRoutes = require('./modules/kitchen/kitchenRoutes');
+const examRoutes = require('./modules/teachers/examRoutes');
 
 // Load user routes with error handling
 let userRoutes;
@@ -41,6 +46,9 @@ app.use('/api/staff', staffRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/payroll', payrollRoutes);
+app.use('/api/hr', hrRoutes);
+app.use('/api/kitchen', kitchenRoutes);
+app.use('/api', examRoutes);
 
 if (userRoutes) {
   app.use('/api/users', userRoutes);

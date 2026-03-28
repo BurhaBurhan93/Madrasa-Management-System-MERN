@@ -29,8 +29,8 @@ const TeacherStudents = () => {
         axios.get('http://localhost:5000/api/teacher/students', config)
       ]);
 
-      setSubjects(subjectsRes.data || []);
-      setStudents(studentsRes.data || []);
+      setSubjects(subjectsRes.data.data || []);
+      setStudents(studentsRes.data.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -46,8 +46,8 @@ const TeacherStudents = () => {
       student._id === selectedSubject;
 
     const matchesSearch =
-      (student.name || student.userId?.name || '').toLowerCase().includes(search.toLowerCase()) ||
-      (student.studentId || '').toLowerCase().includes(search.toLowerCase());
+      (student.user?.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (student.studentCode || '').toLowerCase().includes(search.toLowerCase());
 
     return matchesSubject && matchesSearch;
   });
@@ -128,7 +128,7 @@ const TeacherStudents = () => {
           >
             <option value="all">All Subjects</option>
             {subjects.map((sub) => (
-              <option key={sub.id} value={sub.id}>
+              <option key={sub._id} value={sub._id}>
                 {sub.name}
               </option>
             ))}
@@ -149,7 +149,7 @@ const TeacherStudents = () => {
         {filteredStudents.map((student) => {
           const subject = subjects.find(s => s.id === student.subjectId || s._id === student.subjectId);
           const status = getStatus(student.average || 0);
-          const studentName = student.name || student.userId?.name || 'Unknown';
+          const studentName = student.user?.name || 'Unknown';
 
           return (
             <Card key={student.id || student._id} className="hover:shadow-md transition-shadow">
@@ -158,7 +158,7 @@ const TeacherStudents = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-lg font-semibold">{studentName}</h3>
-                    <p className="text-sm text-gray-500">{student.studentId || 'N/A'}</p>
+                    <p className="text-sm text-gray-500">{student.studentCode || 'N/A'}</p>
                   </div>
                   <Badge variant={status.variant}>
                     {status.text}

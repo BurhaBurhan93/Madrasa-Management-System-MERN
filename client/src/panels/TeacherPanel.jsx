@@ -10,6 +10,7 @@ import useLocalStorage from '../hooks/useLocalStorage';
 const TeacherPanel = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
 
   const [sidebarOpen, setSidebarOpen] = useLocalStorage('teacherSidebarOpen', true);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -78,7 +79,6 @@ const TeacherPanel = () => {
       label: 'Attendance',
       type: 'dropdown',
       items: [
-        { id: 'sessions', label: 'Class Sessions', path: 'sessions' },
         { id: 'mark-attendance', label: 'Mark Attendance', path: 'attendance' },
         { id: 'attendance-reports', label: 'Attendance Reports', path: 'attendance-reports' },
       ]
@@ -110,7 +110,6 @@ const TeacherPanel = () => {
       type: 'dropdown',
       items: [
         { id: 'complaints', label: 'Assigned Complaints', path: 'complaints' },
-        { id: 'messages', label: 'Messages', path: 'messages' },
       ]
     },
   ];

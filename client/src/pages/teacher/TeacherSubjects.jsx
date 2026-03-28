@@ -23,7 +23,7 @@ const TeacherSubjects = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const response = await axios.get('http://localhost:5000/api/teacher/subjects', config);
-      setSubjects(response.data || []);
+      setSubjects(response.data.data || []);
     } catch (error) {
       console.error('Error fetching subjects:', error);
     } finally {

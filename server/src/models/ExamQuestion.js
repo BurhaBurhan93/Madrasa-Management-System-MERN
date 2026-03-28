@@ -6,6 +6,10 @@ const ExamQuestionSchema = new Schema({
   class: { type: Schema.Types.ObjectId, ref: 'Class' },
   subject: { type: Schema.Types.ObjectId, ref: 'Subject' },
   question: { type: String, required: true },
+  questionType: { type: String, enum: ['mcq', 'truefalse', 'short', 'essay'], default: 'mcq' },
+  options: [{ type: String }],
+  correctAnswer: { type: String },
+  marks: { type: Number, default: 1 },
   answer: { type: String },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });

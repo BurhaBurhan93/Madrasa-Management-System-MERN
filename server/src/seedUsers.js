@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const seedUsers = async () => {
   try {
     const testUsers = [
-      { name: 'Admin User', email: 'admin@gm  ', password: 'admin1234', role: 'admin' },
+      { name: 'Admin User', email: 'admin@gmail.com', password: 'admin1234', role: 'admin' },
       { name: 'Student User', email: 'student@gmail.com', password: 'student1234', role: 'student' },
       { name: 'Teacher User', email: 'teacher@gmail.com', password: 'teacher1234', role: 'teacher' },
       { name: 'Staff User', email: 'staff@gmail.com', password: 'staff1234', role: 'staff' }

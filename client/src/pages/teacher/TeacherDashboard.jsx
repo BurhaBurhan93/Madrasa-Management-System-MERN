@@ -45,53 +45,34 @@ const TeacherDashboard = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       const statsRes = await axios.get('http://localhost:5000/api/teacher/dashboard', config);
-      setQuickStats(statsRes.data);
+      setQuickStats(statsRes.data.data || statsRes.data);
 
       const assignmentsRes = await axios.get('http://localhost:5000/api/teacher/assignments', config);
-      const assignments = assignmentsRes.data || [];
+      const assignments = assignmentsRes.data.data || [];
       
       const examsRes = await axios.get('http://localhost:5000/api/teacher/exams', config);
-      const exams = examsRes.data || [];
-
-      const attendanceRes = await axios.get('http://localhost:5000/api/teacher/attendance', config);
-      const attendance = attendanceRes.data || [];
-
-      const monthlyAttendance = {};
-      attendance.forEach(record => {
-        const month = new Date(record.date).toLocaleString('default', { month: 'short' });
-        if (!monthlyAttendance[month]) {
-          monthlyAttendance[month] = { total: 0, present: 0 };
-        }
-        monthlyAttendance[month].total++;
-        if (record.status === 'present') monthlyAttendance[month].present++;
-      });
-      
-      const attendanceChart = Object.keys(monthlyAttendance).map(month => ({
-        month,
-        rate: Math.round((monthlyAttendance[month].present / monthlyAttendance[month].total) * 100)
-      }));
-      setClassAttendanceData(attendanceChart);
+      const exams = examsRes.data.data || [];
 
       const activities = [
         ...assignments.slice(0, 2).map(a => ({
           id: a._id,
           title: 'Assignment: ' + a.title,
-          course: a.subject?.name,
+          course: a.courseId?.name,
           date: a.dueDate
         })),
         ...exams.slice(0, 1).map(e => ({
           id: e._id,
-          title: 'Exam: ' + e.name,
-          course: e.subject?.name,
-          date: e.date
+          title: 'Exam: ' + e.title,
+          course: e.examType?.name,
+          date: e.startDate
         }))
       ];
       setRecentActivity(activities);
 
-      const upcoming = exams.filter(e => e.status === 'upcoming').slice(0, 3).map(e => ({
+      const upcoming = exams.filter(e => e.status === 'scheduled').slice(0, 3).map(e => ({
         id: e._id,
-        title: e.name,
-        date: e.date,
+        title: e.title,
+        date: e.startDate,
         time: '10:00 AM'
       }));
       setUpcomingClasses(upcoming);
