@@ -65,7 +65,6 @@ exports.getPurchases = async (req, res) => {
       };
     }
     const purchases = await KitchenPurchase.find(query)
-      .populate('supplier', 'name phone')
       .sort({ purchaseDate: -1 });
     res.json({ success: true, count: purchases.length, data: purchases });
   } catch (error) {
@@ -288,7 +287,7 @@ exports.getSupplierHistory = async (req, res) => {
   try {
     const supplier = await Supplier.findById(req.params.id);
     if (!supplier) return res.status(404).json({ success: false, message: 'Supplier not found' });
-    const purchases = await KitchenPurchase.find({ supplier: req.params.id }).sort({ purchaseDate: -1 });
+    const purchases = await KitchenPurchase.find({ supplier: supplier.name }).sort({ purchaseDate: -1 });
     const totalSpent = purchases.reduce((s, p) => s + p.totalPrice, 0);
     res.json({ success: true, data: { supplier, purchases, totalSpent } });
   } catch (error) {
@@ -349,7 +348,7 @@ exports.getReports = async (req, res) => {
     const [purchases, consumption, inventory, budget, waste, activeStudents] = await Promise.all([
       KitchenPurchase.find({ purchaseDate: dateRange }),
       DailyFoodConsumption.find({ consumptionDate: dateRange }),
-      KitchenInventory.find(),
+      KitchenInventory.find().select('quantity minimumStock itemName unit'),
       KitchenBudget.findOne({ month: m, year: y }),
       KitchenWaste.find({ wasteDate: dateRange }),
       Student.countDocuments({ status: 'active', deletedAt: null })

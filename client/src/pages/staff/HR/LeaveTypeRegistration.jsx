@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../../lib/api';
 import Button from '../../../components/UIHelper/Button';
-import { FiPlus, FiEdit2, FiTrash2, FiX } from 'react-icons/fi';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 
 const LeaveTypeRegistration = () => {
   const [leaveTypes, setLeaveTypes] = useState([]);
@@ -27,13 +27,8 @@ const LeaveTypeRegistration = () => {
 
   const fetchLeaveTypes = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/hr/leave-types', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.data.success) {
-        setLeaveTypes(res.data.data);
-      }
+      const res = await api.get('/hr/leave-types');
+      if (res.data.success) setLeaveTypes(res.data.data);
     } catch (error) {
       console.error('Error fetching leave types:', error);
       alert('Failed to fetch leave types');
@@ -53,16 +48,10 @@ const LeaveTypeRegistration = () => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const url = editMode
-        ? `http://localhost:5000/api/hr/leave-types/${currentId}`
-        : 'http://localhost:5000/api/hr/leave-types';
-      
-      const method = editMode ? 'put' : 'post';
-      
-      const res = await axios[method](url, formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api[editMode ? 'put' : 'post'](
+        editMode ? `/hr/leave-types/${currentId}` : '/hr/leave-types',
+        formData
+      );
 
       if (res.data.success) {
         alert(res.data.message);
@@ -99,10 +88,7 @@ const LeaveTypeRegistration = () => {
     if (!window.confirm('Are you sure you want to delete this leave type?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.delete(`http://localhost:5000/api/hr/leave-types/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.delete(`/hr/leave-types/${id}`);
 
       if (res.data.success) {
         alert(res.data.message);
@@ -132,263 +118,100 @@ const LeaveTypeRegistration = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Leave Type Registration</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage different types of leaves</p>
-        </div>
-        <Button
-          onClick={() => {
-            resetForm();
-            setShowModal(true);
-          }}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white"
-        >
-          <FiPlus className="inline mr-2" /> Add Leave Type
-        </Button>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800">Leave Type Registration</h1>
+        <p className="text-sm text-gray-500 mt-1">Manage different types of leaves</p>
       </div>
 
-      {/* Leave Types Table */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 text-gray-600 text-sm">
-            <tr>
-              <th className="p-3 text-left">Code</th>
-              <th className="p-3 text-left">Leave Type</th>
-              <th className="p-3 text-left">Max Days</th>
-              <th className="p-3 text-left">Paid/Unpaid</th>
-              <th className="p-3 text-left">Carry Forward</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaveTypes.length === 0 ? (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Form */}
+        <div className="bg-white rounded-xl shadow p-6 space-y-3">
+          <h2 className="text-lg font-semibold text-gray-700">{editMode ? 'Edit Leave Type' : 'Add Leave Type'}</h2>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Leave Type Name <span className="text-red-500">*</span></label>
+              <input type="text" name="leaveTypeName" value={formData.leaveTypeName} onChange={handleInputChange} required className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="e.g., Sick Leave" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Leave Code <span className="text-red-500">*</span></label>
+              <input type="text" name="leaveCode" value={formData.leaveCode} onChange={handleInputChange} required className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="e.g., SL" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Max Days <span className="text-red-500">*</span></label>
+              <input type="number" name="maxDaysAllowed" value={formData.maxDaysAllowed} onChange={handleInputChange} required min="1" className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Gender Specific</label>
+              <select name="genderSpecific" value={formData.genderSpecific} onChange={handleInputChange} className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none">
+                <option value="both">Both</option>
+                <option value="male">Male Only</option>
+                <option value="female">Female Only</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                <input type="checkbox" name="isPaid" checked={formData.isPaid} onChange={handleInputChange} className="w-4 h-4 text-cyan-600 rounded" /> Paid Leave
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                <input type="checkbox" name="carryForward" checked={formData.carryForward} onChange={handleInputChange} className="w-4 h-4 text-cyan-600 rounded" /> Carry Forward
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                <input type="checkbox" name="requiresMedicalCertificate" checked={formData.requiresMedicalCertificate} onChange={handleInputChange} className="w-4 h-4 text-cyan-600 rounded" /> Medical Certificate
+              </label>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select name="status" value={formData.status} onChange={handleInputChange} className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button type="submit" disabled={loading} className="flex-1">{loading ? 'Saving...' : editMode ? 'Update' : 'Create'}</Button>
+              {editMode && <Button type="button" variant="secondary" onClick={resetForm}>Cancel</Button>}
+            </div>
+          </form>
+        </div>
+
+        {/* Table */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50 text-gray-600 text-sm">
               <tr>
-                <td colSpan="7" className="p-8 text-center text-gray-500">
-                  No leave types found. Click "Add Leave Type" to create one.
-                </td>
+                <th className="p-3 text-left">Code</th>
+                <th className="p-3 text-left">Leave Type</th>
+                <th className="p-3 text-left">Max Days</th>
+                <th className="p-3 text-left">Paid</th>
+                <th className="p-3 text-left">Carry Forward</th>
+                <th className="p-3 text-left">Status</th>
+                <th className="p-3 text-left">Actions</th>
               </tr>
-            ) : (
-              leaveTypes.map((leaveType) => (
-                <tr key={leaveType._id} className="border-t hover:bg-gray-50">
-                  <td className="p-3 font-medium">{leaveType.leaveCode}</td>
-                  <td className="p-3">{leaveType.leaveTypeName}</td>
-                  <td className="p-3">{leaveType.maxDaysAllowed} days</td>
+            </thead>
+            <tbody>
+              {leaveTypes.length === 0 ? (
+                <tr><td colSpan="7" className="p-8 text-center text-gray-500">No leave types found</td></tr>
+              ) : leaveTypes.map(lt => (
+                <tr key={lt._id} className="border-t hover:bg-gray-50">
+                  <td className="p-3 font-medium">{lt.leaveCode}</td>
+                  <td className="p-3">{lt.leaveTypeName}</td>
+                  <td className="p-3">{lt.maxDaysAllowed} days</td>
                   <td className="p-3">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        leaveType.isPaid
-                          ? 'bg-green-100 text-green-600'
-                          : 'bg-orange-100 text-orange-600'
-                      }`}
-                    >
-                      {leaveType.isPaid ? 'Paid' : 'Unpaid'}
-                    </span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${lt.isPaid ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}`}>{lt.isPaid ? 'Paid' : 'Unpaid'}</span>
                   </td>
-                  <td className="p-3">{leaveType.carryForward ? 'Yes' : 'No'}</td>
+                  <td className="p-3">{lt.carryForward ? 'Yes' : 'No'}</td>
                   <td className="p-3">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        leaveType.status === 'active'
-                          ? 'bg-green-100 text-green-600'
-                          : 'bg-red-100 text-red-600'
-                      }`}
-                    >
-                      {leaveType.status}
-                    </span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${lt.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>{lt.status}</span>
                   </td>
                   <td className="p-3 space-x-2">
-                    <button
-                      onClick={() => handleEdit(leaveType)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <FiEdit2 size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(leaveType._id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <FiTrash2 size={18} />
-                    </button>
+                    <button onClick={() => handleEdit(lt)} className="text-blue-600 hover:text-blue-800"><FiEdit2 size={18} /></button>
+                    <button onClick={() => handleDelete(lt._id)} className="text-red-600 hover:text-red-800"><FiTrash2 size={18} /></button>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-800">
-                {editMode ? 'Edit Leave Type' : 'Add New Leave Type'}
-              </h2>
-              <button
-                onClick={() => {
-                  setShowModal(false);
-                  resetForm();
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <FiX size={24} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Leave Type Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="leaveTypeName"
-                    value={formData.leaveTypeName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-                    placeholder="e.g., Sick Leave"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Leave Code <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="leaveCode"
-                    value={formData.leaveCode}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-                    placeholder="e.g., SL"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Max Days Allowed <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="maxDaysAllowed"
-                    value={formData.maxDaysAllowed}
-                    onChange={handleInputChange}
-                    required
-                    min="1"
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-                    placeholder="e.g., 15"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Gender Specific
-                  </label>
-                  <select
-                    name="genderSpecific"
-                    value={formData.genderSpecific}
-                    onChange={handleInputChange}
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-                  >
-                    <option value="both">Both</option>
-                    <option value="male">Male Only</option>
-                    <option value="female">Female Only</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="isPaid"
-                    checked={formData.isPaid}
-                    onChange={handleInputChange}
-                    className="w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500"
-                  />
-                  <label className="ml-2 text-sm text-gray-700">Paid Leave</label>
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="carryForward"
-                    checked={formData.carryForward}
-                    onChange={handleInputChange}
-                    className="w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500"
-                  />
-                  <label className="ml-2 text-sm text-gray-700">Carry Forward</label>
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="requiresMedicalCertificate"
-                    checked={formData.requiresMedicalCertificate}
-                    onChange={handleInputChange}
-                    className="w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500"
-                  />
-                  <label className="ml-2 text-sm text-gray-700">Medical Certificate</label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows="3"
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-                  placeholder="Leave type description..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setShowModal(false);
-                    resetForm();
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Saving...' : editMode ? 'Update' : 'Create'}
-                </Button>
-              </div>
-            </form>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
     </div>
   );
 };

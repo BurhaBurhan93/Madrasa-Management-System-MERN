@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../../lib/api';
 
 const statusColors = {
   active: 'bg-green-100 text-green-700',
@@ -13,8 +13,7 @@ const Employees = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const token = () => localStorage.getItem('token');
-  const headers = () => ({ Authorization: `Bearer ${token()}` });
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchEmployees();
@@ -24,10 +23,11 @@ const Employees = () => {
   const fetchEmployees = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/hr/employees', { headers: headers() });
+      const res = await api.get('/hr/employees');
       if (res.data.success) setEmployees(res.data.data);
     } catch (error) {
       console.error('Error fetching employees:', error);
+      setError('Failed to load employees. Please check your connection.');
     } finally {
       setLoading(false);
     }
@@ -35,10 +35,11 @@ const Employees = () => {
 
   const fetchDepartments = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/hr/departments', { headers: headers() });
+      const res = await api.get('/hr/departments');
       if (res.data.success) setDepartments(res.data.data);
     } catch (error) {
       console.error('Error fetching departments:', error);
+      setError('Failed to load departments.');
     }
   };
 
@@ -55,6 +56,10 @@ const Employees = () => {
         <h1 className="text-2xl font-bold text-gray-800">Employees</h1>
         <p className="text-sm text-gray-500 mt-1">Overview of all registered employees</p>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{error}</div>
+      )}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-4">

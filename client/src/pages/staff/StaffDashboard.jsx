@@ -10,7 +10,11 @@ const StaffDashboard = () => {
     totalBooks: 0,
     borrowedBooks: 0,
     totalStudents: 0,
-    pendingComplaints: 0
+    pendingComplaints: 0,
+    totalEmployees: 0,
+    pendingLeaves: 0,
+    totalInventoryItems: 0,
+    lowStockItems: 0
   });
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +86,10 @@ const StaffDashboard = () => {
     { label: 'Borrowed', value: stats.borrowedBooks, icon: FiActivity, color: 'from-orange-400 to-orange-600' },
     { label: 'Active Users', value: stats.totalStudents, icon: FiUsers, color: 'from-green-400 to-green-600' },
     { label: 'Pending Complaints', value: stats.pendingComplaints, icon: FiInbox, color: 'from-red-400 to-red-600' },
+    { label: 'Employees', value: stats.totalEmployees, icon: FiUsers, color: 'from-purple-400 to-purple-600' },
+    { label: 'Pending Leaves', value: stats.pendingLeaves, icon: FiClock, color: 'from-yellow-400 to-yellow-600' },
+    { label: 'Kitchen Items', value: stats.totalInventoryItems, icon: FiTrendingUp, color: 'from-cyan-400 to-cyan-600' },
+    { label: 'Low Stock', value: stats.lowStockItems, icon: FiAlertCircle, color: 'from-pink-400 to-pink-600' },
   ];
 
   if (loading) {
@@ -115,6 +123,24 @@ const StaffDashboard = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* HR & Kitchen Section Labels */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
+          <p className="text-sm font-semibold text-purple-700 mb-1">👥 HR Department</p>
+          <div className="flex gap-6">
+            <div><p className="text-2xl font-bold text-purple-700">{stats.totalEmployees}</p><p className="text-xs text-gray-500">Active Employees</p></div>
+            <div><p className="text-2xl font-bold text-yellow-600">{stats.pendingLeaves}</p><p className="text-xs text-gray-500">Pending Leaves</p></div>
+          </div>
+        </div>
+        <div className="bg-cyan-50 border border-cyan-100 rounded-xl p-4">
+          <p className="text-sm font-semibold text-cyan-700 mb-1">🍽️ Kitchen Department</p>
+          <div className="flex gap-6">
+            <div><p className="text-2xl font-bold text-cyan-700">{stats.totalInventoryItems}</p><p className="text-xs text-gray-500">Inventory Items</p></div>
+            <div><p className="text-2xl font-bold text-pink-600">{stats.lowStockItems}</p><p className="text-xs text-gray-500">Low Stock Alerts</p></div>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

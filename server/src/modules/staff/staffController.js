@@ -4,6 +4,8 @@ const Book = require('../../models/Book');
 const BorrowedBook = require('../../models/BorrowedBook');
 const Complaint = require('../../models/Complaint');
 const Employee = require('../../models/Employee');
+const Leave = require('../../models/Leave');
+const KitchenInventory = require('../../models/KitchenInventory');
 
 // Get dashboard stats
 const getDashboardStats = async (req, res) => {
@@ -12,12 +14,20 @@ const getDashboardStats = async (req, res) => {
     const borrowedBooks = await BorrowedBook.countDocuments({ status: 'borrowed' });
     const totalStudents = await Student.countDocuments();
     const pendingComplaints = await Complaint.countDocuments({ status: 'pending' });
+    const totalEmployees = await Employee.countDocuments({ status: 'active' });
+    const pendingLeaves = await Leave.countDocuments({ status: 'pending' });
+    const totalInventoryItems = await KitchenInventory.countDocuments();
+    const lowStockItems = await KitchenInventory.countDocuments({ status: 'low' });
 
     res.json({
       totalBooks,
       borrowedBooks,
       totalStudents,
-      pendingComplaints
+      pendingComplaints,
+      totalEmployees,
+      pendingLeaves,
+      totalInventoryItems,
+      lowStockItems
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

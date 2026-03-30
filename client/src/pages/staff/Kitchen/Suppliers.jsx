@@ -1,13 +1,10 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../../lib/api';
 import Button from '../../../components/UIHelper/Button';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiEye } from 'react-icons/fi';
-
-const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+import { FiEdit2, FiTrash2, FiX, FiEye } from 'react-icons/fi';
 
 const Suppliers = () => {
   const [suppliers, setSuppliers] = useState([]);
-  const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [historyModal, setHistoryModal] = useState(null);
   const [history, setHistory] = useState(null);
@@ -19,7 +16,7 @@ const Suppliers = () => {
   const fetchSuppliers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/kitchen/suppliers', api());
+    const res = await api.get('/kitchen/suppliers');
       if (res.data.success) setSuppliers(res.data.data);
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
@@ -29,12 +26,11 @@ const Suppliers = () => {
     try {
       const payload = { ...form, itemsSupplied: form.itemsSupplied.split(',').map(i => i.trim()).filter(Boolean) };
       if (editItem) {
-        await axios.put(`http://localhost:5000/api/kitchen/suppliers/${editItem._id}`, payload, api());
+        await api.put(`/kitchen/suppliers/${editItem._id}`, payload);
       } else {
-        await axios.post('http://localhost:5000/api/kitchen/suppliers', payload, api());
+        await api.post('/kitchen/suppliers', payload);
       }
       fetchSuppliers();
-      setShowModal(false);
       setEditItem(null);
       setForm({ name: '', phone: '', address: '', itemsSupplied: '', status: 'active', notes: '' });
     } catch (e) { alert(e.response?.data?.message || 'Failed to save'); }
@@ -43,33 +39,27 @@ const Suppliers = () => {
   const handleEdit = (s) => {
     setEditItem(s);
     setForm({ name: s.name, phone: s.phone || '', address: s.address || '', itemsSupplied: s.itemsSupplied?.join(', ') || '', status: s.status, notes: s.notes || '' });
-    setShowModal(true);
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this supplier?')) return;
-    try { await axios.delete(`http://localhost:5000/api/kitchen/suppliers/${id}`, api()); fetchSuppliers(); }
+    try { await api.delete(`/kitchen/suppliers/${id}`); fetchSuppliers(); }
     catch (e) { alert('Failed to delete'); }
   };
 
   const viewHistory = async (supplier) => {
     setHistoryModal(supplier);
     try {
-      const res = await axios.get(`http://localhost:5000/api/kitchen/suppliers/${supplier._id}/history`, api());
+      const res = await api.get(`/kitchen/suppliers/${supplier._id}/history`);
       if (res.data.success) setHistory(res.data.data);
     } catch (e) { console.error(e); }
   };
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Suppliers</h1>
-          <p className="text-sm text-gray-500">Manage kitchen suppliers and purchase history</p>
-        </div>
-        <Button onClick={() => { setEditItem(null); setForm({ name: '', phone: '', address: '', itemsSupplied: '', status: 'active', notes: '' }); setShowModal(true); }} className="bg-cyan-500 hover:bg-cyan-600 text-white">
-          <FiPlus className="inline mr-1" /> Add Supplier
-        </Button>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800">Suppliers</h1>
+        <p className="text-sm text-gray-500">Manage kitchen suppliers and purchase history</p>
       </div>
 
       {/* Stats */}
@@ -84,65 +74,60 @@ const Suppliers = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
-        {loading ? <div className="p-8 text-center text-gray-500">Loading...</div> : (
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-600">
-              <tr>
-                <th className="p-3 text-left">Name</th>
-                <th className="p-3 text-left">Phone</th>
-                <th className="p-3 text-left">Items Supplied</th>
-                <th className="p-3 text-left">Status</th>
-                <th className="p-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {suppliers.length === 0 ? (
-                <tr><td colSpan="5" className="p-8 text-center text-gray-500">No suppliers found</td></tr>
-              ) : suppliers.map(s => (
-                <tr key={s._id} className="border-t hover:bg-gray-50">
-                  <td className="p-3 font-medium">{s.name}</td>
-                  <td className="p-3">{s.phone || '-'}</td>
-                  <td className="p-3 text-gray-500">{s.itemsSupplied?.join(', ') || '-'}</td>
-                  <td className="p-3"><span className={`px-2 py-1 text-xs rounded-full font-medium ${s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{s.status}</span></td>
-                  <td className="p-3 flex gap-2">
-                    <button onClick={() => viewHistory(s)} className="text-purple-600 hover:text-purple-800"><FiEye size={16} /></button>
-                    <button onClick={() => handleEdit(s)} className="text-blue-600 hover:text-blue-800"><FiEdit2 size={16} /></button>
-                    <button onClick={() => handleDelete(s._id)} className="text-red-600 hover:text-red-800"><FiTrash2 size={16} /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Add/Edit Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">{editItem ? 'Edit Supplier' : 'Add Supplier'}</h2>
-              <button onClick={() => setShowModal(false)}><FiX size={24} /></button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Form */}
+        <div className="bg-white rounded-xl shadow p-6 space-y-3">
+          <h2 className="text-lg font-semibold text-gray-700">{editItem ? 'Edit Supplier' : 'Add Supplier'}</h2>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input type="text" placeholder="Supplier Name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500" />
+            <input type="text" placeholder="Phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500" />
+            <input type="text" placeholder="Address" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500" />
+            <input type="text" placeholder="Items Supplied (comma separated)" value={form.itemsSupplied} onChange={e => setForm({ ...form, itemsSupplied: e.target.value })} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500" />
+            <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <div className="flex gap-2 pt-1">
+              <Button type="submit" className="flex-1">{editItem ? 'Update' : 'Add'}</Button>
+              {editItem && <Button type="button" variant="secondary" onClick={() => { setEditItem(null); setForm({ name: '', phone: '', address: '', itemsSupplied: '', status: 'active', notes: '' }); }}>Cancel</Button>}
             </div>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <input type="text" placeholder="Supplier Name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-500" />
-              <input type="text" placeholder="Phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-500" />
-              <input type="text" placeholder="Address" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-500" />
-              <input type="text" placeholder="Items Supplied (comma separated)" value={form.itemsSupplied} onChange={e => setForm({ ...form, itemsSupplied: e.target.value })} className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-500" />
-              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-500">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-              <div className="flex justify-end gap-3 pt-2">
-                <Button type="button" variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-                <Button type="submit">{editItem ? 'Update' : 'Add'}</Button>
-              </div>
-            </form>
-          </div>
+          </form>
         </div>
-      )}
+
+        {/* Table */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow overflow-hidden">
+          {loading ? <div className="p-8 text-center text-gray-500">Loading...</div> : (
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-gray-600">
+                <tr>
+                  <th className="p-3 text-left">Name</th>
+                  <th className="p-3 text-left">Phone</th>
+                  <th className="p-3 text-left">Items Supplied</th>
+                  <th className="p-3 text-left">Status</th>
+                  <th className="p-3 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {suppliers.length === 0 ? (
+                  <tr><td colSpan="5" className="p-8 text-center text-gray-500">No suppliers found</td></tr>
+                ) : suppliers.map(s => (
+                  <tr key={s._id} className="border-t hover:bg-gray-50">
+                    <td className="p-3 font-medium">{s.name}</td>
+                    <td className="p-3">{s.phone || '-'}</td>
+                    <td className="p-3 text-gray-500">{s.itemsSupplied?.join(', ') || '-'}</td>
+                    <td className="p-3"><span className={`px-2 py-1 text-xs rounded-full font-medium ${s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{s.status}</span></td>
+                    <td className="p-3 flex gap-2">
+                      <button onClick={() => viewHistory(s)} className="text-purple-600 hover:text-purple-800"><FiEye size={16} /></button>
+                      <button onClick={() => handleEdit(s)} className="text-blue-600 hover:text-blue-800"><FiEdit2 size={16} /></button>
+                      <button onClick={() => handleDelete(s._id)} className="text-red-600 hover:text-red-800"><FiTrash2 size={16} /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
 
       {/* History Modal */}
       {historyModal && history && (

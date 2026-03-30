@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../../lib/api';
 
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 const HRPayroll = () => {
   const [payments, setPayments] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [filters, setFilters] = useState({ employee: '', month: '', year: new Date().getFullYear() });
+  const [filters, setFilters] = useState({ employee: '', month: '', year: '' });
   const [loading, setLoading] = useState(false);
 
   const token = () => localStorage.getItem('token');
@@ -19,7 +19,7 @@ const HRPayroll = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/payroll/employees', { headers: headers() });
+      const res = await api.get('/hr/employees');
       if (res.data.success) setEmployees(res.data.data);
     } catch (error) {
       console.error('Error fetching employees:', error);
@@ -29,7 +29,7 @@ const HRPayroll = () => {
   const fetchPayments = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/payroll/salary-payments?limit=100', { headers: headers() });
+      const res = await api.get('/payroll/salary-payments?limit=100');
       if (res.data.success) setPayments(res.data.data);
     } catch (error) {
       console.error('Error fetching payments:', error);
@@ -39,8 +39,7 @@ const HRPayroll = () => {
   };
 
   const filtered = payments.filter(p => {
-    const emp = employees.find(e => e._id === p.employee);
-    if (filters.employee && p.employee !== filters.employee) return false;
+    if (filters.employee && p.employee?.toString() !== filters.employee) return false;
     if (filters.month && p.salaryMonth !== parseInt(filters.month)) return false;
     if (filters.year && p.salaryYear !== parseInt(filters.year)) return false;
     return true;
@@ -105,7 +104,7 @@ const HRPayroll = () => {
           className="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500 w-24"
         />
         <button
-          onClick={() => setFilters({ employee: '', month: '', year: new Date().getFullYear() })}
+          onClick={() => setFilters({ employee: '', month: '', year: '' })}
           className="text-sm text-gray-500 hover:text-gray-700 underline"
         >
           Clear
@@ -134,7 +133,8 @@ const HRPayroll = () => {
                 <tr><td colSpan="7" className="p-8 text-center text-gray-500">No salary payments found</td></tr>
               ) : (
                 filtered.map(p => {
-                  const emp = employees.find(e => e._id === p.employee);
+                  const empId = p.employee?._id || p.employee;
+                  const emp = employees.find(e => e._id?.toString() === empId?.toString());
                   return (
                     <tr key={p._id} className="border-t hover:bg-gray-50">
                       <td className="p-3 font-medium">{emp?.fullName || '-'}</td>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../../lib/api';
 
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -28,10 +28,7 @@ const HRReports = () => {
 
   const fetchAttendanceSummary = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/hr/attendance/summary?month=${filters.month}&year=${filters.year}`,
-        { headers: headers() }
-      );
+      const res = await api.get(`/hr/attendance/summary?month=${filters.month}&year=${filters.year}`);
       if (res.data.success) setAttendanceSummary(res.data.data);
     } catch (error) {
       console.error('Error fetching attendance summary:', error);
@@ -40,7 +37,7 @@ const HRReports = () => {
 
   const fetchLeaveSummary = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/hr/leaves', { headers: headers() });
+      const res = await api.get(`/hr/leaves?month=${filters.month}&year=${filters.year}`);
       if (res.data.success) {
         const leaves = res.data.data;
         setLeaveSummary({
@@ -57,11 +54,9 @@ const HRReports = () => {
 
   const fetchPayrollSummary = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/payroll/salary-payments?limit=200', { headers: headers() });
+      const res = await api.get(`/payroll/salary-payments?month=${filters.month}&year=${filters.year}&limit=200`);
       if (res.data.success) {
-        const payments = res.data.data.filter(
-          p => p.salaryMonth === parseInt(filters.month) && p.salaryYear === parseInt(filters.year)
-        );
+        const payments = res.data.data;
         setPayrollSummary({
           count: payments.length,
           totalGross: payments.reduce((s, p) => s + (p.grossSalary || 0), 0),

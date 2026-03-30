@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../../lib/api';
 import Button from '../../../components/UIHelper/Button';
 
 const statusOptions = ['present', 'absent', 'late', 'half-day', 'on-leave'];
@@ -25,14 +25,11 @@ const HRAttendance = () => {
 
   useEffect(() => {
     if (employees.length > 0) fetchAttendanceByDate(date);
-  }, [date, employees]);
+  }, [date, employees.length]);
 
   const fetchEmployees = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/hr/employees?status=active', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/hr/employees?status=active');
       if (res.data.success) {
         setEmployees(res.data.data);
         const defaults = {};
@@ -47,10 +44,7 @@ const HRAttendance = () => {
   const fetchAttendanceByDate = async (selectedDate) => {
     setFetching(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:5000/api/hr/attendance/date/${selectedDate}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/hr/attendance/date/${selectedDate}`);
       if (res.data.success && res.data.data.length > 0) {
         const existing = {};
         res.data.data.forEach(r => {
@@ -77,14 +71,11 @@ const HRAttendance = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const payload = {
         date,
         records: employees.map(e => ({ employee: e._id, ...records[e._id] }))
       };
-      const res = await axios.post('http://localhost:5000/api/hr/attendance', payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.post('/hr/attendance', payload);
       if (res.data.success) alert(res.data.message);
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to save attendance');
