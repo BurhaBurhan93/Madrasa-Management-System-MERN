@@ -43,6 +43,19 @@ const TeacherEnterMarks = () => {
         setStudents(res.data.data);
         const m = {};
         res.data.data.forEach(s => { m[s._id] = ''; });
+
+        // fetch existing marks if exam and subject selected
+        if (filters.examId && filters.subjectId) {
+          const resultsRes = await axios.get(
+            `http://localhost:5000/api/teacher/results?examId=${filters.examId}&subjectId=${filters.subjectId}&classId=${filters.classId}`,
+            api()
+          );
+          if (resultsRes.data.success) {
+            resultsRes.data.data.forEach(r => {
+              if (r.student?._id) m[r.student._id] = r.totalScore;
+            });
+          }
+        }
         setMarks(m);
       }
     } catch (e) { console.error(e); } finally { setLoading(false); }

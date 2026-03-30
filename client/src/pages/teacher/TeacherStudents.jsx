@@ -3,7 +3,6 @@ import axios from 'axios';
 import Card from '../../components/UIHelper/Card';
 import Button from '../../components/UIHelper/Button';
 import Badge from '../../components/UIHelper/Badge';
-import Progress from '../../components/UIHelper/Progress';
 import { useNavigate } from 'react-router-dom';
 
 const TeacherStudents = () => {
@@ -12,23 +11,20 @@ const TeacherStudents = () => {
   const [subjects, setSubjects] = useState([]);
   const [students, setStudents] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-
       const [subjectsRes, studentsRes] = await Promise.all([
         axios.get('http://localhost:5000/api/teacher/subjects', config),
         axios.get('http://localhost:5000/api/teacher/students', config)
       ]);
-
       setSubjects(subjectsRes.data.data || []);
       setStudents(studentsRes.data.data || []);
     } catch (error) {
@@ -38,31 +34,19 @@ const TeacherStudents = () => {
     }
   };
 
-  /* ================= FILTER LOGIC ================= */
   const filteredStudents = students.filter((student) => {
-    const matchesSubject =
-      selectedSubject === 'all' ||
-      student.subjectId === Number(selectedSubject) ||
-      student._id === selectedSubject;
-
+    const matchesStatus = selectedStatus === 'all' || student.status === selectedStatus;
     const matchesSearch =
       (student.user?.name || '').toLowerCase().includes(search.toLowerCase()) ||
       (student.studentCode || '').toLowerCase().includes(search.toLowerCase());
-
-    return matchesSubject && matchesSearch;
+    return matchesStatus && matchesSearch;
   });
 
-  /* ================= STATS ================= */
-  const totalStudents = students.length;
-  const avgAttendance = students.length > 0 ? Math.round(
-    students.reduce((sum, s) => sum + (s.attendance || 0), 0) / students.length
-  ) : 0;
-  const excellentStudents = students.filter(s => (s.average || 0) >= 85).length;
-
-  const getStatus = (avg) => {
-    if (avg >= 85) return { text: 'Excellent', variant: 'success' };
-    if (avg >= 70) return { text: 'Good', variant: 'primary' };
-    return { text: 'At Risk', variant: 'danger' };
+  const stats = {
+    total: students.length,
+    active: students.filter(s => s.status === 'active').length,
+    inactive: students.filter(s => s.status === 'inactive').length,
+    subjects: subjects.length,
   };
 
   if (loading) {
@@ -82,131 +66,132 @@ const TeacherStudents = () => {
       {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">My Students</h1>
-        <p className="text-gray-600">
-          Students enrolled in your teaching subjects
-        </p>
+        <p className="text-gray-600">Students enrolled in your classes</p>
       </div>
 
       {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
         <Card className="text-center">
-          <div className="text-3xl font-bold text-blue-600">
-            {totalStudents}
-          </div>
+          <div className="text-3xl font-bold text-blue-600">{stats.total}</div>
           <div className="text-sm text-gray-600">Total Students</div>
         </Card>
-
         <Card className="text-center">
-          <div className="text-3xl font-bold text-green-600">
-            {subjects.length}
-          </div>
-          <div className="text-sm text-gray-600">Active Subjects</div>
+          <div className="text-3xl font-bold text-green-600">{stats.active}</div>
+          <div className="text-sm text-gray-600">Active</div>
         </Card>
-
         <Card className="text-center">
-          <div className="text-3xl font-bold text-purple-600">
-            {avgAttendance}%
-          </div>
-          <div className="text-sm text-gray-600">Avg Attendance</div>
+          <div className="text-3xl font-bold text-red-600">{stats.inactive}</div>
+          <div className="text-sm text-gray-600">Inactive</div>
         </Card>
-
         <Card className="text-center">
-          <div className="text-3xl font-bold text-yellow-600">
-            {excellentStudents}
-          </div>
-          <div className="text-sm text-gray-600">Excellent Students</div>
+          <div className="text-3xl font-bold text-purple-600">{stats.subjects}</div>
+          <div className="text-sm text-gray-600">My Subjects</div>
         </Card>
       </div>
 
       {/* FILTERS */}
-      <div className="flex flex-wrap justify-between items-center mb-6">
-        <div className="flex gap-3">
-          <select
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-            className="px-4 py-2 border rounded-lg"
-          >
-            <option value="all">All Subjects</option>
-            {subjects.map((sub) => (
-              <option key={sub._id} value={sub._id}>
-                {sub.name}
-              </option>
-            ))}
-          </select>
-
-          <input
-            type="text"
-            placeholder="Search student..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="px-4 py-2 border rounded-lg"
-          />
-        </div>
+      <div className="flex flex-wrap gap-3 mb-6">
+        <input
+          type="text"
+          placeholder="Search by name or code..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-green-500 flex-1"
+        />
+        <select
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+          className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select
+          value={selectedSubject}
+          onChange={(e) => setSelectedSubject(e.target.value)}
+          className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="all">All Subjects</option>
+          {subjects.map((sub) => (
+            <option key={sub._id} value={sub._id}>{sub.name}</option>
+          ))}
+        </select>
       </div>
 
       {/* STUDENTS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredStudents.map((student) => {
-          const subject = subjects.find(s => s.id === student.subjectId || s._id === student.subjectId);
-          const status = getStatus(student.average || 0);
-          const studentName = student.user?.name || 'Unknown';
-
-          return (
-            <Card key={student.id || student._id} className="hover:shadow-md transition-shadow">
+      {filteredStudents.length === 0 ? (
+        <div className="text-center py-16 text-gray-500">
+          <p className="text-xl">No students found</p>
+          <p className="text-sm mt-2">Register students via Staff Panel → User Management</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredStudents.map((student) => (
+            <Card key={student._id} className="hover:shadow-md transition-shadow">
               <div className="p-4">
 
+                {/* Header */}
                 <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold">{studentName}</h3>
-                    <p className="text-sm text-gray-500">{student.studentCode || 'N/A'}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-r from-green-400 to-green-600 text-white flex items-center justify-center text-lg font-bold">
+                      {student.user?.name?.[0] || 'S'}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">{student.user?.name || 'Unknown'}</h3>
+                      <p className="text-xs text-gray-500">{student.studentCode || 'N/A'}</p>
+                    </div>
                   </div>
-                  <Badge variant={status.variant}>
-                    {status.text}
+                  <Badge variant={student.status === 'active' ? 'success' : 'danger'}>
+                    {student.status}
                   </Badge>
                 </div>
 
-                <div className="mt-4 text-sm text-gray-600 space-y-1">
-                  <p>Subject: {subject?.name || 'N/A'}</p>
-                  <p>Attendance: {student.attendance || 0}%</p>
-                  <p>Average Score: {student.average || 0}</p>
+                {/* Info */}
+                <div className="mt-4 space-y-2 text-sm text-gray-600">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Class:</span>
+                    <span className="font-medium">{student.currentClass?.name || 'Not Assigned'} {student.currentClass?.section || ''}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Level:</span>
+                    <span className="font-medium">{student.currentLevel || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Email:</span>
+                    <span className="font-medium truncate ml-2">{student.user?.email || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Admission:</span>
+                    <span className="font-medium">{student.admissionDate ? new Date(student.admissionDate).toLocaleDateString() : 'N/A'}</span>
+                  </div>
                 </div>
 
-                <div className="mt-4">
-                  <Progress
-                    value={student.attendance || 0}
-                    max={100}
-                    label="Attendance"
-                  />
-                </div>
-
-                <div className="mt-6 flex gap-2">
+                {/* Buttons */}
+                <div className="mt-4 flex gap-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() =>
-                      navigate(`/teacher/student-profile/${student.id}`)
-                    }
-                  >
-                    View Profile
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      navigate(`/teacher/attendance/${student.id}`)
-                    }
+                    className="flex-1"
+                    onClick={() => navigate('/teacher/attendance')}
                   >
                     Mark Attendance
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => navigate('/teacher/results/enter-marks')}
+                  >
+                    Enter Marks
                   </Button>
                 </div>
 
               </div>
             </Card>
-          );
-        })}
-      </div>
-
+          ))}
+        </div>
+      )}
     </div>
   );
 };

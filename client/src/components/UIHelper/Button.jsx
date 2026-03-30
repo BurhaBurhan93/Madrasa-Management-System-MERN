@@ -2,7 +2,7 @@ import React from 'react';
 
 const Button = ({ children, variant = 'primary', size = 'md', onClick, disabled, className = '', ...props }) => {
   const baseClasses =
-    'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
+    'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer';
 
   const variants = {
     primary: 'bg-gradient-to-r from-blue-700 via-blue-800 to-gray-900 text-white hover:brightness-110',

@@ -25,7 +25,12 @@ const TeacherAttendance = () => {
   const fetchSessions = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/teacher/sessions', api());
-      if (res.data.success) setSessions(res.data.data);
+      if (res.data.success) {
+        setSessions(res.data.data);
+        if (res.data.data.length > 0) {
+          loadSessionAttendance(res.data.data[0]);
+        }
+      }
     } catch (e) { console.error(e); }
   };
 
