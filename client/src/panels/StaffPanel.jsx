@@ -4,7 +4,7 @@ import {
   FiHome, FiBookOpen, FiInbox, FiUser, FiMenu, FiLogOut, 
   FiSearch, FiBell, FiFolder, FiBook, FiClipboard, 
   FiShoppingCart, FiTrendingUp, FiBarChart2, FiChevronDown,
-  FiUsers, FiPackage, FiSettings, FiDollarSign, FiUserPlus
+  FiUsers, FiPackage, FiSettings, FiDollarSign, FiUserPlus, FiCoffee
 } from 'react-icons/fi';
 import useLocalStorage from '../hooks/useLocalStorage';
 
@@ -136,6 +136,39 @@ const StaffPanel = () => {
         { id: 'salary-advances', label: 'Salary Advances', path: 'payroll/salary-advances' }
       ]
     },
+    { 
+      id: 'kitchen', 
+      icon: <FiCoffee size={20} />, 
+      label: 'Kitchen',
+      type: 'dropdown',
+      items: [
+        { id: 'inventory', label: 'Inventory', path: 'kitchen/inventory' },
+        { id: 'meals', label: 'Meal Planning', path: 'kitchen/meals' },
+        { id: 'dailyMenu', label: 'Daily Purchases', path: 'kitchen/menu' },
+        { id: 'weekly-menu', label: 'Weekly Menu', path: 'kitchen/weekly-menu' },
+        { id: 'suppliers', label: 'Suppliers', path: 'kitchen/suppliers' },
+        { id: 'waste', label: 'Waste Tracking', path: 'kitchen/waste' },
+        { id: 'requests', label: 'Budget Requests', path: 'kitchen/requests' },
+        { id: 'reports', label: 'Reports', path: 'kitchen/reports' }
+      ]
+    },
+    { 
+      id: 'hr', 
+      icon: <FiUsers size={20} />, 
+      label: 'Human Resource',
+      type: 'dropdown',
+      items: [
+        { id: 'departments', label: 'Departments', path: 'hr/departments' },
+        { id: 'designations', label: 'Designations', path: 'hr/designations' },
+        { id: 'leave-types', label: 'Leave Types', path: 'hr/leave-types' },
+        { id: 'employee-registration', label: 'Employee Registration', path: 'hr/employee-registration' },
+        { id: 'employees', label: 'Employees', path: 'hr/employees' },
+        { id: 'attendance', label: 'Attendance', path: 'hr/attendance' },
+        { id: 'leave', label: 'Leave Management', path: 'hr/leave' },
+        { id: 'payroll', label: 'Payroll', path: 'hr/payroll' },
+        { id: 'reports', label: 'Reports', path: 'hr/reports' }
+      ]
+    }
   ];
 
   const handleNavigation = (path) => {

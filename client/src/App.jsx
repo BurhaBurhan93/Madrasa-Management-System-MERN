@@ -60,14 +60,12 @@ import TeacherCreateExam from "./pages/teacher/TeacherCreateExam";
 import TeacherExamSubmissions from "./pages/teacher/TeacherExamSubmissions";
 import TeacherStudents from './pages/teacher/TeacherStudents';
 import TeacherAssignments from './pages/teacher/TeacherAssignments';
-import TeacherSessions from './pages/teacher/TeacherSessions';
 import TeacherAttendance from './pages/teacher/TeacherAttendance';
 import TeacherAttendanceReports from './pages/teacher/TeacherAttendanceReport';
 import TeacherViewResults from './pages/teacher/TeacherViewResults';
 import TeacherEnterMarks from './pages/teacher/TeacherEnterMarks';
 import TeacherResults from './pages/teacher/TeacherResults';
 import AssignedComplaints from './pages/teacher/AssignedCompliants';
-import Messages from './pages/teacher/Messages';
 import CreateAssignment from './pages/teacher/CreateAssignment';
 
 // ================= STAFF PAGES =================
@@ -120,6 +118,23 @@ import StaffPayrollSalaryDeductionsEdit from './pages/staff/payroll/SalaryDeduct
 import StaffPayrollSalaryAdvancesCreate from './pages/staff/payroll/SalaryAdvancesCreate';
 import StaffPayrollSalaryAdvancesEdit from './pages/staff/payroll/SalaryAdvancesEdit';
 
+import Employees from './pages/staff/HR/Employees';
+import DepartmentRegistration from './pages/staff/HR/DepartmentRegistration';
+import DesignationRegistration from './pages/staff/HR/DesignationRegistration';
+import LeaveTypeRegistration from './pages/staff/HR/LeaveTypeRegistration';
+import EmployeeRegistration from './pages/staff/HR/EmployeeRegistration';
+import HRAttendance from './pages/staff/HR/Attendance';
+import LeaveManagement from './pages/staff/HR/LeaveManagment';
+import HRPayroll from './pages/staff/HR/Payroll';
+import HRReports from './pages/staff/HR/Reports';
+import Inventory from './pages/staff/Kitchen/Inventory';
+import MealPlaning from './pages/staff/Kitchen/MealPlaning';
+import DailyPlaning from './pages/staff/Kitchen/DailyPlaning';
+import FoodRequest from './pages/staff/Kitchen/FoodRequest';
+import KitchenReports from './pages/staff/Kitchen/Reports';
+import WeeklyMenuPage from './pages/staff/Kitchen/WeeklyMenu';
+import Suppliers from './pages/staff/Kitchen/Suppliers';
+import WasteTracking from './pages/staff/Kitchen/WasteTracking';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -213,7 +228,6 @@ function App() {
             <Route path="profile" element={<TeacherProfile />} />
             <Route path='students' element={<TeacherStudents />} />
             <Route path='assignments' element={<TeacherAssignments />} />
-            <Route path='sessions' element={<TeacherSessions />} />
             <Route path='attendance' element={<TeacherAttendance />} />
             <Route path='attendance-reports' element={<TeacherAttendanceReports />} />
             <Route path='create-assignments' element={<CreateAssignment />} />
@@ -227,7 +241,6 @@ function App() {
             <Route path="results/enter-marks" element={<TeacherEnterMarks />} />
             <Route path="results/view-results" element={<TeacherViewResults />} />
             <Route path="complaints" element={<AssignedComplaints />} />
-            <Route path="messages" element={<Messages />} />
           </Route>
 
           {/* ================= STAFF ================= */}
@@ -284,6 +297,25 @@ function App() {
             <Route path="payroll/salary-advances" element={<StaffPayrollSalaryAdvances />} />
             <Route path="payroll/salary-advances/create" element={<StaffPayrollSalaryAdvancesCreate />} />
             <Route path="payroll/salary-advances/edit/:id" element={<StaffPayrollSalaryAdvancesEdit />} />
+
+            <Route path="hr/employees" element={<Employees />} />
+            <Route path="hr/departments" element={<DepartmentRegistration />} />
+            <Route path="hr/designations" element={<DesignationRegistration />} />
+            <Route path="hr/leave-types" element={<LeaveTypeRegistration />} />
+            <Route path="hr/employee-registration" element={<EmployeeRegistration />} />
+            <Route path="hr/attendance" element={<HRAttendance />} />
+            <Route path="hr/leave" element={<LeaveManagement />} />
+            <Route path="hr/payroll" element={<HRPayroll />} />
+            <Route path="hr/reports" element={<HRReports />} />
+
+            <Route path="kitchen/inventory" element={<Inventory />} />
+            <Route path="kitchen/meals" element={<MealPlaning />} />
+            <Route path="kitchen/menu" element={<DailyPlaning />} />
+            <Route path="kitchen/weekly-menu" element={<WeeklyMenuPage />} />
+            <Route path="kitchen/suppliers" element={<Suppliers />} />
+            <Route path="kitchen/waste" element={<WasteTracking />} />
+            <Route path="kitchen/requests" element={<FoodRequest />} />
+            <Route path="kitchen/reports" element={<KitchenReports />} />
           </Route>
 
           {/* ================= STUDENT ================= */}
