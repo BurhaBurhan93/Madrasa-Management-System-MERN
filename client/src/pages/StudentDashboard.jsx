@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { BarChartComponent, LineChartComponent } from '../components/UIHelper/Chart';
+import { BarChartComponent, LineChartComponent, PieChartComponent } from '../components/UIHelper/Chart';
 import Card from '../components/UIHelper/Card';
 import Avatar from '../components/UIHelper/Avatar';
 import Progress from '../components/UIHelper/Progress';
@@ -23,6 +23,9 @@ const StudentDashboard = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [performanceData, setPerformanceData] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [feeData, setFeeData] = useState([]);
+  const [courseDistribution, setCourseDistribution] = useState([]);
+  const [leaveStats, setLeaveStats] = useState([]);
 
   useEffect(() => {
     fetchUserData();
@@ -138,6 +141,37 @@ const StudentDashboard = () => {
         }))
       ];
       setRecentActivity(activities);
+
+      // Set performance data
+      setPerformanceData([
+        { subject: 'Mathematics', score: 85 },
+        { subject: 'Physics', score: 78 },
+        { subject: 'Chemistry', score: 92 },
+        { subject: 'Biology', score: 88 },
+        { subject: 'English', score: 95 }
+      ]);
+
+      // Set fee data
+      setFeeData([
+        { name: 'Paid', value: 15000, color: '#10B981' },
+        { name: 'Pending', value: 5000, color: '#F59E0B' },
+        { name: 'Overdue', value: 2000, color: '#EF4444' }
+      ]);
+
+      // Set course distribution
+      setCourseDistribution([
+        { name: 'Core', value: 6, color: '#3B82F6' },
+        { name: 'Elective', value: 3, color: '#8B5CF6' },
+        { name: 'Islamic', value: 4, color: '#10B981' },
+        { name: 'Language', value: 2, color: '#F59E0B' }
+      ]);
+
+      // Set leave statistics
+      setLeaveStats([
+        { name: 'Approved', value: 8, color: '#10B981' },
+        { name: 'Pending', value: 2, color: '#F59E0B' },
+        { name: 'Rejected', value: 1, color: '#EF4444' }
+      ]);
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -373,6 +407,45 @@ const StudentDashboard = () => {
               </li>
             ))}
           </ul>
+        </Card>
+      </div>
+
+      {/* Analytics Section with Pie Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card title="Fee Status">
+          <PieChartComponent 
+            data={feeData}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">Total: ${feeData.reduce((a, b) => a + b.value, 0).toLocaleString()}</p>
+          </div>
+        </Card>
+
+        <Card title="Course Distribution">
+          <PieChartComponent 
+            data={courseDistribution}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">Total: {courseDistribution.reduce((a, b) => a + b.value, 0)} Courses</p>
+          </div>
+        </Card>
+
+        <Card title="Leave Statistics">
+          <PieChartComponent 
+            data={leaveStats}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">Total: {leaveStats.reduce((a, b) => a + b.value, 0)} Requests</p>
+          </div>
         </Card>
       </div>
       </div>

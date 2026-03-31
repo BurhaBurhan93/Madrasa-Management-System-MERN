@@ -1,51 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../UIHelper/Card';
 import Badge from '../UIHelper/Badge';
 import Button from '../UIHelper/Button';
 import Progress from '../UIHelper/Progress';
+import axios from 'axios';
 
 const Finance = () => {
+  console.log('[Finance] Component initializing...');
   const [feeStructure, setFeeStructure] = useState({
-    tuition: 2500,
-    accommodation: 1200,
-    meals: 800,
-    library: 150,
-    sports: 100,
-    miscellaneous: 250
+    tuition: 0,
+    accommodation: 0,
+    meals: 0,
+    library: 0,
+    sports: 0,
+    miscellaneous: 0
   });
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [payments, setPayments] = useState([
-    {
-      id: 1,
-      receiptNo: 'REC2024001',
-      date: '2024-01-15',
-      amount: 2000,
-      method: 'Credit Card',
-      status: 'completed',
-      description: 'Tuition fee payment - Fall 2024'
-    },
-    {
-      id: 2,
-      receiptNo: 'REC2024002',
-      date: '2024-01-20',
-      amount: 500,
-      method: 'Bank Transfer',
-      status: 'completed',
-      description: 'Accommodation deposit'
-    },
-    {
-      id: 3,
-      receiptNo: 'REC2024003',
-      date: '2024-02-01',
-      amount: 1500,
-      method: 'Cash',
-      status: 'pending',
-      description: 'Remaining tuition fee'
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[Finance] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[Finance] useEffect triggered - fetching data from API...');
+    fetchFinanceData();
+  }, []);
+
+  const fetchFinanceData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[Finance] Fetching finance data from API...');
+      
+      const config = getConfig();
+      
+      // Fetch fee payments
+      const paymentsResponse = await axios.get('http://localhost:5000/api/student/fee-payments', config);
+      console.log('[Finance] Payments API response:', paymentsResponse.data);
+      setPayments(paymentsResponse.data || []);
+      
+      // Fetch fee structure (if available)
+      try {
+        const feeStructureResponse = await axios.get('http://localhost:5000/api/student/fee-structure', config);
+        console.log('[Finance] Fee structure API response:', feeStructureResponse.data);
+        if (feeStructureResponse.data) {
+          setFeeStructure(feeStructureResponse.data);
+        }
+      } catch (feeErr) {
+        console.log('[Finance] Fee structure not available, using calculated values');
+      }
+    } catch (err) {
+      console.error('[Finance] Error fetching finance data:', err);
+      setError('Failed to fetch finance data. Please try again.');
+      setPayments([]);
+    } finally {
+      setLoading(false);
     }
-  ]);
-
-  const [dueAmount, setDueAmount] = useState(1000);
-  const [totalAmount, setTotalAmount] = useState(5000);
+  };
 
   const statusColors = {
     completed: 'success',
@@ -82,6 +100,18 @@ const Finance = () => {
         <p className="text-gray-600">Manage your fee payments and view payment history</p>
       </div>
 
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading finance data...</p>
+        </div>
+      ) : (
       <div>
       {/* Financial Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -275,6 +305,7 @@ const Finance = () => {
         </Card>
       </div>
       </div>
+      )}
     </div>
   );
 };

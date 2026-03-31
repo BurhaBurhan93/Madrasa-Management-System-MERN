@@ -1,73 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/UIHelper/Card';
 import { BarChartComponent, PieChartComponent } from '../components/UIHelper/Chart';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import { formatDate, formatGrade } from '../lib/utils';
+import axios from 'axios';
 
 const StudentResults = () => {
+  console.log('[StudentResults] Component initializing...');
   const navigate = useNavigate();
-  const [results, setResults] = useState([
-    {
-      id: 1,
-      examTitle: 'Midterm Examination - Calculus',
-      course: 'MATH201',
-      examDate: '2024-02-15',
-      totalMarks: 100,
-      obtainedMarks: 85,
-      percentage: 85,
-      grade: 'A',
-      status: 'published',
-      feedback: 'Good understanding of calculus concepts. Work on integration techniques.'
-    },
-    {
-      id: 2,
-      examTitle: 'Arabic Language Proficiency Test',
-      course: 'ARAB101',
-      examDate: '2024-02-10',
-      totalMarks: 75,
-      obtainedMarks: 68,
-      percentage: 91,
-      grade: 'A-',
-      status: 'published',
-      feedback: 'Excellent grasp of Arabic grammar. Need improvement in writing skills.'
-    },
-    {
-      id: 3,
-      examTitle: 'Islamic Jurisprudence Quiz',
-      course: 'ISLM202',
-      examDate: '2024-02-05',
-      totalMarks: 50,
-      obtainedMarks: 45,
-      percentage: 90,
-      grade: 'A-',
-      status: 'published',
-      feedback: 'Strong knowledge of fundamental concepts. Review the advanced topics.'
-    },
-    {
-      id: 4,
-      examTitle: 'English Composition Midterm',
-      course: 'ENG102',
-      examDate: '2024-02-01',
-      totalMarks: 80,
-      obtainedMarks: 72,
-      percentage: 90,
-      grade: 'A-',
-      status: 'published',
-      feedback: 'Well-structured essays. Focus on grammar and punctuation.'
-    },
-    {
-      id: 5,
-      examTitle: 'Physics Fundamentals Exam',
-      course: 'PHYS101',
-      examDate: '2024-01-28',
-      totalMarks: 100,
-      obtainedMarks: 82,
-      percentage: 82,
-      grade: 'B+',
-      status: 'published',
-      feedback: 'Good grasp of theoretical concepts. Practice more numerical problems.'
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StudentResults] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[StudentResults] useEffect triggered - fetching data from API...');
+    fetchResultsData();
+  }, []);
+
+  const fetchResultsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StudentResults] Fetching results from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/student/results', config);
+      
+      console.log('[StudentResults] API response:', response.data);
+      setResults(response.data || []);
+    } catch (err) {
+      console.error('[StudentResults] Error fetching results:', err);
+      setError('Failed to fetch results. Please try again.');
+      setResults([]);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
   // Prepare data for charts
   const subjectPerformanceData = results.map(result => ({
@@ -91,6 +69,24 @@ const StudentResults = () => {
         <p className="text-gray-600">View your exam results and academic performance</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Results"
+          message={error}
+          onRetry={fetchResultsData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading && results.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading results...</p>
+        </div>
+      ) : (
+      <>
       {/* Summary Cards */}
       <div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -292,6 +288,8 @@ const StudentResults = () => {
           </Card>
         ))}
       </div>
+      </>
+      )}
     </div>
   );
 };

@@ -1,14 +1,48 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
 
 const StaffComplaintFeedback = () => {
-  const [feedbacks, setFeedbacks] = useState([
-    { id: 'f1', complaintId: 'c3', rating: 4, comment: 'Resolved quickly', date: '2026-02-12' },
-  ]);
-  const [search, setSearch] = useState('');
+  console.log('[StaffComplaintFeedback] Component initializing...');
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [form, setForm] = useState({ id: '', complaintId: '', rating: 5, comment: '', date: '' });
+  const [search, setSearch] = useState('');
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StaffComplaintFeedback] Token exists:', !!token);
+    return { headers: { Authorization: `Bearer ${token}` } };
+  };
+
+  useEffect(() => {
+    console.log('[StaffComplaintFeedback] useEffect triggered - fetching data from API...');
+    fetchComplaints();
+  }, []);
+
+  const fetchComplaints = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StaffComplaintFeedback] Fetching complaints from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/staff/complaints', config);
+      
+      console.log('[StaffComplaintFeedback] Complaints API response:', response.data);
+      setComplaints(response.data || []);
+    } catch (err) {
+      console.error('[StaffComplaintFeedback] Error fetching complaints:', err);
+      setError('Failed to fetch complaints. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     return feedbacks.filter(f => f.complaintId.toLowerCase().includes(search.toLowerCase()));
@@ -35,6 +69,18 @@ const StaffComplaintFeedback = () => {
         <p className="text-gray-600">Track satisfaction and comments</p>
       </div>
 
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading complaints...</p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
           <h2 className="text-xl font-semibold mb-4">{form.id ? 'Edit Feedback' : 'Add Feedback'}</h2>
@@ -83,6 +129,7 @@ const StaffComplaintFeedback = () => {
           </div>
         </Card>
       </div>
+      )}
     </div>
   );
 };

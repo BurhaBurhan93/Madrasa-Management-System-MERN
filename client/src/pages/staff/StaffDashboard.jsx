@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ErrorPage from '../../components/UIHelper/ErrorPage';
 import { 
   FiBook, FiUsers, FiInbox, FiTrendingUp, FiActivity,
   FiCheckCircle, FiClock, FiAlertCircle
@@ -14,6 +15,7 @@ const StaffDashboard = () => {
   });
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const pendingTasks = [
     { id: 1, task: 'Review new book requests', priority: 'high', due: 'Today' },
@@ -29,6 +31,7 @@ const StaffDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
@@ -41,6 +44,7 @@ const StaffDashboard = () => {
       setRecentActivities(activitiesResponse.data);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      setError('Failed to load dashboard data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -89,6 +93,20 @@ const StaffDashboard = () => {
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500"></div>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorPage 
+        type="server" 
+        title="Dashboard Unavailable"
+        message={error}
+        onRetry={fetchDashboardData}
+        onHome={() => window.location.href = '/staff/dashboard'}
+        showHomeButton={false}
+        showBackButton={false}
+      />
     );
   }
 

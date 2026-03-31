@@ -4,81 +4,53 @@ import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
 import Badge from '../components/UIHelper/Badge';
 import Progress from '../components/UIHelper/Progress';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import { formatGrade } from '../lib/utils';
+import axios from 'axios';
 
 const StudentCourses = () => {
+  console.log('[StudentCourses] Component initializing...');
   const navigate = useNavigate();
   
-  const [courses, setCourses] = useState([
-    {
-      id: 1,
-      code: 'MATH101',
-      name: 'Calculus I',
-      instructor: 'Dr. Ahmed Hassan',
-      credits: 4,
-      semester: 'Fall 2023',
-      status: 'active',
-      progress: 75,
-      grade: { score: 85, letter: 'B', gpa: 3.3 },
-      schedule: 'Mon/Wed 09:00-10:30 AM',
-      location: 'Room 201'
-    },
-    {
-      id: 2,
-      code: 'PHYS101',
-      name: 'General Physics I',
-      instructor: 'Prof. Sarah Ali',
-      credits: 3,
-      semester: 'Fall 2023',
-      status: 'active',
-      progress: 90,
-      grade: { score: 92, letter: 'A-', gpa: 3.7 },
-      schedule: 'Tue/Thu 11:00-12:30 PM',
-      location: 'Room 305'
-    },
-    {
-      id: 3,
-      code: 'CHEM101',
-      name: 'General Chemistry I',
-      instructor: 'Dr. Mohammed Khan',
-      credits: 3,
-      semester: 'Fall 2023',
-      status: 'active',
-      progress: 60,
-      grade: { score: 78, letter: 'C+', gpa: 2.3 },
-      schedule: 'Mon/Wed 02:00-03:30 PM',
-      location: 'Room 402'
-    },
-    {
-      id: 4,
-      code: 'ARAB101',
-      name: 'Arabic Language I',
-      instructor: 'Dr. Fatima Al-Rashid',
-      credits: 2,
-      semester: 'Fall 2023',
-      status: 'active',
-      progress: 85,
-      grade: { score: 95, letter: 'A', gpa: 4.0 },
-      schedule: 'Tue/Thu 09:00-10:00 AM',
-      location: 'Room 105'
-    },
-    {
-      id: 5,
-      code: 'HIST101',
-      name: 'Islamic History',
-      instructor: 'Dr. Omar Farooq',
-      credits: 3,
-      semester: 'Fall 2023',
-      status: 'completed',
-      progress: 100,
-      grade: { score: 88, letter: 'B+', gpa: 3.3 },
-      schedule: 'Mon/Wed 10:30-12:00 PM',
-      location: 'Room 210'
-    }
-  ]);
-
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StudentCourses] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[StudentCourses] useEffect triggered - fetching data from API...');
+    fetchCoursesData();
+  }, []);
+
+  const fetchCoursesData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StudentCourses] Fetching courses from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/student/courses', config);
+      
+      console.log('[StudentCourses] API response:', response.data);
+      setCourses(response.data || []);
+    } catch (err) {
+      console.error('[StudentCourses] Error fetching courses:', err);
+      setError('Failed to fetch courses. Please try again.');
+      setCourses([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredCourses = courses
     .filter(course => {
@@ -123,16 +95,17 @@ const StudentCourses = () => {
   };
 
   const handleViewCourse = (courseId) => {
+    console.log('[StudentCourses] Viewing course:', courseId);
     navigate(`/courses/${courseId}`);
   };
 
   const handleViewSyllabus = (courseId) => {
-    // Navigate to syllabus view
+    console.log('[StudentCourses] Viewing syllabus:', courseId);
     navigate(`/courses/${courseId}/syllabus`);
   };
 
   const handleViewGrades = (courseId) => {
-    // Navigate to grades view
+    console.log('[StudentCourses] Viewing grades:', courseId);
     navigate(`/courses/${courseId}/grades`);
   };
 
@@ -143,6 +116,23 @@ const StudentCourses = () => {
         <p className="text-gray-600">View and manage your enrolled courses</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Courses"
+          message={error}
+          onRetry={fetchCoursesData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading && courses.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading courses...</p>
+        </div>
+      ) : (
       <div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -290,6 +280,7 @@ const StudentCourses = () => {
         ))}
       </div>
       </div>
+      )}
     </div>
   );
 };

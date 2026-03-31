@@ -7,7 +7,14 @@ const {
   getInventory,
   getRecentActivities,
   getAllComplaints,
-  updateComplaintStatus
+  updateComplaintStatus,
+  getAllBooks,
+  createBook,
+  updateBook,
+  deleteBook,
+  getBookCategories,
+  getLibraryStats,
+  getComplaintStats
 } = require('./staffController');
 const authenticateToken = require('../../middleware/auth');
 
@@ -35,5 +42,14 @@ router.get('/inventory', getInventory);
 // Complaints
 router.get('/complaints', getAllComplaints);
 router.put('/complaints/:id', updateComplaintStatus);
+router.get('/complaints/stats', getComplaintStats);
+
+// Library Management
+router.get('/library/books', getAllBooks);
+router.post('/library/books', createBook);
+router.put('/library/books/:id', updateBook);
+router.delete('/library/books/:id', deleteBook);
+router.get('/library/categories', getBookCategories);
+router.get('/library/stats', getLibraryStats);
 
 module.exports = router;

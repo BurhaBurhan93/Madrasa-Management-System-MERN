@@ -1,28 +1,79 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
-import Input from '../../../components/UIHelper/Input';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
 const StaffComplaintsList = () => {
-  const [complaints, setComplaints] = useState([
-    { id: 'c1', title: 'Library Noise', category: 'Environment', priority: 'low', status: 'open', assignedTo: 'STF2024', date: '2026-02-20' },
-    { id: 'c2', title: 'Broken Chair', category: 'Facility', priority: 'high', status: 'in-progress', assignedTo: 'STF2025', date: '2026-02-22' },
-    { id: 'c3', title: 'Grade Dispute', category: 'Academic', priority: 'medium', status: 'closed', assignedTo: 'STF2024', date: '2026-02-10' },
-  ]);
+  console.log('[StaffComplaintsList] Component initializing...');
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({ status: 'all', priority: 'all', category: 'all', search: '' });
 
-  const filtered = useMemo(() => {
-    return complaints.filter(c => {
-      const s = filters.search.toLowerCase();
-      const matchSearch = c.title.toLowerCase().includes(s) || c.category.toLowerCase().includes(s);
-      const matchStatus = filters.status === 'all' || c.status === filters.status;
-      const matchPriority = filters.priority === 'all' || c.priority === filters.priority;
-      const matchCategory = filters.category === 'all' || c.category === filters.category;
-      return matchSearch && matchStatus && matchPriority && matchCategory;
-    });
-  }, [complaints, filters]);
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StaffComplaintsList] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
 
-  const changeStatus = (id, status) => setComplaints(prev => prev.map(c => (c.id === id ? { ...c, status } : c)));
+  useEffect(() => {
+    console.log('[StaffComplaintsList] useEffect triggered - fetching data from API...');
+    fetchComplaintsData();
+  }, []);
+
+  const fetchComplaintsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StaffComplaintsList] Fetching complaints from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/staff/complaints', config);
+      
+      console.log('[StaffComplaintsList] Complaints API response:', response.data);
+      
+      // Transform API data to match component structure
+      const formattedComplaints = (response.data || []).map((c, index) => ({
+        id: c._id || `c${index}`,
+        title: c.subject || 'Untitled Complaint',
+        category: c.complaintCategory || 'General',
+        priority: c.priorityLevel || 'medium',
+        status: c.complaintStatus === 'in_progress' ? 'in-progress' : c.complaintStatus || 'open',
+        assignedTo: c.assignedTo?.name || c.assignedTo || 'Unassigned',
+        date: c.submittedDate ? new Date(c.submittedDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        description: c.description || ''
+      }));
+      
+      setComplaints(formattedComplaints);
+    } catch (err) {
+      console.error('[StaffComplaintsList] Error fetching complaints:', err);
+      setError('Failed to fetch complaints. Please try again.');
+      setComplaints([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const changeStatus = async (id, newStatus) => {
+    console.log(`[StaffComplaintsList] Changing status for complaint ${id} to ${newStatus}`);
+    try {
+      const config = getConfig();
+      await axios.put(`http://localhost:5000/api/staff/complaints/${id}`, { 
+        status: newStatus 
+      }, config);
+      
+      // Update local state
+      setComplaints(prev => prev.map(c => (c.id === id ? { ...c, status: newStatus } : c)));
+      console.log('[StaffComplaintsList] Status updated successfully');
+    } catch (err) {
+      console.error('[StaffComplaintsList] Error updating complaint status:', err);
+      alert('Failed to update complaint status. Please try again.');
+    }
+  };
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
@@ -31,6 +82,23 @@ const StaffComplaintsList = () => {
         <p className="text-gray-600">Manage and track complaints</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Complaints Data Unavailable"
+          message={error}
+          onRetry={fetchComplaintsData}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading complaints...</p>
+        </div>
+      ) : (
       <Card>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
           <input className="px-3 py-2 border rounded" placeholder="Search" value={filters.search} onChange={e => setFilters({ ...filters, search: e.target.value })} />
@@ -96,6 +164,7 @@ const StaffComplaintsList = () => {
           </table>
         </div>
       </Card>
+      )}
     </div>
   );
 };

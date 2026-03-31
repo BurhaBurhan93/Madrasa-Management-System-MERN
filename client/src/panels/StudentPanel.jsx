@@ -71,6 +71,8 @@ const StudentPanel = () => {
         { id: 'attendance', label: 'Attendance', path: 'attendance' },
         { id: 'exams', label: 'Exams', path: 'exams' },
         { id: 'results', label: 'Results', path: 'results' },
+        { id: 'degrees', label: 'My Degrees', path: 'degrees' },
+        { id: 'education', label: 'Education History', path: 'education' },
       ]
     },
     { 
@@ -103,6 +105,13 @@ const StudentPanel = () => {
         { id: 'fees', label: 'Fees & Payments', path: 'fees' },
         { id: 'transactions', label: 'Transaction History', path: 'transactions' },
       ]
+    },
+    { 
+      id: 'leave', 
+      icon: <FiCalendar size={20} />, 
+      path: 'leave', 
+      label: 'Leave',
+      type: 'link'
     },
     { 
       id: 'communications', 

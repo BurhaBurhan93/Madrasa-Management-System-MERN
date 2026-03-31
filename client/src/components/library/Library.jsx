@@ -1,83 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../UIHelper/Card';
 import Badge from '../UIHelper/Badge';
 import Button from '../UIHelper/Button';
 import Input from '../UIHelper/Input';
+import ErrorPage from '../UIHelper/ErrorPage';
+import axios from 'axios';
 
 const Library = () => {
-  const [books, setBooks] = useState([
-    {
-      id: 1,
-      title: 'Introduction to Computer Science',
-      author: 'John Smith',
-      isbn: '978-0123456789',
-      category: 'Computer Science',
-      status: 'available',
-      dueDate: null,
-      borrowDate: null,
-      image: 'https://via.placeholder.com/120x160/4f46e5/ffffff?text=CS'
-    },
-    {
-      id: 2,
-      title: 'Advanced Mathematics',
-      author: 'Dr. Ahmed Hassan',
-      isbn: '978-0987654321',
-      category: 'Mathematics',
-      status: 'borrowed',
-      dueDate: '2024-03-15',
-      borrowDate: '2024-02-15',
-      image: 'https://via.placeholder.com/120x160/ef4444/ffffff?text=MATH'
-    },
-    {
-      id: 3,
-      title: 'Islamic Jurisprudence',
-      author: 'Sheikh Omar Farooq',
-      isbn: '978-1122334455',
-      category: 'Islamic Studies',
-      status: 'reserved',
-      dueDate: null,
-      borrowDate: null,
-      image: 'https://via.placeholder.com/120x160/10b981/ffffff?text=ISLAM'
-    },
-    {
-      id: 4,
-      title: 'Modern Physics',
-      author: 'Prof. Sarah Johnson',
-      isbn: '978-5566778899',
-      category: 'Physics',
-      status: 'available',
-      dueDate: null,
-      borrowDate: null,
-      image: 'https://via.placeholder.com/120x160/f59e0b/ffffff?text=PHYSICS'
-    }
-  ]);
-
-  const [borrowedBooks, setBorrowedBooks] = useState([
-    {
-      id: 2,
-      title: 'Advanced Mathematics',
-      author: 'Dr. Ahmed Hassan',
-      borrowDate: '2024-02-15',
-      dueDate: '2024-03-15',
-      renewals: 1,
-      status: 'due_soon'
-    }
-  ]);
-
-  const [reservations, setReservations] = useState([
-    {
-      id: 3,
-      title: 'Islamic Jurisprudence',
-      author: 'Sheikh Omar Farooq',
-      reservationDate: '2024-02-10',
-      position: 3,
-      status: 'reserved'
-    }
-  ]);
-
+  console.log('[Library] Component initializing...');
+  const [books, setBooks] = useState([]);
+  const [borrowedBooks, setBorrowedBooks] = useState([]);
+  const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [activeTab, setActiveTab] = useState('catalog');
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[Library] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[Library] useEffect triggered - fetching data from API...');
+    fetchLibraryData();
+  }, []);
+
+  const fetchLibraryData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[Library] Fetching library data from API...');
+      
+      const config = getConfig();
+      
+      // Fetch all books
+      const booksResponse = await axios.get('http://localhost:5000/api/student/books', config);
+      console.log('[Library] Books API response:', booksResponse.data);
+      setBooks(booksResponse.data || []);
+      
+      // Fetch borrowed books
+      const borrowedResponse = await axios.get('http://localhost:5000/api/student/borrowed-books', config);
+      console.log('[Library] Borrowed books API response:', borrowedResponse.data);
+      setBorrowedBooks(borrowedResponse.data || []);
+      
+      // Fetch reservations
+      const reservationsResponse = await axios.get('http://localhost:5000/api/student/reservations', config);
+      console.log('[Library] Reservations API response:', reservationsResponse.data);
+      setReservations(reservationsResponse.data || []);
+    } catch (err) {
+      console.error('[Library] Error fetching library data:', err);
+      setError('Failed to fetch library data. Please try again.');
+      setBooks([]);
+      setBorrowedBooks([]);
+      setReservations([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const categories = [...new Set(books.map(book => book.category))];
 
@@ -103,37 +88,61 @@ const Library = () => {
     }
   };
 
-  const handleBorrow = (bookId) => {
-    setBooks(books.map(book => 
-      book.id === bookId ? { ...book, status: 'borrowed', borrowDate: new Date().toISOString().split('T')[0], dueDate: '2024-03-15' } : book
-    ));
-    
-    const borrowedBook = books.find(book => book.id === bookId);
-    setBorrowedBooks([...borrowedBooks, {
-      ...borrowedBook,
-      borrowDate: new Date().toISOString().split('T')[0],
-      dueDate: '2024-03-15',
-      renewals: 0,
-      status: 'borrowed'
-    }]);
+  const handleBorrow = async (bookId) => {
+    console.log('[Library] Borrowing book:', bookId);
+    try {
+      setLoading(true);
+      const config = getConfig();
+      
+      await axios.post(`http://localhost:5000/api/student/books/${bookId}/borrow`, {}, config);
+      console.log('[Library] Book borrowed successfully');
+      
+      // Refresh data
+      await fetchLibraryData();
+    } catch (err) {
+      console.error('[Library] Error borrowing book:', err);
+      alert('Error borrowing book: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleReturn = (bookId) => {
-    setBooks(books.map(book => 
-      book.id === bookId ? { ...book, status: 'available', borrowDate: null, dueDate: null } : book
-    ));
-    
-    setBorrowedBooks(borrowedBooks.filter(book => book.id !== bookId));
+  const handleReturn = async (bookId) => {
+    console.log('[Library] Returning book:', bookId);
+    try {
+      setLoading(true);
+      const config = getConfig();
+      
+      await axios.post(`http://localhost:5000/api/student/books/${bookId}/return`, {}, config);
+      console.log('[Library] Book returned successfully');
+      
+      // Refresh data
+      await fetchLibraryData();
+    } catch (err) {
+      console.error('[Library] Error returning book:', err);
+      alert('Error returning book: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRenew = (bookId) => {
-    setBorrowedBooks(borrowedBooks.map(book => 
-      book.id === bookId ? { ...book, dueDate: new Date(new Date(book.dueDate).setDate(new Date(book.dueDate).getDate() + 14)).toISOString().split('T')[0], renewals: book.renewals + 1 } : book
-    ));
-    
-    setBooks(books.map(book => 
-      book.id === bookId ? { ...book, dueDate: new Date(new Date(book.dueDate).setDate(new Date(book.dueDate).getDate() + 14)).toISOString().split('T')[0] } : book
-    ));
+  const handleRenew = async (bookId) => {
+    console.log('[Library] Renewing book:', bookId);
+    try {
+      setLoading(true);
+      const config = getConfig();
+      
+      await axios.post(`http://localhost:5000/api/student/books/${bookId}/renew`, {}, config);
+      console.log('[Library] Book renewed successfully');
+      
+      // Refresh data
+      await fetchLibraryData();
+    } catch (err) {
+      console.error('[Library] Error renewing book:', err);
+      alert('Error renewing book: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -143,6 +152,23 @@ const Library = () => {
         <p className="text-gray-600">Browse books, manage borrowed items, and access learning resources</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Library Service Unavailable"
+          message={error}
+          onRetry={fetchLibraryData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading && books.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading library data...</p>
+        </div>
+      ) : (
       <div>
       {/* Tab Navigation */}
       <div className="mb-6">
@@ -420,6 +446,7 @@ const Library = () => {
         </Card>
       </div>
       </div>
+      )}
     </div>
   );
 };

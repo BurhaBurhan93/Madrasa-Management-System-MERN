@@ -1,16 +1,55 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
 const StaffLibraryCategories = () => {
-  const [categories, setCategories] = useState([
-    { id: '1', name: 'Islamic Studies', code: 'ISL', status: 'active' },
-    { id: '2', name: 'Quran', code: 'QUR', status: 'active' },
-    { id: '3', name: 'Arabic Language', code: 'ARB', status: 'active' },
-  ]);
+  console.log('[StaffLibraryCategories] Component initializing...');
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ id: '', name: '', code: '' });
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StaffLibraryCategories] Token exists:', !!token);
+    return { headers: { Authorization: `Bearer ${token}` } };
+  };
+
+  useEffect(() => {
+    console.log('[StaffLibraryCategories] useEffect triggered - fetching data from API...');
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StaffLibraryCategories] Fetching categories from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/staff/library/categories', config);
+      
+      console.log('[StaffLibraryCategories] Categories API response:', response.data);
+      const formattedCategories = (response.data || []).map(c => ({
+        id: c._id,
+        name: c.name,
+        code: c.name?.substring(0, 3).toUpperCase() || 'CAT',
+        status: 'active'
+      }));
+      setCategories(formattedCategories);
+    } catch (err) {
+      console.error('[StaffLibraryCategories] Error fetching categories:', err);
+      setError('Failed to fetch categories. Please try again.');
+      setCategories([]);
+    } finally {
+      setLoading(false);
+    }
+  };
   const filtered = useMemo(
     () =>
       categories.filter(
@@ -42,6 +81,23 @@ const StaffLibraryCategories = () => {
         <p className="text-gray-600">Add, edit and manage book categories</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Categories"
+          message={error}
+          onRetry={fetchCategories}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading categories...</p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1">
           <h2 className="text-xl font-semibold mb-4">{form.id ? 'Edit Category' : 'Add Category'}</h2>
@@ -93,6 +149,7 @@ const StaffLibraryCategories = () => {
           </div>
         </Card>
       </div>
+      )}
     </div>
   );
 };

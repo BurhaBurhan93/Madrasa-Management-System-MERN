@@ -1,14 +1,48 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
 
 const StaffLibrarySales = () => {
-  const [sales, setSales] = useState([
-    { id: '1', student: 'STD1001', title: 'Fiqh Essentials', qty: 1, price: 15, date: '2026-02-20', receipt: 'SAL-0001' },
-  ]);
+  console.log('[StaffLibrarySales] Component initializing...');
+  const [sales, setSales] = useState([]);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ id: '', student: '', title: '', qty: 1, price: 0, date: '', receipt: '' });
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StaffLibrarySales] Token exists:', !!token);
+    return { headers: { Authorization: `Bearer ${token}` } };
+  };
+
+  useEffect(() => {
+    console.log('[StaffLibrarySales] useEffect triggered - fetching data from API...');
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StaffLibrarySales] Fetching books from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/staff/library/books', config);
+      
+      console.log('[StaffLibrarySales] Books API response:', response.data);
+      setBooks(response.data || []);
+    } catch (err) {
+      console.error('[StaffLibrarySales] Error fetching books:', err);
+      setError('Failed to fetch books. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     return sales.filter(s => {
@@ -41,6 +75,18 @@ const StaffLibrarySales = () => {
         <p className="text-gray-600">Record sales and generate receipts</p>
       </div>
 
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading books...</p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1">
           <h2 className="text-xl font-semibold mb-4">{form.id ? 'Edit Sale' : 'New Sale'}</h2>
@@ -97,6 +143,7 @@ const StaffLibrarySales = () => {
           </div>
         </Card>
       </div>
+      )}
     </div>
   );
 };

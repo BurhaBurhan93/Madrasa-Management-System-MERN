@@ -1,14 +1,49 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
 const StaffComplaintActions = () => {
-  const [actions, setActions] = useState([
-    { id: 'a1', complaintId: 'c2', note: 'Called maintenance', result: 'Awaiting parts', followUp: '2026-02-25', nextRequired: true },
-  ]);
+  console.log('[StaffComplaintActions] Component initializing...');
+  const [actions, setActions] = useState([]);
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [form, setForm] = useState({ id: '', complaintId: '', note: '', result: '', followUp: '', nextRequired: false });
   const [search, setSearch] = useState('');
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StaffComplaintActions] Token exists:', !!token);
+    return { headers: { Authorization: `Bearer ${token}` } };
+  };
+
+  useEffect(() => {
+    console.log('[StaffComplaintActions] useEffect triggered - fetching data from API...');
+    fetchComplaints();
+  }, []);
+
+  const fetchComplaints = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StaffComplaintActions] Fetching complaints from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/staff/complaints', config);
+      
+      console.log('[StaffComplaintActions] Complaints API response:', response.data);
+      setComplaints(response.data || []);
+    } catch (err) {
+      console.error('[StaffComplaintActions] Error fetching complaints:', err);
+      setError('Failed to fetch complaints. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     return actions.filter(a => a.complaintId.toLowerCase().includes(search.toLowerCase()));
@@ -35,6 +70,23 @@ const StaffComplaintActions = () => {
         <p className="text-gray-600">Record actions, notes, and follow-ups</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Complaint Actions"
+          message={error}
+          onRetry={fetchComplaints}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading complaints...</p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
           <h2 className="text-xl font-semibold mb-4">{form.id ? 'Edit Action' : 'Add Action'}</h2>
@@ -89,6 +141,7 @@ const StaffComplaintActions = () => {
           </div>
         </Card>
       </div>
+      )}
     </div>
   );
 };

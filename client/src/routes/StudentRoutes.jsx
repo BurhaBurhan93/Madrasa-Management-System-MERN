@@ -10,6 +10,9 @@ import StudentResults from '../pages/StudentResults';
 import StudentSchedule from '../pages/StudentSchedule';
 import StudentExams from '../pages/StudentExams';
 import StudentFees from '../pages/StudentFees';
+import StudentEducation from '../pages/StudentEducation';
+import StudentDegree from '../pages/StudentDegree';
+import StudentLeave from '../pages/StudentLeave';
 import StudentLibrary from '../pages/StudentLibrary';
 import StudentComplaints from '../pages/StudentComplaints';
 import StudentExamAttempt from "../pages/StudentExamAttempt";
@@ -33,6 +36,9 @@ const StudentRoutes = () => (
     <Route path="schedule" element={<StudentSchedule />} />
     <Route path="exams" element={<StudentExams />} />
     <Route path="fees" element={<StudentFees />} />
+    <Route path="education" element={<StudentEducation />} />
+    <Route path="degrees" element={<StudentDegree />} />
+    <Route path="leave" element={<StudentLeave />} />
     <Route path="library" element={<StudentLibrary />} />
     <Route path="resources" element={<LearningResources />} />
     <Route path="borrowed" element={<BorrowedBooks />} />

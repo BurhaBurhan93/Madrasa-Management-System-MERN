@@ -1,22 +1,51 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
 
 const StaffLibraryReports = () => {
-  const data = {
-    totalBooks: 320,
-    borrowed: 45,
-    returned: 120,
-    purchases: 25,
-    sales: 18,
-    lowStock: 12,
+  console.log('[StaffLibraryReports] Component initializing...');
+  const [data, setData] = useState({
+    totalBooks: 0,
+    borrowed: 0,
+    returned: 0,
+    lowStock: 0
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StaffLibraryReports] Token exists:', !!token);
+    return { headers: { Authorization: `Bearer ${token}` } };
   };
 
-  const ratios = useMemo(() => {
-    return {
-      borrowedRate: Math.round((data.borrowed / data.totalBooks) * 100),
-      returnedRate: Math.round((data.returned / data.totalBooks) * 100),
-    };
-  }, [data]);
+  useEffect(() => {
+    console.log('[StaffLibraryReports] useEffect triggered - fetching data from API...');
+    fetchLibraryStats();
+  }, []);
+
+  const fetchLibraryStats = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StaffLibraryReports] Fetching library stats from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/staff/library/stats', config);
+      
+      console.log('[StaffLibraryReports] Stats API response:', response.data);
+      setData(response.data);
+    } catch (err) {
+      console.error('[StaffLibraryReports] Error fetching stats:', err);
+      setError('Failed to fetch library statistics. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const borrowedRate = data.totalBooks > 0 ? Math.round((data.borrowed / data.totalBooks) * 100) : 0;
+  const returnedRate = data.totalBooks > 0 ? Math.round((data.returned / data.totalBooks) * 100) : 0;
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
@@ -25,7 +54,20 @@ const StaffLibraryReports = () => {
         <p className="text-gray-600">Overview and KPIs</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading reports...</p>
+        </div>
+      ) : (
+      <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Card className="text-center">
           <div className="text-2xl font-bold text-blue-600">{data.totalBooks}</div>
           <div className="text-sm text-gray-600">Total Books</div>
@@ -39,14 +81,6 @@ const StaffLibraryReports = () => {
           <div className="text-sm text-gray-600">Returned</div>
         </Card>
         <Card className="text-center">
-          <div className="text-2xl font-bold text-purple-600">{data.purchases}</div>
-          <div className="text-sm text-gray-600">Purchases</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-2xl font-bold text-pink-600">{data.sales}</div>
-          <div className="text-sm text-gray-600">Sales</div>
-        </Card>
-        <Card className="text-center">
           <div className="text-2xl font-bold text-red-600">{data.lowStock}</div>
           <div className="text-sm text-gray-600">Low Stock</div>
         </Card>
@@ -57,11 +91,11 @@ const StaffLibraryReports = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-sm text-blue-700">Borrowed Rate</p>
-            <p className="text-2xl font-bold text-blue-700">{ratios.borrowedRate}%</p>
+            <p className="text-2xl font-bold text-blue-700">{borrowedRate}%</p>
           </div>
           <div className="p-4 bg-green-50 rounded-lg border border-green-200">
             <p className="text-sm text-green-700">Returned Rate</p>
-            <p className="text-2xl font-bold text-green-700">{ratios.returnedRate}%</p>
+            <p className="text-2xl font-bold text-green-700">{returnedRate}%</p>
           </div>
           <div className="p-4 bg-red-50 rounded-lg border border-red-200">
             <p className="text-sm text-red-700">Low Stock</p>
@@ -69,6 +103,8 @@ const StaffLibraryReports = () => {
           </div>
         </div>
       </Card>
+      </>
+      )}
     </div>
   );
 };

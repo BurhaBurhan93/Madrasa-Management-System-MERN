@@ -4,6 +4,7 @@ const Book = require('../../models/Book');
 const BorrowedBook = require('../../models/BorrowedBook');
 const Complaint = require('../../models/Complaint');
 const Employee = require('../../models/Employee');
+const BookCategory = require('../../models/BookCategory');
 
 // Get dashboard stats
 const getDashboardStats = async (req, res) => {
@@ -161,6 +162,126 @@ const updateComplaintStatus = async (req, res) => {
   }
 };
 
+// Library Management Functions
+
+// Get all books
+const getAllBooks = async (req, res) => {
+  try {
+    const books = await Book.find()
+      .populate('category', 'name')
+      .sort({ createdAt: -1 });
+
+    const formattedBooks = books.map(book => ({
+      id: book._id,
+      title: book.title,
+      author: book.author || 'Unknown',
+      category: book.category?._id || book.category,
+      categoryName: book.category?.name || 'Uncategorized',
+      stock: book.stock || 0,
+      isbn: book.isbn || '',
+      pages: book.pages || 0,
+      publisher: book.publisher || ''
+    }));
+
+    res.json(formattedBooks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Create new book
+const createBook = async (req, res) => {
+  try {
+    const bookData = req.body;
+    const newBook = new Book(bookData);
+    await newBook.save();
+    res.status(201).json(newBook);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update book
+const updateBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const book = await Book.findByIdAndUpdate(id, updateData, { new: true });
+    if (!book) {
+      return res.status(404).json({ message: 'Book not found' });
+    }
+
+    res.json(book);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete book
+const deleteBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const book = await Book.findByIdAndDelete(id);
+    if (!book) {
+      return res.status(404).json({ message: 'Book not found' });
+    }
+    res.json({ message: 'Book deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get book categories
+const getBookCategories = async (req, res) => {
+  try {
+    const categories = await BookCategory.find({ deletedAt: null });
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get library statistics for reports
+const getLibraryStats = async (req, res) => {
+  try {
+    const totalBooks = await Book.countDocuments();
+    const borrowed = await BorrowedBook.countDocuments({ status: 'borrowed' });
+    const returned = await BorrowedBook.countDocuments({ status: 'returned' });
+    const lowStock = await Book.countDocuments({ stock: { $lte: 5 } });
+
+    res.json({
+      totalBooks,
+      borrowed,
+      returned,
+      lowStock
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get complaint statistics for reports
+const getComplaintStats = async (req, res) => {
+  try {
+    const total = await Complaint.countDocuments();
+    const open = await Complaint.countDocuments({ complaintStatus: 'open' });
+    const inProgress = await Complaint.countDocuments({ complaintStatus: 'in_progress' });
+    const closed = await Complaint.countDocuments({ complaintStatus: 'closed' });
+    const highPriority = await Complaint.countDocuments({ priorityLevel: 'high' });
+
+    res.json({
+      total,
+      open,
+      inProgress,
+      closed,
+      highPriority
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getDashboardStats,
   getAllStudents,
@@ -168,5 +289,14 @@ module.exports = {
   getInventory,
   getRecentActivities,
   getAllComplaints,
-  updateComplaintStatus
+  updateComplaintStatus,
+  // Library management
+  getAllBooks,
+  createBook,
+  updateBook,
+  deleteBook,
+  getBookCategories,
+  getLibraryStats,
+  // Complaint stats
+  getComplaintStats
 };

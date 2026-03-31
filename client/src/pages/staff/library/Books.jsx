@@ -1,22 +1,134 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
 import Select from '../../../components/UIHelper/Select';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
 const StaffLibraryBooks = () => {
-  const [categories] = useState([
-    { id: 'ISL', name: 'Islamic Studies' },
-    { id: 'QUR', name: 'Quran' },
-    { id: 'ARB', name: 'Arabic Language' },
-  ]);
-  const [books, setBooks] = useState([
-    { id: 'b1', title: 'Fiqh Essentials', author: 'Ibn Rushd', category: 'ISL', stock: 12, isbn: '9780000001' },
-    { id: 'b2', title: 'Tajweed Rules', author: 'H Al-Qari', category: 'QUR', stock: 8, isbn: '9780000002' },
-  ]);
+  console.log('[StaffLibraryBooks] Component initializing...');
+  const [categories, setCategories] = useState([]);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
-  const [form, setForm] = useState({ id: '', title: '', author: '', category: 'ISL', stock: 0, isbn: '' });
+  const [form, setForm] = useState({ id: '', title: '', author: '', category: '', stock: 0, isbn: '' });
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StaffLibraryBooks] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[StaffLibraryBooks] useEffect triggered - fetching data from API...');
+    fetchBooksData();
+    fetchCategories();
+  }, []);
+
+  const fetchBooksData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StaffLibraryBooks] Fetching books from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/staff/library/books', config);
+      
+      console.log('[StaffLibraryBooks] Books API response:', response.data);
+      setBooks(response.data || []);
+    } catch (err) {
+      console.error('[StaffLibraryBooks] Error fetching books:', err);
+      setError('Failed to fetch books. Please try again.');
+      setBooks([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      console.log('[StaffLibraryBooks] Fetching categories from API...');
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/staff/library/categories', config);
+      
+      console.log('[StaffLibraryBooks] Categories API response:', response.data);
+      const formattedCategories = (response.data || []).map(c => ({
+        id: c._id,
+        name: c.name
+      }));
+      setCategories(formattedCategories);
+      
+      // Set default category if available
+      if (formattedCategories.length > 0 && !form.category) {
+        setForm(prev => ({ ...prev, category: formattedCategories[0].id }));
+      }
+    } catch (err) {
+      console.error('[StaffLibraryBooks] Error fetching categories:', err);
+    }
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.title || !form.author) return;
+    
+    console.log('[StaffLibraryBooks] Submitting book form:', form);
+    try {
+      const config = getConfig();
+      const bookData = {
+        title: form.title,
+        author: form.author,
+        category: form.category,
+        stock: Number(form.stock),
+        isbn: form.isbn,
+        available: Number(form.stock)
+      };
+      
+      if (form.id) {
+        await axios.put(`http://localhost:5000/api/staff/library/books/${form.id}`, bookData, config);
+        console.log('[StaffLibraryBooks] Book updated successfully');
+      } else {
+        await axios.post('http://localhost:5000/api/staff/library/books', bookData, config);
+        console.log('[StaffLibraryBooks] Book created successfully');
+      }
+      
+      setForm({ id: '', title: '', author: '', category: categories[0]?.id || '', stock: 0, isbn: '' });
+      fetchBooksData();
+    } catch (err) {
+      console.error('[StaffLibraryBooks] Error saving book:', err);
+      alert('Failed to save book. Please try again.');
+    }
+  };
+
+  const onEdit = (b) => {
+    console.log('[StaffLibraryBooks] Editing book:', b);
+    setForm({
+      id: b.id,
+      title: b.title,
+      author: b.author,
+      category: b.category,
+      stock: b.stock,
+      isbn: b.isbn
+    });
+  };
+
+  const onDelete = async (id) => {
+    console.log('[StaffLibraryBooks] Deleting book:', id);
+    try {
+      const config = getConfig();
+      await axios.delete(`http://localhost:5000/api/staff/library/books/${id}`, config);
+      console.log('[StaffLibraryBooks] Book deleted successfully');
+      fetchBooksData();
+    } catch (err) {
+      console.error('[StaffLibraryBooks] Error deleting book:', err);
+      alert('Failed to delete book. Please try again.');
+    }
+  };
 
   const filtered = useMemo(() => {
     return books.filter(b => {
@@ -26,20 +138,6 @@ const StaffLibraryBooks = () => {
     });
   }, [books, search, filterCat]);
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    if (!form.title || !form.author) return;
-    if (form.id) {
-      setBooks(prev => prev.map(b => (b.id === form.id ? { ...form, stock: Number(form.stock) } : b)));
-    } else {
-      setBooks(prev => [...prev, { ...form, id: Date.now().toString(), stock: Number(form.stock) }]);
-    }
-    setForm({ id: '', title: '', author: '', category: 'ISL', stock: 0, isbn: '' });
-  };
-
-  const onEdit = (b) => setForm(b);
-  const onDelete = (id) => setBooks(prev => prev.filter(b => b.id !== id));
-
   return (
     <div className="w-full bg-gray-50 min-h-screen">
       <div className="py-6 mb-8">
@@ -47,6 +145,23 @@ const StaffLibraryBooks = () => {
         <p className="text-gray-600">Add, edit and manage books and stock</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Library Books Unavailable"
+          message={error}
+          onRetry={fetchBooksData}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading books...</p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1">
           <h2 className="text-xl font-semibold mb-4">{form.id ? 'Edit Book' : 'Add Book'}</h2>
@@ -105,6 +220,7 @@ const StaffLibraryBooks = () => {
           </div>
         </Card>
       </div>
+      )}
     </div>
   );
 };

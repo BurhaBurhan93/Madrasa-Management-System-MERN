@@ -1,14 +1,49 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
 const StaffLibraryPurchases = () => {
-  const [purchases, setPurchases] = useState([
-    { id: '1', supplier: 'EduBooks', invoice: 'INV-1001', title: 'Fiqh Essentials', qty: 10, price: 12.5, date: '2026-01-15' },
-  ]);
+  console.log('[StaffLibraryPurchases] Component initializing...');
+  const [purchases, setPurchases] = useState([]);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ id: '', supplier: '', invoice: '', title: '', qty: 1, price: 0, date: '' });
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StaffLibraryPurchases] Token exists:', !!token);
+    return { headers: { Authorization: `Bearer ${token}` } };
+  };
+
+  useEffect(() => {
+    console.log('[StaffLibraryPurchases] useEffect triggered - fetching data from API...');
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StaffLibraryPurchases] Fetching books from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/staff/library/books', config);
+      
+      console.log('[StaffLibraryPurchases] Books API response:', response.data);
+      setBooks(response.data || []);
+    } catch (err) {
+      console.error('[StaffLibraryPurchases] Error fetching books:', err);
+      setError('Failed to fetch books. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     return purchases.filter(p => {
@@ -38,6 +73,23 @@ const StaffLibraryPurchases = () => {
         <p className="text-gray-600">Record purchases and update stock</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Purchases"
+          message={error}
+          onRetry={fetchBooks}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading books...</p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1">
           <h2 className="text-xl font-semibold mb-4">{form.id ? 'Edit Purchase' : 'Add Purchase'}</h2>
@@ -94,6 +146,7 @@ const StaffLibraryPurchases = () => {
           </div>
         </Card>
       </div>
+      )}
     </div>
   );
 };

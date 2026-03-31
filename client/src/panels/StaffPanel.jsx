@@ -155,7 +155,7 @@ const StaffPanel = () => {
     { 
       id: 'hr', 
       icon: <FiUsers size={20} />, 
-      label: 'Human Resource',
+      label: 'HR',
       type: 'dropdown',
       items: [
         { id: 'departments', label: 'Departments', path: 'hr/departments' },

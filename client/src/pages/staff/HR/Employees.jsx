@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
 const statusColors = {
   active: 'bg-green-100 text-green-700',
@@ -12,6 +13,7 @@ const Employees = () => {
   const [filterDept, setFilterDept] = useState('');
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const token = () => localStorage.getItem('token');
   const headers = () => ({ Authorization: `Bearer ${token()}` });
@@ -23,11 +25,13 @@ const Employees = () => {
 
   const fetchEmployees = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await axios.get('http://localhost:5000/api/hr/employees', { headers: headers() });
       if (res.data.success) setEmployees(res.data.data);
     } catch (error) {
       console.error('Error fetching employees:', error);
+      setError('Failed to fetch employees. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -51,6 +55,17 @@ const Employees = () => {
 
   return (
     <div className="p-6 space-y-6">
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Employees Data Unavailable"
+          message={error}
+          onRetry={fetchEmployees}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
+      )}
+      
       <div>
         <h1 className="text-2xl font-bold text-gray-800">Employees</h1>
         <p className="text-sm text-gray-500 mt-1">Overview of all registered employees</p>

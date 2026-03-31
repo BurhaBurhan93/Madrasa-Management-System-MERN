@@ -3,60 +3,53 @@ import { useNavigate } from 'react-router-dom';
 import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
 import Badge from '../components/UIHelper/Badge';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import { formatDate } from '../lib/utils';
+import axios from 'axios';
 
 const StudentAssignments = () => {
+  console.log('[StudentAssignments] Component initializing...');
   const navigate = useNavigate();
   
-  const [assignments, setAssignments] = useState([
-    {
-      id: 1,
-      title: 'Calculus Homework Chapter 3',
-      course: 'Mathematics',
-      dueDate: '2024-02-15',
-      status: 'pending',
-      submitted: false,
-      maxPoints: 100,
-      description: 'Complete exercises 1-20 from chapter 3',
-      attachments: [{ name: 'Chapter3.pdf', type: 'pdf' }]
-    },
-    {
-      id: 2,
-      title: 'Physics Lab Report',
-      course: 'Physics',
-      dueDate: '2024-02-12',
-      status: 'submitted',
-      submitted: true,
-      maxPoints: 100,
-      description: 'Lab report on Simple Harmonic Motion experiment',
-      attachments: [{ name: 'lab_report.docx', type: 'docx' }],
-      submissionDate: '2024-02-11'
-    },
-    {
-      id: 3,
-      title: 'History Research Paper',
-      course: 'History',
-      dueDate: '2024-02-20',
-      status: 'in-progress',
-      submitted: false,
-      maxPoints: 150,
-      description: 'Research paper on Islamic Golden Age contributions to science',
-      attachments: []
-    },
-    {
-      id: 4,
-      title: 'Chemistry Assignment',
-      course: 'Chemistry',
-      dueDate: '2024-02-08',
-      status: 'overdue',
-      submitted: false,
-      maxPoints: 75,
-      description: 'Complete problems 1-30 from textbook chapter 5'
-    }
-  ]);
-
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('dueDate');
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StudentAssignments] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[StudentAssignments] useEffect triggered - fetching data from API...');
+    fetchAssignmentsData();
+  }, []);
+
+  const fetchAssignmentsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StudentAssignments] Fetching assignments from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/student/assignments', config);
+      
+      console.log('[StudentAssignments] API response:', response.data);
+      setAssignments(response.data || []);
+    } catch (err) {
+      console.error('[StudentAssignments] Error fetching assignments:', err);
+      setError('Failed to fetch assignments. Please try again.');
+      setAssignments([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredAssignments = assignments
     .filter(assignment => {
@@ -105,7 +98,7 @@ const StudentAssignments = () => {
   };
 
   const handleViewAssignment = (assignmentId) => {
-    // Navigate to assignment detail view
+    console.log('[StudentAssignments] Viewing assignment:', assignmentId);
     navigate(`/assignments/${assignmentId}`);
   };
 
@@ -116,16 +109,19 @@ const StudentAssignments = () => {
   });
 
   const handleShowSubmissionModal = (assignmentId) => {
+    console.log('[StudentAssignments] Opening submission modal for:', assignmentId);
     setShowSubmissionModal(assignmentId);
   };
 
   const handleHideSubmissionModal = () => {
+    console.log('[StudentAssignments] Closing submission modal');
     setShowSubmissionModal(null);
     setSubmissionData({ file: null, notes: '' });
   };
 
   const handleSubmissionChange = (e) => {
     const { name, value, files } = e.target;
+    console.log(`[StudentAssignments] Submission input changed - ${name}`);
     if (name === 'file') {
       setSubmissionData(prev => ({ ...prev, [name]: files[0] }));
     } else {
@@ -133,18 +129,46 @@ const StudentAssignments = () => {
     }
   };
 
-  const handleSubmitAssignment = (assignmentId) => {
-    // Handle assignment submission
-    setAssignments(prev => prev.map(ass => 
-      ass.id === assignmentId 
-        ? { ...ass, status: 'submitted', submitted: true, submissionDate: new Date().toISOString().split('T')[0] }
-        : ass
-    ));
-    
-    // Close modal and reset form
-    handleHideSubmissionModal();
-    
-    alert('Assignment submitted successfully!');
+  const handleSubmitAssignment = async (assignmentId) => {
+    console.log('[StudentAssignments] Submitting assignment:', assignmentId);
+    try {
+      setLoading(true);
+      const config = getConfig();
+      
+      // Create form data for file upload
+      const formData = new FormData();
+      if (submissionData.file) {
+        formData.append('file', submissionData.file);
+      }
+      formData.append('notes', submissionData.notes);
+      
+      // Submit to backend API
+      await axios.post(`http://localhost:5000/api/student/assignments/${assignmentId}/submit`, formData, {
+        ...config,
+        headers: {
+          ...config.headers,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      console.log('[StudentAssignments] Assignment submitted successfully');
+      
+      // Update local state
+      setAssignments(prev => prev.map(ass => 
+        ass.id === assignmentId || ass._id === assignmentId
+          ? { ...ass, status: 'submitted', submitted: true, submissionDate: new Date().toISOString().split('T')[0] }
+          : ass
+      ));
+      
+      // Close modal and reset form
+      handleHideSubmissionModal();
+      alert('Assignment submitted successfully!');
+    } catch (err) {
+      console.error('[StudentAssignments] Error submitting assignment:', err);
+      alert('Error submitting assignment: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -154,6 +178,23 @@ const StudentAssignments = () => {
         <p className="text-gray-600">Manage and track your assignments</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Assignments"
+          message={error}
+          onRetry={fetchAssignmentsData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading && assignments.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading assignments...</p>
+        </div>
+      ) : (
       <div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -429,6 +470,7 @@ const StudentAssignments = () => {
         </div>
       )}
       </div>
+      )}
     </div>
   );
 };

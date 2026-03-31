@@ -46,6 +46,7 @@ import StaffPayrollSalaryDeductionsCreate from '../pages/staff/payroll/SalaryDed
 import StaffPayrollSalaryDeductionsEdit from '../pages/staff/payroll/SalaryDeductionsEdit';
 import StaffPayrollSalaryAdvancesCreate from '../pages/staff/payroll/SalaryAdvancesCreate';
 import StaffPayrollSalaryAdvancesEdit from '../pages/staff/payroll/SalaryAdvancesEdit';
+import StaffLeaveManagement from '../pages/StaffLeaveManagement';
 
 const StaffRoutes = () => (
   <Route path="/staff/*" element={<StaffPanel />}>
@@ -99,6 +100,7 @@ const StaffRoutes = () => (
     <Route path="payroll/salary-advances" element={<StaffPayrollSalaryAdvances />} />
     <Route path="payroll/salary-advances/create" element={<StaffPayrollSalaryAdvancesCreate />} />
     <Route path="payroll/salary-advances/edit/:id" element={<StaffPayrollSalaryAdvancesEdit />} />
+    <Route path="leave" element={<StaffLeaveManagement />} />
   </Route>
 );
 

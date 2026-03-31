@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiUser, FiBell, FiLock, FiGlobe, FiMoon, FiSmartphone, FiSave } from 'react-icons/fi';
+import axios from 'axios';
 
 const StudentSettings = () => {
+  console.log('[StudentSettings] Component initializing...');
   const [activeTab, setActiveTab] = useState('profile');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [settings, setSettings] = useState({
     // Profile Settings
-    firstName: 'Ahmed',
-    lastName: 'Mohamed',
-    email: 'ahmed.mohamed@example.com',
-    phone: '+1234567890',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
     language: 'English',
     timezone: 'UTC+0',
     
@@ -30,12 +34,79 @@ const StudentSettings = () => {
     compactView: false,
   });
 
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StudentSettings] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[StudentSettings] useEffect triggered - fetching data from API...');
+    fetchSettingsData();
+  }, []);
+
+  const fetchSettingsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StudentSettings] Fetching profile from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/student/profile', config);
+      
+      console.log('[StudentSettings] Profile API response:', response.data);
+      
+      // Update settings with API data
+      const userData = response.data;
+      setSettings(prev => ({
+        ...prev,
+        firstName: userData.name?.split(' ')[0] || '',
+        lastName: userData.name?.split(' ').slice(1).join(' ') || '',
+        email: userData.email || '',
+        phone: userData.phone || '',
+        language: userData.language || 'English',
+        timezone: userData.timezone || 'UTC+0'
+      }));
+    } catch (err) {
+      console.error('[StudentSettings] Error fetching profile:', err);
+      setError('Failed to fetch profile data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleChange = (key, value) => {
+    console.log(`[StudentSettings] Setting changed: ${key} = ${value}`);
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleSave = () => {
-    alert('Settings saved successfully!');
+  const handleSave = async () => {
+    console.log('[StudentSettings] Saving settings...');
+    try {
+      setLoading(true);
+      const config = getConfig();
+      
+      // Prepare data for API
+      const updateData = {
+        name: `${settings.firstName} ${settings.lastName}`.trim(),
+        email: settings.email,
+        phone: settings.phone,
+        language: settings.language,
+        timezone: settings.timezone
+      };
+      
+      await axios.put('http://localhost:5000/api/student/profile', updateData, config);
+      console.log('[StudentSettings] Settings saved successfully');
+      alert('Settings saved successfully!');
+    } catch (err) {
+      console.error('[StudentSettings] Error saving settings:', err);
+      alert('Error saving settings: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const tabs = [
@@ -53,6 +124,18 @@ const StudentSettings = () => {
         <p className="text-gray-500 mt-1">Manage your account preferences and settings</p>
       </div>
 
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading settings...</p>
+        </div>
+      ) : (
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar Tabs */}
         <div className="lg:w-64 shrink-0">
@@ -294,6 +377,7 @@ const StudentSettings = () => {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };
