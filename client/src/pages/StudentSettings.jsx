@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiUser, FiBell, FiLock, FiGlobe, FiMoon, FiSmartphone, FiSave } from 'react-icons/fi';
 import axios from 'axios';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 
 const StudentSettings = () => {
   console.log('[StudentSettings] Component initializing...');
@@ -124,10 +125,15 @@ const StudentSettings = () => {
         <p className="text-gray-500 mt-1">Manage your account preferences and settings</p>
       </div>
 
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
-        </div>
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Settings"
+          message={error}
+          onRetry={fetchSettingsData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
       )}
 
       {loading ? (

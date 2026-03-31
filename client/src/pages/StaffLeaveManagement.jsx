@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
 import Input from '../components/UIHelper/Input';
@@ -8,7 +9,7 @@ import Select from '../components/UIHelper/Select';
 import Badge from '../components/UIHelper/Badge';
 import Modal from '../components/UIHelper/Modal';
 import { FiPlus, FiEdit2, FiTrash2, FiCheckCircle, FiXCircle, FiCalendar, FiClock, FiUser } from 'react-icons/fi';
-import { BarChartComponent, PieChartComponent } from '../components/UIHelper/Chart';
+import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 
 const StaffLeaveManagement = () => {
   const navigate = useNavigate();
@@ -218,10 +219,15 @@ const StaffLeaveManagement = () => {
         <p className="text-gray-600 mt-1">Manage employee leave requests and approvals</p>
       </div>
 
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
-        </div>
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Leave Management Unavailable"
+          message={error}
+          onRetry={fetchData}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
       )}
 
       {loading ? (

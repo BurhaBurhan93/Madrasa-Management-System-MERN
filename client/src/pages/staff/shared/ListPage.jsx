@@ -2,6 +2,7 @@
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import DataTable from '../../../components/UIHelper/DataTable';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -103,7 +104,16 @@ const ListPage = ({
         </div>
       </Card>
 
-      {error && <div className="mb-4 text-red-600 text-sm">{error}</div>}
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Data"
+          message={error}
+          onRetry={fetchItems}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
+      )}
 
       <Card>
         <div className="flex items-center justify-between mb-4">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiCalendar, FiClock, FiMapPin, FiUsers, FiPlus } from 'react-icons/fi';
 import axios from 'axios';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 
 const StudentEvents = () => {
   console.log('[StudentEvents] Component initializing...');
@@ -125,10 +126,15 @@ const StudentEvents = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
-        </div>
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Events"
+          message={error}
+          onRetry={fetchEventsData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
       )}
 
       {loading && events.length === 0 ? (

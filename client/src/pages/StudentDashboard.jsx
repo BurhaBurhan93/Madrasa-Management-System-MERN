@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { BarChartComponent, LineChartComponent, PieChartComponent } from '../components/UIHelper/Chart';
+import { 
+  BarChartComponent, 
+  LineChartComponent, 
+  PieChartComponent,
+  DoughnutChartComponent 
+} from '../components/UIHelper/ECharts';
 import Card from '../components/UIHelper/Card';
 import Avatar from '../components/UIHelper/Avatar';
 import Progress from '../components/UIHelper/Progress';
@@ -142,36 +147,35 @@ const StudentDashboard = () => {
       ];
       setRecentActivity(activities);
 
-      // Set performance data
-      setPerformanceData([
-        { subject: 'Mathematics', score: 85 },
-        { subject: 'Physics', score: 78 },
-        { subject: 'Chemistry', score: 92 },
-        { subject: 'Biology', score: 88 },
-        { subject: 'English', score: 95 }
-      ]);
+      // Set performance data from courses with grades
+      const performanceChartData = (coursesRes.data || [])
+        .filter(c => c.grade && c.grade.score)
+        .map(c => ({
+          subject: c.name?.substring(0, 15) || 'Unknown',
+          score: c.grade.score
+        }));
+      setPerformanceData(performanceChartData.length > 0 ? performanceChartData : []);
 
-      // Set fee data
-      setFeeData([
-        { name: 'Paid', value: 15000, color: '#10B981' },
-        { name: 'Pending', value: 5000, color: '#F59E0B' },
-        { name: 'Overdue', value: 2000, color: '#EF4444' }
-      ]);
+      // Set fee data from API (will be empty until fees API is integrated)
+      // TODO: Replace with actual fee data from API when available
+      setFeeData([]);
 
-      // Set course distribution
-      setCourseDistribution([
-        { name: 'Core', value: 6, color: '#3B82F6' },
-        { name: 'Elective', value: 3, color: '#8B5CF6' },
-        { name: 'Islamic', value: 4, color: '#10B981' },
-        { name: 'Language', value: 2, color: '#F59E0B' }
-      ]);
+      // Set course distribution from actual course data
+      const courseTypes = {};
+      (coursesRes.data || []).forEach(course => {
+        const type = course.type || 'Core';
+        courseTypes[type] = (courseTypes[type] || 0) + 1;
+      });
+      const courseDistData = Object.keys(courseTypes).map((type, idx) => ({
+        name: type,
+        value: courseTypes[type],
+        color: ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B'][idx % 4]
+      }));
+      setCourseDistribution(courseDistData.length > 0 ? courseDistData : []);
 
-      // Set leave statistics
-      setLeaveStats([
-        { name: 'Approved', value: 8, color: '#10B981' },
-        { name: 'Pending', value: 2, color: '#F59E0B' },
-        { name: 'Rejected', value: 1, color: '#EF4444' }
-      ]);
+      // Set leave statistics from API (will be empty until leave API is integrated)
+      // TODO: Replace with actual leave data from API when available
+      setLeaveStats([]);
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -290,22 +294,34 @@ const StudentDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Attendance Trend Chart */}
         <Card title="Attendance Trend">
-          <BarChartComponent 
-            data={attendanceData} 
-            dataKey="rate" 
-            nameKey="month" 
-            title="Monthly Attendance Rate"
-          />
+          {attendanceData.length > 0 ? (
+            <BarChartComponent 
+              data={attendanceData} 
+              dataKey="rate" 
+              nameKey="month" 
+              title="Monthly Attendance Rate"
+            />
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No attendance data available</p>
+            </div>
+          )}
         </Card>
 
         {/* Performance Chart */}
         <Card title="Performance by Subject">
-          <LineChartComponent 
-            data={performanceData} 
-            dataKey="score" 
-            nameKey="subject" 
-            title="Subject-wise Performance"
-          />
+          {performanceData.length > 0 ? (
+            <LineChartComponent 
+              data={performanceData} 
+              dataKey="score" 
+              nameKey="subject" 
+              title="Subject-wise Performance"
+            />
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No performance data available</p>
+            </div>
+          )}
         </Card>
       </div>
 
@@ -413,39 +429,63 @@ const StudentDashboard = () => {
       {/* Analytics Section with Pie Charts */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card title="Fee Status">
-          <PieChartComponent 
-            data={feeData}
-            dataKey="value"
-            nameKey="name"
-            height={250}
-          />
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">Total: ${feeData.reduce((a, b) => a + b.value, 0).toLocaleString()}</p>
-          </div>
+          {feeData.length > 0 ? (
+            <>
+              <PieChartComponent 
+                data={feeData}
+                dataKey="value"
+                nameKey="name"
+                height={250}
+              />
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600">Total: ${feeData.reduce((a, b) => a + b.value, 0).toLocaleString()}</p>
+              </div>
+            </>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No fee data available</p>
+            </div>
+          )}
         </Card>
 
         <Card title="Course Distribution">
-          <PieChartComponent 
-            data={courseDistribution}
-            dataKey="value"
-            nameKey="name"
-            height={250}
-          />
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">Total: {courseDistribution.reduce((a, b) => a + b.value, 0)} Courses</p>
-          </div>
+          {courseDistribution.length > 0 ? (
+            <>
+              <PieChartComponent 
+                data={courseDistribution}
+                dataKey="value"
+                nameKey="name"
+                height={250}
+              />
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600">Total: {courseDistribution.reduce((a, b) => a + b.value, 0)} Courses</p>
+              </div>
+            </>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No course data available</p>
+            </div>
+          )}
         </Card>
 
         <Card title="Leave Statistics">
-          <PieChartComponent 
-            data={leaveStats}
-            dataKey="value"
-            nameKey="name"
-            height={250}
-          />
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">Total: {leaveStats.reduce((a, b) => a + b.value, 0)} Requests</p>
-          </div>
+          {leaveStats.length > 0 ? (
+            <>
+              <PieChartComponent 
+                data={leaveStats}
+                dataKey="value"
+                nameKey="name"
+                height={250}
+              />
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600">Total: {leaveStats.reduce((a, b) => a + b.value, 0)} Requests</p>
+              </div>
+            </>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No leave data available</p>
+            </div>
+          )}
         </Card>
       </div>
       </div>

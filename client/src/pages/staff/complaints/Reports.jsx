@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
+import { PieChartComponent, BarChartComponent } from '../../../components/UIHelper/ECharts';
 
 const StaffComplaintReports = () => {
   console.log('[StaffComplaintReports] Component initializing...');
@@ -52,10 +54,15 @@ const StaffComplaintReports = () => {
         <p className="text-gray-600">Overview and KPIs</p>
       </div>
 
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
-        </div>
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Reports"
+          message={error}
+          onRetry={fetchComplaintStats}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
       )}
 
       {loading ? (
@@ -85,6 +92,38 @@ const StaffComplaintReports = () => {
         <Card className="text-center">
           <div className="text-2xl font-bold text-red-600">{summary.highPriority}</div>
           <div className="text-sm text-gray-600">High Priority</div>
+        </Card>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <Card title="Complaint Status Distribution">
+          <PieChartComponent 
+            data={[
+              { name: 'Open', value: summary.open, color: '#6B7280' },
+              { name: 'In Progress', value: summary.inProgress, color: '#F59E0B' },
+              { name: 'Closed', value: summary.closed, color: '#10B981' },
+              { name: 'High Priority', value: summary.highPriority, color: '#EF4444' }
+            ].filter(d => d.value > 0)}
+            dataKey="value"
+            nameKey="name"
+            height={300}
+          />
+        </Card>
+
+        <Card title="Complaint Overview">
+          <BarChartComponent 
+            data={[
+              { name: 'Total', value: summary.total },
+              { name: 'Open', value: summary.open },
+              { name: 'In Progress', value: summary.inProgress },
+              { name: 'Closed', value: summary.closed },
+              { name: 'High Priority', value: summary.highPriority }
+            ]}
+            dataKey="value"
+            nameKey="name"
+            height={300}
+          />
         </Card>
       </div>
 

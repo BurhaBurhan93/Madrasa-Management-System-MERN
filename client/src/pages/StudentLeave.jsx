@@ -5,8 +5,9 @@ import Button from '../components/UIHelper/Button';
 import Input from '../components/UIHelper/Input';
 import Select from '../components/UIHelper/Select';
 import Badge from '../components/UIHelper/Badge';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import { FiPlus, FiCalendar, FiClock, FiCheckCircle, FiXCircle, FiAlertCircle } from 'react-icons/fi';
-import { BarChartComponent } from '../components/UIHelper/Chart';
+import { BarChartComponent } from '../components/UIHelper/ECharts';
 import axios from 'axios';
 
 const StudentLeave = () => {
@@ -184,10 +185,15 @@ const StudentLeave = () => {
         <p className="text-gray-600 mt-1">Apply for leave and track your leave history</p>
       </div>
 
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
-        </div>
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Leave Data"
+          message={error}
+          onRetry={fetchLeaveData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
       )}
 
       {/* Stats Cards */}

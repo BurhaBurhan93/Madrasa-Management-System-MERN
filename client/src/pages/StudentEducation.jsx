@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
 import Input from '../components/UIHelper/Input';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import { FiPlus, FiEdit2, FiTrash2, FiGraduationCap, FiBook } from 'react-icons/fi';
+import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 import axios from 'axios';
 
 const StudentEducation = () => {
@@ -160,6 +162,35 @@ const StudentEducation = () => {
             </div>
             <div className="p-3 bg-purple-100 rounded-full"><FiBook className="w-6 h-6 text-purple-600" /></div>
           </div>
+        </Card>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <Card title="Education by Institution">
+          <BarChartComponent 
+            data={Array.from(new Set(educationHistory.map(e => e.previousInstitution))).map(inst => ({
+              name: inst?.substring(0, 15) || 'Unknown',
+              value: educationHistory.filter(e => e.previousInstitution === inst).length
+            }))}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
+
+        <Card title="Degree Types">
+          <PieChartComponent 
+            data={[
+              { name: 'High School', value: educationHistory.filter(e => e.previousDegree?.toLowerCase().includes('school')).length, color: '#3B82F6' },
+              { name: 'Bachelor', value: educationHistory.filter(e => e.previousDegree?.toLowerCase().includes('bachelor')).length, color: '#10B981' },
+              { name: 'Master', value: educationHistory.filter(e => e.previousDegree?.toLowerCase().includes('master')).length, color: '#8B5CF6' },
+              { name: 'Certificate', value: educationHistory.filter(e => e.previousDegree?.toLowerCase().includes('certificate') || e.previousDegree?.toLowerCase().includes('diploma')).length, color: '#F59E0B' }
+            ].filter(d => d.value > 0)}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
         </Card>
       </div>
 

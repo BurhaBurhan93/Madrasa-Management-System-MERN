@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChartComponent, LineChartComponent, PieChartComponent } from '../../components/UIHelper/Chart';
+import { PieChartComponent, BarChartComponent } from '../../components/UIHelper/ECharts';
 import Card from '../../components/UIHelper/Card';
 import Avatar from '../../components/UIHelper/Avatar';
 import { formatDate } from '../../lib/utils';
@@ -34,45 +34,23 @@ const AdminDashboard = () => {
     }
   };
 
-  const enrollmentData = [
-    { month: 'Jan', students: 380 },
-    { month: 'Feb', students: 395 },
-    { month: 'Mar', students: 410 },
-    { month: 'Apr', students: 425 },
-    { month: 'May', students: 440 },
-    { month: 'Jun', students: 450 }
-  ];
+  // TODO: Replace with actual enrollment data from API when available
+  const [enrollmentData, setEnrollmentData] = useState([]);
 
-  const revenueData = [
-    { month: 'Jan', amount: 95000 },
-    { month: 'Feb', amount: 102000 },
-    { month: 'Mar', amount: 108000 },
-    { month: 'Apr', amount: 115000 },
-    { month: 'May', amount: 118000 },
-    { month: 'Jun', amount: 125000 }
-  ];
+  // TODO: Replace with actual revenue data from API when available
+  const [revenueData, setRevenueData] = useState([]);
 
   const userDistributionData = [
     { name: 'Students', value: quickStats.totalStudents, color: '#3B82F6' },
     { name: 'Teachers', value: quickStats.totalTeachers, color: '#10B981' },
-    { name: 'Staff', value: quickStats.totalStaff, color: '#8B5CF6' },
-    { name: 'Admins', value: 5, color: '#EF4444' }
+    { name: 'Staff', value: quickStats.totalStaff, color: '#8B5CF6' }
   ];
 
-  const recentActivity = [
-    { id: 1, title: 'New Student Registered', user: 'Mohammed Ali', date: '2024-02-10', type: 'student' },
-    { id: 2, title: 'Fee Payment Received', user: 'Ahmed Hassan', amount: '$500', date: '2024-02-10', type: 'payment' },
-    { id: 3, title: 'New Teacher Added', user: 'Ustad Abdullah', date: '2024-02-09', type: 'teacher' },
-    { id: 4, title: 'Complaint Resolved', user: 'Student #1245', date: '2024-02-09', type: 'complaint' },
-    { id: 5, title: 'Exam Schedule Published', user: 'Academic Dept', date: '2024-02-08', type: 'academic' }
-  ];
+  // TODO: Replace with actual recent activity from API when available
+  const [recentActivity] = useState([]);
 
-  const upcomingEvents = [
-    { id: 1, title: 'Board Meeting', date: '2024-02-15', time: '10:00 AM', type: 'meeting' },
-    { id: 2, title: 'Parent-Teacher Conference', date: '2024-02-16', time: '2:00 PM', type: 'conference' },
-    { id: 3, title: 'Mid-term Exams Begin', date: '2024-02-20', time: '9:00 AM', type: 'exam' },
-    { id: 4, title: 'Staff Training Workshop', date: '2024-02-22', time: '10:00 AM', type: 'training' }
-  ];
+  // TODO: Replace with actual upcoming events from API when available
+  const [upcomingEvents] = useState([]);
 
   const getActivityIcon = (type) => {
     const icons = {

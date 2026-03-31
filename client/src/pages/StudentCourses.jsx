@@ -5,6 +5,7 @@ import Button from '../components/UIHelper/Button';
 import Badge from '../components/UIHelper/Badge';
 import Progress from '../components/UIHelper/Progress';
 import ErrorPage from '../components/UIHelper/ErrorPage';
+import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 import { formatGrade } from '../lib/utils';
 import axios from 'axios';
 
@@ -160,6 +161,34 @@ const StudentCourses = () => {
             {courses.filter(c => c.status === 'completed').length}
           </div>
           <div className="text-sm text-gray-600">Completed</div>
+        </Card>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <Card title="Course Status Distribution">
+          <PieChartComponent 
+            data={[
+              { name: 'Active', value: courses.filter(c => c.status === 'active').length, color: '#3B82F6' },
+              { name: 'Completed', value: courses.filter(c => c.status === 'completed').length, color: '#10B981' },
+              { name: 'Dropped', value: courses.filter(c => c.status === 'dropped').length, color: '#EF4444' }
+            ].filter(d => d.value > 0)}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
+
+        <Card title="Credits by Course">
+          <BarChartComponent 
+            data={courses.map(c => ({
+              name: c.name?.substring(0, 15) || 'Unknown',
+              value: c.credits || 0
+            }))}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
         </Card>
       </div>
 

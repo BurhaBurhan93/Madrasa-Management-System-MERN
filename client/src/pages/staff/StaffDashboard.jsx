@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ErrorPage from '../../components/UIHelper/ErrorPage';
+import { PieChartComponent, BarChartComponent } from '../../components/UIHelper/ECharts';
 import { 
   FiBook, FiUsers, FiInbox, FiTrendingUp, FiActivity,
   FiCheckCircle, FiClock, FiAlertCircle
@@ -17,12 +18,8 @@ const StaffDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const pendingTasks = [
-    { id: 1, task: 'Review new book requests', priority: 'high', due: 'Today' },
-    { id: 2, task: 'Update library catalog', priority: 'medium', due: 'Tomorrow' },
-    { id: 3, task: 'Follow up on overdue books', priority: 'high', due: 'Today' },
-    { id: 4, task: 'Prepare monthly report', priority: 'low', due: 'Next week' },
-  ];
+  // TODO: Replace with actual pending tasks from API when available
+  const [pendingTasks] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -133,6 +130,49 @@ const StaffDashboard = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h3 className="font-semibold text-gray-800 mb-4">Library Overview</h3>
+          {(stats.totalBooks - stats.borrowedBooks) > 0 || stats.borrowedBooks > 0 ? (
+            <PieChartComponent 
+              data={[
+                { name: 'Available Books', value: stats.totalBooks - stats.borrowedBooks, color: '#3B82F6' },
+                { name: 'Borrowed Books', value: stats.borrowedBooks, color: '#F59E0B' }
+              ].filter(d => d.value > 0)}
+              dataKey="value"
+              nameKey="name"
+              height={250}
+            />
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No library data available</p>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h3 className="font-semibold text-gray-800 mb-4">Dashboard Metrics</h3>
+          {stats.totalBooks > 0 || stats.totalStudents > 0 || stats.pendingComplaints > 0 ? (
+            <BarChartComponent 
+              data={[
+                { name: 'Total Books', value: stats.totalBooks },
+                { name: 'Borrowed', value: stats.borrowedBooks },
+                { name: 'Students', value: stats.totalStudents },
+                { name: 'Complaints', value: stats.pendingComplaints }
+              ]}
+              dataKey="value"
+              nameKey="name"
+              height={250}
+            />
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No metrics data available</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

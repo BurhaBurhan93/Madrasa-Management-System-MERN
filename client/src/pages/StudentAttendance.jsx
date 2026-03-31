@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/UIHelper/Card';
 import Badge from '../components/UIHelper/Badge';
-import { BarChartComponent } from '../components/UIHelper/Chart';
+import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 import ErrorPage from '../components/UIHelper/ErrorPage';
 import { formatDate } from '../lib/utils';
 import axios from 'axios';

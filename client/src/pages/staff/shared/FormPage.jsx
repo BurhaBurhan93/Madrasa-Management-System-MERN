@@ -3,6 +3,7 @@ import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
 import Select from '../../../components/UIHelper/Select';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -167,7 +168,17 @@ const FormPage = ({
               ))}
             </div>
 
-            {error && <div className="text-sm text-red-600">{error}</div>}
+            {error && !loading && (
+              <ErrorPage 
+                type="server" 
+                title="Form Error"
+                message={error}
+                onRetry={() => window.location.reload()}
+                onHome={() => window.location.href = '/staff/dashboard'}
+                showBackButton={true}
+                onBack={() => window.history.back()}
+              />
+            )}
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => window.history.back()}>Cancel</Button>

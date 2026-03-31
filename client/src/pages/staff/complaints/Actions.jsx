@@ -1,146 +1,179 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
 import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
+const API_BASE = 'http://localhost:5000/api';
+
 const StaffComplaintActions = () => {
-  console.log('[StaffComplaintActions] Component initializing...');
   const [actions, setActions] = useState([]);
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [form, setForm] = useState({ id: '', complaintId: '', note: '', result: '', followUp: '', nextRequired: false });
+  const [form, setForm] = useState({ id: '', complaint: '', actionDescription: '', actionResult: '', followUpDate: '', nextActionRequired: false });
   const [search, setSearch] = useState('');
 
-  // Get API config with auth token
   const getConfig = () => {
     const token = localStorage.getItem('token');
-    console.log('[StaffComplaintActions] Token exists:', !!token);
     return { headers: { Authorization: `Bearer ${token}` } };
   };
 
-  useEffect(() => {
-    console.log('[StaffComplaintActions] useEffect triggered - fetching data from API...');
-    fetchComplaints();
-  }, []);
-
-  const fetchComplaints = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('[StaffComplaintActions] Fetching complaints from API...');
-      
-      const config = getConfig();
-      const response = await axios.get('http://localhost:5000/api/staff/complaints', config);
-      
-      console.log('[StaffComplaintActions] Complaints API response:', response.data);
-      setComplaints(response.data || []);
+      const [actionsResponse, complaintsResponse] = await Promise.all([
+        axios.get(`${API_BASE}/staff/complaint-actions`, getConfig()),
+        axios.get(`${API_BASE}/staff/complaints`, getConfig())
+      ]);
+      setActions(actionsResponse.data || []);
+      setComplaints(complaintsResponse.data || []);
     } catch (err) {
-      console.error('[StaffComplaintActions] Error fetching complaints:', err);
-      setError('Failed to fetch complaints. Please try again.');
+      setError('Failed to fetch complaint actions. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+useEffect(() => {
+    fetchData();
+    const intervalId = window.setInterval(fetchData, 10000);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   const filtered = useMemo(() => {
-    return actions.filter(a => a.complaintId.toLowerCase().includes(search.toLowerCase()));
+    const query = search.toLowerCase();
+    return actions.filter((action) => {
+      const subject = action.complaint?.subject || '';
+      const code = action.complaint?.complaintCode || '';
+      return subject.toLowerCase().includes(query) || code.toLowerCase().includes(query);
+    });
   }, [actions, search]);
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    if (!form.complaintId || !form.note) return;
-    if (form.id) {
-      setActions(prev => prev.map(a => (a.id === form.id ? form : a)));
-    } else {
-      setActions(prev => [...prev, { ...form, id: Date.now().toString() }]);
+    const payload = {
+      complaint: form.complaint,
+      actionDescription: form.actionDescription,
+      actionResult: form.actionResult,
+      followUpDate: form.followUpDate || null,
+      nextActionRequired: form.nextActionRequired
+    };
+
+    try {
+      if (form.id) {
+        await axios.put(`${API_BASE}/staff/complaint-actions/${form.id}`, payload, getConfig());
+      } else {
+        await axios.post(`${API_BASE}/staff/complaint-actions`, payload, getConfig());
+      }
+      setForm({ id: '', complaint: '', actionDescription: '', actionResult: '', followUpDate: '', nextActionRequired: false });
+      await fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to save complaint action.');
     }
-    setForm({ id: '', complaintId: '', note: '', result: '', followUp: '', nextRequired: false });
   };
 
-  const onEdit = (a) => setForm(a);
-  const onDelete = (id) => setActions(prev => prev.filter(a => a.id !== id));
+  const onEdit = (action) => {
+    setForm({
+      id: action._id,
+      complaint: action.complaint?._id || '',
+      actionDescription: action.actionDescription || '',
+      actionResult: action.actionResult || '',
+      followUpDate: action.followUpDate ? new Date(action.followUpDate).toISOString().split('T')[0] : '',
+      nextActionRequired: !!action.nextActionRequired
+    });
+  };
+
+  const onDelete = async (id) => {
+    await axios.delete(`${API_BASE}/staff/complaint-actions/${id}`, getConfig());
+    await fetchData();
+  };
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
       <div className="py-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Complaint Actions</h1>
-        <p className="text-gray-600">Record actions, notes, and follow-ups</p>
+        <p className="text-gray-600">Create and edit action records stored in the database</p>
       </div>
 
       {error && !loading && (
-        <ErrorPage 
-          type="server" 
+        <ErrorPage
+          type="server"
           title="Unable to Load Complaint Actions"
           message={error}
-          onRetry={fetchComplaints}
-          onHome={() => window.location.href = '/staff/dashboard'}
+          onRetry={fetchData}
+          onHome={() => { window.location.href = '/staff/dashboard'; }}
           showBackButton={false}
         />
       )}
 
       {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading complaints...</p>
-        </div>
+        <div className="text-center py-8 text-gray-600">Loading actions...</div>
       ) : (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card>
-          <h2 className="text-xl font-semibold mb-4">{form.id ? 'Edit Action' : 'Add Action'}</h2>
-          <form onSubmit={onSubmit} className="space-y-3">
-            <Input label="Complaint ID" id="complaintId" name="complaintId" type="text" value={form.complaintId} onChange={e => setForm({ ...form, complaintId: e.target.value })} />
-            <Input label="Note" id="note" name="note" type="text" value={form.note} onChange={e => setForm({ ...form, note: e.target.value })} />
-            <Input label="Result" id="result" name="result" type="text" value={form.result} onChange={e => setForm({ ...form, result: e.target.value })} />
-            <Input label="Follow-up Date" id="followUp" name="followUp" type="date" value={form.followUp} onChange={e => setForm({ ...form, followUp: e.target.value })} />
-            <div className="flex items-center gap-2">
-              <input id="nextRequired" type="checkbox" checked={form.nextRequired} onChange={e => setForm({ ...form, nextRequired: e.target.checked })} />
-              <label htmlFor="nextRequired" className="text-sm">Next action required</label>
-            </div>
-            <Button type="submit">{form.id ? 'Update' : 'Create'}</Button>
-          </form>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card>
+            <h2 className="text-xl font-semibold mb-4">{form.id ? 'Edit Action' : 'Add Action'}</h2>
+            <form onSubmit={onSubmit} className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Complaint</label>
+                <select className="w-full px-3 py-2 border rounded-lg" value={form.complaint} onChange={(e) => setForm({ ...form, complaint: e.target.value })}>
+                  <option value="">Select complaint</option>
+                  {complaints.map((complaint) => (
+                    <option key={complaint._id} value={complaint._id}>
+                      {complaint.complaintCode} - {complaint.subject}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Input label="Action Description" value={form.actionDescription} onChange={(e) => setForm({ ...form, actionDescription: e.target.value })} />
+              <Input label="Action Result" value={form.actionResult} onChange={(e) => setForm({ ...form, actionResult: e.target.value })} />
+              <Input label="Follow Up Date" type="date" value={form.followUpDate} onChange={(e) => setForm({ ...form, followUpDate: e.target.value })} />
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" checked={form.nextActionRequired} onChange={(e) => setForm({ ...form, nextActionRequired: e.target.checked })} />
+                Next action required
+              </label>
+              <Button type="submit">{form.id ? 'Update' : 'Create'}</Button>
+            </form>
+          </Card>
 
-        <Card className="lg:col-span-2">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Action History</h2>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter by Complaint ID" className="px-3 py-2 border rounded" />
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Complaint</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Note</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Result</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Follow-up</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Next</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filtered.map(a => (
-                  <tr key={a.id}>
-                    <td className="px-4 py-2">{a.complaintId}</td>
-                    <td className="px-4 py-2">{a.note}</td>
-                    <td className="px-4 py-2">{a.result || '-'}</td>
-                    <td className="px-4 py-2">{a.followUp || '-'}</td>
-                    <td className="px-4 py-2">{a.nextRequired ? 'Yes' : 'No'}</td>
-                    <td className="px-4 py-2">
-                      <div className="flex gap-2">
-                        <Button size="sm" onClick={() => onEdit(a)}>Edit</Button>
-                        <Button size="sm" variant="danger" onClick={() => onDelete(a.id)}>Delete</Button>
-                      </div>
-                    </td>
+          <Card className="lg:col-span-2">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Action Records</h2>
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search complaint" className="px-3 py-2 border rounded" />
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Complaint</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Description</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Result</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Follow Up</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      </div>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filtered.map((action) => (
+                    <tr key={action._id}>
+                      <td className="px-4 py-2">{action.complaint?.complaintCode || '-'}</td>
+                      <td className="px-4 py-2">{action.actionDescription || '-'}</td>
+                      <td className="px-4 py-2">{action.actionResult || '-'}</td>
+                      <td className="px-4 py-2">{action.followUpDate ? new Date(action.followUpDate).toLocaleDateString() : '-'}</td>
+                      <td className="px-4 py-2">
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => onEdit(action)}>Edit</Button>
+                          <Button size="sm" variant="danger" onClick={() => onDelete(action._id)}>Delete</Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
       )}
     </div>
   );

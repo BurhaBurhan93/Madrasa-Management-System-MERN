@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiPackage, FiPlus, FiMinus, FiAlertTriangle, FiCheckCircle, FiSearch, FiRefreshCw, FiX } from 'react-icons/fi';
+import Card from '../../components/UIHelper/Card';
+import { PieChartComponent, BarChartComponent } from '../../components/UIHelper/ECharts';
 
 const StaffInventory = () => {
   const [inventory, setInventory] = useState([]);
@@ -134,6 +136,34 @@ const StaffInventory = () => {
             {new Set(inventory.map(i => i.category)).size}
           </p>
         </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card title="Inventory by Category">
+          <PieChartComponent 
+            data={Array.from(new Set(inventory.map(i => i.category))).map((cat, idx) => ({
+              name: cat,
+              value: inventory.filter(i => i.category === cat).length,
+              color: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'][idx % 6]
+            }))}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
+
+        <Card title="Stock Status Overview">
+          <BarChartComponent 
+            data={[
+              { name: 'Normal Stock', value: inventory.filter(i => i.quantity > (i.minLevel || 10)).length },
+              { name: 'Low Stock', value: lowStockItems.length }
+            ]}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
       </div>
 
       {/* Search */}

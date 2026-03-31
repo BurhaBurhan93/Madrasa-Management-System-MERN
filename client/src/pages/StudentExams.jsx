@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useExam } from '../contexts/ExamContext';
 import axios from 'axios';
 import ErrorPage from '../components/UIHelper/ErrorPage';
-
-import Card from '../components/UIHelper/Card';
+import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 import Badge from '../components/UIHelper/Badge';
 import Button from '../components/UIHelper/Button';
 

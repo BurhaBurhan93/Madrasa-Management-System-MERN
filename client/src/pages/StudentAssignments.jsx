@@ -4,6 +4,7 @@ import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
 import Badge from '../components/UIHelper/Badge';
 import ErrorPage from '../components/UIHelper/ErrorPage';
+import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 import { formatDate } from '../lib/utils';
 import axios from 'axios';
 
@@ -222,6 +223,35 @@ const StudentAssignments = () => {
             {assignments.filter(a => a.status === 'overdue').length}
           </div>
           <div className="text-xs sm:text-sm text-gray-600">Overdue</div>
+        </Card>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <Card title="Assignment Status Distribution">
+          <PieChartComponent 
+            data={[
+              { name: 'Submitted', value: assignments.filter(a => a.status === 'submitted').length, color: '#10B981' },
+              { name: 'Pending', value: assignments.filter(a => a.status === 'pending').length, color: '#3B82F6' },
+              { name: 'In Progress', value: assignments.filter(a => a.status === 'in-progress').length, color: '#F59E0B' },
+              { name: 'Overdue', value: assignments.filter(a => a.status === 'overdue').length, color: '#EF4444' }
+            ].filter(d => d.value > 0)}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
+
+        <Card title="Assignments by Course">
+          <BarChartComponent 
+            data={Array.from(new Set(assignments.map(a => a.course))).map(course => ({
+              name: course?.substring(0, 15) || 'Unknown',
+              value: assignments.filter(a => a.course === course).length
+            }))}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
         </Card>
       </div>
 

@@ -5,8 +5,9 @@ import Button from '../components/UIHelper/Button';
 import Input from '../components/UIHelper/Input';
 import Select from '../components/UIHelper/Select';
 import Badge from '../components/UIHelper/Badge';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import { FiAward, FiCalendar, FiCheckCircle, FiClock } from 'react-icons/fi';
-import { PieChartComponent } from '../components/UIHelper/Chart';
+import { PieChartComponent } from '../components/UIHelper/ECharts';
 import axios from 'axios';
 
 const StudentDegree = () => {
@@ -100,10 +101,15 @@ const StudentDegree = () => {
         <p className="text-gray-600 mt-1">View your enrolled programs and academic progress</p>
       </div>
 
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
-        </div>
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Degrees"
+          message={error}
+          onRetry={fetchDegreeData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
       )}
 
       {loading && enrolledDegrees.length === 0 ? (

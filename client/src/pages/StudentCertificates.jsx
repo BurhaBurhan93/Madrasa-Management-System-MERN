@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FiAward, FiDownload, FiShare2, FiEye, FiCalendar, FiCheckCircle } from 'react-icons/fi';
 import axios from 'axios';
+import ErrorPage from '../components/UIHelper/ErrorPage';
+import Card from '../components/UIHelper/Card';
+import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 
 const StudentCertificates = () => {
   console.log('[StudentCertificates] Component initializing...');
@@ -104,10 +107,15 @@ const StudentCertificates = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
-        </div>
+      {error && !loading && (
+        <ErrorPage 
+          type="server" 
+          title="Unable to Load Certificates"
+          message={error}
+          onRetry={fetchCertificatesData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
       )}
 
       {loading && certificates.length === 0 && achievements.length === 0 ? (
@@ -118,59 +126,73 @@ const StudentCertificates = () => {
       ) : (
         <>
       {/* Certificates Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <FiAward className="text-sky-500" />
-            My Certificates
-          </h3>
-        </div>
-        <div className="divide-y divide-gray-100">
-          {certificates.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
-              No certificates found. Complete courses to earn certificates.
-            </div>
-          ) : (
-            certificates.map((cert) => (
-            <div key={cert.id} className="p-6 hover:bg-gray-50 transition-colors">
-              <div className="flex items-start justify-between">
-                <div className="flex gap-4">
-                  <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-md">
-                    <FiAward size={32} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800 text-lg">{cert.title}</h4>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                      <span className="flex items-center gap-1">
-                        <FiCalendar size={14} />
-                        {cert.date}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getTypeColor(cert.type)}`}>
-                        {cert.type}
-                      </span>
-                      <span className="flex items-center gap-1 text-green-600">
-                        <FiCheckCircle size={14} />
-                        Grade: {cert.grade}
-                      </span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <FiAward className="text-sky-500" />
+              My Certificates
+            </h3>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {certificates.length === 0 ? (
+              <div className="p-6 text-center text-gray-500">
+                No certificates found. Complete courses to earn certificates.
+              </div>
+            ) : (
+              certificates.map((cert) => (
+              <div key={cert.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex gap-4">
+                    <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-md">
+                      <FiAward size={32} />
                     </div>
-                    <p className="text-sm text-gray-400 mt-1">Issued by {cert.issuer}</p>
+                    <div>
+                      <h4 className="font-semibold text-gray-800 text-lg">{cert.title}</h4>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <FiCalendar size={14} />
+                          {cert.date}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getTypeColor(cert.type)}`}>
+                          {cert.type}
+                        </span>
+                        <span className="flex items-center gap-1 text-green-600">
+                          <FiCheckCircle size={14} />
+                          Grade: {cert.grade}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-400 mt-1">Issued by {cert.issuer}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <button className="p-2 rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors" title="View">
-                    <FiEye size={18} />
-                  </button>
-                  <button className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors" title="Download">
-                    <FiDownload size={18} />
-                  </button>
-                  <button className="p-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors" title="Share">
-                    <FiShare2 size={18} />
-                  </button>
+                  <div className="flex gap-2">
+                    <button className="p-2 rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors" title="View">
+                      <FiEye size={18} />
+                    </button>
+                    <button className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors" title="Download">
+                      <FiDownload size={18} />
+                    </button>
+                    <button className="p-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors" title="Share">
+                      <FiShare2 size={18} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )))}
+            )))}
+          </div>
         </div>
+
+        <Card title="Certificate Distribution">
+          <PieChartComponent 
+            data={[
+              { name: 'Course', value: certificates.filter(c => c.type === 'Course').length, color: '#3B82F6' },
+              { name: 'Achievement', value: certificates.filter(c => c.type === 'Achievement').length, color: '#10B981' }
+            ].filter(d => d.value > 0)}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
       </div>
 
       {/* Achievements Section */}

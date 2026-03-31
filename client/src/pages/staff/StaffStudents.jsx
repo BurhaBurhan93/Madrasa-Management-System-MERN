@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiSearch, FiFilter, FiDownload, FiEye, FiBook, FiMail, FiPhone, FiRefreshCw, FiX } from 'react-icons/fi';
+import Card from '../../components/UIHelper/Card';
+import { PieChartComponent, BarChartComponent } from '../../components/UIHelper/ECharts';
 
 const StaffStudents = () => {
   const [students, setStudents] = useState([]);
@@ -102,6 +104,33 @@ const StaffStudents = () => {
           <p className="text-gray-500 text-sm">Classes</p>
           <p className="text-2xl font-bold text-blue-600">{classes.length - 1}</p>
         </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card title="Student Status Distribution">
+          <PieChartComponent 
+            data={[
+              { name: 'Active', value: students.filter(s => s.status === 'active').length, color: '#10B981' },
+              { name: 'Inactive', value: students.filter(s => s.status === 'inactive').length, color: '#EF4444' }
+            ].filter(d => d.value > 0)}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
+
+        <Card title="Students by Class">
+          <BarChartComponent 
+            data={classes.filter(c => c !== 'all').map(cls => ({
+              name: `Class ${cls}`,
+              value: students.filter(s => s.class === cls).length
+            }))}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
       </div>
 
       {/* Filters */}

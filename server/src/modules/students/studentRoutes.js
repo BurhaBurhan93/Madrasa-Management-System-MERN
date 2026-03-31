@@ -23,6 +23,7 @@ router.get('/results', ctrl.getExamResults);
 
 router.get('/fees', ctrl.getFeePayments);
 
+router.get('/complaints', ctrl.getStudentComplaints);
 router.post('/complaints', ctrl.submitComplaint);
 
 // Leave routes

@@ -147,19 +147,35 @@ const getFeePayments = async (req, res) => {
 // Submit complaint
 const submitComplaint = async (req, res) => {
   try {
-    const { title, description, category } = req.body;
-    
+    const { title, description, category, priority } = req.body;
     const complaint = new Complaint({
-      studentId: req.user.id,
-      title,
+      complaintCode: `CMP-${Date.now()}`,
+      complainantType: 'student',
+      complainant: req.user.id,
+      subject: title,
       description,
-      category,
-      status: 'pending'
+      complaintCategory: category,
+      priorityLevel: priority || 'medium',
+      complaintStatus: 'open'
     });
-    
+
     await complaint.save();
-    
+
     res.status(201).json(complaint);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get student complaints
+const getStudentComplaints = async (req, res) => {
+  try {
+    const complaints = await Complaint.find({
+      complainant: req.user.id,
+      complainantType: 'student'
+    }).sort({ createdAt: -1 });
+
+    res.json(complaints);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -340,7 +356,18 @@ const getBooks = async (req, res) => {
       .sort({ title: 1 });
     
     console.log('[StudentController] Books fetched:', books.length);
-    res.json(books);
+    res.json(
+      books.map((book) => ({
+        _id: book._id,
+        title: book.title,
+        author: book.author || 'Unknown',
+        isbn: book.isbn || '',
+        category: book.category?.name || 'Uncategorized',
+        status: book.stock > 0 ? 'available' : 'borrowed',
+        stock: book.stock || 0,
+        image: book.coverImage || 'https://via.placeholder.com/120x160/e5e7eb/6b7280?text=BOOK'
+      }))
+    );
   } catch (error) {
     console.error('[StudentController] Error fetching books:', error);
     res.status(500).json({ message: error.message });
@@ -367,7 +394,21 @@ const getBorrowedBooks = async (req, res) => {
       .sort({ borrowedAt: -1 });
     
     console.log('[StudentController] Borrowed books fetched:', borrowedBooks.length);
-    res.json(borrowedBooks);
+    res.json(
+      borrowedBooks.map((record) => ({
+        _id: record._id,
+        id: record.book?._id || record._id,
+        title: record.book?.title || 'Unknown book',
+        author: record.book?.author || 'Unknown',
+        isbn: record.book?.isbn || '',
+        category: record.book?.category?.name || 'Uncategorized',
+        borrowDate: record.borrowedAt,
+        dueDate: record.returnDate,
+        renewals: 0,
+        status: record.returnDate && new Date(record.returnDate) < new Date() ? 'due_soon' : 'borrowed',
+        image: record.book?.coverImage || 'https://via.placeholder.com/120x160/e5e7eb/6b7280?text=BOOK'
+      }))
+    );
   } catch (error) {
     console.error('[StudentController] Error fetching borrowed books:', error);
     res.status(500).json({ message: error.message });
@@ -566,6 +607,7 @@ module.exports = {
   getExamResults,
   getFeePayments,
   submitComplaint,
+  getStudentComplaints,
   getStudentLeaves,
   createStudentLeave,
   getStudentEducation,
