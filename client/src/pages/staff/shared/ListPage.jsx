@@ -203,7 +203,7 @@ const ListPage = ({ title, subtitle, endpoint, columns, createPath, editPathForR
                 <input value={filterValue} onChange={(e) => { setFilterValue(e.target.value); setPage(1); }} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition-all focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100" placeholder="Type to filter rows..." />
               </div>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 lg:min-w-[190px]">{loading ? 'Loading records...' : `${visibleItems.length} visible / ${totalForPagination} total`}</div>
+        
           </div>
         </div>
       </Card>
