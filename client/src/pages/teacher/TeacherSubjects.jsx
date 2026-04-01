@@ -11,7 +11,10 @@ const TeacherSubjects = () => {
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState([]);
   const [filter, setFilter] = useState('all');
+  const [fieldFilter, setFieldFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
+
+  const uniqueFields = ['all', ...new Set(subjects.map(s => s.field).filter(Boolean))];
 
   useEffect(() => {
     fetchSubjects();
@@ -33,8 +36,9 @@ const TeacherSubjects = () => {
 
   const filteredSubjects = subjects
     .filter((sub) => {
-      if (filter === 'all') return true;
-      return (sub.status || 'active') === filter;
+      const matchStatus = filter === 'all' || (sub.status || 'active') === filter;
+      const matchField = fieldFilter === 'all' || sub.field === fieldFilter;
+      return matchStatus && matchField;
     })
     .sort((a, b) => {
       if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
@@ -45,14 +49,11 @@ const TeacherSubjects = () => {
 
   const getStatusVariant = (status) => {
     switch (status) {
-      case 'active':
-        return 'primary';
-      case 'completed':
-        return 'success';
-      case 'upcoming':
-        return 'warning';
-      default:
-        return 'default';
+      case 'active': return 'success';
+      case 'completed': return 'primary';
+      case 'upcoming': return 'warning';
+      case 'inactive': return 'danger';
+      default: return 'default';
     }
   };
 
@@ -107,7 +108,7 @@ const TeacherSubjects = () => {
       {/* FILTERS */}
       <div className="flex flex-wrap justify-between items-center mb-6">
         <div className="flex gap-2 mb-4 md:mb-0">
-          {['all','active','completed','upcoming'].map((status) => (
+          {['all','active','completed','upcoming','inactive'].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
@@ -122,15 +123,24 @@ const TeacherSubjects = () => {
           ))}
         </div>
 
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg"
-        >
-          <option value="name">Sort by Name</option>
-          <option value="students">Sort by Students</option>
-          <option value="progress">Sort by Progress</option>
-        </select>
+        <div className="flex gap-3">
+          <select
+            value={fieldFilter}
+            onChange={(e) => setFieldFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            {uniqueFields.map(f => <option key={f} value={f}>{f === 'all' ? 'All Fields' : f}</option>)}
+          </select>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <option value="name">Sort by Name</option>
+            <option value="students">Sort by Students</option>
+            <option value="progress">Sort by Progress</option>
+          </select>
+        </div>
       </div>
 
       {/* SUBJECT CARDS */}
@@ -159,13 +169,13 @@ const TeacherSubjects = () => {
               </div>
 
               <div className="mt-6 flex flex-wrap gap-2">
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" onClick={() => navigate(`/teacher/students?subjectId=${subject._id}`)}>
                   Students
                 </Button>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" onClick={() => navigate(`/teacher/attendance?subjectId=${subject._id}`)}>
                   Attendance
                 </Button>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" onClick={() => navigate(`/teacher/exams?subjectId=${subject._id}`)}>
                   Exams
                 </Button>
               </div>

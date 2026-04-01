@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../../lib/api';
 
-const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 const Reports = () => {
@@ -9,12 +8,12 @@ const Reports = () => {
   const [filters, setFilters] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => { fetchReport(); }, [filters]);
+  useEffect(() => { fetchReport(); }, [filters.month, filters.year]);
 
   const fetchReport = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5000/api/kitchen/reports?month=${filters.month}&year=${filters.year}`, api());
+    const res = await api.get(`/kitchen/reports?month=${filters.month}&year=${filters.year}`);
       if (res.data.success) setReport(res.data.data);
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };

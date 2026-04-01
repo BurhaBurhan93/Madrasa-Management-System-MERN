@@ -14,7 +14,7 @@ const StaffPanel = () => {
   const [sidebarOpen, setSidebarOpen] = useLocalStorage('staffSidebarOpen', true);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [ setLoading] = useState(true);
 
   useEffect(() => {
     fetchUserData();

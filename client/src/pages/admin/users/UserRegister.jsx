@@ -16,7 +16,11 @@ const UserRegister = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/users', formData);
+      const payload = { ...formData };
+      if (!payload.bloodType) delete payload.bloodType;
+      if (!payload.dob) delete payload.dob;
+      if (!payload.idNumber) delete payload.idNumber;
+      await axios.post('http://localhost:5000/api/users', payload);
       alert('User created successfully');
       navigate('/staff/users');
     } catch (error) {

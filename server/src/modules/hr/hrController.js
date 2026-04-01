@@ -58,7 +58,9 @@ exports.getDepartmentById = async (req, res) => {
 // Create department
 exports.createDepartment = async (req, res) => {
   try {
-    const department = await Department.create(req.body);
+    const data = { ...req.body };
+    if (!data.departmentHead) delete data.departmentHead;
+    const department = await Department.create(data);
     
     res.status(201).json({
       success: true,
@@ -77,9 +79,11 @@ exports.createDepartment = async (req, res) => {
 // Update department
 exports.updateDepartment = async (req, res) => {
   try {
+    const data = { ...req.body };
+    if (!data.departmentHead) delete data.departmentHead;
     const department = await Department.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      data,
       { new: true, runValidators: true }
     );
     
@@ -468,8 +472,13 @@ exports.createEmployee = async (req, res) => {
       const count = await Employee.countDocuments();
       req.body.employeeCode = `EMP${String(count + 1).padStart(5, '0')}`;
     }
+    const data = { ...req.body };
+    if (!data.department) delete data.department;
+    if (!data.designation) delete data.designation;
+    if (!data.reportingManager) delete data.reportingManager;
+    if (!data.dateOfBirth) delete data.dateOfBirth;
     
-    const employee = await Employee.create(req.body);
+    const employee = await Employee.create(data);
     
     res.status(201).json({
       success: true,
