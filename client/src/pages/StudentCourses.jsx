@@ -119,7 +119,7 @@ const StudentCourses = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Courses"
           message={error}
           onRetry={fetchCoursesData}

@@ -145,7 +145,7 @@ const StudentSchedule = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Schedule"
           message={error}
           onRetry={fetchScheduleData}

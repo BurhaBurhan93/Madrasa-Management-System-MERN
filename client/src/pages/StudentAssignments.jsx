@@ -181,7 +181,7 @@ const StudentAssignments = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Assignments"
           message={error}
           onRetry={fetchAssignmentsData}

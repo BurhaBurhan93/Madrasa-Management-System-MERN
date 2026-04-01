@@ -10,11 +10,13 @@ import {
 import Card from '../components/UIHelper/Card';
 import Avatar from '../components/UIHelper/Avatar';
 import Progress from '../components/UIHelper/Progress';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import { formatDate, formatGrade, calculatePercentage } from '../lib/utils';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [studentProfile, setStudentProfile] = useState(null);
   const [quickStats, setQuickStats] = useState({
@@ -54,6 +56,7 @@ const StudentDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
@@ -179,6 +182,7 @@ const StudentDashboard = () => {
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      setError('Failed to load dashboard data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -192,6 +196,19 @@ const StudentDashboard = () => {
           <p className="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
       </div>
+    );
+  }
+
+  if (error && !loading) {
+    return (
+      <ErrorPage
+        type="generic"
+        title="Unable to Load Dashboard"
+        message={error}
+        onRetry={fetchDashboardData}
+        onHome={() => { window.location.href = '/student/dashboard'; }}
+        showBackButton={false}
+      />
     );
   }
 

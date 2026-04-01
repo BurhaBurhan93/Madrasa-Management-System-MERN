@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import DataTable from '../../../components/UIHelper/DataTable';
@@ -148,7 +148,7 @@ const CrudPage = ({
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Data"
           message={error}
           onRetry={fetchItems}

@@ -103,7 +103,7 @@ const StudentDegree = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Degrees"
           message={error}
           onRetry={fetchDegreeData}

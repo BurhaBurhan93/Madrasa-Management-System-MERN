@@ -96,7 +96,7 @@ const StaffDashboard = () => {
   if (error) {
     return (
       <ErrorPage 
-        type="server" 
+        type="generic" 
         title="Dashboard Unavailable"
         message={error}
         onRetry={fetchDashboardData}

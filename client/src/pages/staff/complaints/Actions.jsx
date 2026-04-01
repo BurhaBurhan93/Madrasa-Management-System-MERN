@@ -100,7 +100,7 @@ useEffect(() => {
 
       {error && !loading && (
         <ErrorPage
-          type="server"
+          type="generic"
           title="Unable to Load Complaint Actions"
           message={error}
           onRetry={fetchData}

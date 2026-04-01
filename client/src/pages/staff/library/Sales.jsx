@@ -93,7 +93,7 @@ useEffect(() => {
         <p className="text-gray-600">Record book sales with database-backed data</p>
       </div>
 
-      {error && !loading && <ErrorPage type="server" title="Unable to Load Sales Data" message={error} onRetry={fetchData} onHome={() => { window.location.href = '/staff/dashboard'; }} showBackButton={false} />}
+      {error && !loading && <ErrorPage type="generic" title="Unable to Load Sales Data" message={error} onRetry={fetchData} onHome={() => { window.location.href = '/staff/dashboard'; }} showBackButton={false} />}
 
       {loading ? <div className="text-center py-8 text-gray-600">Loading sales...</div> : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

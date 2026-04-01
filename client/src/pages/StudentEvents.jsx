@@ -128,7 +128,7 @@ const StudentEvents = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Events"
           message={error}
           onRetry={fetchEventsData}

@@ -450,7 +450,7 @@ const StudentProfile = () => {
 
       <ErrorPage 
 
-        type="server" 
+        type="generic" 
 
         title="Profile Unavailable"
 

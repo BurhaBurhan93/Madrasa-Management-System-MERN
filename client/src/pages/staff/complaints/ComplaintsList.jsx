@@ -88,7 +88,7 @@ const StaffComplaintsList = () => {
 
       {error && !loading && (
         <ErrorPage
-          type="server"
+          type="generic"
           title="Complaints Data Unavailable"
           message={error}
           onRetry={fetchComplaintsData}

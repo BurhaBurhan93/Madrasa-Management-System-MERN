@@ -221,7 +221,7 @@ const StaffLeaveManagement = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Leave Management Unavailable"
           message={error}
           onRetry={fetchData}

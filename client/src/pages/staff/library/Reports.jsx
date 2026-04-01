@@ -118,7 +118,7 @@ const StaffLibraryReports = () => {
 
         <ErrorPage 
 
-          type="server" 
+          type="generic" 
 
           title="Unable to Load Reports"
 

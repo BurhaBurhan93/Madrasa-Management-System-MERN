@@ -298,7 +298,7 @@ const StaffLibraryBooks = () => {
 
         <ErrorPage 
 
-          type="server" 
+          type="generic" 
 
           title="Library Books Unavailable"
 

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import FormPage from '../shared/FormPage';
 import { expensesConfig } from './Expenses';
 

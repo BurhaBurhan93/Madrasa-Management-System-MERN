@@ -123,7 +123,7 @@ const StudentAttendance = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Attendance"
           message={error}
           onRetry={fetchAttendanceData}

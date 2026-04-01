@@ -104,7 +104,7 @@ const StudentExams = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Exams"
           message={error}
           onRetry={fetchExamResults}

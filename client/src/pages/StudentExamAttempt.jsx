@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -12,6 +13,7 @@ const StudentExamAttempt = () => {
   const [submission, setSubmission] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => { fetchExam(); checkSubmission(); }, [examId]);
 
@@ -19,7 +21,10 @@ const StudentExamAttempt = () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/student/exams/${examId}`, api());
       if (res.data.success) setExam(res.data.data);
-    } catch (e) { console.error(e); } finally { setLoading(false); }
+    } catch (e) { 
+      console.error(e);
+      setError('Failed to load exam. Please try again.');
+    } finally { setLoading(false); }
   };
 
   const checkSubmission = async () => {
@@ -47,6 +52,19 @@ const StudentExamAttempt = () => {
   };
 
   if (loading) return <div className="p-8 text-center text-gray-500">Loading exam...</div>;
+
+  if (error && !loading) {
+    return (
+      <ErrorPage
+        type="generic"
+        title="Unable to Load Exam"
+        message={error}
+        onRetry={fetchExam}
+        onHome={() => navigate('/student/exams')}
+        showBackButton={false}
+      />
+    );
+  }
 
   if (submission) return (
     <div className="p-6 max-w-lg mx-auto text-center space-y-4">

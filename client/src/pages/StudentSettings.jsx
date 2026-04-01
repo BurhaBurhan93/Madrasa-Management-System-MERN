@@ -127,7 +127,7 @@ const StudentSettings = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Settings"
           message={error}
           onRetry={fetchSettingsData}

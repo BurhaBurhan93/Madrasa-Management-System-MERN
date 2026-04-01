@@ -121,7 +121,7 @@ const Employees = () => {
 
         <ErrorPage 
 
-          type="server" 
+          type="generic" 
 
           title="Employees Data Unavailable"
 

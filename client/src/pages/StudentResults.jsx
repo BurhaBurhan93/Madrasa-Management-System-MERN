@@ -144,7 +144,7 @@ const StudentResults = () => {
 
         <ErrorPage 
 
-          type="server" 
+          type="generic" 
 
           title="Unable to Load Results"
 

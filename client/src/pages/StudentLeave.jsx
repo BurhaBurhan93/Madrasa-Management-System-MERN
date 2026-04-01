@@ -187,7 +187,7 @@ const StudentLeave = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Leave Data"
           message={error}
           onRetry={fetchLeaveData}

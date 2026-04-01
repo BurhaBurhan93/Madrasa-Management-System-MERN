@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Route } from 'react-router-dom';
 import StaffPanel from '../panels/StaffPanel';
 import StaffLibraryCategories from '../pages/staff/library/Categories';

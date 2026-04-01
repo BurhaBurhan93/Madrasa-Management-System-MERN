@@ -170,7 +170,7 @@ const FormPage = ({
 
             {error && !loading && (
               <ErrorPage 
-                type="server" 
+                type="generic" 
                 title="Form Error"
                 message={error}
                 onRetry={() => window.location.reload()}

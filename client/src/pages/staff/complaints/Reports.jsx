@@ -56,7 +56,7 @@ const StaffComplaintReports = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Reports"
           message={error}
           onRetry={fetchComplaintStats}

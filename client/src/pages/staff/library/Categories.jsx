@@ -71,7 +71,7 @@ useEffect(() => {
 
       {error && !loading && (
         <ErrorPage
-          type="server"
+          type="generic"
           title="Unable to Load Categories"
           message={error}
           onRetry={fetchCategories}

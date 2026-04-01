@@ -109,7 +109,7 @@ const Library = () => {
 
       {error && !loading && (
         <ErrorPage
-          type="server"
+          type="generic"
           title="Library Service Unavailable"
           message={error}
           onRetry={fetchLibraryData}

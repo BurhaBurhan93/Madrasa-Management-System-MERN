@@ -98,7 +98,7 @@ useEffect(() => {
 
       {error && !loading && (
         <ErrorPage
-          type="server"
+          type="generic"
           title="Unable to Load Feedback"
           message={error}
           onRetry={fetchData}

@@ -109,7 +109,7 @@ const StudentCertificates = () => {
 
       {error && !loading && (
         <ErrorPage 
-          type="server" 
+          type="generic" 
           title="Unable to Load Certificates"
           message={error}
           onRetry={fetchCertificatesData}

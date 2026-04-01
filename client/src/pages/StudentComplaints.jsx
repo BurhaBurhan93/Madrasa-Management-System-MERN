@@ -121,7 +121,7 @@ const StudentComplaints = () => {
 
       {error && !loading && (
         <ErrorPage
-          type="server"
+          type="generic"
           title="Unable to Load Complaints"
           message={error}
           onRetry={fetchComplaints}
