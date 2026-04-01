@@ -1,6 +1,18 @@
 import React from 'react';
 
-const Input = ({ label, id, type = 'text', placeholder, value, onChange, error, required = false, className = '', ...props }) => {
+const Input = ({
+  label,
+  id,
+  type = 'text',
+  placeholder,
+  helperText,
+  value,
+  onChange,
+  error,
+  required = false,
+  className = '',
+  ...props
+}) => {
   return (
     <div className="space-y-2">
       {label && (
@@ -20,6 +32,7 @@ const Input = ({ label, id, type = 'text', placeholder, value, onChange, error, 
         } ${className}`}
         {...props}
       />
+      {!error && helperText && <p className="text-xs text-gray-500">{helperText}</p>}
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );

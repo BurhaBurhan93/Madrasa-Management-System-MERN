@@ -16,6 +16,27 @@ const parseJsonSafe = async (res) => {
   }
 };
 
+const formatFieldLabel = (label = '') => label.toLowerCase().replace(/\s+/g, ' ');
+
+const getDefaultHelperText = (field, endpoint) => {
+  const context = endpoint.includes('/payroll')
+    ? 'payroll'
+    : endpoint.includes('/finance')
+      ? 'finance'
+      : '';
+
+  if (!context) return '';
+
+  const label = formatFieldLabel(field.label);
+
+  if (field.type === 'relation') return `Choose the related ${label} record for this ${context} entry.`;
+  if (field.type === 'date') return `Select the ${label} for this ${context} record.`;
+  if (field.type === 'number') return `Enter the ${label} as a numeric value.`;
+  if (field.type === 'select') return `Select the correct ${label} option before saving.`;
+
+  return `Provide the ${label} for this ${context} record.`;
+};
+
 const RelationSelect = ({ field, value, onChange }) => {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +71,7 @@ const RelationSelect = ({ field, value, onChange }) => {
           <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
       </select>
+      {field.helperText && <p className="mt-1 text-xs text-gray-500">{field.helperText}</p>}
     </div>
   );
 };
@@ -136,35 +158,41 @@ const FormPage = ({
         ) : (
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {formFields.map((field) => (
-                <div key={field.name} className="space-y-1">
-                  {field.type === 'relation' ? (
-                    <RelationSelect
-                      field={field}
-                      value={form[field.name]}
-                      onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
-                    />
-                  ) : field.type === 'select' ? (
-                    <Select
-                      label={field.label}
-                      id={field.name}
-                      value={form[field.name] ?? ''}
-                      onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
-                      options={field.options}
-                      error={fieldErrors[field.name]}
-                    />
-                  ) : (
-                    <Input
-                      label={field.label}
-                      id={field.name}
-                      type={field.type || 'text'}
-                      value={form[field.name] ?? ''}
-                      onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
-                      error={fieldErrors[field.name]}
-                    />
-                  )}
-                </div>
-              ))}
+              {formFields.map((field) => {
+                const helperText = field.helperText || getDefaultHelperText(field, endpoint);
+
+                return (
+                  <div key={field.name} className="space-y-1">
+                    {field.type === 'relation' ? (
+                      <RelationSelect
+                        field={{ ...field, helperText }}
+                        value={form[field.name]}
+                        onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
+                      />
+                    ) : field.type === 'select' ? (
+                      <Select
+                        label={field.label}
+                        id={field.name}
+                        value={form[field.name] ?? ''}
+                        onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
+                        options={field.options}
+                        helperText={helperText}
+                        error={fieldErrors[field.name]}
+                      />
+                    ) : (
+                      <Input
+                        label={field.label}
+                        id={field.name}
+                        type={field.type || 'text'}
+                        value={form[field.name] ?? ''}
+                        onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
+                        helperText={helperText}
+                        error={fieldErrors[field.name]}
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {error && <div className="text-sm text-red-600">{error}</div>}

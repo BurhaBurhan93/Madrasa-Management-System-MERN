@@ -7,6 +7,7 @@ const Select = ({
   value, 
   onChange, 
   error, 
+  helperText,
   required = false, 
   className = '',
   placeholder,
@@ -38,6 +39,7 @@ const Select = ({
           </option>
         ))}
       </select>
+      {!error && helperText && <p className="mt-1 text-xs text-gray-500">{helperText}</p>}
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );
