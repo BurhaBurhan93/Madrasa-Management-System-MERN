@@ -1,66 +1,90 @@
-import React, { useState } from 'react';
-import { FiCalendar, FiClock, FiMapPin, FiUsers, FiPlus, FiFilter } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiCalendar, FiClock, FiMapPin, FiUsers, FiPlus } from 'react-icons/fi';
+import axios from 'axios';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 
 const StudentEvents = () => {
-  const [events] = useState([
-    {
-      id: 1,
-      title: 'Annual Quran Competition',
-      date: '2024-03-15',
-      time: '09:00 AM - 02:00 PM',
-      location: 'Main Hall',
-      type: 'Competition',
-      attendees: 120,
-      description: 'Annual inter-school Quran recitation and memorization competition.',
-      status: 'upcoming',
-    },
-    {
-      id: 2,
-      title: 'Islamic History Workshop',
-      date: '2024-03-20',
-      time: '10:00 AM - 12:00 PM',
-      location: 'Conference Room B',
-      type: 'Workshop',
-      attendees: 45,
-      description: 'Learn about the Golden Age of Islam and its contributions to science.',
-      status: 'upcoming',
-    },
-    {
-      id: 3,
-      title: 'Parent-Teacher Meeting',
-      date: '2024-03-25',
-      time: '02:00 PM - 05:00 PM',
-      location: 'Classroom 101',
-      type: 'Meeting',
-      attendees: 80,
-      description: 'Discuss student progress and academic performance.',
-      status: 'upcoming',
-    },
-    {
-      id: 4,
-      title: 'Eid Celebration',
-      date: '2024-04-10',
-      time: '10:00 AM - 04:00 PM',
-      location: 'School Ground',
-      type: 'Celebration',
-      attendees: 500,
-      description: 'Annual Eid celebration with food, games, and activities.',
-      status: 'upcoming',
-    },
-    {
-      id: 5,
-      title: 'Arabic Calligraphy Workshop',
-      date: '2024-02-28',
-      time: '11:00 AM - 01:00 PM',
-      location: 'Art Room',
-      type: 'Workshop',
-      attendees: 30,
-      description: 'Learn the art of Arabic calligraphy from master calligraphers.',
-      status: 'completed',
-    },
-  ]);
-
+  console.log('[StudentEvents] Component initializing...');
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StudentEvents] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[StudentEvents] useEffect triggered - fetching data from API...');
+    fetchEventsData();
+  }, []);
+
+  const fetchEventsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StudentEvents] Fetching events from API...');
+      
+      const config = getConfig();
+      
+      // Fetch exams as events
+      const examsResponse = await axios.get('http://localhost:5000/api/student/exams', config);
+      console.log('[StudentEvents] Exams API response:', examsResponse.data);
+      
+      // Fetch assignments with due dates as events
+      const assignmentsResponse = await axios.get('http://localhost:5000/api/student/assignments', config);
+      console.log('[StudentEvents] Assignments API response:', assignmentsResponse.data);
+      
+      // Transform exams to events format
+      const examEvents = (examsResponse.data || []).map(exam => ({
+        id: `exam-${exam._id || exam.id}`,
+        title: exam.title || 'Exam',
+        date: exam.date || exam.publishDate || new Date().toISOString().split('T')[0],
+        time: exam.time || '09:00 AM',
+        location: exam.location || 'Exam Hall',
+        type: exam.type === 'final' ? 'Competition' : 'Workshop',
+        attendees: 0,
+        description: exam.description || `Exam: ${exam.title}`,
+        status: exam.status === 'completed' ? 'completed' : 'upcoming',
+        source: 'exam'
+      }));
+      
+      // Transform assignments to events format
+      const assignmentEvents = (assignmentsResponse.data || [])
+        .filter(a => a.dueDate)
+        .map(assignment => ({
+          id: `assignment-${assignment._id || assignment.id}`,
+          title: assignment.title || 'Assignment Due',
+          date: assignment.dueDate,
+          time: '11:59 PM',
+          location: 'Online',
+          type: 'Meeting',
+          attendees: 0,
+          description: assignment.description || `Assignment due: ${assignment.title}`,
+          status: assignment.status === 'submitted' ? 'completed' : 'upcoming',
+          source: 'assignment'
+        }));
+      
+      // Combine and sort by date
+      const allEvents = [...examEvents, ...assignmentEvents].sort((a, b) => 
+        new Date(a.date) - new Date(b.date)
+      );
+      
+      setEvents(allEvents);
+      console.log('[StudentEvents] Combined events:', allEvents.length);
+    } catch (err) {
+      console.error('[StudentEvents] Error fetching events:', err);
+      setError('Failed to fetch events. Please try again.');
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredEvents = events.filter(event => {
     if (filter === 'all') return true;
@@ -102,6 +126,24 @@ const StudentEvents = () => {
         </div>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="generic" 
+          title="Unable to Load Events"
+          message={error}
+          onRetry={fetchEventsData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading && events.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading events...</p>
+        </div>
+      ) : (
+      <div>
       {/* Events Calendar View */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Events List */}
@@ -199,6 +241,8 @@ const StudentEvents = () => {
           </div>
         </div>
       </div>
+      </div>
+      )}
     </div>
   );
 };

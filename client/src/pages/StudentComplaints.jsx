@@ -1,44 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
 import Input from '../components/UIHelper/Input';
 import Badge from '../components/UIHelper/Badge';
+import ErrorPage from '../components/UIHelper/ErrorPage';
+
+const API_BASE = 'http://localhost:5000/api';
+const POLL_INTERVAL = 10000;
+
+const mapComplaint = (complaint) => ({
+  id: complaint._id,
+  title: complaint.subject || 'Untitled Complaint',
+  category: complaint.complaintCategory || 'General',
+  priority: complaint.priorityLevel || 'medium',
+  status: complaint.complaintStatus === 'in_progress' ? 'in-progress' : complaint.complaintStatus || 'open',
+  description: complaint.description || '',
+  submittedDate: complaint.submittedDate || complaint.createdAt,
+  closedAt: complaint.closedAt
+});
 
 const StudentComplaints = () => {
-  const [complaints, setComplaints] = useState([
-    {
-      id: 1,
-      title: 'Classroom Temperature Issue',
-      category: 'Facility',
-      date: '2024-02-10',
-      status: 'resolved',
-      priority: 'medium',
-      description: 'Classroom AC is not working properly during afternoon classes.',
-      response: 'Maintenance team has fixed the AC unit. Issue resolved.',
-      submittedDate: '2024-02-08'
-    },
-    {
-      id: 2,
-      title: 'Library Noise Complaint',
-      category: 'Environment',
-      date: '2024-02-12',
-      status: 'pending',
-      priority: 'low',
-      description: 'Students are making too much noise in the library affecting concentration.',
-      submittedDate: '2024-02-10'
-    },
-    {
-      id: 3,
-      title: 'Assignment Deadline Extension Request',
-      category: 'Academic',
-      date: '2024-02-15',
-      status: 'in-progress',
-      priority: 'high',
-      description: 'Requesting deadline extension for mathematics assignment due to family emergency.',
-      submittedDate: '2024-02-12'
-    }
-  ]);
-
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [showComplaintModal, setShowComplaintModal] = useState(false);
   const [complaintData, setComplaintData] = useState({
     title: '',
@@ -47,46 +32,63 @@ const StudentComplaints = () => {
     description: ''
   });
 
-  const handleOpenComplaintModal = () => {
-    setShowComplaintModal(true);
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    return { headers: { Authorization: `Bearer ${token}` } };
   };
 
-  const handleCloseComplaintModal = () => {
-    setShowComplaintModal(false);
-    setComplaintData({
-      title: '',
-      category: 'Academic',
-      priority: 'medium',
-      description: ''
-    });
+  const fetchComplaints = async ({ silent = false } = {}) => {
+    try {
+      if (!silent) {
+        setLoading(true);
+      }
+      setError(null);
+      const response = await axios.get(`${API_BASE}/student/complaints`, getConfig());
+      setComplaints((response.data || []).map(mapComplaint));
+    } catch (err) {
+      setError('Failed to load complaints. Please try again.');
+      if (!silent) {
+        setComplaints([]);
+      }
+    } finally {
+      if (!silent) {
+        setLoading(false);
+      }
+    }
   };
 
-  const handleComplaintChange = (e) => {
-    const { name, value } = e.target;
-    setComplaintData(prev => ({ ...prev, [name]: value }));
-  };
+  useEffect(() => {
+    fetchComplaints();
+    const intervalId = window.setInterval(() => fetchComplaints({ silent: true }), POLL_INTERVAL);
+    return () => window.clearInterval(intervalId);
+  }, []);
 
-  const handleSubmitComplaint = (e) => {
+  const handleSubmitComplaint = async (e) => {
     e.preventDefault();
-    
-    const newComplaint = {
-      id: complaints.length + 1,
-      ...complaintData,
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending',
-      submittedDate: new Date().toISOString().split('T')[0]
-    };
-    
-    setComplaints(prev => [newComplaint, ...prev]);
-    handleCloseComplaintModal();
-    alert('Complaint submitted successfully!');
+
+    try {
+      setLoading(true);
+      await axios.post(`${API_BASE}/student/complaints`, complaintData, getConfig());
+      setShowComplaintModal(false);
+      setComplaintData({
+        title: '',
+        category: 'Academic',
+        priority: 'medium',
+        description: ''
+      });
+      await fetchComplaints({ silent: true });
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to submit complaint.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'resolved':
+      case 'closed':
         return 'success';
-      case 'pending':
+      case 'open':
         return 'warning';
       case 'in-progress':
         return 'primary';
@@ -108,210 +110,141 @@ const StudentComplaints = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  const formatDate = (value) => (value ? new Date(value).toLocaleDateString() : '-');
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
       <div className="py-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Complaints & Feedback</h1>
-        <p className="text-gray-600">Submit complaints and track their status</p>
+        <p className="text-gray-600">Submit complaints and follow their live status</p>
       </div>
 
-      <div>
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {error && !loading && (
+        <ErrorPage
+          type="generic"
+          title="Unable to Load Complaints"
+          message={error}
+          onRetry={fetchComplaints}
+          onHome={() => { window.location.href = '/student/dashboard'; }}
+          showBackButton={false}
+        />
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="text-center">
           <div className="text-3xl font-bold text-blue-600">{complaints.length}</div>
           <div className="text-sm text-gray-600">Total Complaints</div>
         </Card>
-        
         <Card className="text-center">
-          <div className="text-3xl font-bold text-yellow-600">
-            {complaints.filter(c => c.status === 'pending').length}
-          </div>
-          <div className="text-sm text-gray-600">Pending</div>
+          <div className="text-3xl font-bold text-yellow-600">{complaints.filter((c) => c.status === 'open').length}</div>
+          <div className="text-sm text-gray-600">Open</div>
         </Card>
-        
         <Card className="text-center">
-          <div className="text-3xl font-bold text-green-600">
-            {complaints.filter(c => c.status === 'resolved').length}
-          </div>
-          <div className="text-sm text-gray-600">Resolved</div>
-        </Card>
-        
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-purple-600">
-            {complaints.filter(c => c.status === 'in-progress').length}
-          </div>
-          <div className="text-sm text-gray-600">In Progress</div>
+          <div className="text-3xl font-bold text-green-600">{complaints.filter((c) => c.status === 'closed').length}</div>
+          <div className="text-sm text-gray-600">Closed</div>
         </Card>
       </div>
 
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-800">My Complaints</h2>
-        <Button 
-          variant="primary" 
-          onClick={handleOpenComplaintModal}
-        >
+        <Button variant="primary" onClick={() => setShowComplaintModal(true)}>
           Submit New Complaint
         </Button>
       </div>
 
-      {/* Complaints List */}
-      <div className="space-y-6">
-        {complaints.map(complaint => (
-          <Card key={complaint.id} className="hover:shadow-md transition-shadow">
-            <div className="flex flex-col md:flex-row md:items-start justify-between">
-              <div className="flex-1 mb-4 md:mb-0 md:pr-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">{complaint.title}</h3>
-                  <div className="flex space-x-2">
-                    <Badge variant={getPriorityColor(complaint.priority)}>
-                      {complaint.priority.charAt(0).toUpperCase() + complaint.priority.slice(1)}
-                    </Badge>
-                    <Badge variant={getStatusColor(complaint.status)}>
-                      {complaint.status.charAt(0).toUpperCase() + complaint.status.slice(1)}
-                    </Badge>
+      {loading && complaints.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading complaints...</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {complaints.map((complaint) => (
+            <Card key={complaint.id}>
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900">{complaint.title}</h3>
+                    <div className="flex gap-2">
+                      <Badge variant={getPriorityColor(complaint.priority)}>{complaint.priority}</Badge>
+                      <Badge variant={getStatusColor(complaint.status)}>{complaint.status}</Badge>
+                    </div>
                   </div>
+                  <p className="text-sm text-gray-600 mb-2">{complaint.category}</p>
+                  <p className="text-gray-700">{complaint.description}</p>
                 </div>
-                
-                <div className="flex items-center space-x-4 mb-2">
-                  <span className="text-sm text-gray-600">{complaint.category}</span>
-                  <span className="text-sm text-gray-500">Submitted: {formatDate(complaint.submittedDate)}</span>
+                <div className="text-sm text-gray-600">
+                  <p>Submitted: {formatDate(complaint.submittedDate)}</p>
+                  <p>Closed: {formatDate(complaint.closedAt)}</p>
                 </div>
-                
-                <p className="text-gray-700 mb-3">{complaint.description}</p>
-                
-                {complaint.response && (
-                  <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                    <p className="text-sm text-green-800">
-                      <span className="font-medium">Response:</span> {complaint.response}
-                    </p>
-                  </div>
-                )}
               </div>
-              
-              <div className="text-right">
-                <p className="text-sm text-gray-600">Date</p>
-                <p className="font-medium">{formatDate(complaint.date)}</p>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+          {complaints.length === 0 && (
+            <Card className="text-center py-8">
+              <p className="text-gray-600">No complaints submitted yet.</p>
+            </Card>
+          )}
+        </div>
+      )}
 
-      {/* Submit Complaint Modal */}
       {showComplaintModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Submit New Complaint
-                </h3>
-                <button 
-                  onClick={handleCloseComplaintModal}
-                  className="text-gray-400 hover:text-gray-600"
+          <div className="bg-white rounded-xl max-w-2xl w-full">
+            <form onSubmit={handleSubmitComplaint} className="p-6 space-y-4">
+              <h3 className="text-xl font-semibold text-gray-900">Submit New Complaint</h3>
+              <Input
+                label="Title"
+                name="title"
+                value={complaintData.title}
+                onChange={(e) => setComplaintData((prev) => ({ ...prev, title: e.target.value }))}
+              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select
+                  className="w-full px-3 py-2 border rounded-lg"
+                  value={complaintData.category}
+                  onChange={(e) => setComplaintData((prev) => ({ ...prev, category: e.target.value }))}
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                  <option value="Academic">Academic</option>
+                  <option value="Facility">Facility</option>
+                  <option value="Environment">Environment</option>
+                  <option value="General">General</option>
+                </select>
               </div>
-              
-              <form onSubmit={handleSubmitComplaint} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Title
-                  </label>
-                  <Input
-                    type="text"
-                    name="title"
-                    value={complaintData.title}
-                    onChange={handleComplaintChange}
-                    placeholder="Brief title for your complaint"
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Category
-                    </label>
-                    <select
-                      name="category"
-                      value={complaintData.category}
-                      onChange={handleComplaintChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="Academic">Academic</option>
-                      <option value="Facility">Facility</option>
-                      <option value="Environment">Environment</option>
-                      <option value="Staff">Staff</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Priority
-                    </label>
-                    <select
-                      name="priority"
-                      value={complaintData.priority}
-                      onChange={handleComplaintChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    rows={5}
-                    value={complaintData.description}
-                    onChange={handleComplaintChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Provide detailed description of your complaint..."
-                    required
-                  />
-                </div>
-                
-                <div className="flex justify-end space-x-3 pt-4">
-                  <Button 
-                    variant="outline" 
-                    type="button"
-                    onClick={handleCloseComplaintModal}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit"
-                  >
-                    Submit Complaint
-                  </Button>
-                </div>
-              </form>
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                <select
+                  className="w-full px-3 py-2 border rounded-lg"
+                  value={complaintData.priority}
+                  onChange={(e) => setComplaintData((prev) => ({ ...prev, priority: e.target.value }))}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows="5"
+                  value={complaintData.description}
+                  onChange={(e) => setComplaintData((prev) => ({ ...prev, description: e.target.value }))}
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button type="button" variant="secondary" onClick={() => setShowComplaintModal(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" variant="primary">
+                  Submit
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 };

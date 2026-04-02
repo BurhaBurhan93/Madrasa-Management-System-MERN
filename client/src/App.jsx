@@ -1,4 +1,4 @@
-﻿import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ExamProvider } from "./contexts/ExamContext";
@@ -92,18 +92,25 @@ import StaffFinanceExpenses from './pages/staff/finance/Expenses';
 import StaffFinanceReports from './pages/staff/finance/FinancialReports';
 import StaffFinanceTransactionsCreate from './pages/staff/finance/TransactionsCreate';
 import StaffFinanceTransactionsEdit from './pages/staff/finance/TransactionsEdit';
+import StaffFinanceTransactionsView from './pages/staff/finance/TransactionsView';
 import StaffFinanceAccountsCreate from './pages/staff/finance/AccountsCreate';
 import StaffFinanceAccountsEdit from './pages/staff/finance/AccountsEdit';
+import StaffFinanceAccountsView from './pages/staff/finance/AccountsView';
 import StaffFinanceFeeStructuresCreate from './pages/staff/finance/FeeStructuresCreate';
 import StaffFinanceFeeStructuresEdit from './pages/staff/finance/FeeStructuresEdit';
+import StaffFinanceFeeStructuresView from './pages/staff/finance/FeeStructuresView';
 import StaffFinanceStudentFeesCreate from './pages/staff/finance/StudentFeesCreate';
 import StaffFinanceStudentFeesEdit from './pages/staff/finance/StudentFeesEdit';
+import StaffFinanceStudentFeesView from './pages/staff/finance/StudentFeesView';
 import StaffFinanceFeePaymentsCreate from './pages/staff/finance/FeePaymentsCreate';
 import StaffFinanceFeePaymentsEdit from './pages/staff/finance/FeePaymentsEdit';
+import StaffFinanceFeePaymentsView from './pages/staff/finance/FeePaymentsView';
 import StaffFinanceExpensesCreate from './pages/staff/finance/ExpensesCreate';
 import StaffFinanceExpensesEdit from './pages/staff/finance/ExpensesEdit';
+import StaffFinanceExpensesView from './pages/staff/finance/ExpensesView';
 import StaffFinanceReportsCreate from './pages/staff/finance/FinancialReportsCreate';
 import StaffFinanceReportsEdit from './pages/staff/finance/FinancialReportsEdit';
+import StaffFinanceReportsView from './pages/staff/finance/FinancialReportsView';
 import StaffPayrollIndex from './pages/staff/payroll/Payroll';
 import StaffPayrollSalaryStructures from './pages/staff/payroll/SalaryStructures';
 import StaffPayrollSalaryPayments from './pages/staff/payroll/SalaryPayments';
@@ -111,12 +118,16 @@ import StaffPayrollSalaryDeductions from './pages/staff/payroll/SalaryDeductions
 import StaffPayrollSalaryAdvances from './pages/staff/payroll/SalaryAdvances';
 import StaffPayrollSalaryStructuresCreate from './pages/staff/payroll/SalaryStructuresCreate';
 import StaffPayrollSalaryStructuresEdit from './pages/staff/payroll/SalaryStructuresEdit';
+import StaffPayrollSalaryStructuresView from './pages/staff/payroll/SalaryStructuresView';
 import StaffPayrollSalaryPaymentsCreate from './pages/staff/payroll/SalaryPaymentsCreate';
 import StaffPayrollSalaryPaymentsEdit from './pages/staff/payroll/SalaryPaymentsEdit';
+import StaffPayrollSalaryPaymentsView from './pages/staff/payroll/SalaryPaymentsView';
 import StaffPayrollSalaryDeductionsCreate from './pages/staff/payroll/SalaryDeductionsCreate';
 import StaffPayrollSalaryDeductionsEdit from './pages/staff/payroll/SalaryDeductionsEdit';
+import StaffPayrollSalaryDeductionsView from './pages/staff/payroll/SalaryDeductionsView';
 import StaffPayrollSalaryAdvancesCreate from './pages/staff/payroll/SalaryAdvancesCreate';
 import StaffPayrollSalaryAdvancesEdit from './pages/staff/payroll/SalaryAdvancesEdit';
+import StaffPayrollSalaryAdvancesView from './pages/staff/payroll/SalaryAdvancesView';
 
 import Employees from './pages/staff/HR/Employees';
 import DepartmentRegistration from './pages/staff/HR/DepartmentRegistration';
@@ -266,37 +277,48 @@ function App() {
             <Route path="finance/transactions" element={<StaffFinanceTransactions />} />
             <Route path="finance/transactions/create" element={<StaffFinanceTransactionsCreate />} />
             <Route path="finance/transactions/edit/:id" element={<StaffFinanceTransactionsEdit />} />
+            <Route path="finance/transactions/view/:id" element={<StaffFinanceTransactionsView />} />
             <Route path="finance/accounts" element={<StaffFinanceAccounts />} />
             <Route path="finance/accounts/create" element={<StaffFinanceAccountsCreate />} />
             <Route path="finance/accounts/edit/:id" element={<StaffFinanceAccountsEdit />} />
+            <Route path="finance/accounts/view/:id" element={<StaffFinanceAccountsView />} />
             <Route path="finance/fee-structures" element={<StaffFinanceFeeStructures />} />
             <Route path="finance/fee-structures/create" element={<StaffFinanceFeeStructuresCreate />} />
             <Route path="finance/fee-structures/edit/:id" element={<StaffFinanceFeeStructuresEdit />} />
+            <Route path="finance/fee-structures/view/:id" element={<StaffFinanceFeeStructuresView />} />
             <Route path="finance/student-fees" element={<StaffFinanceStudentFees />} />
             <Route path="finance/student-fees/create" element={<StaffFinanceStudentFeesCreate />} />
             <Route path="finance/student-fees/edit/:id" element={<StaffFinanceStudentFeesEdit />} />
+            <Route path="finance/student-fees/view/:id" element={<StaffFinanceStudentFeesView />} />
             <Route path="finance/fee-payments" element={<StaffFinanceFeePayments />} />
             <Route path="finance/fee-payments/create" element={<StaffFinanceFeePaymentsCreate />} />
             <Route path="finance/fee-payments/edit/:id" element={<StaffFinanceFeePaymentsEdit />} />
+            <Route path="finance/fee-payments/view/:id" element={<StaffFinanceFeePaymentsView />} />
             <Route path="finance/expenses" element={<StaffFinanceExpenses />} />
             <Route path="finance/expenses/create" element={<StaffFinanceExpensesCreate />} />
             <Route path="finance/expenses/edit/:id" element={<StaffFinanceExpensesEdit />} />
+            <Route path="finance/expenses/view/:id" element={<StaffFinanceExpensesView />} />
             <Route path="finance/reports" element={<StaffFinanceReports />} />
             <Route path="finance/reports/create" element={<StaffFinanceReportsCreate />} />
             <Route path="finance/reports/edit/:id" element={<StaffFinanceReportsEdit />} />
+            <Route path="finance/reports/view/:id" element={<StaffFinanceReportsView />} />
             <Route path="payroll" element={<StaffPayrollIndex />} />
             <Route path="payroll/salary-structures" element={<StaffPayrollSalaryStructures />} />
             <Route path="payroll/salary-structures/create" element={<StaffPayrollSalaryStructuresCreate />} />
             <Route path="payroll/salary-structures/edit/:id" element={<StaffPayrollSalaryStructuresEdit />} />
+            <Route path="payroll/salary-structures/view/:id" element={<StaffPayrollSalaryStructuresView />} />
             <Route path="payroll/salary-payments" element={<StaffPayrollSalaryPayments />} />
             <Route path="payroll/salary-payments/create" element={<StaffPayrollSalaryPaymentsCreate />} />
             <Route path="payroll/salary-payments/edit/:id" element={<StaffPayrollSalaryPaymentsEdit />} />
+            <Route path="payroll/salary-payments/view/:id" element={<StaffPayrollSalaryPaymentsView />} />
             <Route path="payroll/salary-deductions" element={<StaffPayrollSalaryDeductions />} />
             <Route path="payroll/salary-deductions/create" element={<StaffPayrollSalaryDeductionsCreate />} />
             <Route path="payroll/salary-deductions/edit/:id" element={<StaffPayrollSalaryDeductionsEdit />} />
+            <Route path="payroll/salary-deductions/view/:id" element={<StaffPayrollSalaryDeductionsView />} />
             <Route path="payroll/salary-advances" element={<StaffPayrollSalaryAdvances />} />
             <Route path="payroll/salary-advances/create" element={<StaffPayrollSalaryAdvancesCreate />} />
             <Route path="payroll/salary-advances/edit/:id" element={<StaffPayrollSalaryAdvancesEdit />} />
+            <Route path="payroll/salary-advances/view/:id" element={<StaffPayrollSalaryAdvancesView />} />
 
             <Route path="hr/employees" element={<Employees />} />
             <Route path="hr/departments" element={<DepartmentRegistration />} />
@@ -354,4 +376,6 @@ function App() {
 }
 
 export default App;
+
+
 

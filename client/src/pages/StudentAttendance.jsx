@@ -2,41 +2,86 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/UIHelper/Card';
 import Badge from '../components/UIHelper/Badge';
-import { BarChartComponent } from '../components/UIHelper/Chart';
+import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import { formatDate } from '../lib/utils';
+import axios from 'axios';
 
 const StudentAttendance = () => {
+  console.log('[StudentAttendance] Component initializing...');
   const navigate = useNavigate();
   
-  const [attendanceData, setAttendanceData] = useState([
-    { id: 1, date: '2024-02-01', course: 'Mathematics', status: 'present', time: '09:00 AM' },
-    { id: 2, date: '2024-02-01', course: 'Physics', status: 'present', time: '10:30 AM' },
-    { id: 3, date: '2024-02-01', course: 'Chemistry', status: 'absent', time: '12:00 PM' },
-    { id: 4, date: '2024-02-02', course: 'Mathematics', status: 'present', time: '09:00 AM' },
-    { id: 5, date: '2024-02-02', course: 'Physics', status: 'late', time: '10:45 AM' },
-    { id: 6, date: '2024-02-02', course: 'Chemistry', status: 'present', time: '12:00 PM' },
-    { id: 7, date: '2024-02-03', course: 'Mathematics', status: 'present', time: '09:00 AM' },
-    { id: 8, date: '2024-02-03', course: 'Physics', status: 'present', time: '10:30 AM' },
-    { id: 9, date: '2024-02-03', course: 'Chemistry', status: 'present', time: '12:00 PM' },
-  ]);
-
-  const [monthlyStats, setMonthlyStats] = useState([
-    { month: 'Jan', present: 22, absent: 2, late: 1 },
-    { month: 'Feb', present: 18, absent: 1, late: 0 },
-    { month: 'Mar', present: 20, absent: 0, late: 2 },
-    { month: 'Apr', present: 21, absent: 1, late: 1 },
-    { month: 'May', present: 19, absent: 3, late: 0 },
-    { month: 'Jun', present: 20, absent: 0, late: 1 },
-  ]);
-
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
-  const [stats, setStats] = useState({
-    totalDays: 25,
-    present: 22,
-    absent: 2,
-    late: 1,
-    attendanceRate: 96
-  });
+
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StudentAttendance] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[StudentAttendance] useEffect triggered - fetching data from API...');
+    fetchAttendanceData();
+  }, []);
+
+  const fetchAttendanceData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StudentAttendance] Fetching attendance records from API...');
+      
+      const config = getConfig();
+      const response = await axios.get('http://localhost:5000/api/student/attendance', config);
+      
+      console.log('[StudentAttendance] API response:', response.data);
+      const records = response.data || [];
+      setAttendanceData(records);
+    } catch (err) {
+      console.error('[StudentAttendance] Error fetching attendance data:', err);
+      setError('Failed to fetch attendance records. Please try again.');
+      setAttendanceData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Calculate stats from actual data
+  const stats = React.useMemo(() => {
+    const totalDays = attendanceData.length;
+    const present = attendanceData.filter(r => r.status === 'present').length;
+    const absent = attendanceData.filter(r => r.status === 'absent').length;
+    const late = attendanceData.filter(r => r.status === 'late').length;
+    const attendanceRate = totalDays > 0 ? Math.round(((present + late) / totalDays) * 100) : 0;
+    
+    return { totalDays, present, absent, late, attendanceRate };
+  }, [attendanceData]);
+
+  // Calculate monthly stats from actual data
+  const monthlyStats = React.useMemo(() => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const data = months.map(month => ({ month, present: 0, absent: 0, late: 0 }));
+    
+    attendanceData.forEach(record => {
+      if (record.date) {
+        const date = new Date(record.date);
+        const monthIndex = date.getMonth();
+        if (monthIndex >= 0 && monthIndex < 12) {
+          if (record.status === 'present') data[monthIndex].present++;
+          else if (record.status === 'absent') data[monthIndex].absent++;
+          else if (record.status === 'late') data[monthIndex].late++;
+        }
+      }
+    });
+    
+    // Return last 6 months with data
+    return data.slice(-6);
+  }, [attendanceData]);
 
   const filteredAttendance = attendanceData.filter(record => {
     if (filter === 'all') return true;
@@ -75,6 +120,17 @@ const StudentAttendance = () => {
         <h1 className="text-3xl font-bold text-gray-900">Attendance Records</h1>
         <p className="text-gray-600">Track your attendance history and performance</p>
       </div>
+
+      {error && !loading && (
+        <ErrorPage 
+          type="generic" 
+          title="Unable to Load Attendance"
+          message={error}
+          onRetry={fetchAttendanceData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
+      )}
 
       {/* Quick Stats */}
       <div>

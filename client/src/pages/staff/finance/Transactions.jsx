@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ListPage from '../shared/ListPage';
 import Badge from '../../../components/UIHelper/Badge';
 
@@ -67,8 +67,10 @@ const Transactions = () => (
     columns={transactionsConfig.columns}
     createPath="/staff/finance/transactions/create"
     editPathForRow={(row) => `/staff/finance/transactions/edit/${row._id}`}
+    viewPathForRow={(row) => '/staff/finance/transactions/view/' + row._id}
     searchPlaceholder="Search transactions..."
   />
 );
 
 export default Transactions;
+

@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FiSearch, FiFilter, FiDownload, FiEye, FiBook, FiMail, FiPhone } from 'react-icons/fi';
+import { FiSearch, FiFilter, FiDownload, FiEye, FiBook, FiMail, FiPhone, FiRefreshCw, FiX } from 'react-icons/fi';
+import Card from '../../components/UIHelper/Card';
+import { PieChartComponent, BarChartComponent } from '../../components/UIHelper/ECharts';
 
 const StaffStudents = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterClass, setFilterClass] = useState('all');
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   useEffect(() => {
     fetchStudents();
@@ -15,12 +19,26 @@ const StaffStudents = () => {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/staff/students');
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get('http://localhost:5000/api/staff/students', config);
       setStudents(response.data);
     } catch (error) {
       console.error('Error fetching students:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleViewStudent = async (studentId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get(`http://localhost:5000/api/staff/students/${studentId}`, config);
+      setSelectedStudent(response.data);
+      setShowDetailModal(true);
+    } catch (error) {
+      console.error('Error fetching student details:', error);
     }
   };
 
@@ -49,10 +67,19 @@ const StaffStudents = () => {
           <h2 className="text-2xl font-bold text-gray-800">Student Management</h2>
           <p className="text-gray-500 mt-1">View and manage student information</p>
         </div>
-        <button className="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-md transition-shadow flex items-center gap-2">
-          <FiDownload size={16} />
-          Export List
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={fetchStudents}
+            className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-shadow flex items-center gap-2"
+          >
+            <FiRefreshCw size={16} />
+            Refresh
+          </button>
+          <button className="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-md transition-shadow flex items-center gap-2">
+            <FiDownload size={16} />
+            Export List
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -77,6 +104,33 @@ const StaffStudents = () => {
           <p className="text-gray-500 text-sm">Classes</p>
           <p className="text-2xl font-bold text-blue-600">{classes.length - 1}</p>
         </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card title="Student Status Distribution">
+          <PieChartComponent 
+            data={[
+              { name: 'Active', value: students.filter(s => s.status === 'active').length, color: '#10B981' },
+              { name: 'Inactive', value: students.filter(s => s.status === 'inactive').length, color: '#EF4444' }
+            ].filter(d => d.value > 0)}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
+
+        <Card title="Students by Class">
+          <BarChartComponent 
+            data={classes.filter(c => c !== 'all').map(cls => ({
+              name: `Class ${cls}`,
+              value: students.filter(s => s.class === cls).length
+            }))}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
       </div>
 
       {/* Filters */}
@@ -153,7 +207,10 @@ const StaffStudents = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <button className="p-2 rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors">
+                    <button 
+                      onClick={() => handleViewStudent(student.id)}
+                      className="p-2 rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors"
+                    >
                       <FiEye size={18} />
                     </button>
                   </td>
@@ -169,6 +226,86 @@ const StaffStudents = () => {
           </table>
         </div>
       </div>
+
+      {/* Student Detail Modal */}
+      {showDetailModal && selectedStudent && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Student Details</h3>
+              <button 
+                onClick={() => setShowDetailModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center text-xl font-semibold">
+                  {selectedStudent.student?.name?.split(' ').map(n => n[0]).join('') || 'S'}
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900">{selectedStudent.student?.name}</h4>
+                  <p className="text-gray-500">{selectedStudent.student?.studentId}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-500">Class</p>
+                  <p className="font-medium text-gray-900">{selectedStudent.student?.class || 'N/A'}</p>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-500">Status</p>
+                  <span className={`px-2 py-1 rounded text-sm font-medium ${
+                    selectedStudent.student?.status === 'active' 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-red-100 text-red-700'
+                  }`}>
+                    {selectedStudent.student?.status}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <h5 className="font-semibold text-gray-900 mb-2">Contact Information</h5>
+                <div className="space-y-2">
+                  <p className="flex items-center gap-2 text-gray-600">
+                    <FiMail size={16} /> {selectedStudent.student?.email || 'N/A'}
+                  </p>
+                  <p className="flex items-center gap-2 text-gray-600">
+                    <FiPhone size={16} /> {selectedStudent.student?.phone || 'N/A'}
+                  </p>
+                </div>
+              </div>
+
+              {selectedStudent.borrowedBooks && selectedStudent.borrowedBooks.length > 0 && (
+                <div>
+                  <h5 className="font-semibold text-gray-900 mb-2">Borrowed Books</h5>
+                  <div className="space-y-2">
+                    {selectedStudent.borrowedBooks.map((book, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-sky-50 p-2 rounded-lg">
+                        <FiBook size={16} className="text-sky-600" />
+                        <span className="text-sm">{book.bookTitle}</span>
+                        <span className="text-xs text-gray-500">(Due: {new Date(book.dueDate).toLocaleDateString()})</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="p-6 border-t border-gray-100 flex justify-end">
+              <button 
+                onClick={() => setShowDetailModal(false)}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

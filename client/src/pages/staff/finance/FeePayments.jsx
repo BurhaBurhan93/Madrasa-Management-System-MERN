@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ListPage from '../shared/ListPage';
 
 export const feePaymentsConfig = {
@@ -63,8 +63,10 @@ const FeePayments = () => (
     columns={feePaymentsConfig.columns}
     createPath="/staff/finance/fee-payments/create"
     editPathForRow={(row) => `/staff/finance/fee-payments/edit/${row._id}`}
+    viewPathForRow={(row) => '/staff/finance/fee-payments/view/' + row._id}
     searchPlaceholder="Search fee payments..."
   />
 );
 
 export default FeePayments;
+

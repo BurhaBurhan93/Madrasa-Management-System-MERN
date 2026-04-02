@@ -1,106 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useExam } from '../contexts/ExamContext';
-
-import Card from '../components/UIHelper/Card';
+import axios from 'axios';
+import ErrorPage from '../components/UIHelper/ErrorPage';
+import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 import Badge from '../components/UIHelper/Badge';
 import Button from '../components/UIHelper/Button';
 
 const StudentExams = () => {
-  const [exams, setExams] = useState([
-    {
-      id: 1,
-      title: 'Midterm Examination',
-      course: 'Mathematics',
-      date: '2024-03-15',
-      time: '09:00 AM',
-      duration: '2 hours',
-      location: 'Room 201',
-      type: 'midterm',
-      status: 'scheduled',
-      description: 'Comprehensive exam covering chapters 1-5'
-    },
-    {
-      id: 2,
-      title: 'Physics Final Exam',
-      course: 'Physics',
-      date: '2024-03-20',
-      time: '10:30 AM',
-      duration: '3 hours',
-      location: 'Auditorium A',
-      type: 'final',
-      status: 'scheduled',
-      description: 'Final examination for Physics course'
-    },
-    {
-      id: 3,
-      title: 'Arabic Quiz',
-      course: 'Arabic Language',
-      date: '2024-02-25',
-      time: '11:00 AM',
-      duration: '1 hour',
-      location: 'Room 105',
-      type: 'quiz',
-      status: 'completed',
-      description: 'Quiz on Arabic grammar and literature',
-      score: 85
-    },
-    {
-      id: 4,
-      title: 'Islamic Studies Test',
-      course: 'Islamic Studies',
-      date: '2024-03-05',
-      time: '02:00 PM',
-      duration: '1.5 hours',
-      location: 'Room 301',
-      type: 'test',
-      status: 'upcoming',
-      description: 'Test on Islamic history and jurisprudence'
-    }
-  ]);
-
-  const [pastExams, setPastExams] = useState([
-    {
-      id: 5,
-      title: 'Calculus Quiz',
-      course: 'Mathematics',
-      date: '2024-02-10',
-      score: 92,
-      maxScore: 100,
-      grade: 'A',
-      feedback: 'Excellent performance on derivatives'
-    },
-    {
-      id: 6,
-      title: 'Chemistry Midterm',
-      course: 'Chemistry',
-      date: '2024-02-01',
-      score: 78,
-      maxScore: 100,
-      grade: 'C+',
-      feedback: 'Need improvement in organic chemistry'
-    }
-  ]);
-
+  console.log('[StudentExams] Component initializing...');
+  const navigate = useNavigate();
+  const { exams: contextExams, submissions } = useExam();
+  
+  const [examResults, setExamResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('upcoming');
 
-  const navigate = useNavigate();
-const { exams: contextExams, submissions } = useExam();
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StudentExams] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
 
-const studentId = "student_001";
+  useEffect(() => {
+    console.log('[StudentExams] useEffect triggered - fetching data from API...');
+    fetchExamResults();
+  }, []);
 
-const publishedExams = contextExams.filter(
-  e => e.status === "published"
-);
+  const fetchExamResults = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StudentExams] Fetching exam results from API...');
+      
+      const config = getConfig();
+      
+      // Fetch exam results from FinalResult model
+      const resultsResponse = await axios.get('http://localhost:5000/api/student/final-results', config);
+      console.log('[StudentExams] Exam results API response:', resultsResponse.data);
+      setExamResults(resultsResponse.data || []);
+    } catch (err) {
+      console.error('[StudentExams] Error fetching exam results:', err);
+      setError('Failed to fetch exam results. Please try again.');
+      setExamResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const studentSubmissions = submissions.filter(
-  s => s.studentId === studentId
-);
 
-const hasSubmitted = (examId) => {
-  return studentSubmissions.find(s => s.examId === examId);
-};
+  const hasSubmitted = (examId) => {
+    return submissions.find(s => s.examId === examId);
+  };
 
+  const publishedExams = contextExams.filter(e => e.status === "published");
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -145,7 +102,24 @@ const hasSubmitted = (examId) => {
         <p className="text-gray-600">View and manage your examination schedule and results</p>
       </div>
 
-      <div>
+      {error && !loading && (
+        <ErrorPage 
+          type="generic" 
+          title="Unable to Load Exams"
+          message={error}
+          onRetry={fetchExamResults}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading exams...</p>
+        </div>
+      ) : (
+      <>
       {/* Tab Navigation */}
       <div className="mb-6">
         <div className="border-b border-gray-200">
@@ -263,72 +237,50 @@ const hasSubmitted = (examId) => {
       )}
 
       {activeTab === 'past' && (
-  <div className="space-y-6">
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
-
-      {/* 🔥 REAL SUBMISSIONS */}
-      {studentSubmissions.map(submission => {
-        const exam = contextExams.find(
-          e => e.id === submission.examId
-        );
-
-        return (
-          <Card key={submission.id} className="hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {exam?.title}
-                </h3>
-                <p className="text-gray-600">
-                  {new Date(submission.submittedAt).toLocaleString()}
-                </p>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+            {examResults.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No exam results found. Complete exams to see your results here.
               </div>
+            ) : (
+              examResults.map(result => (
+                <Card key={result._id} className="hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {result.exam?.title || 'Exam Result'}
+                      </h3>
+                      <p className="text-gray-600">
+                        Grade: {result.grade || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-green-600">
+                        {result.totalScore || 0}
+                      </p>
+                      <p className="text-sm text-gray-600">Score</p>
+                    </div>
+                  </div>
 
-              <div className="text-right">
-                <p className="text-2xl font-bold text-green-600">
-                  {submission.score} / {submission.totalMarks}
-                </p>
-              </div>
-            </div>
-          </Card>
-        );
-      })}
-
-      {/* 📌 OLD STATIC DATA (دست نخورده) */}
-      {pastExams.map(exam => (
-        <Card key={exam.id} className="hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">{exam.title}</h3>
-              <p className="text-gray-600">{exam.course}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-green-600">{exam.score}%</p>
-              <p className="text-sm text-gray-600">Grade: {exam.grade}</p>
-            </div>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-sm text-gray-600">Status</p>
+                      <p className="font-medium">{result.status || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Date</p>
+                      <p className="font-medium">
+                        {result.createdAt ? formatDate(result.createdAt) : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              ))
+            )}
           </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <p className="text-sm text-gray-600">Date</p>
-              <p className="font-medium">{formatDate(exam.date)}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Score</p>
-              <p className="font-medium">{exam.score}/{exam.maxScore}</p>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-200 pt-4">
-            <p className="text-sm text-gray-600">Feedback:</p>
-            <p className="text-gray-700">{exam.feedback}</p>
-          </div>
-        </Card>
-      ))}
-
-    </div>
-  </div>
-)}
+        </div>
+      )}
 
 
       {/* Exam Preparation Tips */}
@@ -355,7 +307,8 @@ const hasSubmitted = (examId) => {
           </div>
         </Card>
       </div>
-      </div>
+      </>
+      )}
     </div>
   );
 };

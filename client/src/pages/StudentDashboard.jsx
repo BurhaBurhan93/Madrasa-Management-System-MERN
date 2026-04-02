@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { BarChartComponent, LineChartComponent } from '../components/UIHelper/Chart';
+import { 
+  BarChartComponent, 
+  LineChartComponent, 
+  PieChartComponent,
+  DoughnutChartComponent 
+} from '../components/UIHelper/ECharts';
 import Card from '../components/UIHelper/Card';
 import Avatar from '../components/UIHelper/Avatar';
 import Progress from '../components/UIHelper/Progress';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 import { formatDate, formatGrade, calculatePercentage } from '../lib/utils';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [studentProfile, setStudentProfile] = useState(null);
   const [quickStats, setQuickStats] = useState({
@@ -23,6 +30,9 @@ const StudentDashboard = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [performanceData, setPerformanceData] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [feeData, setFeeData] = useState([]);
+  const [courseDistribution, setCourseDistribution] = useState([]);
+  const [leaveStats, setLeaveStats] = useState([]);
 
   useEffect(() => {
     fetchUserData();
@@ -46,6 +56,7 @@ const StudentDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
@@ -139,8 +150,39 @@ const StudentDashboard = () => {
       ];
       setRecentActivity(activities);
 
+      // Set performance data from courses with grades
+      const performanceChartData = (coursesRes.data || [])
+        .filter(c => c.grade && c.grade.score)
+        .map(c => ({
+          subject: c.name?.substring(0, 15) || 'Unknown',
+          score: c.grade.score
+        }));
+      setPerformanceData(performanceChartData.length > 0 ? performanceChartData : []);
+
+      // Set fee data from API (will be empty until fees API is integrated)
+      // TODO: Replace with actual fee data from API when available
+      setFeeData([]);
+
+      // Set course distribution from actual course data
+      const courseTypes = {};
+      (coursesRes.data || []).forEach(course => {
+        const type = course.type || 'Core';
+        courseTypes[type] = (courseTypes[type] || 0) + 1;
+      });
+      const courseDistData = Object.keys(courseTypes).map((type, idx) => ({
+        name: type,
+        value: courseTypes[type],
+        color: ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B'][idx % 4]
+      }));
+      setCourseDistribution(courseDistData.length > 0 ? courseDistData : []);
+
+      // Set leave statistics from API (will be empty until leave API is integrated)
+      // TODO: Replace with actual leave data from API when available
+      setLeaveStats([]);
+
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      setError('Failed to load dashboard data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -154,6 +196,19 @@ const StudentDashboard = () => {
           <p className="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
       </div>
+    );
+  }
+
+  if (error && !loading) {
+    return (
+      <ErrorPage
+        type="generic"
+        title="Unable to Load Dashboard"
+        message={error}
+        onRetry={fetchDashboardData}
+        onHome={() => { window.location.href = '/student/dashboard'; }}
+        showBackButton={false}
+      />
     );
   }
 
@@ -256,22 +311,34 @@ const StudentDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Attendance Trend Chart */}
         <Card title="Attendance Trend">
-          <BarChartComponent 
-            data={attendanceData} 
-            dataKey="rate" 
-            nameKey="month" 
-            title="Monthly Attendance Rate"
-          />
+          {attendanceData.length > 0 ? (
+            <BarChartComponent 
+              data={attendanceData} 
+              dataKey="rate" 
+              nameKey="month" 
+              title="Monthly Attendance Rate"
+            />
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No attendance data available</p>
+            </div>
+          )}
         </Card>
 
         {/* Performance Chart */}
         <Card title="Performance by Subject">
-          <LineChartComponent 
-            data={performanceData} 
-            dataKey="score" 
-            nameKey="subject" 
-            title="Subject-wise Performance"
-          />
+          {performanceData.length > 0 ? (
+            <LineChartComponent 
+              data={performanceData} 
+              dataKey="score" 
+              nameKey="subject" 
+              title="Subject-wise Performance"
+            />
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No performance data available</p>
+            </div>
+          )}
         </Card>
       </div>
 
@@ -373,6 +440,69 @@ const StudentDashboard = () => {
               </li>
             ))}
           </ul>
+        </Card>
+      </div>
+
+      {/* Analytics Section with Pie Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card title="Fee Status">
+          {feeData.length > 0 ? (
+            <>
+              <PieChartComponent 
+                data={feeData}
+                dataKey="value"
+                nameKey="name"
+                height={250}
+              />
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600">Total: ${feeData.reduce((a, b) => a + b.value, 0).toLocaleString()}</p>
+              </div>
+            </>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No fee data available</p>
+            </div>
+          )}
+        </Card>
+
+        <Card title="Course Distribution">
+          {courseDistribution.length > 0 ? (
+            <>
+              <PieChartComponent 
+                data={courseDistribution}
+                dataKey="value"
+                nameKey="name"
+                height={250}
+              />
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600">Total: {courseDistribution.reduce((a, b) => a + b.value, 0)} Courses</p>
+              </div>
+            </>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No course data available</p>
+            </div>
+          )}
+        </Card>
+
+        <Card title="Leave Statistics">
+          {leaveStats.length > 0 ? (
+            <>
+              <PieChartComponent 
+                data={leaveStats}
+                dataKey="value"
+                nameKey="name"
+                height={250}
+              />
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600">Total: {leaveStats.reduce((a, b) => a + b.value, 0)} Requests</p>
+              </div>
+            </>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>No leave data available</p>
+            </div>
+          )}
         </Card>
       </div>
       </div>

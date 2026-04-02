@@ -1,36 +1,82 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useExam } from '../contexts/ExamContext';
+import axios from 'axios';
+import ErrorPage from '../components/UIHelper/ErrorPage';
 
 const StudentSchedule = () => {
+  console.log('[StudentSchedule] Component initializing...');
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState('weekly'); // weekly, daily, monthly
+  const [viewMode, setViewMode] = useState('weekly');
+  const [scheduleData, setScheduleData] = useState({
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: []
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Sample schedule data
-  const scheduleData = {
-    monday: [
-      { id: 1, course: 'MATH201', time: '9:00 AM - 10:30 AM', room: 'Room 201', instructor: 'Dr. Ali Hassan', type: 'lecture' },
-      { id: 2, course: 'ARAB101', time: '11:00 AM - 12:30 PM', room: 'Room 105', instructor: 'Prof. Fatima Ahmed', type: 'lecture' },
-      { id: 3, course: 'ISLM202', time: '2:00 PM - 3:30 PM', room: 'Room 301', instructor: 'Sheikh Omar Farooq', type: 'seminar' }
-    ],
-    tuesday: [
-      { id: 4, course: 'ENG102', time: '10:00 AM - 11:30 AM', room: 'Room 103', instructor: 'Ms. Sarah Johnson', type: 'lecture' },
-      { id: 5, course: 'PHYS101', time: '1:00 PM - 2:30 PM', room: 'Lab 2', instructor: 'Dr. Muhammad Khan', type: 'lab' },
-      { id: 6, course: 'MATH201', time: '3:00 PM - 4:30 PM', room: 'Room 201', instructor: 'Dr. Ali Hassan', type: 'tutorial' }
-    ],
-    wednesday: [
-      { id: 7, course: 'ARAB101', time: '9:30 AM - 11:00 AM', room: 'Room 105', instructor: 'Prof. Fatima Ahmed', type: 'tutorial' },
-      { id: 8, course: 'ISLM202', time: '12:00 PM - 1:30 PM', room: 'Room 301', instructor: 'Sheikh Omar Farooq', type: 'lecture' },
-      { id: 9, course: 'ENG102', time: '3:00 PM - 4:30 PM', room: 'Room 103', instructor: 'Ms. Sarah Johnson', type: 'seminar' }
-    ],
-    thursday: [
-      { id: 10, course: 'PHYS101', time: '10:00 AM - 11:30 AM', room: 'Room 205', instructor: 'Dr. Muhammad Khan', type: 'lecture' },
-      { id: 11, course: 'MATH201', time: '1:00 PM - 2:30 PM', room: 'Room 201', instructor: 'Dr. Ali Hassan', type: 'lecture' },
-      { id: 12, course: 'ISLM202', time: '3:00 PM - 4:30 PM', room: 'Room 301', instructor: 'Sheikh Omar Farooq', type: 'tutorial' }
-    ],
-    friday: [
-      { id: 13, course: 'ARAB101', time: '11:00 AM - 12:30 PM', room: 'Room 105', instructor: 'Prof. Fatima Ahmed', type: 'lecture' },
-      { id: 14, course: 'ENG102', time: '2:00 PM - 3:30 PM', room: 'Room 103', instructor: 'Ms. Sarah Johnson', type: 'tutorial' }
-    ]
+  // Get API config with auth token
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    console.log('[StudentSchedule] Token exists:', !!token);
+    return {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+  };
+
+  useEffect(() => {
+    console.log('[StudentSchedule] useEffect triggered - fetching data from API...');
+    fetchScheduleData();
+  }, []);
+
+  const fetchScheduleData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('[StudentSchedule] Fetching schedule from API...');
+      
+      const config = getConfig();
+      
+      // Fetch student courses for schedule
+      const coursesResponse = await axios.get('http://localhost:5000/api/student/courses', config);
+      console.log('[StudentSchedule] Courses API response:', coursesResponse.data);
+      
+      // Transform courses into schedule format
+      const courses = coursesResponse.data || [];
+      const formattedSchedule = {
+        monday: [],
+        tuesday: [],
+        wednesday: [],
+        thursday: [],
+        friday: []
+      };
+      
+      courses.forEach((course, index) => {
+        // Distribute courses across weekdays for demo
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        const day = days[index % 5];
+        
+        formattedSchedule[day].push({
+          id: course._id || index,
+          course: course.code || course.name,
+          time: course.schedule || '09:00 AM - 10:30 AM',
+          room: course.location || 'Room 101',
+          instructor: course.instructor || 'TBD',
+          type: index % 2 === 0 ? 'lecture' : 'tutorial'
+        });
+      });
+      
+      setScheduleData(formattedSchedule);
+      console.log('[StudentSchedule] Schedule data formatted:', formattedSchedule);
+    } catch (err) {
+      console.error('[StudentSchedule] Error fetching schedule:', err);
+      setError('Failed to fetch schedule. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -97,6 +143,23 @@ const StudentSchedule = () => {
         <p className="text-gray-600">View and manage your class schedule</p>
       </div>
 
+      {error && !loading && (
+        <ErrorPage 
+          type="generic" 
+          title="Unable to Load Schedule"
+          message={error}
+          onRetry={fetchScheduleData}
+          onHome={() => window.location.href = '/student/dashboard'}
+          showBackButton={false}
+        />
+      )}
+
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading schedule...</p>
+        </div>
+      ) : (
       <div>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
@@ -295,6 +358,7 @@ const StudentSchedule = () => {
         </div>
       </div>
       </div>
+      )}
     </div>
   );
 };

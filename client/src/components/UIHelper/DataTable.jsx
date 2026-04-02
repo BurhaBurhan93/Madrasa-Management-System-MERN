@@ -7,7 +7,10 @@ const DataTable = ({
   onRowClick,
   rowClassName = '',
   cellClassName = '',
-  headerClassName = ''
+  headerClassName = '',
+  sortKey,
+  sortDirection = 'asc',
+  onSort
 }) => {
   return (
     <Table className="min-w-full divide-y divide-gray-200">
@@ -17,7 +20,20 @@ const DataTable = ({
             key={column.key}
             className={headerClassName}
           >
-            {column.header}
+            {column.sortable && onSort ? (
+              <button
+                type="button"
+                onClick={() => onSort(column.key)}
+                className="inline-flex items-center gap-1 text-left text-xs font-medium uppercase tracking-wider text-inherit"
+              >
+                <span>{column.header}</span>
+                <span className={`text-[10px] ${sortKey === column.key ? 'text-cyan-600' : 'text-slate-300'}`}>
+                  {sortKey === column.key ? (sortDirection === 'asc' ? '?' : '?') : '?'}
+                </span>
+              </button>
+            ) : (
+              column.header
+            )}
           </Table.Head>
         ))}
       </Table.Header>
@@ -25,7 +41,7 @@ const DataTable = ({
       <Table.Body>
         {data.map((row, rowIndex) => (
           <Table.Row
-            key={rowIndex}
+            key={row._id || rowIndex}
             className={rowClassName}
             onClick={() => onRowClick && onRowClick(row)}
           >
@@ -35,7 +51,7 @@ const DataTable = ({
                 className={cellClassName}
               >
                 {column.render
-                  ? column.render(row[column.key], row)
+                  ? column.render(row[column.key], row, rowIndex)
                   : row[column.key]}
               </Table.Cell>
             ))}

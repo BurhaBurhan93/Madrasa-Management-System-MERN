@@ -27,14 +27,14 @@ const TableRow = ({ children, className = '' }) => {
 };
 
 const TableCell = ({ children, className = '' }) => {
-  return <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${className}`}>{children}</td>;
+  return <td className={`px-4 py-2.5 whitespace-nowrap text-sm text-gray-500 ${className}`}>{children}</td>;
 };
 
 const TableHead = ({ children, className = '' }) => {
   return (
     <th
       scope="col"
-      className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${className}`}
+      className={`px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${className}`}
     >
       {children}
     </th>

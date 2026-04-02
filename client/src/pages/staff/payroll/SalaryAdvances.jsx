@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ListPage from '../shared/ListPage';
 
 export const salaryAdvancesConfig = {
@@ -55,8 +55,10 @@ const SalaryAdvances = () => (
     columns={salaryAdvancesConfig.columns}
     createPath="/staff/payroll/salary-advances/create"
     editPathForRow={(row) => `/staff/payroll/salary-advances/edit/${row._id}`}
+    viewPathForRow={(row) => '/staff/payroll/salary-advances/view/' + row._id}
     searchPlaceholder="Search salary advances..."
   />
 );
 
 export default SalaryAdvances;
+

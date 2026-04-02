@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FiPackage, FiPlus, FiMinus, FiAlertTriangle, FiCheckCircle, FiSearch } from 'react-icons/fi';
+import { FiPackage, FiPlus, FiMinus, FiAlertTriangle, FiCheckCircle, FiSearch, FiRefreshCw, FiX } from 'react-icons/fi';
+import Card from '../../components/UIHelper/Card';
+import { PieChartComponent, BarChartComponent } from '../../components/UIHelper/ECharts';
 
 const StaffInventory = () => {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     fetchInventory();
@@ -22,6 +28,38 @@ const StaffInventory = () => {
       console.error('Error fetching inventory:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddStock = async () => {
+    if (!selectedItem || quantity <= 0) return;
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.post(`http://localhost:5000/api/staff/inventory/${selectedItem.id}/add`, { quantity }, config);
+      setShowAddModal(false);
+      setSelectedItem(null);
+      setQuantity(1);
+      fetchInventory();
+    } catch (error) {
+      console.error('Error adding stock:', error);
+      alert('Failed to add stock. Please try again.');
+    }
+  };
+
+  const handleRemoveStock = async () => {
+    if (!selectedItem || quantity <= 0) return;
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.post(`http://localhost:5000/api/staff/inventory/${selectedItem.id}/remove`, { quantity }, config);
+      setShowRemoveModal(false);
+      setSelectedItem(null);
+      setQuantity(1);
+      fetchInventory();
+    } catch (error) {
+      console.error('Error removing stock:', error);
+      alert('Failed to remove stock. Please try again.');
     }
   };
 
@@ -48,10 +86,19 @@ const StaffInventory = () => {
           <h2 className="text-2xl font-bold text-gray-800">Inventory Management</h2>
           <p className="text-gray-500 mt-1">Track and manage school inventory</p>
         </div>
-        <button className="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-md transition-shadow flex items-center gap-2">
-          <FiPlus size={16} />
-          Add Item
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={fetchInventory}
+            className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-shadow flex items-center gap-2"
+          >
+            <FiRefreshCw size={16} />
+            Refresh
+          </button>
+          <button className="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-md transition-shadow flex items-center gap-2">
+            <FiPlus size={16} />
+            Add Item
+          </button>
+        </div>
       </div>
 
       {/* Alerts */}
@@ -89,6 +136,34 @@ const StaffInventory = () => {
             {new Set(inventory.map(i => i.category)).size}
           </p>
         </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card title="Inventory by Category">
+          <PieChartComponent 
+            data={Array.from(new Set(inventory.map(i => i.category))).map((cat, idx) => ({
+              name: cat,
+              value: inventory.filter(i => i.category === cat).length,
+              color: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'][idx % 6]
+            }))}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
+
+        <Card title="Stock Status Overview">
+          <BarChartComponent 
+            data={[
+              { name: 'Normal Stock', value: inventory.filter(i => i.quantity > (i.minLevel || 10)).length },
+              { name: 'Low Stock', value: lowStockItems.length }
+            ]}
+            dataKey="value"
+            nameKey="name"
+            height={250}
+          />
+        </Card>
       </div>
 
       {/* Search */}
@@ -143,11 +218,17 @@ const StaffInventory = () => {
               </p>
 
               <div className="flex gap-2">
-                <button className="flex-1 py-2 bg-sky-50 text-sky-600 rounded-lg hover:bg-sky-100 transition-colors flex items-center justify-center gap-1">
+                <button 
+                  onClick={() => { setSelectedItem(item); setShowAddModal(true); }}
+                  className="flex-1 py-2 bg-sky-50 text-sky-600 rounded-lg hover:bg-sky-100 transition-colors flex items-center justify-center gap-1"
+                >
                   <FiPlus size={16} />
                   Add
                 </button>
-                <button className="flex-1 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-1">
+                <button 
+                  onClick={() => { setSelectedItem(item); setShowRemoveModal(true); }}
+                  className="flex-1 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-1"
+                >
                   <FiMinus size={16} />
                   Remove
                 </button>
@@ -156,6 +237,96 @@ const StaffInventory = () => {
           );
         })}
       </div>
+
+      {/* Add Stock Modal */}
+      {showAddModal && selectedItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Add Stock</h3>
+              <button 
+                onClick={() => { setShowAddModal(false); setQuantity(1); }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-gray-600">Adding stock for: <span className="font-semibold">{selectedItem.name}</span></p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity to Add</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button 
+                  onClick={handleAddStock}
+                  className="flex-1 px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
+                >
+                  Add Stock
+                </button>
+                <button 
+                  onClick={() => { setShowAddModal(false); setQuantity(1); }}
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove Stock Modal */}
+      {showRemoveModal && selectedItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Remove Stock</h3>
+              <button 
+                onClick={() => { setShowRemoveModal(false); setQuantity(1); }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-gray-600">Removing stock for: <span className="font-semibold">{selectedItem.name}</span></p>
+              <p className="text-sm text-gray-500">Current quantity: {selectedItem.quantity}</p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity to Remove</label>
+                <input
+                  type="number"
+                  min="1"
+                  max={selectedItem.quantity}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button 
+                  onClick={handleRemoveStock}
+                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Remove Stock
+                </button>
+                <button 
+                  onClick={() => { setShowRemoveModal(false); setQuantity(1); }}
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

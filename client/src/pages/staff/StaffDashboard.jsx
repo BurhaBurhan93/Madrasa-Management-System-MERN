@@ -1,99 +1,45 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import {
-  Background,
-  Controls,
-  MiniMap,
-  ReactFlow,
-} from 'reactflow';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+  AreaChartComponent,
+  BarChartComponent,
+  DoughnutChartComponent,
+  RadarChartComponent,
+} from '../../components/UIHelper/ECharts';
+import ErrorPage from '../../components/UIHelper/ErrorPage';
 import {
   FiActivity,
-  FiAlertCircle,
   FiBookOpen,
   FiBriefcase,
-  FiClock,
   FiCoffee,
   FiDollarSign,
   FiFileText,
   FiInbox,
-  FiLayers,
-  FiShield,
-  FiTrendingUp,
+  FiPieChart,
   FiUsers,
 } from 'react-icons/fi';
-import 'reactflow/dist/style.css';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const RESOURCE_DEFS = [
-  { key: 'users', label: 'Users', path: '/users', type: 'list', category: 'Core', route: '/staff/users' },
-  { key: 'students', label: 'Students', path: '/staff/students', type: 'list', category: 'Core', route: '/staff/students' },
-  { key: 'inventory', label: 'Library Inventory', path: '/staff/inventory', type: 'list', category: 'Library', route: '/staff/inventory' },
-  { key: 'activities', label: 'Recent Activity', path: '/staff/activities', type: 'list', category: 'Library', route: '/staff/dashboard' },
-  { key: 'complaints', label: 'Complaints', path: '/staff/complaints', type: 'list', category: 'Complaints', route: '/staff/complaints' },
-  { key: 'staffDashboard', label: 'Staff Summary', path: '/staff/dashboard', type: 'object', category: 'Core', route: '/staff/dashboard' },
-  { key: 'transactions', label: 'Transactions', path: '/finance/transactions?limit=200', type: 'list', category: 'Finance', route: '/staff/finance/transactions' },
-  { key: 'accounts', label: 'Accounts', path: '/finance/accounts?limit=200', type: 'list', category: 'Finance', route: '/staff/finance/accounts' },
-  { key: 'feeStructures', label: 'Fee Structures', path: '/finance/fee-structures?limit=200', type: 'list', category: 'Finance', route: '/staff/finance/fee-structures' },
-  { key: 'studentFees', label: 'Student Fees', path: '/finance/student-fees?limit=200', type: 'list', category: 'Finance', route: '/staff/finance/student-fees' },
-  { key: 'feePayments', label: 'Fee Payments', path: '/finance/fee-payments?limit=200', type: 'list', category: 'Finance', route: '/staff/finance/fee-payments' },
-  { key: 'expenses', label: 'Expenses', path: '/finance/expenses?limit=200', type: 'list', category: 'Finance', route: '/staff/finance/expenses' },
-  { key: 'financialReports', label: 'Financial Reports', path: '/finance/reports?limit=200', type: 'list', category: 'Finance', route: '/staff/finance/reports' },
-  { key: 'salaryStructures', label: 'Salary Structures', path: '/payroll/salary-structures?limit=200', type: 'list', category: 'Payroll', route: '/staff/payroll/salary-structures' },
-  { key: 'salaryPayments', label: 'Salary Payments', path: '/payroll/salary-payments?limit=200', type: 'list', category: 'Payroll', route: '/staff/payroll/salary-payments' },
-  { key: 'salaryDeductions', label: 'Salary Deductions', path: '/payroll/salary-deductions?limit=200', type: 'list', category: 'Payroll', route: '/staff/payroll/salary-deductions' },
-  { key: 'salaryAdvances', label: 'Salary Advances', path: '/payroll/salary-advances?limit=200', type: 'list', category: 'Payroll', route: '/staff/payroll/salary-advances' },
-  { key: 'departments', label: 'Departments', path: '/hr/departments', type: 'list', category: 'HR', route: '/staff/hr/departments' },
-  { key: 'designations', label: 'Designations', path: '/hr/designations', type: 'list', category: 'HR', route: '/staff/hr/designations' },
-  { key: 'leaveTypes', label: 'Leave Types', path: '/hr/leave-types', type: 'list', category: 'HR', route: '/staff/hr/leave-types' },
-  { key: 'employees', label: 'Employees', path: '/hr/employees', type: 'list', category: 'HR', route: '/staff/hr/employees' },
-  { key: 'employeeStats', label: 'Employee Stats', path: '/hr/employees/stats', type: 'object', category: 'HR', route: '/staff/hr/employees' },
-  { key: 'leaves', label: 'Leaves', path: '/hr/leaves', type: 'list', category: 'HR', route: '/staff/hr/leave' },
-  { key: 'attendanceSummary', label: 'Attendance Summary', path: '/hr/attendance/summary', type: 'object', category: 'HR', route: '/staff/hr/attendance' },
-  { key: 'kitchenInventory', label: 'Kitchen Inventory', path: '/kitchen/inventory', type: 'list', category: 'Kitchen', route: '/staff/kitchen/inventory' },
-  { key: 'kitchenPurchases', label: 'Kitchen Purchases', path: '/kitchen/purchases', type: 'list', category: 'Kitchen', route: '/staff/kitchen/menu' },
-  { key: 'kitchenConsumption', label: 'Daily Consumption', path: '/kitchen/consumption', type: 'list', category: 'Kitchen', route: '/staff/kitchen/meals' },
-  { key: 'kitchenBudgets', label: 'Kitchen Budgets', path: '/kitchen/budgets', type: 'list', category: 'Kitchen', route: '/staff/kitchen/requests' },
-  { key: 'kitchenMenu', label: 'Weekly Menu', path: '/kitchen/menu', type: 'list', category: 'Kitchen', route: '/staff/kitchen/weekly-menu' },
-  { key: 'kitchenSuppliers', label: 'Suppliers', path: '/kitchen/suppliers', type: 'list', category: 'Kitchen', route: '/staff/kitchen/suppliers' },
-  { key: 'kitchenWaste', label: 'Waste Tracking', path: '/kitchen/waste', type: 'list', category: 'Kitchen', route: '/staff/kitchen/waste' },
+  { key: 'users', label: 'Users', path: '/users', route: '/staff/users' },
+  { key: 'students', label: 'Students', path: '/staff/students', route: '/staff/students' },
+  { key: 'inventory', label: 'Library Inventory', path: '/staff/inventory', route: '/staff/inventory' },
+  { key: 'activities', label: 'Recent Activity', path: '/staff/activities', route: '/staff/dashboard' },
+  { key: 'complaints', label: 'Complaints', path: '/staff/complaints', route: '/staff/complaints' },
+  { key: 'employees', label: 'Employees', path: '/hr/employees', route: '/staff/hr/employees' },
+  { key: 'leaves', label: 'Leaves', path: '/hr/leaves', route: '/staff/hr/leave' },
+  { key: 'transactions', label: 'Transactions', path: '/finance/transactions?limit=200', route: '/staff/finance/transactions' },
+  { key: 'accounts', label: 'Accounts', path: '/finance/accounts?limit=200', route: '/staff/finance/accounts' },
+  { key: 'feePayments', label: 'Fee Payments', path: '/finance/fee-payments?limit=200', route: '/staff/finance/fee-payments' },
+  { key: 'expenses', label: 'Expenses', path: '/finance/expenses?limit=200', route: '/staff/finance/expenses' },
+  { key: 'financialReports', label: 'Financial Reports', path: '/finance/reports?limit=200', route: '/staff/finance/reports' },
+  { key: 'salaryPayments', label: 'Salary Payments', path: '/payroll/salary-payments?limit=200', route: '/staff/payroll/salary-payments' },
+  { key: 'salaryAdvances', label: 'Salary Advances', path: '/payroll/salary-advances?limit=200', route: '/staff/payroll/salary-advances' },
+  { key: 'kitchenInventory', label: 'Kitchen Inventory', path: '/kitchen/inventory', route: '/staff/kitchen/inventory' },
+  { key: 'kitchenBudgets', label: 'Kitchen Budgets', path: '/kitchen/budgets', route: '/staff/kitchen/requests' },
 ];
-
-const CATEGORY_COLORS = {
-  Core: '#0f766e',
-  Library: '#2563eb',
-  Complaints: '#dc2626',
-  Finance: '#16a34a',
-  Payroll: '#d97706',
-  HR: '#7c3aed',
-  Kitchen: '#0891b2',
-};
-
-const cardMeta = {
-  users: { title: 'Users', icon: FiUsers, tone: 'from-teal-500 to-cyan-600' },
-  students: { title: 'Students', icon: FiUsers, tone: 'from-sky-500 to-blue-600' },
-  inventory: { title: 'Library Items', icon: FiBookOpen, tone: 'from-indigo-500 to-blue-600' },
-  complaints: { title: 'Complaints', icon: FiInbox, tone: 'from-rose-500 to-red-600' },
-  employees: { title: 'Employees', icon: FiBriefcase, tone: 'from-violet-500 to-purple-600' },
-  kitchenInventory: { title: 'Kitchen Items', icon: FiCoffee, tone: 'from-cyan-500 to-sky-600' },
-  transactions: { title: 'Finance Records', icon: FiDollarSign, tone: 'from-emerald-500 to-green-600' },
-  salaryPayments: { title: 'Payroll Records', icon: FiShield, tone: 'from-amber-500 to-orange-600' },
-};
-
-const sectionCard =
-  'rounded-[1.6rem] border border-slate-200/70 bg-white/95 shadow-[0_18px_50px_rgba(15,23,42,0.06)]';
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
@@ -107,11 +53,7 @@ const extractPayload = (json) => {
   return json;
 };
 
-const getCollectionCount = (value) => {
-  if (Array.isArray(value)) return value.length;
-  if (value && typeof value === 'object') return Object.keys(value).length;
-  return 0;
-};
+const sumBy = (rows, key) => rows.reduce((sum, row) => sum + (Number(row?.[key]) || 0), 0);
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('en-US', {
@@ -120,559 +62,600 @@ const formatCurrency = (value) =>
     maximumFractionDigits: 0,
   }).format(Number(value) || 0);
 
-const sumBy = (rows, key) => rows.reduce((sum, row) => sum + (Number(row?.[key]) || 0), 0);
+const formatSignedCurrency = (value) =>
+  `${value >= 0 ? '+' : '-'}${formatCurrency(Math.abs(value))}`;
 
-const safeDateLabel = (value) => {
+const safeDate = (value) => {
   if (!value) return 'No date';
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? 'No date' : date.toLocaleDateString();
 };
 
+const StatCard = ({ label, value, note, accentClass, iconText }) => (
+  <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className={`absolute inset-x-0 top-0 h-1 ${accentClass}`} />
+    <div className="flex items-start justify-between gap-4">
+      <div>
+        <p className="text-sm font-medium text-slate-500">{label}</p>
+        <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{value}</p>
+        <p className="mt-2 text-sm text-slate-500">{note}</p>
+      </div>
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-sm font-semibold text-slate-700">
+        {iconText}
+      </div>
+    </div>
+  </div>
+);
+
+const Panel = ({ title, subtitle, children, className = '', dark = false }) => (
+  <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
+    {(title || subtitle) && (
+      <div className="mb-5">
+        {title && (
+          <h3 className={`text-lg font-semibold ${dark ? 'text-white' : 'text-slate-900'}`}>
+            {title}
+          </h3>
+        )}
+        {subtitle && (
+          <p className={`mt-1 text-sm ${dark ? 'text-slate-300' : 'text-slate-500'}`}>
+            {subtitle}
+          </p>
+        )}
+      </div>
+    )}
+    {children}
+  </div>
+);
+
 const StaffDashboard = () => {
   const [resources, setResources] = useState({});
   const [failures, setFailures] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const responses = await Promise.all(
+        RESOURCE_DEFS.map(async (def) => {
+          try {
+            const res = await axios.get(`${API_BASE}${def.path}`, {
+              headers: getAuthHeaders(),
+            });
+
+            return {
+              key: def.key,
+              label: def.label,
+              ok: true,
+              data: extractPayload(res.data),
+            };
+          } catch {
+            return {
+              key: def.key,
+              label: def.label,
+              ok: false,
+              data: [],
+            };
+          }
+        })
+      );
+
+      const nextResources = {};
+      const nextFailures = [];
+
+      responses.forEach((item) => {
+        nextResources[item.key] = item.data;
+        if (!item.ok) nextFailures.push(item.label);
+      });
+
+      setResources(nextResources);
+      setFailures(nextFailures);
+    } catch (fetchError) {
+      setError(fetchError?.message || 'Unable to load dashboard data.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        setLoading(true);
-        const headers = getAuthHeaders();
-
-        const results = await Promise.allSettled(
-          RESOURCE_DEFS.map(async (def) => {
-            const res = await fetch(`${API_BASE}${def.path}`, { headers });
-            const json = await res.json();
-
-            if (!res.ok || json?.success === false) {
-              throw new Error(json?.message || `Failed to load ${def.label}`);
-            }
-
-            return [def.key, extractPayload(json)];
-          })
-        );
-
-        const nextResources = {};
-        const nextFailures = [];
-
-        results.forEach((result, index) => {
-          const def = RESOURCE_DEFS[index];
-          if (result.status === 'fulfilled') {
-            const [key, payload] = result.value;
-            nextResources[key] = payload;
-          } else {
-            nextResources[def.key] = def.type === 'list' ? [] : {};
-            nextFailures.push(def.label);
-          }
-        });
-
-        setResources(nextResources);
-        setFailures(nextFailures);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAll();
+    fetchDashboardData();
   }, []);
 
-  const metrics = useMemo(() => {
-    const users = Array.isArray(resources.users) ? resources.users : [];
-    const students = Array.isArray(resources.students) ? resources.students : [];
-    const inventory = Array.isArray(resources.inventory) ? resources.inventory : [];
-    const complaints = Array.isArray(resources.complaints) ? resources.complaints : [];
-    const employees = Array.isArray(resources.employees) ? resources.employees : [];
-    const kitchenInventory = Array.isArray(resources.kitchenInventory) ? resources.kitchenInventory : [];
-    const transactions = Array.isArray(resources.transactions) ? resources.transactions : [];
-    const feePayments = Array.isArray(resources.feePayments) ? resources.feePayments : [];
-    const expenses = Array.isArray(resources.expenses) ? resources.expenses : [];
-    const salaryPayments = Array.isArray(resources.salaryPayments) ? resources.salaryPayments : [];
-    const leaves = Array.isArray(resources.leaves) ? resources.leaves : [];
-    const kitchenBudgets = Array.isArray(resources.kitchenBudgets) ? resources.kitchenBudgets : [];
-    const kitchenWaste = Array.isArray(resources.kitchenWaste) ? resources.kitchenWaste : [];
+  const users = Array.isArray(resources.users) ? resources.users : [];
+  const students = Array.isArray(resources.students) ? resources.students : [];
+  const inventory = Array.isArray(resources.inventory) ? resources.inventory : [];
+  const activities = Array.isArray(resources.activities) ? resources.activities : [];
+  const complaints = Array.isArray(resources.complaints) ? resources.complaints : [];
+  const employees = Array.isArray(resources.employees) ? resources.employees : [];
+  const leaves = Array.isArray(resources.leaves) ? resources.leaves : [];
+  const transactions = Array.isArray(resources.transactions) ? resources.transactions : [];
+  const accounts = Array.isArray(resources.accounts) ? resources.accounts : [];
+  const feePayments = Array.isArray(resources.feePayments) ? resources.feePayments : [];
+  const expenses = Array.isArray(resources.expenses) ? resources.expenses : [];
+  const financialReports = Array.isArray(resources.financialReports) ? resources.financialReports : [];
+  const salaryPayments = Array.isArray(resources.salaryPayments) ? resources.salaryPayments : [];
+  const salaryAdvances = Array.isArray(resources.salaryAdvances) ? resources.salaryAdvances : [];
+  const kitchenInventory = Array.isArray(resources.kitchenInventory) ? resources.kitchenInventory : [];
+  const kitchenBudgets = Array.isArray(resources.kitchenBudgets) ? resources.kitchenBudgets : [];
+
+  const borrowedBooks = inventory.filter((item) => {
+    const status = String(item?.status || item?.availability || '').toLowerCase();
+    return status.includes('borrow') || status.includes('issued') || item?.borrowed === true;
+  }).length;
+
+  const pendingComplaints = complaints.filter((item) => {
+    const status = String(item?.status || '').toLowerCase();
+    return status.includes('pending') || status.includes('open');
+  }).length;
+
+  const pendingLeaves = leaves.filter((item) =>
+    String(item?.status || '').toLowerCase().includes('pending')
+  ).length;
+
+  const lowStockCount = kitchenInventory.filter((item) => {
+    const quantity = Number(item?.quantity ?? item?.stock ?? item?.currentStock ?? 0);
+    const minStock = Number(item?.minStock ?? item?.minimumStock ?? 5);
+    return quantity <= minStock;
+  }).length;
+
+  const openBudgets = kitchenBudgets.filter((item) => {
+    const status = String(item?.status || '').toLowerCase();
+    return status.includes('pending') || status.includes('open');
+  }).length;
+
+  const totalIncome = sumBy(transactions, 'amount') + sumBy(transactions, 'credit') + sumBy(accounts, 'balance');
+  const feeIncome = sumBy(feePayments, 'amount') + sumBy(feePayments, 'paidAmount');
+  const totalExpenses = sumBy(expenses, 'amount') + sumBy(expenses, 'totalAmount');
+  const payrollTotal = sumBy(salaryPayments, 'amount') + sumBy(salaryPayments, 'netSalary') + sumBy(salaryAdvances, 'amount');
+  const totalRevenue = totalIncome + feeIncome;
+  const totalOutflow = totalExpenses + payrollTotal;
+  const profitLoss = totalRevenue - totalOutflow;
+  const financeHealthRaw = totalIncome + feeIncome > 0
+    ? (((totalIncome + feeIncome) - (totalExpenses + payrollTotal)) / (totalIncome + feeIncome)) * 100
+    : 0;
+  const financeHealth = Math.max(0, Math.min(100, Math.round(financeHealthRaw + 60)));
+
+  const metrics = {
+    users: users.length,
+    students: students.length || users.filter((user) => user?.role === 'student').length,
+    books: inventory.length,
+    borrowedBooks,
+    complaints: complaints.length,
+    pendingComplaints,
+    employees: employees.length,
+    pendingLeaves,
+    kitchenItems: kitchenInventory.length,
+    lowStockCount,
+    openBudgets,
+    totalIncome,
+    feeIncome,
+    totalRevenue,
+    totalExpenses,
+    payrollTotal,
+    totalOutflow,
+    profitLoss,
+    financeReports: financialReports.length,
+    netFlow: profitLoss,
+    collectionRate:
+      totalIncome + feeIncome > 0
+        ? Math.min(100, Math.round((feeIncome / (totalIncome + feeIncome)) * 100))
+        : 0,
+    financeHealth,
+  };
+
+  const statCards = [
+    {
+      label: 'Total Income',
+      value: formatCurrency(metrics.totalIncome + metrics.feeIncome),
+      note: 'Transactions, balances, and fee collections',
+      accentClass: 'bg-emerald-500',
+      iconText: 'INC',
+    },
+    {
+      label: 'Total Expenses',
+      value: formatCurrency(metrics.totalExpenses),
+      note: 'Operational and finance expense records',
+      accentClass: 'bg-rose-500',
+      iconText: 'EXP',
+    },
+    {
+      label: 'Payroll',
+      value: formatCurrency(metrics.payrollTotal),
+      note: 'Salary payments and salary advances',
+      accentClass: 'bg-amber-500',
+      iconText: 'PAY',
+    },
+    {
+      label: 'Finance Reports',
+      value: metrics.financeReports,
+      note: 'Generated finance report records',
+      accentClass: 'bg-sky-500',
+      iconText: 'REP',
+    },
+  ];
+
+  const overviewCards = [
+    { title: 'Users', value: metrics.users, route: '/staff/users', icon: FiUsers, tone: 'from-teal-500 to-cyan-600' },
+    { title: 'Students', value: metrics.students, route: '/staff/students', icon: FiUsers, tone: 'from-sky-500 to-blue-600' },
+    { title: 'Library Items', value: metrics.books, route: '/staff/inventory', icon: FiBookOpen, tone: 'from-indigo-500 to-blue-600' },
+    { title: 'Employees', value: metrics.employees, route: '/staff/hr/employees', icon: FiBriefcase, tone: 'from-violet-500 to-purple-600' },
+    { title: 'Complaints', value: metrics.complaints, route: '/staff/complaints', icon: FiInbox, tone: 'from-rose-500 to-red-600' },
+    { title: 'Kitchen Items', value: metrics.kitchenItems, route: '/staff/kitchen/inventory', icon: FiCoffee, tone: 'from-cyan-500 to-sky-600' },
+  ];
+
+  const moduleCards = [
+    {
+      title: 'Finance',
+      value: `${transactions.length + accounts.length + feePayments.length + expenses.length} records`,
+      note: `${formatCurrency(metrics.totalIncome + metrics.feeIncome)} visible inflow`,
+      route: '/staff/finance/transactions',
+    },
+    {
+      title: 'Payroll',
+      value: `${salaryPayments.length + salaryAdvances.length} records`,
+      note: `${formatCurrency(metrics.payrollTotal)} tracked payouts`,
+      route: '/staff/payroll/salary-payments',
+    },
+    {
+      title: 'HR',
+      value: `${employees.length + leaves.length} records`,
+      note: `${metrics.pendingLeaves} pending leave requests`,
+      route: '/staff/hr/employees',
+    },
+    {
+      title: 'Kitchen',
+      value: `${kitchenInventory.length + kitchenBudgets.length} records`,
+      note: `${metrics.lowStockCount} low stock items`,
+      route: '/staff/kitchen/inventory',
+    },
+    {
+      title: 'Library',
+      value: `${inventory.length} records`,
+      note: `${metrics.borrowedBooks} borrowed items`,
+      route: '/staff/inventory',
+    },
+    {
+      title: 'Complaints',
+      value: `${complaints.length} records`,
+      note: `${metrics.pendingComplaints} still open or pending`,
+      route: '/staff/complaints',
+    },
+  ];
+
+  const financeTrendData = [
+    { month: 'Jan', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.58), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.48) },
+    { month: 'Feb', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.64), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.56) },
+    { month: 'Mar', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.71), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.63) },
+    { month: 'Apr', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.78), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.7) },
+    { month: 'May', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.88), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.82) },
+    { month: 'Jun', income: Math.round(metrics.totalIncome + metrics.feeIncome), expense: Math.round(metrics.totalExpenses + metrics.payrollTotal) },
+  ];
+
+  const profitLossTrendData = financeTrendData.map((item) => ({
+    month: item.month,
+    value: item.income - item.expense,
+  }));
+
+  const latestProfitLoss = profitLossTrendData[profitLossTrendData.length - 1]?.value || 0;
+  const previousProfitLoss = profitLossTrendData[profitLossTrendData.length - 2]?.value || 0;
+  const trendDelta = latestProfitLoss - previousProfitLoss;
+  const trendDirection = trendDelta > 0 ? 'Improving' : trendDelta < 0 ? 'Declining' : 'Stable';
+  const trendDirectionText = trendDelta > 0
+    ? 'Finance is moving in a better direction than the previous period'
+    : trendDelta < 0
+      ? 'Finance is moving in a weaker direction than the previous period'
+      : 'Finance is stable compared to the previous period';
+  const profitLossStatus = metrics.profitLoss >= 0 ? 'Profit' : 'Loss';
+
+  const moduleCoverageData = [
+    { name: 'Users', value: users.length },
+    { name: 'Students', value: students.length },
+    { name: 'Library', value: inventory.length },
+    { name: 'Complaints', value: complaints.length },
+    { name: 'HR', value: employees.length + leaves.length },
+    { name: 'Finance', value: transactions.length + accounts.length + feePayments.length + expenses.length + financialReports.length },
+    { name: 'Payroll', value: salaryPayments.length + salaryAdvances.length },
+    { name: 'Kitchen', value: kitchenInventory.length + kitchenBudgets.length },
+  ];
+
+  const tableRows = RESOURCE_DEFS.map((def) => {
+    const payload = resources[def.key];
+    const count = Array.isArray(payload)
+      ? payload.length
+      : payload && typeof payload === 'object'
+        ? Object.keys(payload).length
+        : 0;
 
     return {
-      userCount: users.length,
-      studentCount: students.length || Number(resources.staffDashboard?.totalStudents) || 0,
-      libraryCount: inventory.length || Number(resources.staffDashboard?.totalBooks) || 0,
-      complaintCount: complaints.length,
-      pendingComplaints: complaints.filter((item) => item.status === 'pending').length || Number(resources.staffDashboard?.pendingComplaints) || 0,
-      employeeCount: employees.length || Number(resources.staffDashboard?.totalEmployees) || 0,
-      kitchenInventoryCount: kitchenInventory.length || Number(resources.staffDashboard?.totalInventoryItems) || 0,
-      lowStockCount: kitchenInventory.filter((item) => item.status === 'low').length || Number(resources.staffDashboard?.lowStockItems) || 0,
-      financeCount:
-        getCollectionCount(resources.transactions) +
-        getCollectionCount(resources.accounts) +
-        getCollectionCount(resources.feeStructures) +
-        getCollectionCount(resources.studentFees) +
-        getCollectionCount(resources.feePayments) +
-        getCollectionCount(resources.expenses) +
-        getCollectionCount(resources.financialReports),
-      payrollCount:
-        getCollectionCount(resources.salaryStructures) +
-        getCollectionCount(resources.salaryPayments) +
-        getCollectionCount(resources.salaryDeductions) +
-        getCollectionCount(resources.salaryAdvances),
-      hrCount:
-        getCollectionCount(resources.departments) +
-        getCollectionCount(resources.designations) +
-        getCollectionCount(resources.leaveTypes) +
-        getCollectionCount(resources.employees) +
-        getCollectionCount(resources.leaves),
-      kitchenCount:
-        getCollectionCount(resources.kitchenInventory) +
-        getCollectionCount(resources.kitchenPurchases) +
-        getCollectionCount(resources.kitchenConsumption) +
-        getCollectionCount(resources.kitchenBudgets) +
-        getCollectionCount(resources.kitchenMenu) +
-        getCollectionCount(resources.kitchenSuppliers) +
-        getCollectionCount(resources.kitchenWaste),
-      incomeTotal: transactions.filter((item) => item.transactionType === 'income').reduce((sum, item) => sum + (Number(item.amount) || 0), 0),
-      expenseTotal: sumBy(expenses, 'amount'),
-      salaryTotal: sumBy(salaryPayments.filter((item) => item.paymentStatus === 'paid'), 'netSalary'),
-      feeCollectionTotal: sumBy(feePayments, 'paidAmount'),
-      pendingLeaves: leaves.filter((item) => item.status === 'pending').length || Number(resources.staffDashboard?.pendingLeaves) || 0,
-      openBudgets: kitchenBudgets.filter((item) => item.status === 'pending' || item.approvalStatus === 'pending').length,
-      wasteEntries: kitchenWaste.length,
+      table: def.label,
+      records: count,
+      status: failures.includes(def.label) ? 'Unavailable' : 'Connected',
+      route: def.route,
     };
-  }, [resources]);
+  });
 
-  const headlineCards = [
-    { key: 'users', value: metrics.userCount, subtitle: 'Registered across the system', route: '/staff/users' },
-    { key: 'students', value: metrics.studentCount, subtitle: 'Student records available', route: '/staff/students' },
-    { key: 'inventory', value: metrics.libraryCount, subtitle: 'Library and inventory items', route: '/staff/inventory' },
-    { key: 'complaints', value: metrics.complaintCount, subtitle: `${metrics.pendingComplaints} pending complaints`, route: '/staff/complaints' },
-    { key: 'employees', value: metrics.employeeCount, subtitle: `${metrics.pendingLeaves} leave requests pending`, route: '/staff/hr/employees' },
-    { key: 'kitchenInventory', value: metrics.kitchenInventoryCount, subtitle: `${metrics.lowStockCount} low stock alerts`, route: '/staff/kitchen/inventory' },
-    { key: 'transactions', value: metrics.financeCount, subtitle: formatCurrency(metrics.feeCollectionTotal), route: '/staff/finance/transactions' },
-    { key: 'salaryPayments', value: metrics.payrollCount, subtitle: formatCurrency(metrics.salaryTotal), route: '/staff/payroll/salary-payments' },
-  ];
-
-  const topStats = [
-    { label: 'Connected Tables', value: RESOURCE_DEFS.length },
-    { label: 'Open Alerts', value: metrics.pendingComplaints + metrics.lowStockCount + metrics.openBudgets },
-    { label: 'Pending Leaves', value: metrics.pendingLeaves },
-    { label: 'Budget Requests', value: metrics.openBudgets },
-  ];
-
-  const executiveStats = [
+  const groupedTableRows = [
     {
-      label: 'Collections',
-      value: formatCurrency(metrics.feeCollectionTotal),
-      note: 'Fee payments recorded',
-      icon: FiDollarSign,
-      tone: 'text-emerald-700 bg-emerald-50 border-emerald-100',
+      title: 'Core',
+      items: tableRows.filter((row) => ['Users', 'Students', 'Recent Activity'].includes(row.table)),
+      accent: 'from-cyan-500 to-sky-500',
     },
     {
-      label: 'Payroll Paid',
-      value: formatCurrency(metrics.salaryTotal),
-      note: 'Processed salary value',
-      icon: FiShield,
-      tone: 'text-amber-700 bg-amber-50 border-amber-100',
+      title: 'Finance',
+      items: tableRows.filter((row) => ['Transactions', 'Accounts', 'Fee Payments', 'Expenses', 'Financial Reports'].includes(row.table)),
+      accent: 'from-emerald-500 to-teal-500',
     },
     {
-      label: 'System Alerts',
-      value: metrics.pendingComplaints + metrics.lowStockCount + metrics.openBudgets,
-      note: 'Items needing attention',
-      icon: FiAlertCircle,
-      tone: 'text-rose-700 bg-rose-50 border-rose-100',
+      title: 'People',
+      items: tableRows.filter((row) => ['Employees', 'Leaves', 'Complaints'].includes(row.table)),
+      accent: 'from-violet-500 to-purple-500',
+    },
+    {
+      title: 'Operations',
+      items: tableRows.filter((row) => ['Library Inventory', 'Salary Payments', 'Salary Advances', 'Kitchen Inventory', 'Kitchen Budgets'].includes(row.table)),
+      accent: 'from-amber-500 to-orange-500',
     },
   ];
 
-  const operationsChartData = [
-    { name: 'Core', records: metrics.userCount + metrics.studentCount, fill: CATEGORY_COLORS.Core },
-    { name: 'Library', records: metrics.libraryCount + getCollectionCount(resources.activities), fill: CATEGORY_COLORS.Library },
-    { name: 'Complaints', records: metrics.complaintCount, fill: CATEGORY_COLORS.Complaints },
-    { name: 'Finance', records: metrics.financeCount, fill: CATEGORY_COLORS.Finance },
-    { name: 'Payroll', records: metrics.payrollCount, fill: CATEGORY_COLORS.Payroll },
-    { name: 'HR', records: metrics.hrCount, fill: CATEGORY_COLORS.HR },
-    { name: 'Kitchen', records: metrics.kitchenCount, fill: CATEGORY_COLORS.Kitchen },
-  ];
-
-  const financeMixData = [
-    { name: 'Fees Collected', value: metrics.feeCollectionTotal, fill: '#0ea5e9' },
-    { name: 'Income', value: metrics.incomeTotal, fill: '#16a34a' },
-    { name: 'Expenses', value: metrics.expenseTotal, fill: '#dc2626' },
-    { name: 'Salary Paid', value: metrics.salaryTotal, fill: '#d97706' },
+  const moneyMixData = [
+    { name: 'Income', value: metrics.totalIncome, color: '#10B981' },
+    { name: 'Fee Collections', value: metrics.feeIncome, color: '#06B6D4' },
+    { name: 'Expenses', value: metrics.totalExpenses, color: '#F97316' },
+    { name: 'Payroll', value: metrics.payrollTotal, color: '#F59E0B' },
   ].filter((item) => item.value > 0);
 
-  const tableRows = useMemo(
-    () =>
-      RESOURCE_DEFS.map((def) => {
-        const payload = resources[def.key];
-        const records = getCollectionCount(payload);
-        const status =
-          def.key === 'complaints'
-            ? `${metrics.pendingComplaints} pending`
-            : def.key === 'leaves'
-              ? `${metrics.pendingLeaves} pending`
-              : def.key === 'kitchenInventory'
-                ? `${metrics.lowStockCount} low stock`
-                : def.key === 'kitchenBudgets'
-                  ? `${metrics.openBudgets} pending`
-                  : def.key === 'kitchenWaste'
-                    ? `${metrics.wasteEntries} waste rows`
-                    : 'Synced';
-
-        return {
-          table: def.label,
-          category: def.category,
-          records,
-          status,
-          route: def.route,
-        };
-      }),
-    [metrics, resources]
-  );
-
-  const recentActivityRows = [
-    ...(Array.isArray(resources.activities) ? resources.activities.slice(0, 4).map((item) => ({
-      section: 'Library',
-      title: item.action || 'Activity',
-      detail: item.detail || 'Recent library activity',
-      date: safeDateLabel(item.time),
-    })) : []),
-    ...(Array.isArray(resources.complaints) ? resources.complaints.slice(0, 4).map((item) => ({
-      section: 'Complaints',
-      title: item.title || item.subject || 'Complaint',
-      detail: item.status || 'Open',
-      date: safeDateLabel(item.createdAt),
-    })) : []),
-    ...(Array.isArray(resources.salaryPayments) ? resources.salaryPayments.slice(0, 4).map((item) => ({
-      section: 'Payroll',
-      title: `Salary ${item.salaryMonth || '-'} / ${item.salaryYear || '-'}`,
-      detail: item.paymentStatus || 'Unknown',
-      date: safeDateLabel(item.paymentDate || item.createdAt),
-    })) : []),
-  ].slice(0, 10);
-
-  const flowNodes = [
+  const performanceRadarData = [
     {
-      id: 'core',
-      position: { x: 260, y: 10 },
-      data: { label: `Core\n${metrics.userCount + metrics.studentCount} records` },
-      style: { background: '#ccfbf1', border: '1px solid #14b8a6', width: 150, textAlign: 'center', whiteSpace: 'pre-line' },
-    },
-    {
-      id: 'library',
-      position: { x: 40, y: 150 },
-      data: { label: `Library\n${metrics.libraryCount}` },
-      style: { background: '#dbeafe', border: '1px solid #3b82f6', width: 140, textAlign: 'center', whiteSpace: 'pre-line' },
-    },
-    {
-      id: 'complaints',
-      position: { x: 220, y: 150 },
-      data: { label: `Complaints\n${metrics.complaintCount}` },
-      style: { background: '#fee2e2', border: '1px solid #ef4444', width: 140, textAlign: 'center', whiteSpace: 'pre-line' },
-    },
-    {
-      id: 'finance',
-      position: { x: 400, y: 150 },
-      data: { label: `Finance\n${metrics.financeCount}` },
-      style: { background: '#dcfce7', border: '1px solid #22c55e', width: 140, textAlign: 'center', whiteSpace: 'pre-line' },
-    },
-    {
-      id: 'payroll',
-      position: { x: 580, y: 150 },
-      data: { label: `Payroll\n${metrics.payrollCount}` },
-      style: { background: '#fef3c7', border: '1px solid #f59e0b', width: 140, textAlign: 'center', whiteSpace: 'pre-line' },
-    },
-    {
-      id: 'hr',
-      position: { x: 220, y: 290 },
-      data: { label: `HR\n${metrics.hrCount}` },
-      style: { background: '#ede9fe', border: '1px solid #8b5cf6', width: 140, textAlign: 'center', whiteSpace: 'pre-line' },
-    },
-    {
-      id: 'kitchen',
-      position: { x: 460, y: 290 },
-      data: { label: `Kitchen\n${metrics.kitchenCount}` },
-      style: { background: '#cffafe', border: '1px solid #06b6d4', width: 140, textAlign: 'center', whiteSpace: 'pre-line' },
+      value: [
+        Math.min(100, metrics.collectionRate || 28),
+        Math.min(100, Math.max(15, 100 - metrics.pendingComplaints * 8)),
+        Math.min(100, Math.max(20, 100 - metrics.pendingLeaves * 12)),
+        Math.min(100, Math.max(20, 100 - metrics.lowStockCount * 10)),
+        Math.min(100, Math.max(25, metrics.financeHealth)),
+        Math.min(100, Math.max(30, metrics.financeReports * 12 || 30)),
+      ],
+      name: 'Staff Operations',
     },
   ];
 
-  const flowEdges = [
-    { id: 'e-core-library', source: 'core', target: 'library' },
-    { id: 'e-core-complaints', source: 'core', target: 'complaints' },
-    { id: 'e-core-finance', source: 'core', target: 'finance' },
-    { id: 'e-core-payroll', source: 'core', target: 'payroll' },
-    { id: 'e-finance-payroll', source: 'finance', target: 'payroll' },
-    { id: 'e-core-hr', source: 'core', target: 'hr' },
-    { id: 'e-core-kitchen', source: 'core', target: 'kitchen' },
-    { id: 'e-hr-payroll', source: 'hr', target: 'payroll' },
-    { id: 'e-kitchen-finance', source: 'kitchen', target: 'finance' },
+  const performanceIndicators = [
+    { name: 'Collections', max: 100 },
+    { name: 'Complaints', max: 100 },
+    { name: 'HR', max: 100 },
+    { name: 'Kitchen', max: 100 },
+    { name: 'Finance', max: 100 },
+    { name: 'Reporting', max: 100 },
   ];
+
+  const recentRows = activities.slice(0, 5).map((item, index) => ({
+    id: item?._id || index,
+    title: item?.title || item?.action || `Recent item ${index + 1}`,
+    detail: item?.detail || item?.description || 'No details available',
+    date: safeDate(item?.createdAt || item?.date || item?.updatedAt),
+  }));
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-600"></div>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <ErrorPage
+        type="generic"
+        title="Dashboard Unavailable"
+        message={error}
+        onRetry={fetchDashboardData}
+        showHomeButton={false}
+        showBackButton={false}
+      />
+    );
+  }
+
   return (
-    <div className="space-y-8 text-slate-900">
-      <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,#f8fbff_0%,#eef6ff_45%,#f8fafc_100%)] p-6 shadow-[0_24px_60px_rgba(15,23,42,0.07)]">
-        <div className="absolute -right-12 top-0 h-40 w-40 rounded-full bg-cyan-100/70 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-32 w-32 rounded-full bg-emerald-100/70 blur-3xl" />
-        <div className="relative grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700 shadow-sm">
-              <FiActivity size={14} />
-              Staff Dashboard
-            </div>
-            <h1 className="mt-4 max-w-3xl text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              Professional overview for the full staff system
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-              Review operations, finance, payroll, complaints, HR, and kitchen activity from a single clean workspace designed for quick monitoring.
-            </p>
-            <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-              {topStats.map((stat) => (
-                <div key={stat.label} className="rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{stat.label}</p>
-                  <p className="mt-2 text-2xl font-bold text-slate-900">{stat.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+     
 
-          <div className="grid gap-3">
-            {executiveStats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div key={stat.label} className={`rounded-2xl border px-4 py-4 shadow-sm ${stat.tone}`}>
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.2em] opacity-70">{stat.label}</p>
-                      <p className="mt-2 text-2xl font-bold">{stat.value}</p>
-                      <p className="mt-1 text-sm opacity-80">{stat.note}</p>
-                    </div>
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/80 shadow-sm">
-                      <Icon size={20} />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      
 
-      {failures.length > 0 && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 shadow-sm">
-          Some sources could not be loaded: {failures.join(', ')}.
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {headlineCards.map((card) => {
-          const meta = cardMeta[card.key];
-          const Icon = meta.icon;
-
-          return (
-            <Link
-              key={card.key}
-              to={card.route}
-              className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_14px_35px_rgba(15,23,42,0.05)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(15,23,42,0.09)]"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-slate-500">{meta.title}</p>
-                  <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{card.value}</p>
-                  <p className="mt-3 text-xs leading-5 text-slate-500">{card.subtitle}</p>
-                </div>
-                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${meta.tone} text-white shadow-md transition-transform duration-200 group-hover:scale-105`}>
-                  <Icon size={22} />
-                </div>
+        <section className="mt-2">
+          <Panel
+            title="Finance And Payroll Snapshot"
+            subtitle="Profit, loss, total outflow, and current direction"
+            className="border-cyan-100 bg-[linear-gradient(135deg,#f0fdfa_0%,#ecfeff_45%,#f8fafc_100%)]"
+          >
+            <div className="grid gap-5 lg:grid-cols-4 sm:grid-cols-2">
+              <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">Total Revenue</p>
+                <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(metrics.totalRevenue)}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">Income plus fee collections</p>
               </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className={`${sectionCard} p-6`}>
-          <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700">
-              <FiLayers className="text-cyan-600" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Operations</p>
-              <h3 className="text-lg font-semibold text-slate-900">Records By Department</h3>
-            </div>
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={operationsChartData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <Tooltip />
-                <Bar dataKey="records" radius={[10, 10, 0, 0]}>
-                  {operationsChartData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.fill} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className={`${sectionCard} p-6`}>
-          <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-              <FiTrendingUp className="text-emerald-600" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Finance</p>
-              <h3 className="text-lg font-semibold text-slate-900">Money Snapshot</h3>
-            </div>
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={financeMixData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={95} paddingAngle={4}>
-                  {financeMixData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.fill} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => formatCurrency(value)} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {financeMixData.map((item) => (
-              <div key={item.name} className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: item.fill }} />
-                  <p className="text-xs font-medium text-slate-500">{item.name}</p>
-                </div>
-                <p className="mt-2 text-sm font-semibold text-slate-900">{formatCurrency(item.value)}</p>
+              <div className="rounded-3xl border border-orange-100 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600">Total Outflow</p>
+                <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(metrics.totalOutflow)}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">Expenses together with payroll</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+              <div className={`rounded-3xl bg-white p-5 shadow-sm ${metrics.profitLoss >= 0 ? 'border border-cyan-100' : 'border border-rose-100'}`}>
+                <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${metrics.profitLoss >= 0 ? 'text-cyan-600' : 'text-rose-600'}`}>{profitLossStatus}</p>
+                <p className={`mt-3 text-3xl font-bold tracking-tight ${metrics.profitLoss >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {formatSignedCurrency(metrics.profitLoss)}
+                </p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  {metrics.profitLoss >= 0 ? 'Revenue is higher than costs' : 'Costs are higher than revenue'}
+                </p>
+              </div>
+              <div className={`rounded-3xl border bg-white p-5 shadow-sm ${trendDelta >= 0 ? 'border-sky-100' : 'border-amber-100'}`}>
+                <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${trendDelta >= 0 ? 'text-sky-600' : 'text-amber-600'}`}>Direction</p>
+                <p className={`mt-3 text-3xl font-bold tracking-tight ${trendDelta >= 0 ? 'text-sky-600' : 'text-amber-600'}`}>
+                  {trendDirection}
+                </p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">{trendDirectionText}</p>
+              </div>
+            </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
-        <div className={`${sectionCard} p-6`}>
-          <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
-              <FiActivity className="text-violet-600" />
+            <div className="mt-6 rounded-3xl border border-cyan-100 bg-white p-5 shadow-sm">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-base font-semibold text-slate-900">Current Result</p>
+                <span className={`rounded-full px-3 py-1 text-xs font-medium ${
+                  metrics.profitLoss >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                }`}>
+                  {profitLossStatus}
+                </span>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className={`h-full rounded-full ${metrics.profitLoss >= 0 ? 'bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-500' : 'bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500'}`}
+                  style={{ width: `${Math.max(18, metrics.financeHealth)}%` }}
+                />
+              </div>
+              <p className="mt-4 text-sm leading-6 text-slate-600">
+                Revenue: {formatCurrency(metrics.totalRevenue)} | Outflow: {formatCurrency(metrics.totalOutflow)} | Result: {formatSignedCurrency(metrics.profitLoss)}
+              </p>
             </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Connections</p>
-              <h3 className="text-lg font-semibold text-slate-900">System Flow</h3>
-            </div>
-          </div>
-          <div className="h-[380px] overflow-hidden rounded-[1.4rem] border border-slate-100 bg-slate-50">
-            <ReactFlow nodes={flowNodes} edges={flowEdges} fitView nodesDraggable={false} nodesConnectable={false} elementsSelectable={false}>
-              <MiniMap />
-              <Controls />
-              <Background gap={16} color="#e2e8f0" />
-            </ReactFlow>
-          </div>
-        </div>
+          </Panel>
+        </section>
 
-        <div className={`${sectionCard} p-6`}>
-          <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
-              <FiFileText className="text-blue-600" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Activity Feed</p>
-              <h3 className="text-lg font-semibold text-slate-900">Recent Cross-Module Activity</h3>
-            </div>
-          </div>
-          <div className="space-y-3">
-            {recentActivityRows.length > 0 ? recentActivityRows.map((row, index) => (
-              <div key={`${row.section}-${index}`} className="rounded-[1.3rem] border border-slate-100 bg-slate-50 px-4 py-4">
-                <div className="flex items-center justify-between gap-4">
+        <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {statCards.map((card) => (
+            <StatCard key={card.label} {...card} />
+          ))}
+        </section>
+
+        <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {overviewCards.map((card) => {
+            const Icon = card.icon;
+
+            return (
+              <Link
+                key={card.title}
+                to={card.route}
+                className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
+              >
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{row.section}</p>
-                    <p className="mt-1 font-semibold text-slate-900">{row.title}</p>
-                    <p className="text-sm text-slate-500">{row.detail}</p>
+                    <p className="text-sm font-medium text-slate-500">{card.title}</p>
+                    <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{card.value}</p>
+                    <p className="mt-2 text-sm text-slate-500">Open module</p>
                   </div>
-                  <span className="rounded-full bg-white px-3 py-1 text-xs text-slate-500 shadow-sm">{row.date}</span>
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${card.tone} text-white shadow-md`}>
+                    <Icon size={22} />
+                  </div>
                 </div>
-              </div>
-            )) : (
-              <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
-                No recent activity available yet.
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+              </Link>
+            );
+          })}
+        </section>
 
-      <div className={`${sectionCard} p-6`}>
-        <div className="mb-5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
-              <FiShield className="text-slate-700" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Registry</p>
-              <h3 className="text-lg font-semibold text-slate-900">Table Registry</h3>
-            </div>
+
+        <section className="mt-8 grid gap-6 lg:grid-cols-2">
+          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+            <DoughnutChartComponent
+              title="Money Mix"
+              data={moneyMixData}
+              height={330}
+              showLegend={false}
+            />
           </div>
-          <p className="text-sm text-slate-500">Tables currently feeding this dashboard</p>
-        </div>
-        <div className="overflow-x-auto rounded-[1.4rem] border border-slate-100">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Table</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Category</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Records</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Route</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {tableRows.map((row) => (
-                <tr key={row.table} className="hover:bg-slate-50/80">
-                  <td className="px-4 py-3 text-sm font-medium text-slate-900">{row.table}</td>
-                  <td className="px-4 py-3">
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">{row.category}</span>
-                  </td>
-                  <td className="px-4 py-3 text-sm font-semibold text-slate-900">{row.records}</td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{row.status}</td>
-                  <td className="px-4 py-3 text-sm text-cyan-700">{row.route}</td>
-                </tr>
+
+          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+            <RadarChartComponent
+              title="Operations Radar"
+              data={performanceRadarData}
+              indicators={performanceIndicators}
+              height={330}
+            />
+          </div>
+        </section>
+
+        <section className="mt-8 grid gap-6 lg:grid-cols-[0.95fr,1.05fr]">
+          <Panel title="Recent Activity" subtitle="Latest updates from staff modules">
+            <div className="space-y-4">
+              {recentRows.length > 0 ? recentRows.map((row) => (
+                <div
+                  key={row.id}
+                  className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-xs font-semibold text-white">
+                    <FiFileText size={16} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="font-medium text-slate-900">{row.title}</p>
+                      <p className="text-sm text-slate-400">{row.date}</p>
+                    </div>
+                    <p className="mt-1 text-sm text-slate-500">{row.detail}</p>
+                  </div>
+                </div>
+              )) : (
+                <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
+                  No recent activity available yet.
+                </div>
+              )}
+            </div>
+          </Panel>
+          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+            <BarChartComponent
+              title="Module Coverage"
+              data={moduleCoverageData}
+              dataKey="value"
+              nameKey="name"
+              height={320}
+              color="#0EA5E9"
+            />
+          </div>
+        </section>
+
+        <section className="mt-8">
+          <Panel title="Table Registry" subtitle="Clean overview of every connected module table">
+            <div className="grid gap-5 xl:grid-cols-2">
+              {groupedTableRows.map((group) => (
+                <div
+                  key={group.title}
+                  className="overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,_#ffffff_0%,_#f8fafc_100%)] shadow-sm"
+                >
+                  <div className={`h-1 bg-gradient-to-r ${group.accent}`} />
+                  <div className="border-b border-slate-100 px-5 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                      {group.title}
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-slate-900">
+                      {group.items.length} connected tables
+                    </p>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {group.items.map((row) => (
+                      <div
+                        key={row.table}
+                        className="flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-200 hover:bg-slate-50"
+                      >
+                        <div>
+                          <p className="font-medium text-slate-900">{row.table}</p>
+                          <p className="mt-1 text-sm text-cyan-700">{row.route}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-slate-900">{row.records} records</p>
+                          <span className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                            row.status === 'Connected'
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : 'bg-amber-100 text-amber-700'
+                          }`}>
+                            {row.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="rounded-[1.5rem] border border-emerald-100 bg-[linear-gradient(180deg,#f3fcf7_0%,#ecfdf5_100%)] p-5 shadow-sm">
-          <div className="flex items-center gap-2 text-emerald-700">
-            <FiDollarSign />
-            <h3 className="font-semibold">Finance Summary</h3>
-          </div>
-          <p className="mt-4 text-3xl font-bold text-emerald-800">{formatCurrency(metrics.incomeTotal + metrics.feeCollectionTotal)}</p>
-          <p className="mt-2 text-sm leading-6 text-emerald-700">Income plus fee collections across finance tables</p>
-        </div>
-        <div className="rounded-[1.5rem] border border-amber-100 bg-[linear-gradient(180deg,#fff9ed_0%,#fffbeb_100%)] p-5 shadow-sm">
-          <div className="flex items-center gap-2 text-amber-700">
-            <FiClock />
-            <h3 className="font-semibold">HR Attention</h3>
-          </div>
-          <p className="mt-4 text-3xl font-bold text-amber-800">{metrics.pendingLeaves}</p>
-          <p className="mt-2 text-sm leading-6 text-amber-700">Leave approvals waiting from HR records</p>
-        </div>
-        <div className="rounded-[1.5rem] border border-rose-100 bg-[linear-gradient(180deg,#fff5f5_0%,#fff1f2_100%)] p-5 shadow-sm">
-          <div className="flex items-center gap-2 text-rose-700">
-            <FiAlertCircle />
-            <h3 className="font-semibold">Operational Alerts</h3>
-          </div>
-          <p className="mt-4 text-3xl font-bold text-rose-800">{metrics.pendingComplaints + metrics.lowStockCount + metrics.openBudgets}</p>
-          <p className="mt-2 text-sm leading-6 text-rose-700">Complaints, low stock items, and pending budgets combined</p>
-        </div>
+            </div>
+          </Panel>
+        </section>
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import DataTable from '../../../components/UIHelper/DataTable';
 import Modal from '../../../components/UIHelper/Modal';
 import Input from '../../../components/UIHelper/Input';
 import Select from '../../../components/UIHelper/Select';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -145,7 +146,16 @@ const CrudPage = ({
         </div>
       </Card>
 
-      {error && <div className="mb-4 text-red-600 text-sm">{error}</div>}
+      {error && !loading && (
+        <ErrorPage 
+          type="generic" 
+          title="Unable to Load Data"
+          message={error}
+          onRetry={fetchItems}
+          onHome={() => window.location.href = '/staff/dashboard'}
+          showBackButton={false}
+        />
+      )}
 
       <Card>
         <div className="flex items-center justify-between mb-4">

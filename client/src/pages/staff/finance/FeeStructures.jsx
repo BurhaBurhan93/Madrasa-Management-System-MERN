@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ListPage from '../shared/ListPage';
 
 export const feeStructuresConfig = {
@@ -67,8 +67,10 @@ const FeeStructures = () => (
     columns={feeStructuresConfig.columns}
     createPath="/staff/finance/fee-structures/create"
     editPathForRow={(row) => `/staff/finance/fee-structures/edit/${row._id}`}
+    viewPathForRow={(row) => '/staff/finance/fee-structures/view/' + row._id}
     searchPlaceholder="Search fee structures..."
   />
 );
 
 export default FeeStructures;
+

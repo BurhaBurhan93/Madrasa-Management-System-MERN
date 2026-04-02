@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ListPage from '../shared/ListPage';
 
 export const salaryStructuresConfig = {
@@ -67,8 +67,10 @@ const SalaryStructures = () => (
     columns={salaryStructuresConfig.columns}
     createPath="/staff/payroll/salary-structures/create"
     editPathForRow={(row) => `/staff/payroll/salary-structures/edit/${row._id}`}
+    viewPathForRow={(row) => '/staff/payroll/salary-structures/view/' + row._id}
     searchPlaceholder="Search salary structures..."
   />
 );
 
 export default SalaryStructures;
+

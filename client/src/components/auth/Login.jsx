@@ -82,6 +82,57 @@ const Login = ({ setIsAuthenticated }) => {
 
     setIsLoading(true);
 
+    // Check if using demo credentials - bypass backend
+    const demoCreds = demoCredentials[selectedRole];
+    const isDemoMode = formData.username === demoCreds.username && 
+                       formData.password === demoCreds.password;
+
+    if (isDemoMode) {
+      console.log('Demo mode: Bypassing database connection');
+      
+      // Create mock user data
+      const mockUser = {
+        _id: `demo-${selectedRole}-001`,
+        name: `Demo ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`,
+        email: demoCreds.username,
+        role: selectedRole
+      };
+      
+      // Store auth data
+      localStorage.setItem('token', 'demo-token-' + selectedRole);
+      localStorage.setItem('userId', mockUser._id);
+      localStorage.setItem('userRole', selectedRole);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('isDemoMode', 'true');
+      
+      if (setIsAuthenticated) {
+        setIsAuthenticated(true);
+      }
+
+      // Navigate based on role
+      switch (selectedRole) {
+        case 'admin':
+          navigate('/admin/dashboard');
+          break;
+        case 'student':
+          navigate('/student/dashboard');
+          break;
+        case 'teacher':
+          navigate('/teacher');
+          break;
+        case 'staff':
+          navigate('/staff');
+          break;
+        default:
+          navigate('/');
+      }
+      
+      setIsLoading(false);
+      return;
+    }
+
+    // Normal login flow with backend
     try {
       // Call backend API for login
       const response = await axios.post('http://localhost:5000/api/auth/login', {
@@ -98,6 +149,7 @@ const Login = ({ setIsAuthenticated }) => {
       localStorage.setItem('userRole', selectedRole);
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('isAuthenticated', 'true');
+      localStorage.removeItem('isDemoMode');
       
       // Set axios default header for future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;

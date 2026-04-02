@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ListPage from '../shared/ListPage';
 
 export const studentFeesConfig = {
@@ -57,8 +57,10 @@ const StudentFees = () => (
     columns={studentFeesConfig.columns}
     createPath="/staff/finance/student-fees/create"
     editPathForRow={(row) => `/staff/finance/student-fees/edit/${row._id}`}
+    viewPathForRow={(row) => '/staff/finance/student-fees/view/' + row._id}
     searchPlaceholder="Search student fees..."
   />
 );
 
 export default StudentFees;
+

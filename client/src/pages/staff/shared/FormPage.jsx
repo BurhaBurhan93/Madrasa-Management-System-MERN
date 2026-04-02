@@ -3,6 +3,8 @@ import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
 import Select from '../../../components/UIHelper/Select';
+import ErrorPage from '../../../components/UIHelper/ErrorPage';
+import StaffPageLayout from './StaffPageLayout';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -19,22 +21,13 @@ const parseJsonSafe = async (res) => {
 const formatFieldLabel = (label = '') => label.toLowerCase().replace(/\s+/g, ' ');
 
 const getDefaultHelperText = (field, endpoint) => {
-  const context = endpoint.includes('/payroll')
-    ? 'payroll'
-    : endpoint.includes('/finance')
-      ? 'finance'
-      : '';
-
-  if (!context) return '';
-
+  const context = endpoint.includes('/payroll') ? 'payroll' : endpoint.includes('/finance') ? 'finance' : endpoint.includes('/hr') ? 'HR' : endpoint.includes('/kitchen') ? 'kitchen' : 'record';
   const label = formatFieldLabel(field.label);
-
-  if (field.type === 'relation') return `Choose the related ${label} record for this ${context} entry.`;
-  if (field.type === 'date') return `Select the ${label} for this ${context} record.`;
+  if (field.type === 'relation') return `Choose the related ${label} for this ${context} item.`;
+  if (field.type === 'date') return `Select the ${label} for this ${context} item.`;
   if (field.type === 'number') return `Enter the ${label} as a numeric value.`;
-  if (field.type === 'select') return `Select the correct ${label} option before saving.`;
-
-  return `Provide the ${label} for this ${context} record.`;
+  if (field.type === 'select') return `Select the correct ${label} option.`;
+  return `Provide the ${label} for this ${context} item.`;
 };
 
 const RelationSelect = ({ field, value, onChange }) => {
@@ -47,7 +40,7 @@ const RelationSelect = ({ field, value, onChange }) => {
         const res = await fetch(`${API_BASE}${field.relationEndpoint}`);
         const data = await parseJsonSafe(res);
         const rows = data.data || data;
-        setOptions(rows.map((row) => ({ value: row._id, label: field.relationLabel(row) })));
+        setOptions(rows.map((row) => ({ value: field.relationValue ? field.relationValue(row) : (row._id || row.id), label: field.relationLabel(row) })));
       } catch (err) {
         console.error('RelationSelect fetch error:', err);
       } finally {
@@ -55,39 +48,39 @@ const RelationSelect = ({ field, value, onChange }) => {
       }
     };
     fetchOptions();
-  }, [field.relationEndpoint]);
+  }, [field.relationEndpoint, field.relationLabel]);
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>
-      <select
-        value={value ?? ''}
-        onChange={onChange}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-        disabled={loading}
-      >
-        <option value="">{loading ? 'Loading...' : `-- Select ${field.label} --`}</option>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-slate-700">{field.label}</label>
+      <select value={value ?? ''} onChange={onChange} disabled={loading} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition-all focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100">
+        <option value="">{loading ? 'Loading...' : `Select ${field.label}`}</option>
+        {options.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
       </select>
-      {field.helperText && <p className="mt-1 text-xs text-gray-500">{field.helperText}</p>}
+      {field.helperText && <p className="text-xs text-slate-500">{field.helperText}</p>}
     </div>
   );
 };
 
-const FormPage = ({
-  titleCreate,
-  titleEdit,
-  endpoint,
-  formFields,
-  initialForm,
-  mapRowToForm,
-  mapFormToPayload,
-  mode,
-  id,
-  onSavedPath
-}) => {
+const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
+  const targetEndpoint = readEndpoint || endpoint;
+  if (readMode === 'collection') {
+    const res = await fetch(`${API_BASE}${targetEndpoint}`);
+    const data = await parseJsonSafe(res);
+    if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load');
+    const rows = data.data || [];
+    const match = rows.find((row) => String(row._id) === String(id));
+    if (!match) throw new Error('Record not found');
+    return match;
+  }
+
+  const res = await fetch(`${API_BASE}${targetEndpoint}/${id}`);
+  const data = await parseJsonSafe(res);
+  if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load');
+  return data.data;
+};
+
+const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, mapRowToForm, mapFormToPayload, mode, id, onSavedPath, readMode = 'single', readEndpoint }) => {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -100,10 +93,8 @@ const FormPage = ({
       setLoading(true);
       setError('');
       try {
-        const res = await fetch(`${API_BASE}${endpoint}/${id}`);
-        const data = await parseJsonSafe(res);
-        if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load');
-        setForm(mapRowToForm ? mapRowToForm(data.data) : data.data);
+        const record = await loadRecordByMode({ endpoint, id, readMode, readEndpoint });
+        setForm(mapRowToForm ? mapRowToForm(record) : record);
       } catch (err) {
         setError(err.message || 'Load error');
       } finally {
@@ -111,7 +102,7 @@ const FormPage = ({
       }
     };
     load();
-  }, [mode, id]);
+  }, [mode, id, endpoint, mapRowToForm, readMode, readEndpoint]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -121,9 +112,7 @@ const FormPage = ({
       const newFieldErrors = {};
       formFields.filter((f) => f.type === 'number').forEach(({ name }) => {
         const val = form[name];
-        if (val !== '' && val !== null && val !== undefined && Number.isNaN(Number(val))) {
-          newFieldErrors[name] = 'Only numbers are allowed';
-        }
+        if (val !== '' && val !== null && val !== undefined && Number.isNaN(Number(val))) newFieldErrors[name] = 'Only numbers are allowed';
       });
       if (Object.keys(newFieldErrors).length > 0) {
         setFieldErrors(newFieldErrors);
@@ -146,68 +135,43 @@ const FormPage = ({
   };
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">{mode === 'edit' ? titleEdit : titleCreate}</h1>
-        <p className="text-gray-600">Fill the form and save.</p>
-      </div>
-
-      <Card>
+    <StaffPageLayout eyebrow="Reusable Staff Form" title={mode === 'edit' ? titleEdit : titleCreate} subtitle="Consistent form design for create and update pages across staff modules." actions={<Button variant="outline" onClick={() => window.history.back()}>Back</Button>}>
+      <Card className="rounded-[28px] border border-slate-200 shadow-sm">
         {loading ? (
-          <div className="text-sm text-gray-500">Loading data...</div>
+          <div className="p-6 text-sm text-slate-500">Loading data...</div>
         ) : (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               {formFields.map((field) => {
                 const helperText = field.helperText || getDefaultHelperText(field, endpoint);
-
-                return (
-                  <div key={field.name} className="space-y-1">
-                    {field.type === 'relation' ? (
-                      <RelationSelect
-                        field={{ ...field, helperText }}
-                        value={form[field.name]}
-                        onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
-                      />
-                    ) : field.type === 'select' ? (
-                      <Select
-                        label={field.label}
-                        id={field.name}
-                        value={form[field.name] ?? ''}
-                        onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
-                        options={field.options}
-                        helperText={helperText}
-                        error={fieldErrors[field.name]}
-                      />
-                    ) : (
-                      <Input
-                        label={field.label}
-                        id={field.name}
-                        type={field.type || 'text'}
-                        value={form[field.name] ?? ''}
-                        onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
-                        helperText={helperText}
-                        error={fieldErrors[field.name]}
-                      />
-                    )}
-                  </div>
-                );
+                if (field.type === 'relation') return <RelationSelect key={field.name} field={{ ...field, helperText }} value={form[field.name]} onChange={(e) => setForm({ ...form, [field.name]: e.target.value })} />;
+                if (field.type === 'select') return <Select key={field.name} label={field.label} id={field.name} value={form[field.name] ?? ''} onChange={(e) => setForm({ ...form, [field.name]: e.target.value })} options={field.options} helperText={helperText} error={fieldErrors[field.name]} placeholder={`Select ${field.label}`} />;
+                if (field.type === 'textarea') {
+                  return (
+                    <div key={field.name} className={`space-y-2 ${field.fullWidth !== false ? 'md:col-span-2' : ''}`}>
+                      <label htmlFor={field.name} className="block text-sm font-medium text-slate-700">{field.label}</label>
+                      <textarea id={field.name} rows={field.rows || 4} value={form[field.name] ?? ''} onChange={(e) => setForm({ ...form, [field.name]: e.target.value })} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition-all focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100" />
+                      {!fieldErrors[field.name] && helperText && <p className="text-xs text-slate-500">{helperText}</p>}
+                      {fieldErrors[field.name] && <p className="text-sm text-red-600">{fieldErrors[field.name]}</p>}
+                    </div>
+                  );
+                }
+                return <Input key={field.name} label={field.label} id={field.name} type={field.type || 'text'} value={form[field.name] ?? ''} onChange={(e) => setForm({ ...form, [field.name]: e.target.value })} helperText={helperText} error={fieldErrors[field.name]} className="rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 focus:border-cyan-400 focus:bg-white focus:ring-cyan-100" />;
               })}
             </div>
 
-            {error && <div className="text-sm text-red-600">{error}</div>}
+            {error && !loading && <ErrorPage type="generic" title="Form Error" message={error} onRetry={() => window.location.reload()} onHome={() => (window.location.href = '/staff/dashboard')} showBackButton={true} onBack={() => window.history.back()} />}
 
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
               <Button variant="outline" onClick={() => window.history.back()}>Cancel</Button>
-              <Button variant="primary" onClick={handleSave} disabled={saving}>
-                {saving ? 'Saving...' : 'Save'}
-              </Button>
+              <Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Record'}</Button>
             </div>
           </div>
         )}
       </Card>
-    </div>
+    </StaffPageLayout>
   );
 };
 
 export default FormPage;
+

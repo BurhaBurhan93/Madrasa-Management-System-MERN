@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ListPage from '../shared/ListPage';
 
 export const accountsConfig = {
@@ -53,8 +53,10 @@ const Accounts = () => (
     columns={accountsConfig.columns}
     createPath="/staff/finance/accounts/create"
     editPathForRow={(row) => `/staff/finance/accounts/edit/${row._id}`}
+    viewPathForRow={(row) => '/staff/finance/accounts/view/' + row._id}
     searchPlaceholder="Search accounts..."
   />
 );
 
 export default Accounts;
+

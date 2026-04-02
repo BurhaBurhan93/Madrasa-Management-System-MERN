@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ListPage from '../shared/ListPage';
 
 export const salaryDeductionsConfig = {
@@ -51,8 +51,10 @@ const SalaryDeductions = () => (
     columns={salaryDeductionsConfig.columns}
     createPath="/staff/payroll/salary-deductions/create"
     editPathForRow={(row) => `/staff/payroll/salary-deductions/edit/${row._id}`}
+    viewPathForRow={(row) => '/staff/payroll/salary-deductions/view/' + row._id}
     searchPlaceholder="Search salary deductions..."
   />
 );
 
 export default SalaryDeductions;
+
