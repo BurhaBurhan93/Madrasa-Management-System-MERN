@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   FiHome, FiBookOpen, FiInbox, FiUser, FiMenu, FiLogOut,
   FiSearch, FiBell, FiChevronDown,
-  FiUsers, FiPackage, FiDollarSign, FiUserPlus, FiCoffee
+  FiUsers, FiPackage, FiDollarSign, FiUserPlus, FiCoffee, FiAward
 } from 'react-icons/fi';
 import useLocalStorage from '../hooks/useLocalStorage';
 
@@ -59,6 +59,23 @@ const StaffPanel = () => {
       items: [
         { id: 'users-list', label: 'All Users', path: 'users' },
         { id: 'users-register', label: 'Register User', path: 'users/register' }
+      ]
+    },
+    {
+      id: 'registrar',
+      icon: <FiAward size={19} />,
+      label: 'Registrar / Student Affairs',
+      type: 'dropdown',
+      items: [
+        { id: 'admissions', label: 'Admissions', path: 'registrar/admissions' },
+        { id: 'students', label: 'All Students', path: 'registrar/students' },
+        { id: 'profiles', label: 'Student Profiles', path: 'registrar/profiles' },
+        { id: 'class-assignment', label: 'Class Assignment', path: 'registrar/class-assignment' },
+        { id: 'data-correction', label: 'Data Correction', path: 'registrar/data-correction' },
+        { id: 'guardians', label: 'Guardian Management', path: 'registrar/guardians' },
+        { id: 'education-history', label: 'Education History', path: 'registrar/education-history' },
+        { id: 'documents', label: 'Documents Management', path: 'registrar/documents' },
+        { id: 'reports', label: 'Reports & Export', path: 'registrar/reports' }
       ]
     },
     { id: 'students', icon: <FiUsers size={19} />, path: 'students', label: 'Students', type: 'link' },

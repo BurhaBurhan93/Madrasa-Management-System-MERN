@@ -1,24 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
-import Input from '../components/UIHelper/Input';
 import ErrorPage from '../components/UIHelper/ErrorPage';
-import { FiPlus, FiEdit2, FiTrash2, FiGraduationCap, FiBook } from 'react-icons/fi';
+import { FiBook, FiGraduationCap, FiAlertCircle } from 'react-icons/fi';
 import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 import axios from 'axios';
 
 const StudentEducation = () => {
   console.log('[StudentEducation] Component initializing...');
+  const navigate = useNavigate();
   const [educationHistory, setEducationHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({
-    previousDegree: '',
-    previousInstitution: '',
-    location: ''
-  });
 
   // Get API config with auth token
   const getConfig = () => {
@@ -54,77 +48,29 @@ const StudentEducation = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    console.log(`[StudentEducation] Input changed - ${name}:`, value);
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading education history...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('[StudentEducation] Form submitted - editingId:', editingId, 'formData:', formData);
-    
-    try {
-      setLoading(true);
-      const config = getConfig();
-      
-      if (editingId) {
-        console.log('[StudentEducation] Updating existing record:', editingId);
-        const response = await axios.put(`http://localhost:5000/api/student/education/${editingId}`, formData, config);
-        console.log('[StudentEducation] Record updated successfully:', response.data);
-      } else {
-        console.log('[StudentEducation] Creating new record');
-        const response = await axios.post('http://localhost:5000/api/student/education', formData, config);
-        console.log('[StudentEducation] New record created:', response.data);
-      }
-      
-      // Refresh data from API
-      await fetchEducationData();
-      
-      console.log('[StudentEducation] Resetting form state');
-      setShowForm(false);
-      setEditingId(null);
-      setFormData({ previousDegree: '', previousInstitution: '', location: '' });
-      console.log('[StudentEducation] Form submission completed successfully');
-    } catch (err) {
-      console.error('[StudentEducation] Error in handleSubmit:', err);
-      alert('Error saving education record: ' + (err.response?.data?.message || err.message));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEdit = (edu) => {
-    console.log('[StudentEducation] Edit clicked for record:', edu._id, edu);
-    setFormData({ previousDegree: edu.previousDegree, previousInstitution: edu.previousInstitution, location: edu.location });
-    setEditingId(edu._id);
-    setShowForm(true);
-    console.log('[StudentEducation] Edit mode activated for:', edu._id);
-  };
-
-  const handleDelete = async (id) => {
-    console.log('[StudentEducation] Delete clicked for record:', id);
-    if (window.confirm('Delete this record?')) {
-      console.log('[StudentEducation] Confirming delete for:', id);
-      try {
-        setLoading(true);
-        const config = getConfig();
-        await axios.delete(`http://localhost:5000/api/student/education/${id}`, config);
-        console.log('[StudentEducation] Record deleted from API');
-        
-        // Refresh data from API
-        await fetchEducationData();
-        console.log('[StudentEducation] Delete operation completed');
-      } catch (err) {
-        console.error('[StudentEducation] Error deleting record:', err);
-        alert('Error deleting record: ' + (err.response?.data?.message || err.message));
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      console.log('[StudentEducation] Delete cancelled by user');
-    }
-  };
+  if (error) {
+    return (
+      <ErrorPage 
+        type="generic" 
+        title="Education History Unavailable"
+        message={error}
+        onRetry={fetchEducationData}
+        onHome={() => window.location.href = '/student/dashboard'}
+        showBackButton={false}
+      />
+    );
+  }
 
   console.log('[StudentEducation] Rendering with', educationHistory.length, 'records');
 
@@ -132,9 +78,35 @@ const StudentEducation = () => {
     <div className="w-full min-h-screen bg-gray-50 p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Education History</h1>
-        <p className="text-gray-600 mt-1">Manage your previous education and academic background</p>
+        <p className="text-gray-600 mt-1">View your previous education and academic background</p>
+        
+        {/* Information Banner */}
+        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <FiAlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-amber-900">Read-Only Access</h3>
+              <p className="mt-1 text-sm text-amber-700">
+                Your education history is managed by the Registrar's office to ensure data accuracy. 
+                To request changes or add new records, please contact the Registrar or submit a request through Communications.
+              </p>
+              <div className="mt-3 flex gap-3">
+                <button
+                  onClick={() => navigate('/student/communications')}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 hover:text-amber-900"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  Contact Registrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
           <div className="flex items-center justify-between">
@@ -194,29 +166,7 @@ const StudentEducation = () => {
         </Card>
       </div>
 
-      <div className="mb-6">
-        <Button onClick={() => setShowForm(!showForm)}>
-          <FiPlus className="mr-2" /> {showForm ? 'Cancel' : 'Add Education Record'}
-        </Button>
-      </div>
-
-      {showForm && (
-        <Card className="mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">{editingId ? 'Edit' : 'Add'} Education Record</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label="Degree/Certificate" name="previousDegree" value={formData.previousDegree} onChange={handleInputChange} placeholder="e.g., High School Diploma" />
-              <Input label="Institution" name="previousInstitution" value={formData.previousInstitution} onChange={handleInputChange} placeholder="e.g., Kabul High School" />
-            </div>
-            <Input label="Location" name="location" value={formData.location} onChange={handleInputChange} placeholder="e.g., Kabul, Afghanistan" />
-            <div className="flex space-x-4">
-              <Button type="submit">{editingId ? 'Update' : 'Add'} Record</Button>
-              <Button variant="outline" onClick={() => { setShowForm(false); setEditingId(null); setFormData({ previousDegree: '', previousInstitution: '', location: '' }); }}>Cancel</Button>
-            </div>
-          </form>
-        </Card>
-      )}
-
+      {/* Education Records Table */}
       <Card title="Previous Education Records">
         {educationHistory.length === 0 ? (
           <div className="text-center py-12">
@@ -224,6 +174,7 @@ const StudentEducation = () => {
               <FiGraduationCap className="w-10 h-10 text-gray-400" />
             </div>
             <p className="text-gray-500">No education records found.</p>
+            <p className="text-sm text-gray-400 mt-2">Your education history will appear here once added by the Registrar's office.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -234,7 +185,6 @@ const StudentEducation = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Institution</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Added Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -251,12 +201,6 @@ const StudentEducation = () => {
                     <td className="px-6 py-4 text-sm text-gray-900">{edu.previousInstitution}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{edu.location}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{new Date(edu.createdAt).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 text-sm font-medium">
-                      <div className="flex space-x-3">
-                        <button onClick={() => handleEdit(edu)} className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"><FiEdit2 size={18} /></button>
-                        <button onClick={() => handleDelete(edu._id)} className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"><FiTrash2 size={18} /></button>
-                      </div>
-                    </td>
                   </tr>
                 ))}
               </tbody>

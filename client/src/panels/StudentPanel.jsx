@@ -70,7 +70,9 @@ const StudentPanel = () => {
         { id: 'schedule', label: 'Schedule', path: 'schedule' },
         { id: 'attendance', label: 'Attendance', path: 'attendance' },
         { id: 'exams', label: 'Exams', path: 'exams' },
-        { id: 'results', label: 'Results', path: 'results' },
+        { id: 'exam-results', label: 'Exam Results', path: 'exam-results' },
+        { id: 'timetable', label: 'Next Semester Timetable', path: 'timetable' },
+        { id: 'results', label: 'All Results', path: 'results' },
         { id: 'degrees', label: 'My Degrees', path: 'degrees' },
         { id: 'education', label: 'Education History', path: 'education' },
       ]

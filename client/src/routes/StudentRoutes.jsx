@@ -2,7 +2,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import StudentPanel from '../panels/StudentPanel';
 import StudentDashboard from '../pages/StudentDashboard';
-import StudentProfile from '../pages/StudentProfile';
+import StudentProfile from '../pages/StudentProfileReadonly';
 import StudentCourses from '../pages/StudentCourses';
 import StudentAttendance from '../pages/StudentAttendance';
 import StudentAssignments from '../pages/StudentAssignments';

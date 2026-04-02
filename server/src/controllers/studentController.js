@@ -9,6 +9,7 @@ const Complaint = require('../models/Complaint');
 const Assignment = require('../models/Assignment');
 const StudentLeave = require('../models/StudentLeave');
 const StudentEducation = require('../models/StudentEducation');
+const Admission = require('../models/Admission');
 
 const jwt = require('jsonwebtoken');
 
@@ -123,9 +124,22 @@ const getExamResults = async (req, res) => {
   try {
     const results = await ExamAnswer.find({ 
       studentId: req.user.id 
-    }).populate('examId');
+    })
+      .populate('examId', 'title subject examType academicYear')
+      .populate({ path: 'examId', populate: { path: 'createdBy', select: 'name' } })
+      .lean();
     
-    res.json(results);
+    // Enrich results with teacher name from exam's createdBy
+    const enrichedResults = results.map(result => ({
+      ...result,
+      teacherName: result.examId?.createdBy?.name || 'N/A',
+      subjectName: result.examId?.subject?.name || 'N/A',
+      examTitle: result.examId?.title || 'Exam',
+      examType: result.examId?.examType?.name || 'General',
+      academicYear: result.examId?.academicYear || new Date().getFullYear().toString()
+    }));
+    
+    res.json(enrichedResults);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -598,7 +612,199 @@ const getStudentFinalResults = async (req, res) => {
   }
 };
 
+// Get all students (for Registrar/Staff)
+const getAllStudents = async (req, res) => {
+  try {
+    const students = await Student.find({ deletedAt: null })
+      .populate('user', 'name email phone')
+      .populate('currentClass', 'className')
+      .lean();
+    
+    // Merge student data with user data
+    const enrichedStudents = students.map(student => ({
+      ...student,
+      firstName: student.user?.name?.split(' ')[0],
+      lastName: student.user?.name?.split(' ')[1] || '',
+      name: student.user?.name,
+      email: student.user?.email,
+      phone: student.user?.phone
+    }));
+    
+    res.json({
+      success: true,
+      data: enrichedStudents
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
+  }
+};
+
+// Get all admissions (for Registrar/Staff)
+const getAllAdmissions = async (req, res) => {
+  try {
+    const admissions = await Admission.find({ deletedAt: null })
+      .populate('degree', 'degreeName name')
+      .lean();
+    
+    res.json({
+      success: true,
+      data: admissions
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
+  }
+};
+
+// Create new admission
+const createAdmission = async (req, res) => {
+  try {
+    const admissionData = req.body;
+    
+    // Handle nested address objects
+    const admission = new Admission({
+      ...admissionData,
+      permanentAddress: {
+        province: admissionData.permanentAddress_province,
+        district: admissionData.permanentAddress_district,
+        village: admissionData.permanentAddress_village
+      },
+      currentAddress: {
+        province: admissionData.currentAddress_province,
+        district: admissionData.currentAddress_district,
+        village: admissionData.currentAddress_village
+      }
+    });
+    
+    await admission.save();
+    
+    res.status(201).json({
+      success: true,
+      data: admission
+    });
+  } catch (error) {
+    res.status(400).json({ 
+      success: false,
+      message: error.message 
+    });
+  }
+};
+
+// Update admission
+const updateAdmission = async (req, res) => {
+  try {
+    const admissionData = req.body;
+    
+    const admission = await Admission.findByIdAndUpdate(
+      req.params.id,
+      admissionData,
+      { new: true, runValidators: true }
+    );
+    
+    if (!admission) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admission not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: admission
+    });
+  } catch (error) {
+    res.status(400).json({ 
+      success: false,
+      message: error.message 
+    });
+  }
+};
+
+// Delete admission (soft delete)
+const deleteAdmission = async (req, res) => {
+  try {
+    const admission = await Admission.findByIdAndUpdate(
+      req.params.id,
+      { deletedAt: new Date() },
+      { new: true }
+    );
+    
+    if (!admission) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admission not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Admission deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
+  }
+};
+
+// Convert admission to student
+const convertToStudent = async (req, res) => {
+  try {
+    const admission = await Admission.findById(req.params.id).populate('degree');
+    if (!admission) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admission not found'
+      });
+    }
+    
+    // Create user account first
+    const user = new User({
+      name: `${admission.firstName} ${admission.lastName}`,
+      email: admission.email || `${admission.firstName.toLowerCase()}@example.com`,
+      password: 'defaultPassword123', // Should be changed by user
+      role: 'student',
+      phone: admission.phone,
+      status: 'active'
+    });
+    await user.save();
+    
+    // Create student record
+    const student = new Student({
+      user: user._id,
+      studentCode: `STU-${Date.now()}`,
+      currentClass: admission.degree?._id,
+      currentLevel: admission.degree?.degreeName || 'Level 1',
+      admissionDate: new Date(),
+      status: 'active'
+    });
+    await student.save();
+    
+    // Update admission status
+    admission.status = 'accepted';
+    await admission.save();
+    
+    res.json({
+      success: true,
+      message: 'Admission converted to student successfully',
+      data: { user, student }
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
+  }
+};
+
 module.exports = {
+  // Student routes
   getStudentProfile,
   updateStudentProfile,
   getStudentCourses,
@@ -621,5 +827,13 @@ module.exports = {
   returnBook,
   renewBook,
   getStudentDocuments,
-  getStudentFinalResults
+  getStudentFinalResults,
+  
+  // Registrar/Staff routes
+  getAllStudents,
+  getAllAdmissions,
+  createAdmission,
+  updateAdmission,
+  deleteAdmission,
+  convertToStudent
 };

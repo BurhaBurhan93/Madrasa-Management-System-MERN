@@ -60,7 +60,7 @@ const StudentProfile = () => {
 
 
 
-  const [editMode, setEditMode] = useState(false);
+  const [readOnlyMode, setReadOnlyMode] = useState(true);
 
   const [imagePreview, setImagePreview] = useState(null);
 

@@ -27,7 +27,7 @@ import UserEdit from './pages/admin/users/UserEdit';
 
 // ================= STUDENT PAGES =================
 import StudentDashboard from './pages/StudentDashboard';
-import StudentProfile from './pages/StudentProfile';
+import StudentProfile from './pages/StudentProfileReadonly';
 import StudentCourses from './pages/StudentCourses';
 import StudentAttendance from './pages/StudentAttendance';
 import StudentAssignments from './pages/StudentAssignments';
@@ -41,6 +41,8 @@ import StudentExamAttempt from "./pages/StudentExamAttempt";
 import StudentCertificates from './pages/StudentCertificates';
 import StudentEvents from './pages/StudentEvents';
 import StudentSettings from './pages/StudentSettings';
+import StudentExamResults from './pages/StudentExamResults';
+import StudentTimetable from './pages/StudentTimetable';
 import LearningResources from './components/library/LearningResources';
 import BorrowedBooks from './components/library/BorrowedBooks';
 import PurchaseHistory from './components/library/PurchaseHistory';
@@ -71,6 +73,15 @@ import CreateAssignment from './pages/teacher/CreateAssignment';
 // ================= STAFF PAGES =================
 import StaffDashboard from './pages/staff/StaffDashboard';
 import StaffStudents from './pages/staff/StaffStudents';
+import StudentAdmissions from './pages/staff/registrar/StudentAdmissions';
+import StudentsList from './pages/staff/registrar/StudentsList';
+import StudentProfiles from './pages/staff/registrar/StudentProfiles';
+import ClassAssignment from './pages/staff/registrar/ClassAssignment';
+import DataCorrection from './pages/staff/registrar/DataCorrection';
+import GuardianManagement from './pages/staff/registrar/GuardianManagement';
+import EducationHistory from './pages/staff/registrar/EducationHistory';
+import DocumentsManagement from './pages/staff/registrar/DocumentsManagement';
+import RegistrarReports from './pages/staff/registrar/RegistrarReports';
 import StaffInventory from './pages/staff/StaffInventory';
 import StaffLibraryCategories from './pages/staff/library/Categories';
 import StaffLibraryBooks from './pages/staff/library/Books';
@@ -261,6 +272,15 @@ function App() {
             <Route path="users" element={<UserIndex />} />
             <Route path="users/register" element={<UserRegister />} />
             <Route path="users/edit/:id" element={<UserEdit />} />
+            <Route path="registrar/admissions" element={<StudentAdmissions />} />
+            <Route path="registrar/students" element={<StudentsList />} />
+            <Route path="registrar/profiles" element={<StudentProfiles />} />
+            <Route path="registrar/class-assignment" element={<ClassAssignment />} />
+            <Route path="registrar/data-correction" element={<DataCorrection />} />
+            <Route path="registrar/guardians" element={<GuardianManagement />} />
+            <Route path="registrar/education-history" element={<EducationHistory />} />
+            <Route path="registrar/documents" element={<DocumentsManagement />} />
+            <Route path="registrar/reports" element={<RegistrarReports />} />
             <Route path="students" element={<StaffStudents />} />
             <Route path="inventory" element={<StaffInventory />} />
             <Route path="library/categories" element={<StaffLibraryCategories />} />
@@ -350,6 +370,8 @@ function App() {
             <Route path="assignments" element={<StudentAssignments />} />
             <Route path="homework-submission" element={<HomeworkSubmission />} />
             <Route path="results" element={<StudentResults />} />
+            <Route path="exam-results" element={<StudentExamResults />} />
+            <Route path="timetable" element={<StudentTimetable />} />
             <Route path="schedule" element={<StudentSchedule />} />
             <Route path="exams" element={<StudentExams />} />
             <Route path="fees" element={<StudentFees />} />
