@@ -5,7 +5,7 @@ import { libraryBooksConfig } from './Books';
 
 const BooksView = () => {
   const { id } = useParams();
-  return <RecordViewPage title="Book Details" subtitle={libraryBooksConfig.subtitle} endpoint={libraryBooksConfig.endpoint} id={id} fields={libraryBooksConfig.formFields} listPath="/staff/library/books" editPath={`/staff/library/books/edit/${id}`} readMode="collection" readEndpoint={libraryBooksConfig.endpoint} />;
+  return <RecordViewPage title="Book Details" subtitle={libraryBooksConfig.subtitle} endpoint={libraryBooksConfig.endpoint} id={id} fields={libraryBooksConfig.formFields} listPath="/staff/library/books" editPath={`/staff/library/books/edit/${id}`} />;
 };
 
 export default BooksView;

@@ -1,6 +1,31 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import StaffPanel from '../panels/StaffPanel';
+
+// Dashboard
+import StaffDashboard from '../pages/staff/StaffDashboard';
+
+// Core
+import StaffStudents from '../pages/staff/StaffStudents';
+import StaffInventory from '../pages/staff/StaffInventory';
+
+// Users
+import UserIndex from '../pages/admin/users/UserIndex';
+import UserRegister from '../pages/admin/users/UserRegister';
+import UserEdit from '../pages/admin/users/UserEdit';
+
+// Registrar
+import StudentAdmissions from '../pages/staff/registrar/StudentAdmissions';
+import StudentsList from '../pages/staff/registrar/StudentsList';
+import StudentProfiles from '../pages/staff/registrar/StudentProfiles';
+import ClassAssignment from '../pages/staff/registrar/ClassAssignment';
+import DataCorrection from '../pages/staff/registrar/DataCorrection';
+import GuardianManagement from '../pages/staff/registrar/GuardianManagement';
+import EducationHistory from '../pages/staff/registrar/EducationHistory';
+import DocumentsManagement from '../pages/staff/registrar/DocumentsManagement';
+import RegistrarReports from '../pages/staff/registrar/RegistrarReports';
+
+// Library
 import StaffLibraryCategories from '../pages/staff/library/Categories';
 import StaffLibraryCategoriesCreate from '../pages/staff/library/CategoriesCreate';
 import StaffLibraryCategoriesEdit from '../pages/staff/library/CategoriesEdit';
@@ -22,6 +47,8 @@ import StaffLibrarySalesCreate from '../pages/staff/library/SalesCreate';
 import StaffLibrarySalesEdit from '../pages/staff/library/SalesEdit';
 import StaffLibrarySalesView from '../pages/staff/library/SalesView';
 import StaffLibraryReports from '../pages/staff/library/Reports';
+
+// Complaints
 import StaffComplaintsList from '../pages/staff/complaints/ComplaintsList';
 import StaffComplaintsView from '../pages/staff/complaints/ComplaintsView';
 import StaffComplaintActions from '../pages/staff/complaints/Actions';
@@ -33,53 +60,62 @@ import StaffComplaintFeedbackCreate from '../pages/staff/complaints/FeedbackCrea
 import StaffComplaintFeedbackEdit from '../pages/staff/complaints/FeedbackEdit';
 import StaffComplaintFeedbackView from '../pages/staff/complaints/FeedbackView';
 import StaffComplaintReports from '../pages/staff/complaints/Reports';
+
+// Finance
 import StaffFinanceIndex from '../pages/staff/finance/Finance';
 import StaffFinanceTransactions from '../pages/staff/finance/Transactions';
-import StaffFinanceAccounts from '../pages/staff/finance/Accounts';
-import StaffFinanceFeeStructures from '../pages/staff/finance/FeeStructures';
-import StaffFinanceStudentFees from '../pages/staff/finance/StudentFees';
-import StaffFinanceFeePayments from '../pages/staff/finance/FeePayments';
-import StaffFinanceExpenses from '../pages/staff/finance/Expenses';
-import StaffFinanceReports from '../pages/staff/finance/FinancialReports';
 import StaffFinanceTransactionsCreate from '../pages/staff/finance/TransactionsCreate';
 import StaffFinanceTransactionsEdit from '../pages/staff/finance/TransactionsEdit';
 import StaffFinanceTransactionsView from '../pages/staff/finance/TransactionsView';
+import StaffFinanceAccounts from '../pages/staff/finance/Accounts';
 import StaffFinanceAccountsCreate from '../pages/staff/finance/AccountsCreate';
 import StaffFinanceAccountsEdit from '../pages/staff/finance/AccountsEdit';
 import StaffFinanceAccountsView from '../pages/staff/finance/AccountsView';
+import StaffFinanceFeeStructures from '../pages/staff/finance/FeeStructures';
 import StaffFinanceFeeStructuresCreate from '../pages/staff/finance/FeeStructuresCreate';
 import StaffFinanceFeeStructuresEdit from '../pages/staff/finance/FeeStructuresEdit';
 import StaffFinanceFeeStructuresView from '../pages/staff/finance/FeeStructuresView';
+import StaffFinanceStudentFees from '../pages/staff/finance/StudentFees';
 import StaffFinanceStudentFeesCreate from '../pages/staff/finance/StudentFeesCreate';
 import StaffFinanceStudentFeesEdit from '../pages/staff/finance/StudentFeesEdit';
 import StaffFinanceStudentFeesView from '../pages/staff/finance/StudentFeesView';
+import StaffFinanceFeePayments from '../pages/staff/finance/FeePayments';
 import StaffFinanceFeePaymentsCreate from '../pages/staff/finance/FeePaymentsCreate';
 import StaffFinanceFeePaymentsEdit from '../pages/staff/finance/FeePaymentsEdit';
 import StaffFinanceFeePaymentsView from '../pages/staff/finance/FeePaymentsView';
+import StaffFinanceExpenses from '../pages/staff/finance/Expenses';
 import StaffFinanceExpensesCreate from '../pages/staff/finance/ExpensesCreate';
 import StaffFinanceExpensesEdit from '../pages/staff/finance/ExpensesEdit';
 import StaffFinanceExpensesView from '../pages/staff/finance/ExpensesView';
+import StaffFinanceReports from '../pages/staff/finance/FinancialReports';
 import StaffFinanceReportsCreate from '../pages/staff/finance/FinancialReportsCreate';
 import StaffFinanceReportsEdit from '../pages/staff/finance/FinancialReportsEdit';
 import StaffFinanceReportsView from '../pages/staff/finance/FinancialReportsView';
+
+// Payroll
 import StaffPayrollIndex from '../pages/staff/payroll/Payroll';
 import StaffPayrollSalaryStructures from '../pages/staff/payroll/SalaryStructures';
-import StaffPayrollSalaryPayments from '../pages/staff/payroll/SalaryPayments';
-import StaffPayrollSalaryDeductions from '../pages/staff/payroll/SalaryDeductions';
-import StaffPayrollSalaryAdvances from '../pages/staff/payroll/SalaryAdvances';
 import StaffPayrollSalaryStructuresCreate from '../pages/staff/payroll/SalaryStructuresCreate';
 import StaffPayrollSalaryStructuresEdit from '../pages/staff/payroll/SalaryStructuresEdit';
 import StaffPayrollSalaryStructuresView from '../pages/staff/payroll/SalaryStructuresView';
+import StaffPayrollSalaryPayments from '../pages/staff/payroll/SalaryPayments';
 import StaffPayrollSalaryPaymentsCreate from '../pages/staff/payroll/SalaryPaymentsCreate';
 import StaffPayrollSalaryPaymentsEdit from '../pages/staff/payroll/SalaryPaymentsEdit';
 import StaffPayrollSalaryPaymentsView from '../pages/staff/payroll/SalaryPaymentsView';
+import StaffPayrollSalaryDeductions from '../pages/staff/payroll/SalaryDeductions';
 import StaffPayrollSalaryDeductionsCreate from '../pages/staff/payroll/SalaryDeductionsCreate';
 import StaffPayrollSalaryDeductionsEdit from '../pages/staff/payroll/SalaryDeductionsEdit';
 import StaffPayrollSalaryDeductionsView from '../pages/staff/payroll/SalaryDeductionsView';
+import StaffPayrollSalaryAdvances from '../pages/staff/payroll/SalaryAdvances';
 import StaffPayrollSalaryAdvancesCreate from '../pages/staff/payroll/SalaryAdvancesCreate';
 import StaffPayrollSalaryAdvancesEdit from '../pages/staff/payroll/SalaryAdvancesEdit';
 import StaffPayrollSalaryAdvancesView from '../pages/staff/payroll/SalaryAdvancesView';
+
+// HR
 import Employees from '../pages/staff/HR/Employees';
+import EmployeeRegistration from '../pages/staff/HR/EmployeeRegistration';
+import EmployeeEdit from '../pages/staff/HR/EmployeeEdit';
+import EmployeeView from '../pages/staff/HR/EmployeeView';
 import DepartmentRegistration from '../pages/staff/HR/DepartmentRegistration';
 import DepartmentCreate from '../pages/staff/HR/DepartmentCreate';
 import DepartmentEdit from '../pages/staff/HR/DepartmentEdit';
@@ -92,17 +128,16 @@ import LeaveTypeRegistration from '../pages/staff/HR/LeaveTypeRegistration';
 import LeaveTypeCreate from '../pages/staff/HR/LeaveTypeCreate';
 import LeaveTypeEdit from '../pages/staff/HR/LeaveTypeEdit';
 import LeaveTypeView from '../pages/staff/HR/LeaveTypeView';
-import EmployeeRegistration from '../pages/staff/HR/EmployeeRegistration';
-import EmployeeEdit from '../pages/staff/HR/EmployeeEdit';
-import EmployeeView from '../pages/staff/HR/EmployeeView';
 import HRAttendance from '../pages/staff/HR/Attendance';
 import LeaveManagement from '../pages/staff/HR/LeaveManagment';
 import HRPayroll from '../pages/staff/HR/Payroll';
 import HRReports from '../pages/staff/HR/Reports';
-import Inventory from '../pages/staff/Kitchen/Inventory';
-import InventoryCreate from '../pages/staff/Kitchen/InventoryCreate';
-import InventoryEdit from '../pages/staff/Kitchen/InventoryEdit';
-import InventoryView from '../pages/staff/Kitchen/InventoryView';
+
+// Kitchen
+import KitchenInventory from '../pages/staff/Kitchen/Inventory';
+import KitchenInventoryCreate from '../pages/staff/Kitchen/InventoryCreate';
+import KitchenInventoryEdit from '../pages/staff/Kitchen/InventoryEdit';
+import KitchenInventoryView from '../pages/staff/Kitchen/InventoryView';
 import MealPlaning from '../pages/staff/Kitchen/MealPlaning';
 import MealPlaningCreate from '../pages/staff/Kitchen/MealPlaningCreate';
 import MealPlaningEdit from '../pages/staff/Kitchen/MealPlaningEdit';
@@ -123,47 +158,75 @@ import WasteTracking from '../pages/staff/Kitchen/WasteTracking';
 import WasteTrackingCreate from '../pages/staff/Kitchen/WasteTrackingCreate';
 import WasteTrackingEdit from '../pages/staff/Kitchen/WasteTrackingEdit';
 import WasteTrackingView from '../pages/staff/Kitchen/WasteTrackingView';
+import FoodRequest from '../pages/staff/Kitchen/FoodRequest';
+import KitchenReports from '../pages/staff/Kitchen/Reports';
+
 import StaffLeaveManagement from '../pages/StaffLeaveManagement';
 
-const StaffRoutes = () => (
+// exported as a plain Route element — used directly inside <Routes> in App.jsx
+const staffRoutes = (
   <Route path="/staff/*" element={<StaffPanel />}>
-    <Route index element={<StaffLibraryCategories />} />
-    <Route path="library">
-      <Route path="categories" element={<StaffLibraryCategories />} />
-      <Route path="categories/create" element={<StaffLibraryCategoriesCreate />} />
-      <Route path="categories/edit/:id" element={<StaffLibraryCategoriesEdit />} />
-      <Route path="categories/view/:id" element={<StaffLibraryCategoriesView />} />
-      <Route path="books" element={<StaffLibraryBooks />} />
-      <Route path="books/create" element={<StaffLibraryBooksCreate />} />
-      <Route path="books/edit/:id" element={<StaffLibraryBooksEdit />} />
-      <Route path="books/view/:id" element={<StaffLibraryBooksView />} />
-      <Route path="borrowed" element={<StaffLibraryBorrowed />} />
-      <Route path="borrowed/create" element={<StaffLibraryBorrowedCreate />} />
-      <Route path="borrowed/edit/:id" element={<StaffLibraryBorrowedEdit />} />
-      <Route path="borrowed/view/:id" element={<StaffLibraryBorrowedView />} />
-      <Route path="purchases" element={<StaffLibraryPurchases />} />
-      <Route path="purchases/create" element={<StaffLibraryPurchasesCreate />} />
-      <Route path="purchases/edit/:id" element={<StaffLibraryPurchasesEdit />} />
-      <Route path="purchases/view/:id" element={<StaffLibraryPurchasesView />} />
-      <Route path="sales" element={<StaffLibrarySales />} />
-      <Route path="sales/create" element={<StaffLibrarySalesCreate />} />
-      <Route path="sales/edit/:id" element={<StaffLibrarySalesEdit />} />
-      <Route path="sales/view/:id" element={<StaffLibrarySalesView />} />
-      <Route path="reports" element={<StaffLibraryReports />} />
-    </Route>
-    <Route path="complaints">
-      <Route index element={<StaffComplaintsList />} />
-      <Route path="view/:id" element={<StaffComplaintsView />} />
-      <Route path="actions" element={<StaffComplaintActions />} />
-      <Route path="actions/create" element={<StaffComplaintActionsCreate />} />
-      <Route path="actions/edit/:id" element={<StaffComplaintActionsEdit />} />
-      <Route path="actions/view/:id" element={<StaffComplaintActionsView />} />
-      <Route path="feedback" element={<StaffComplaintFeedback />} />
-      <Route path="feedback/create" element={<StaffComplaintFeedbackCreate />} />
-      <Route path="feedback/edit/:id" element={<StaffComplaintFeedbackEdit />} />
-      <Route path="feedback/view/:id" element={<StaffComplaintFeedbackView />} />
-      <Route path="reports" element={<StaffComplaintReports />} />
-    </Route>
+
+    <Route index element={<StaffDashboard />} />
+    <Route path="dashboard" element={<StaffDashboard />} />
+
+    {/* Users */}
+    <Route path="users" element={<UserIndex />} />
+    <Route path="users/register" element={<UserRegister />} />
+    <Route path="users/edit/:id" element={<UserEdit />} />
+
+    {/* Registrar */}
+    <Route path="registrar/admissions" element={<StudentAdmissions />} />
+    <Route path="registrar/students" element={<StudentsList />} />
+    <Route path="registrar/profiles" element={<StudentProfiles />} />
+    <Route path="registrar/class-assignment" element={<ClassAssignment />} />
+    <Route path="registrar/data-correction" element={<DataCorrection />} />
+    <Route path="registrar/guardians" element={<GuardianManagement />} />
+    <Route path="registrar/education-history" element={<EducationHistory />} />
+    <Route path="registrar/documents" element={<DocumentsManagement />} />
+    <Route path="registrar/reports" element={<RegistrarReports />} />
+
+    {/* Core */}
+    <Route path="students" element={<StaffStudents />} />
+    <Route path="inventory" element={<StaffInventory />} />
+
+    {/* Library */}
+    <Route path="library/categories" element={<StaffLibraryCategories />} />
+    <Route path="library/categories/create" element={<StaffLibraryCategoriesCreate />} />
+    <Route path="library/categories/edit/:id" element={<StaffLibraryCategoriesEdit />} />
+    <Route path="library/categories/view/:id" element={<StaffLibraryCategoriesView />} />
+    <Route path="library/books" element={<StaffLibraryBooks />} />
+    <Route path="library/books/create" element={<StaffLibraryBooksCreate />} />
+    <Route path="library/books/edit/:id" element={<StaffLibraryBooksEdit />} />
+    <Route path="library/books/view/:id" element={<StaffLibraryBooksView />} />
+    <Route path="library/borrowed" element={<StaffLibraryBorrowed />} />
+    <Route path="library/borrowed/create" element={<StaffLibraryBorrowedCreate />} />
+    <Route path="library/borrowed/edit/:id" element={<StaffLibraryBorrowedEdit />} />
+    <Route path="library/borrowed/view/:id" element={<StaffLibraryBorrowedView />} />
+    <Route path="library/purchases" element={<StaffLibraryPurchases />} />
+    <Route path="library/purchases/create" element={<StaffLibraryPurchasesCreate />} />
+    <Route path="library/purchases/edit/:id" element={<StaffLibraryPurchasesEdit />} />
+    <Route path="library/purchases/view/:id" element={<StaffLibraryPurchasesView />} />
+    <Route path="library/sales" element={<StaffLibrarySales />} />
+    <Route path="library/sales/create" element={<StaffLibrarySalesCreate />} />
+    <Route path="library/sales/edit/:id" element={<StaffLibrarySalesEdit />} />
+    <Route path="library/sales/view/:id" element={<StaffLibrarySalesView />} />
+    <Route path="library/reports" element={<StaffLibraryReports />} />
+
+    {/* Complaints */}
+    <Route path="complaints" element={<StaffComplaintsList />} />
+    <Route path="complaints/view/:id" element={<StaffComplaintsView />} />
+    <Route path="complaints/actions" element={<StaffComplaintActions />} />
+    <Route path="complaints/actions/create" element={<StaffComplaintActionsCreate />} />
+    <Route path="complaints/actions/edit/:id" element={<StaffComplaintActionsEdit />} />
+    <Route path="complaints/actions/view/:id" element={<StaffComplaintActionsView />} />
+    <Route path="complaints/feedback" element={<StaffComplaintFeedback />} />
+    <Route path="complaints/feedback/create" element={<StaffComplaintFeedbackCreate />} />
+    <Route path="complaints/feedback/edit/:id" element={<StaffComplaintFeedbackEdit />} />
+    <Route path="complaints/feedback/view/:id" element={<StaffComplaintFeedbackView />} />
+    <Route path="complaints/reports" element={<StaffComplaintReports />} />
+
+    {/* Finance */}
     <Route path="finance" element={<StaffFinanceIndex />} />
     <Route path="finance/transactions" element={<StaffFinanceTransactions />} />
     <Route path="finance/transactions/create" element={<StaffFinanceTransactionsCreate />} />
@@ -193,6 +256,8 @@ const StaffRoutes = () => (
     <Route path="finance/reports/create" element={<StaffFinanceReportsCreate />} />
     <Route path="finance/reports/edit/:id" element={<StaffFinanceReportsEdit />} />
     <Route path="finance/reports/view/:id" element={<StaffFinanceReportsView />} />
+
+    {/* Payroll */}
     <Route path="payroll" element={<StaffPayrollIndex />} />
     <Route path="payroll/salary-structures" element={<StaffPayrollSalaryStructures />} />
     <Route path="payroll/salary-structures/create" element={<StaffPayrollSalaryStructuresCreate />} />
@@ -210,9 +275,8 @@ const StaffRoutes = () => (
     <Route path="payroll/salary-advances/create" element={<StaffPayrollSalaryAdvancesCreate />} />
     <Route path="payroll/salary-advances/edit/:id" element={<StaffPayrollSalaryAdvancesEdit />} />
     <Route path="payroll/salary-advances/view/:id" element={<StaffPayrollSalaryAdvancesView />} />
-    <Route path="hr/employees" element={<Employees />} />
-    <Route path="hr/employees/edit/:id" element={<EmployeeEdit />} />
-    <Route path="hr/employees/view/:id" element={<EmployeeView />} />
+
+    {/* HR */}
     <Route path="hr/departments" element={<DepartmentRegistration />} />
     <Route path="hr/departments/create" element={<DepartmentCreate />} />
     <Route path="hr/departments/edit/:id" element={<DepartmentEdit />} />
@@ -226,14 +290,19 @@ const StaffRoutes = () => (
     <Route path="hr/leave-types/edit/:id" element={<LeaveTypeEdit />} />
     <Route path="hr/leave-types/view/:id" element={<LeaveTypeView />} />
     <Route path="hr/employee-registration" element={<EmployeeRegistration />} />
+    <Route path="hr/employees" element={<Employees />} />
+    <Route path="hr/employees/edit/:id" element={<EmployeeEdit />} />
+    <Route path="hr/employees/view/:id" element={<EmployeeView />} />
     <Route path="hr/attendance" element={<HRAttendance />} />
     <Route path="hr/leave" element={<LeaveManagement />} />
     <Route path="hr/payroll" element={<HRPayroll />} />
     <Route path="hr/reports" element={<HRReports />} />
-    <Route path="kitchen/inventory" element={<Inventory />} />
-    <Route path="kitchen/inventory/create" element={<InventoryCreate />} />
-    <Route path="kitchen/inventory/edit/:id" element={<InventoryEdit />} />
-    <Route path="kitchen/inventory/view/:id" element={<InventoryView />} />
+
+    {/* Kitchen */}
+    <Route path="kitchen/inventory" element={<KitchenInventory />} />
+    <Route path="kitchen/inventory/create" element={<KitchenInventoryCreate />} />
+    <Route path="kitchen/inventory/edit/:id" element={<KitchenInventoryEdit />} />
+    <Route path="kitchen/inventory/view/:id" element={<KitchenInventoryView />} />
     <Route path="kitchen/meals" element={<MealPlaning />} />
     <Route path="kitchen/meals/create" element={<MealPlaningCreate />} />
     <Route path="kitchen/meals/edit/:id" element={<MealPlaningEdit />} />
@@ -254,9 +323,13 @@ const StaffRoutes = () => (
     <Route path="kitchen/waste/create" element={<WasteTrackingCreate />} />
     <Route path="kitchen/waste/edit/:id" element={<WasteTrackingEdit />} />
     <Route path="kitchen/waste/view/:id" element={<WasteTrackingView />} />
+    <Route path="kitchen/requests" element={<FoodRequest />} />
+    <Route path="kitchen/reports" element={<KitchenReports />} />
+
+    {/* Leave */}
     <Route path="leave" element={<StaffLeaveManagement />} />
+
   </Route>
 );
 
-export default StaffRoutes;
-
+export default staffRoutes;

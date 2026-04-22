@@ -1,4 +1,5 @@
 
+require('dotenv').config();
 console.log('[Server] Initializing server...');
 const express = require('express');
 const cors = require('cors');
@@ -6,9 +7,6 @@ const connectDB = require('./config/db');
 const seedDatabase = require('./seedDatabase');
 const app = express();
 console.log('[Server] Express app created');
-
-console.log('[Server] Loading .env config...');
-require('dotenv').config();
 console.log('[Server] .env loaded, PORT:', process.env.PORT || '5000 (default)');
 console.log('[Server] MONGODB_URI exists:', !!(process.env.MONGODB_URI || process.env.MONGO_URI));
 
@@ -36,6 +34,10 @@ const kitchenRoutes = require('./modules/kitchen/kitchenRoutes');
 console.log('[Routes] ✓ kitchenRoutes loaded');
 const examRoutes = require('./modules/teachers/examRoutes');
 console.log('[Routes] ✓ examRoutes loaded');
+const academicRoutes = require('./modules/academic/academicRoutes');
+console.log('[Routes] ✓ academicRoutes loaded');
+const libraryRoutes = require('./modules/library/libraryRoutes');
+console.log('[Routes] ✓ libraryRoutes loaded');
 
 // Load user routes with error handling
 console.log('[Routes] Loading userRoutes...');
@@ -53,7 +55,8 @@ console.log('[Routes] Registering routes...');
 app.use('/api/auth', authRoutes);
 console.log('[Routes] ✓ /api/auth registered');
 app.use('/api/student', studentRoutes);
-console.log('[Routes] ✓ /api/student registered');
+app.use('/api/students', studentRoutes);
+console.log('[Routes] ✓ /api/student + /api/students registered');
 app.use('/api/staff', staffRoutes);
 console.log('[Routes] ✓ /api/staff registered');
 app.use('/api/teacher', teacherRoutes);
@@ -66,6 +69,12 @@ app.use('/api/hr', hrRoutes);
 console.log('[Routes] ✓ /api/hr registered');
 app.use('/api/kitchen', kitchenRoutes);
 console.log('[Routes] ✓ /api/kitchen registered');
+app.use('/api/academic', academicRoutes);
+console.log('[Routes] ✓ /api/academic registered');
+app.use('/api/library', libraryRoutes);
+console.log('[Routes] ✓ /api/library registered');
+app.use('/api/attendance', require('./modules/attendance/attendanceRoutes'));
+console.log('[Routes] ✓ /api/attendance registered');
 app.use('/api', examRoutes);
 console.log('[Routes] ✓ /api (examRoutes) registered');
 

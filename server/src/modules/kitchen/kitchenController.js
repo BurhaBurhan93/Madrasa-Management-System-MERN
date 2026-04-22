@@ -1,4 +1,8 @@
+const mongoose = require('mongoose');
 const KitchenInventory = require('../../models/KitchenInventory');
+
+const safeUserId = (req) =>
+  mongoose.isValidObjectId(req.user?.id) ? req.user.id : undefined;
 const KitchenPurchase = require('../../models/KitchenPurchase');
 const KitchenExpense = require('../../models/KitchenExpense');
 const DailyFoodConsumption = require('../../models/DailyFoodConsumption');
@@ -74,7 +78,9 @@ exports.getPurchases = async (req, res) => {
 
 exports.createPurchase = async (req, res) => {
   try {
-    const data = { ...req.body, recordedBy: req.user?.id };
+    const data = { ...req.body };
+    const uid3 = safeUserId(req);
+    if (uid3) data.recordedBy = uid3;
     data.totalPrice = data.quantity * data.unitPrice;
     const purchase = await KitchenPurchase.create(data);
     await KitchenInventory.findOneAndUpdate(
@@ -187,7 +193,9 @@ exports.createBudget = async (req, res) => {
 
 exports.updateBudget = async (req, res) => {
   try {
-    const budget = await KitchenBudget.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const payload = { ...req.body };
+    if (payload.approvedBy && !mongoose.isValidObjectId(payload.approvedBy)) delete payload.approvedBy;
+    const budget = await KitchenBudget.findByIdAndUpdate(req.params.id, payload, { new: true });
     if (!budget) return res.status(404).json({ success: false, message: 'Budget not found' });
     res.json({ success: true, message: 'Budget updated', data: budget });
   } catch (error) {
@@ -215,7 +223,10 @@ exports.getWeeklyMenu = async (req, res) => {
 
 exports.createWeeklyMenu = async (req, res) => {
   try {
-    const menu = await WeeklyMenu.create({ ...req.body, createdBy: req.user?.id });
+    const data = { ...req.body };
+    const uid = safeUserId(req);
+    if (uid) data.createdBy = uid;
+    const menu = await WeeklyMenu.create(data);
     res.status(201).json({ success: true, message: 'Menu item added', data: menu });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -316,7 +327,10 @@ exports.getWaste = async (req, res) => {
 
 exports.createWaste = async (req, res) => {
   try {
-    const waste = await KitchenWaste.create({ ...req.body, recordedBy: req.user?.id });
+    const wasteData = { ...req.body };
+    const uid2 = safeUserId(req);
+    if (uid2) wasteData.recordedBy = uid2;
+    const waste = await KitchenWaste.create(wasteData);
     await KitchenInventory.findOneAndUpdate(
       { itemName: req.body.itemName },
       { $inc: { quantity: -req.body.quantity } }

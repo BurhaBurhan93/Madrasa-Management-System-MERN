@@ -15,7 +15,7 @@ export const libraryBorrowedConfig = {
     { key: 'status', header: 'Status' }
   ],
   formFields: [
-    { name: 'borrower', label: 'Student', type: 'relation', relationEndpoint: '/staff/students', relationValue: (row) => row._id || row.id, relationLabel: (row) => `${row.name || row.userId?.name} (${row.email || row.userId?.email || 'No Email'})` },
+    { name: 'borrower', label: 'Student', type: 'relation', relationEndpoint: '/staff/students', relationValue: (row) => row._id || row.id, relationLabel: (row) => `${row.name || row.firstName || 'Unknown'} (${row.studentId || row.email || ''})` },
     { name: 'book', label: 'Book', type: 'relation', relationEndpoint: '/staff/library/books', relationValue: (row) => row._id || row.id, relationLabel: (row) => `${row.title} (${row.stock || 0} in stock)` },
     { name: 'status', label: 'Status', type: 'select', options: [
       { value: 'borrowed', label: 'Borrowed' },

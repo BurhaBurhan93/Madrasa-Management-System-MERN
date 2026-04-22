@@ -5,7 +5,7 @@ import { libraryPurchasesConfig } from './Purchases';
 
 const PurchasesEdit = () => {
   const { id } = useParams();
-  return <FormPage titleCreate="Create Purchase" titleEdit="Edit Purchase" endpoint={libraryPurchasesConfig.endpoint} formFields={libraryPurchasesConfig.formFields} initialForm={libraryPurchasesConfig.initialForm} mapRowToForm={libraryPurchasesConfig.mapRowToForm} mapFormToPayload={libraryPurchasesConfig.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/library/purchases" readMode="collection" readEndpoint={libraryPurchasesConfig.endpoint} />;
+  return <FormPage titleCreate="Create Purchase" titleEdit="Edit Purchase" endpoint={libraryPurchasesConfig.endpoint} formFields={libraryPurchasesConfig.formFields} initialForm={libraryPurchasesConfig.initialForm} mapRowToForm={libraryPurchasesConfig.mapRowToForm} mapFormToPayload={libraryPurchasesConfig.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/library/purchases" />;
 };
 
 export default PurchasesEdit;

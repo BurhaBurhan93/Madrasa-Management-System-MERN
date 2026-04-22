@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { saveAuth } from '../../lib/auth';
 
 const Login = ({ setIsAuthenticated }) => {
   const [selectedRole, setSelectedRole] = useState('student');
@@ -88,26 +89,17 @@ const Login = ({ setIsAuthenticated }) => {
                        formData.password === demoCreds.password;
 
     if (isDemoMode) {
-      console.log('Demo mode: Bypassing database connection');
-      
-      // Create mock user data
-      const mockUser = {
-        _id: `demo-${selectedRole}-001`,
-        name: `Demo ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`,
-        email: demoCreds.username,
-        role: selectedRole
-      };
-      
-      // Store auth data
-      localStorage.setItem('token', 'demo-token-' + selectedRole);
-      localStorage.setItem('userId', mockUser._id);
-      localStorage.setItem('userRole', selectedRole);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('isDemoMode', 'true');
-      
-      if (setIsAuthenticated) {
-        setIsAuthenticated(true);
+      console.log('Demo mode: Getting real JWT from server');
+      try {
+        const response = await axios.post('http://localhost:5000/api/auth/demo-login', { role: selectedRole });
+        const { token, user } = response.data;
+        saveAuth(token, user, selectedRole);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        if (setIsAuthenticated) setIsAuthenticated(true);
+      } catch (err) {
+        setErrors({ general: 'Server is offline. Please start the backend server and try again.' });
+        setIsLoading(false);
+        return;
       }
 
       // Navigate based on role
@@ -142,21 +134,10 @@ const Login = ({ setIsAuthenticated }) => {
       });
 
       const { token, user } = response.data;
-      
-      // Store token and user info
-      localStorage.setItem('token', token);
-      localStorage.setItem('userId', user.id || user._id);
-      localStorage.setItem('userRole', selectedRole);
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('isAuthenticated', 'true');
+      saveAuth(token, user, selectedRole);
       localStorage.removeItem('isDemoMode');
-      
-      // Set axios default header for future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
-      if (setIsAuthenticated) {
-        setIsAuthenticated(true);
-      }
+      if (setIsAuthenticated) setIsAuthenticated(true);
 
       // Navigate based on role
       switch (selectedRole) {

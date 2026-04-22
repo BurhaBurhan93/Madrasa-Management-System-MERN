@@ -4,7 +4,7 @@ import ListPage from '../shared/ListPage';
 export const educationHistoryConfig = {
   title: 'Student Education History',
   subtitle: 'Manage previous education records and academic background',
-  endpoint: '/students/education',
+  endpoint: '/students/education-history',
   columns: [
     { key: 'student', header: 'Student', render: (value, row) => row.student?.user?.name || '-' },
     { key: 'previousDegree', header: 'Previous Degree' },

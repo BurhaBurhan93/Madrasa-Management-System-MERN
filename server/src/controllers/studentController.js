@@ -612,6 +612,31 @@ const getStudentFinalResults = async (req, res) => {
   }
 };
 
+// Get single admission by ID
+const getAdmissionById = async (req, res) => {
+  try {
+    const admission = await Admission.findById(req.params.id).populate('degree', 'degreeName name');
+    if (!admission) return res.status(404).json({ success: false, message: 'Admission not found' });
+    res.json({ success: true, data: admission });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Get single student by ID
+const getStudentById = async (req, res) => {
+  try {
+    const student = await Student.findById(req.params.id)
+      .populate('user', 'name email phone')
+      .populate('currentClass', 'className')
+      .lean();
+    if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
+    res.json({ success: true, data: { ...student, firstName: student.user?.name?.split(' ')[0], lastName: student.user?.name?.split(' ')[1] || '' } });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Get all students (for Registrar/Staff)
 const getAllStudents = async (req, res) => {
   try {
@@ -623,9 +648,10 @@ const getAllStudents = async (req, res) => {
     // Merge student data with user data
     const enrichedStudents = students.map(student => ({
       ...student,
-      firstName: student.user?.name?.split(' ')[0],
-      lastName: student.user?.name?.split(' ')[1] || '',
-      name: student.user?.name,
+      _id: student._id,
+      firstName: student.firstName || student.user?.name?.split(' ')[0],
+      lastName:  student.lastName  || student.user?.name?.split(' ')[1] || '',
+      name:  student.user?.name,
       email: student.user?.email,
       phone: student.user?.phone
     }));
@@ -831,7 +857,9 @@ module.exports = {
   
   // Registrar/Staff routes
   getAllStudents,
+  getStudentById,
   getAllAdmissions,
+  getAdmissionById,
   createAdmission,
   updateAdmission,
   deleteAdmission,

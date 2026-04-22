@@ -19,18 +19,15 @@ const StaffPanel = () => {
     fetchUserData();
   }, []);
 
-  const fetchUserData = async () => {
+  const fetchUserData = () => {
     try {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        const res = await fetch(`http://localhost:5000/api/users/${userId}`);
-        const data = await res.json();
-        if (data.success) {
-          setUser(data.data);
-        }
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setUser(parsed);
       }
-    } catch (error) {
-      console.error('Error fetching user:', error);
+    } catch (e) {
+      console.error('Error reading user:', e);
     } finally {
       setLoading(false);
     }
@@ -50,7 +47,7 @@ const StaffPanel = () => {
   }, [setSidebarOpen]);
 
   const menuItems = [
-    { id: 'dashboard', icon: <FiHome size={19} />, path: '', label: 'Dashboard', type: 'link' },
+    { id: 'dashboard', icon: <FiHome size={19} />, path: 'dashboard', label: 'Dashboard', type: 'link' },
     {
       id: 'users',
       icon: <FiUserPlus size={19} />,
@@ -169,7 +166,7 @@ const StaffPanel = () => {
   ];
 
   const handleNavigation = (path) => {
-    navigate(path ? `/staff/${path}` : '/staff');
+    navigate(`/staff/${path}`);
     if (window.innerWidth < 768) setSidebarOpen(false);
   };
 
@@ -191,6 +188,8 @@ const StaffPanel = () => {
     localStorage.removeItem('userRole');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     navigate('/');
   };
 

@@ -5,7 +5,7 @@ import { libraryCategoriesConfig } from './Categories';
 
 const CategoriesView = () => {
   const { id } = useParams();
-  return <RecordViewPage title="Category Details" subtitle={libraryCategoriesConfig.subtitle} endpoint={libraryCategoriesConfig.endpoint} id={id} fields={libraryCategoriesConfig.formFields} listPath="/staff/library/categories" editPath={`/staff/library/categories/edit/${id}`} readMode="collection" readEndpoint={libraryCategoriesConfig.endpoint} />;
+  return <RecordViewPage title="Category Details" subtitle={libraryCategoriesConfig.subtitle} endpoint={libraryCategoriesConfig.endpoint} id={id} fields={libraryCategoriesConfig.formFields} listPath="/staff/library/categories" editPath={`/staff/library/categories/edit/${id}`} />;
 };
 
 export default CategoriesView;

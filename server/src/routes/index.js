@@ -17,6 +17,7 @@ const userRoutes = require('../modules/users/userRoutes');
 
 // Mount routes
 router.use('/auth', authRoutes);
+router.use('/students', studentRoutes);
 router.use('/student', studentRoutes);
 router.use('/teacher', teacherRoutes);
 router.use('/staff', staffRoutes);

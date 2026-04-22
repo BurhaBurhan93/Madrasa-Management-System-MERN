@@ -5,7 +5,7 @@ import { libraryBorrowedConfig } from './Borrowed';
 
 const BorrowedView = () => {
   const { id } = useParams();
-  return <RecordViewPage title="Borrow Record Details" subtitle={libraryBorrowedConfig.subtitle} endpoint={libraryBorrowedConfig.endpoint} id={id} fields={libraryBorrowedConfig.formFields} listPath="/staff/library/borrowed" editPath={`/staff/library/borrowed/edit/${id}`} readMode="collection" readEndpoint={libraryBorrowedConfig.endpoint} />;
+  return <RecordViewPage title="Borrow Record Details" subtitle={libraryBorrowedConfig.subtitle} endpoint={libraryBorrowedConfig.endpoint} id={id} fields={libraryBorrowedConfig.formFields} listPath="/staff/library/borrowed" editPath={`/staff/library/borrowed/edit/${id}`} />;
 };
 
 export default BorrowedView;

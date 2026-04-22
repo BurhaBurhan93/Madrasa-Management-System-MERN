@@ -5,7 +5,22 @@ import { budgetsConfig } from './MealPlaning';
 
 const MealPlaningEdit = () => {
   const { id } = useParams();
-  return <FormPage titleCreate="Create Kitchen Budget" titleEdit="Edit Kitchen Budget" endpoint={budgetsConfig.endpoint} formFields={budgetsConfig.formFields} initialForm={budgetsConfig.initialForm} mapFormToPayload={budgetsConfig.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/kitchen/meals" readMode="collection" readEndpoint={budgetsConfig.endpoint} />;
+  return (
+    <FormPage
+      titleCreate="Create Budget Request"
+      titleEdit="Edit Budget Request"
+      endpoint={budgetsConfig.endpoint}
+      formFields={budgetsConfig.formFields}
+      initialForm={budgetsConfig.initialForm}
+      mapRowToForm={budgetsConfig.mapRowToForm}
+      mapFormToPayload={budgetsConfig.mapFormToPayload}
+      mode="edit"
+      id={id}
+      onSavedPath="/staff/kitchen/meals"
+      readMode="collection"
+      readEndpoint={budgetsConfig.endpoint}
+    />
+  );
 };
 
 export default MealPlaningEdit;
