@@ -1,26 +1,32 @@
 import { useState, useEffect } from 'react';
+import { getAuthHeaders, clearAuth } from '../lib/auth';
 
 const useApi = (url, options = {}) => {
-  const [data, setData] = useState(null);
+  const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError]     = useState(null);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
+          ...getAuthHeaders(),
           ...options.headers,
         },
         ...options,
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.status === 401 || response.status === 403) {
+        clearAuth();
+        window.location.href = '/login';
+        return;
       }
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const result = await response.json();
       setData(result);
@@ -31,15 +37,9 @@ const useApi = (url, options = {}) => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [url]);
+  useEffect(() => { fetchData(); }, [url]);
 
-  const refetch = () => {
-    fetchData();
-  };
-
-  return { data, loading, error, refetch };
+  return { data, loading, error, refetch: fetchData };
 };
 
 export default useApi;

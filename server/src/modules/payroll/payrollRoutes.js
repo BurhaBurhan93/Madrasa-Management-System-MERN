@@ -1,6 +1,9 @@
 ﻿const express = require('express');
 const router = express.Router();
+const auth = require('../../middleware/auth');
 const ctrl = require('./payrollController');
+
+router.use(auth);
 
 // Employees list for relation dropdowns
 router.get('/employees', ctrl.listEmployees);

@@ -20,6 +20,17 @@ const getAllGuardians = async (req, res) => {
   }
 };
 
+// Get single guardian
+const getGuardianById = async (req, res) => {
+  try {
+    const guardian = await Guardian.findById(req.params.id).populate('student', 'firstName lastName studentCode');
+    if (!guardian) return res.status(404).json({ success: false, message: 'Guardian not found' });
+    res.json({ success: true, data: guardian });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Create guardian
 const createGuardian = async (req, res) => {
   try {
@@ -87,6 +98,17 @@ const getAllEducation = async (req, res) => {
   }
 };
 
+// Get single education record
+const getEducationById = async (req, res) => {
+  try {
+    const education = await StudentEducation.findById(req.params.id).populate('student', 'firstName lastName studentCode');
+    if (!education) return res.status(404).json({ success: false, message: 'Education record not found' });
+    res.json({ success: true, data: education });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Create education record
 const createEducation = async (req, res) => {
   try {
@@ -147,6 +169,17 @@ const getAllDocuments = async (req, res) => {
       .sort({ createdAt: -1 });
     
     res.json({ success: true, data: documents });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Get single document
+const getDocumentById = async (req, res) => {
+  try {
+    const document = await UserDocument.findById(req.params.id).populate('student', 'firstName lastName studentCode');
+    if (!document) return res.status(404).json({ success: false, message: 'Document not found' });
+    res.json({ success: true, data: document });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -420,32 +453,24 @@ const getStudentReports = async (req, res) => {
 };
 
 module.exports = {
-  // Guardian
   getAllGuardians,
+  getGuardianById,
   createGuardian,
   updateGuardian,
   deleteGuardian,
-  
-  // Education
   getAllEducation,
+  getEducationById,
   createEducation,
   updateEducation,
   deleteEducation,
-  
-  // Documents
   getAllDocuments,
+  getDocumentById,
   createDocument,
   updateDocument,
   deleteDocument,
-  
-  // Class Assignment
   transferStudent,
   promoteStudent,
-  
-  // Data Correction
   correctStudentData,
   getAuditLogs,
-  
-  // Reports
   getStudentReports
 };

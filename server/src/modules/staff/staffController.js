@@ -1,5 +1,10 @@
+const mongoose = require('mongoose');
 const Student = require('../../models/Student');
 const User = require('../../models/User');
+
+// Returns req.user.id only if it is a valid MongoDB ObjectId, otherwise undefined.
+const safeUserId = (req) =>
+  mongoose.isValidObjectId(req.user?.id) ? req.user.id : undefined;
 const Book = require('../../models/Book');
 const BorrowedBook = require('../../models/BorrowedBook');
 const Complaint = require('../../models/Complaint');
@@ -35,15 +40,15 @@ const getDashboardStats = async (req, res) => {
 const getAllStudents = async (req, res) => {
   try {
     const students = await Student.find()
-      .populate('userId', 'name email')
-      .select('studentId userId class status');
+      .populate('user', 'name email')
+      .select('studentCode user currentClass status');
 
     const formattedStudents = students.map(student => ({
       id: student._id,
-      name: student.userId?.name || 'Unknown',
-      email: student.userId?.email || '',
-      studentId: student.studentId,
-      class: student.class || 'N/A',
+      _id: student._id,
+      name: student.user?.name || 'Unknown',
+      email: student.user?.email || '',
+      studentCode: student.studentCode || '',
       status: student.status
     }));
 
@@ -58,23 +63,22 @@ const getStudentDetails = async (req, res) => {
   try {
     const { id } = req.params;
     
-    const student = await Student.findById(id).populate('userId');
+    const student = await Student.findById(id).populate('user');
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
     }
 
     const borrowedBooks = await BorrowedBook.find({ 
-      studentId: student.userId._id,
+      borrower: student._id,
       status: 'borrowed'
     }).populate('bookId');
 
     res.json({
       student: {
         id: student._id,
-        name: student.userId.name,
-        email: student.userId.email,
-        studentId: student.studentId,
-        class: student.class,
+        name: student.user?.name || 'Unknown',
+        email: student.user?.email || '',
+        studentCode: student.studentCode || '',
         status: student.status
       },
       borrowedBooks: borrowedBooks.map(bb => ({
@@ -179,8 +183,19 @@ const getComplaintActions = async (req, res) => {
       .populate('complaint', 'complaintCode subject')
       .populate('actionTakenBy', 'name')
       .sort({ actionDate: -1, createdAt: -1 });
-
     res.json(actions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getComplaintActionById = async (req, res) => {
+  try {
+    const action = await ComplaintAction.findById(req.params.id)
+      .populate('complaint', 'complaintCode subject')
+      .populate('actionTakenBy', 'name');
+    if (!action) return res.status(404).json({ message: 'Complaint action not found' });
+    res.json(action);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -196,7 +211,7 @@ const createComplaintAction = async (req, res) => {
       followUpDate: req.body.followUpDate || null,
       nextActionRequired: !!req.body.nextActionRequired,
       remarks: req.body.remarks || '',
-      actionTakenBy: req.user.id
+      ...(safeUserId(req) && { actionTakenBy: safeUserId(req) })
     });
 
     res.status(201).json(action);
@@ -249,8 +264,19 @@ const getComplaintFeedbacks = async (req, res) => {
       .populate('complaint', 'complaintCode subject')
       .populate('feedbackBy', 'name')
       .sort({ feedbackDate: -1, createdAt: -1 });
-
     res.json(feedbacks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getComplaintFeedbackById = async (req, res) => {
+  try {
+    const feedback = await ComplaintFeedback.findById(req.params.id)
+      .populate('complaint', 'complaintCode subject')
+      .populate('feedbackBy', 'name');
+    if (!feedback) return res.status(404).json({ message: 'Complaint feedback not found' });
+    res.json(feedback);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -263,7 +289,7 @@ const createComplaintFeedback = async (req, res) => {
       satisfactionLevel: req.body.satisfactionLevel,
       comments: req.body.comments || '',
       feedbackDate: req.body.feedbackDate || new Date(),
-      feedbackBy: req.user.id
+      ...(safeUserId(req) && { feedbackBy: safeUserId(req) })
     });
 
     res.status(201).json(feedback);
@@ -315,7 +341,6 @@ const getAllBooks = async (req, res) => {
     const books = await Book.find()
       .populate('category', 'name')
       .sort({ createdAt: -1 });
-
     const formattedBooks = books.map(book => ({
       id: book._id,
       title: book.title,
@@ -327,8 +352,17 @@ const getAllBooks = async (req, res) => {
       pages: book.pages || 0,
       publisher: book.publisher || ''
     }));
-
     res.json(formattedBooks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getBookById = async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id).populate('category', 'name');
+    if (!book) return res.status(404).json({ message: 'Book not found' });
+    res.json(book);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -387,6 +421,16 @@ const getBookCategories = async (req, res) => {
   }
 };
 
+const getBookCategoryById = async (req, res) => {
+  try {
+    const category = await BookCategory.findById(req.params.id);
+    if (!category) return res.status(404).json({ message: 'Category not found' });
+    res.json(category);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const createBookCategory = async (req, res) => {
   try {
     const category = await BookCategory.create({
@@ -434,22 +478,14 @@ const deleteBookCategory = async (req, res) => {
 const getBorrowedBooks = async (req, res) => {
   try {
     const records = await BorrowedBook.find()
-      .populate({ path: 'borrower', populate: { path: 'userId', select: 'name email' } })
+      .populate({ path: 'borrower', populate: { path: 'user', select: 'name email' } })
       .populate('book', 'title')
       .sort({ borrowedAt: -1 });
-
     res.json(
       records.map((record) => ({
         _id: record._id,
-        borrower: {
-          _id: record.borrower?._id,
-          name: record.borrower?.userId?.name || 'Unknown',
-          email: record.borrower?.userId?.email || ''
-        },
-        book: {
-          _id: record.book?._id,
-          title: record.book?.title || 'Unknown'
-        },
+        borrower: { _id: record.borrower?._id, name: record.borrower?.user?.name || record.borrower?.firstName || 'Unknown', email: record.borrower?.user?.email || '' },
+        book: { _id: record.book?._id, title: record.book?.title || 'Unknown' },
         borrowedAt: record.borrowedAt,
         returnDate: record.returnDate,
         status: record.status
@@ -460,26 +496,42 @@ const getBorrowedBooks = async (req, res) => {
   }
 };
 
+const getBorrowedBookById = async (req, res) => {
+  try {
+    const record = await BorrowedBook.findById(req.params.id)
+      .populate({ path: 'borrower', populate: { path: 'user', select: 'name email' } })
+      .populate('book', 'title');
+    if (!record) return res.status(404).json({ message: 'Borrow record not found' });
+    res.json(record);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const createBorrowedBook = async (req, res) => {
   try {
-    const book = await Book.findById(req.body.book);
-    if (!book) {
-      return res.status(404).json({ message: 'Book not found' });
-    }
-    if (book.stock <= 0) {
-      return res.status(400).json({ message: 'Book is out of stock' });
-    }
+    const borrower = req.body.borrower || null;
+    const book     = req.body.book     || null;
 
+    if (!borrower) return res.status(400).json({ message: 'Borrower (student) is required' });
+    if (!book)     return res.status(400).json({ message: 'Book is required' });
+
+    const bookDoc = await Book.findById(book);
+    if (!bookDoc) return res.status(404).json({ message: 'Book not found' });
+    if (bookDoc.stock <= 0) return res.status(400).json({ message: 'Book is out of stock' });
+
+    // borrower may be a Student _id or a formatted id from getAllStudents
+    // getAllStudents returns { id: student._id, ... } so handle both
     const record = await BorrowedBook.create({
-      borrower: req.body.borrower,
-      book: req.body.book,
+      borrower,
+      book,
       borrowedAt: req.body.borrowedAt || new Date(),
       returnDate: req.body.returnDate || new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       status: 'borrowed'
     });
 
-    book.stock -= 1;
-    await book.save();
+    bookDoc.stock -= 1;
+    await bookDoc.save();
 
     res.status(201).json(record);
   } catch (error) {
@@ -524,6 +576,16 @@ const getBookPurchases = async (req, res) => {
   }
 };
 
+const getBookPurchaseById = async (req, res) => {
+  try {
+    const purchase = await BookPurchase.findById(req.params.id).populate('book', 'title');
+    if (!purchase) return res.status(404).json({ message: 'Purchase not found' });
+    res.json(purchase);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const createBookPurchase = async (req, res) => {
   try {
     const purchase = await BookPurchase.create({
@@ -535,7 +597,7 @@ const createBookPurchase = async (req, res) => {
       unitPrice: req.body.unitPrice,
       totalPrice: req.body.totalPrice,
       purchaseDate: req.body.purchaseDate || new Date(),
-      purchasedBy: req.user.id
+      ...(safeUserId(req) && { purchasedBy: safeUserId(req) })
     });
 
     const book = await Book.findById(req.body.book);
@@ -592,9 +654,21 @@ const getBookSales = async (req, res) => {
   try {
     const sales = await BookSale.find()
       .populate('book', 'title')
-      .populate({ path: 'student', populate: { path: 'userId', select: 'name email' } })
+      .populate({ path: 'student', populate: { path: 'user', select: 'name email' } })
       .sort({ saleDate: -1, createdAt: -1 });
     res.json(sales);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getBookSaleById = async (req, res) => {
+  try {
+    const sale = await BookSale.findById(req.params.id)
+      .populate('book', 'title')
+      .populate({ path: 'student', populate: { path: 'user', select: 'name email' } });
+    if (!sale) return res.status(404).json({ message: 'Sale not found' });
+    res.json(sale);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -610,7 +684,7 @@ const createBookSale = async (req, res) => {
       unitPrice: req.body.unitPrice,
       totalAmount: req.body.totalAmount,
       saleDate: req.body.saleDate || new Date(),
-      soldBy: req.user.id
+      ...(safeUserId(req) && { soldBy: safeUserId(req) })
     });
 
     const book = await Book.findById(req.body.book);
@@ -712,34 +786,39 @@ module.exports = {
   getAllComplaints,
   updateComplaintStatus,
   getComplaintActions,
+  getComplaintActionById,
   createComplaintAction,
   updateComplaintAction,
   deleteComplaintAction,
   getComplaintFeedbacks,
+  getComplaintFeedbackById,
   createComplaintFeedback,
   updateComplaintFeedback,
   deleteComplaintFeedback,
-  // Library management
   getAllBooks,
+  getBookById,
   createBook,
   updateBook,
   deleteBook,
   getBookCategories,
+  getBookCategoryById,
   createBookCategory,
   updateBookCategory,
   deleteBookCategory,
   getBorrowedBooks,
+  getBorrowedBookById,
   createBorrowedBook,
   updateBorrowedBook,
   getBookPurchases,
+  getBookPurchaseById,
   createBookPurchase,
   updateBookPurchase,
   deleteBookPurchase,
   getBookSales,
+  getBookSaleById,
   createBookSale,
   updateBookSale,
   deleteBookSale,
   getLibraryStats,
-  // Complaint stats
   getComplaintStats
 };
