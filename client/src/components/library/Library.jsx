@@ -5,8 +5,9 @@ import Badge from '../UIHelper/Badge';
 import Button from '../UIHelper/Button';
 import Input from '../UIHelper/Input';
 import ErrorPage from '../UIHelper/ErrorPage';
+import { PageSkeleton } from '../UIHelper/SkeletonLoader';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const POLL_INTERVAL = 10000;
 
 const Library = () => {
@@ -119,10 +120,7 @@ const Library = () => {
       )}
 
       {loading && books.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading library data...</p>
-        </div>
+        <PageSkeleton variant="table" />
       ) : (
         <div>
           <div className="mb-6 border-b border-gray-200">

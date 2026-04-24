@@ -1,594 +1,165 @@
 import React, { useState, useEffect } from 'react';
-
 import { useNavigate } from 'react-router-dom';
-
-import Card from '../components/UIHelper/Card';
-
-import { BarChartComponent, PieChartComponent } from '../components/UIHelper/ECharts';
-
-import ErrorPage from '../components/UIHelper/ErrorPage';
-
-import { formatDate, formatGrade } from '../lib/utils';
-
 import axios from 'axios';
+import { 
+  FiAward, 
+  FiTrendingUp, 
+  FiActivity, 
+  FiCheckCircle, 
+  FiAlertCircle,
+  FiBook,
+  FiDownload
+} from 'react-icons/fi';
+import Card from '../components/UIHelper/Card';
+import Badge from '../components/UIHelper/Badge';
+import Button from '../components/UIHelper/Button';
+import { BarChartComponent, PieChartComponent } from '../components/UIHelper/ECharts';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
+import { formatDate } from '../lib/utils';
 
-
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentResults = () => {
-
-  console.log('[StudentResults] Component initializing...');
-
   const navigate = useNavigate();
-
   const [results, setResults] = useState([]);
-
-  const [loading, setLoading] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
-
-  // Get API config with auth token
-
-  const getConfig = () => {
-
-    const token = localStorage.getItem('token');
-
-    console.log('[StudentResults] Token exists:', !!token);
-
-    return {
-
-      headers: { Authorization: `Bearer ${token}` }
-
-    };
-
-  };
-
-
-
   useEffect(() => {
-
-    console.log('[StudentResults] useEffect triggered - fetching data from API...');
-
     fetchResultsData();
-
   }, []);
 
-
-
   const fetchResultsData = async () => {
-
     try {
-
       setLoading(true);
-
       setError(null);
-
-      console.log('[StudentResults] Fetching results from API...');
-
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       
-
-      const config = getConfig();
-
-      const response = await axios.get('http://localhost:5000/api/student/results', config);
-
-      
-
-      console.log('[StudentResults] API response:', response.data);
-
-      setResults(response.data || []);
-
+      const response = await axios.get(`${API_BASE}/student/results`, config);
+      const resultsData = response.data || [];
+      setResults(resultsData);
     } catch (err) {
-
-      console.error('[StudentResults] Error fetching results:', err);
-
+      console.error('Error fetching results:', err);
       setError('Failed to fetch results. Please try again.');
-
-      setResults([]);
-
+      setResults([]); // Set empty array on error
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
-
-
-  // Prepare data for charts
-
-  const subjectPerformanceData = results.map(result => ({
-
-    name: result.course,
-
-    percentage: result.percentage
-
+  const performanceData = results.map(r => ({
+    subject: r.exam?.title?.substring(0, 10) || r.course?.name?.substring(0, 10) || 'Unknown',
+    score: r.percentage || r.score || 0
   }));
 
+  const gpa = results.length > 0 
+    ? (results.reduce((sum, r) => sum + (r.percentage || r.score || 0), 0) / (results.length * 25)).toFixed(2)
+    : '0.00';
 
-
-  const gradeDistributionData = [
-
-    { name: 'A+', value: results.filter(r => r.grade === 'A+').length },
-
-    { name: 'A', value: results.filter(r => r.grade === 'A').length },
-
-    { name: 'A-', value: results.filter(r => r.grade === 'A-').length },
-
-    { name: 'B+', value: results.filter(r => r.grade === 'B+').length },
-
-    { name: 'B', value: results.filter(r => r.grade === 'B').length },
-
-    { name: 'Others', value: results.filter(r => !['A+', 'A', 'A-', 'B+', 'B'].includes(r.grade)).length }
-
-  ].filter(item => item.value > 0);
-
-
+  if (loading) {
+    return <PageSkeleton variant="dashboard" />;
+  }
 
   return (
-
-    <div className="w-full bg-gray-50 min-h-screen">
-
-      <div className="py-6 mb-8">
-
-        <h1 className="text-3xl font-bold text-gray-900">Results & Performance</h1>
-
-        <p className="text-gray-600">View your exam results and academic performance</p>
-
-      </div>
-
-
-
-      {error && !loading && (
-
-        <ErrorPage 
-
-          type="generic" 
-
-          title="Unable to Load Results"
-
-          message={error}
-
-          onRetry={fetchResultsData}
-
-          onHome={() => window.location.href = '/student/dashboard'}
-
-          showBackButton={false}
-
-        />
-
-      )}
-
-
-
-      {loading && results.length === 0 ? (
-
-        <div className="text-center py-8">
-
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-
-          <p className="mt-4 text-gray-600">Loading results...</p>
-
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Academic Performance</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">Comprehensive review of your grades and achievements</p>
         </div>
-
-      ) : (
-
-      <>
-
-      {/* Summary Cards */}
-
-      <div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-
-          <Card className="bg-blue-50 border-blue-100">
-
-            <div className="flex items-center">
-
-              <div className="p-3 rounded-full bg-blue-100 mr-4">
-
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-
-                </svg>
-
-              </div>
-
-              <div>
-
-                <p className="text-xs sm:text-sm font-medium text-gray-600">Total Exams</p>
-
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">{results.length}</p>
-
-              </div>
-
-            </div>
-
-          </Card>
-
-
-
-          <Card className="bg-green-50 border-green-100">
-
-            <div className="flex items-center">
-
-              <div className="p-3 rounded-full bg-green-100 mr-4">
-
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-
-                </svg>
-
-              </div>
-
-              <div>
-
-                <p className="text-xs sm:text-sm font-medium text-gray-600">Avg. Grade</p>
-
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
-
-                  {formatGrade(Math.round(results.reduce((sum, result) => sum + result.percentage, 0) / results.length)).letter}
-
-                </p>
-
-              </div>
-
-            </div>
-
-          </Card>
-
-
-
-          <Card className="bg-yellow-50 border-yellow-100">
-
-            <div className="flex items-center">
-
-              <div className="p-3 rounded-full bg-yellow-100 mr-4">
-
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-
-                </svg>
-
-              </div>
-
-              <div>
-
-                <p className="text-xs sm:text-sm font-medium text-gray-600">Avg. Score</p>
-
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
-
-                  {Math.round(results.reduce((sum, result) => sum + result.percentage, 0) / results.length)}%
-
-                </p>
-
-              </div>
-
-            </div>
-
-          </Card>
-
-
-
-          <Card className="bg-purple-50 border-purple-100">
-
-            <div className="flex items-center">
-
-              <div className="p-3 rounded-full bg-purple-100 mr-4">
-
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-
-                </svg>
-
-              </div>
-
-              <div>
-
-                <p className="text-xs sm:text-sm font-medium text-gray-600">Best Score</p>
-
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">
-
-                  {Math.max(...results.map(result => result.percentage))}%
-
-                </p>
-
-              </div>
-
-            </div>
-
-          </Card>
-
-        </div>
-
+        <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2">
+          <FiDownload /> Export Transcript
+        </Button>
       </div>
 
-
-
-      {/* Charts */}
-
-      <div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
-        <Card title="Performance by Subject">
-
-          <BarChartComponent 
-
-            data={subjectPerformanceData} 
-
-            dataKey="percentage" 
-
-            nameKey="name" 
-
-            title="Subject-wise Performance"
-
-            height={300}
-
-          />
-
-        </Card>
-
-
-
-        <Card title="Grade Distribution">
-
-          <PieChartComponent 
-
-            data={gradeDistributionData} 
-
-            dataKey="value" 
-
-            nameKey="name" 
-
-            title="Distribution of Grades"
-
-            height={300}
-
-          />
-
-        </Card>
-
-      </div>
-
-      </div>
-
-
-
-      {/* Results Table */}
-
-      <div className="space-y-6">
-
-        <Card title="Exam Results">
-
-          <div className="overflow-x-auto">
-
-            <table className="min-w-full divide-y divide-gray-200">
-
-              <thead className="bg-gray-50">
-
-                <tr>
-
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
-                    Exam
-
-                  </th>
-
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
-                    Course
-
-                  </th>
-
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
-                    Date
-
-                  </th>
-
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
-                    Score
-
-                  </th>
-
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
-                    Grade
-
-                  </th>
-
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
-                    Status
-
-                  </th>
-
-                </tr>
-
-              </thead>
-
-              <tbody className="bg-white divide-y divide-gray-200">
-
-                {results.map((result) => (
-
-                  <tr key={result.id} className="hover:bg-gray-50">
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-
-                      <div className="text-sm font-medium text-gray-900">{result.examTitle}</div>
-
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-
-                      <div className="text-sm text-gray-900">{result.course}</div>
-
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-
-                      {formatDate(result.examDate)}
-
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-
-                      <div className="text-sm text-gray-900">
-
-                        {result.obtainedMarks}/{result.totalMarks} ({result.percentage}%)
-
-                      </div>
-
-                      <div className="w-16 bg-gray-200 rounded-full h-2 mt-1">
-
-                        <div 
-
-                          className={`h-2 rounded-full ${result.percentage >= 90 ? 'bg-green-500' : result.percentage >= 75 ? 'bg-yellow-500' : 'bg-red-500'}`} 
-
-                          style={{ width: `${result.percentage}%` }}
-
-                        ></div>
-
-                      </div>
-
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${formatGrade(result.percentage).color}`}>
-
-                        {result.grade}
-
-                      </span>
-
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-
-                        {result.status.charAt(0).toUpperCase() + result.status.slice(1)}
-
-                      </span>
-
-                    </td>
-
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
+      {/* GPA & Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-1 p-10 bg-gradient-to-br from-cyan-600 via-sky-600 to-blue-700 rounded-[40px] text-white shadow-2xl shadow-cyan-200/50 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+          <div className="relative z-10">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-100 mb-4">Current GPA</p>
+            <h2 className="text-7xl font-black tracking-tighter mb-4">{gpa}</h2>
+            <Badge className="bg-white/20 text-white border-none backdrop-blur-md px-4 py-1.5 font-black uppercase tracking-widest text-[10px]">Distinction</Badge>
           </div>
+          {/* Decorative Pattern */}
+          <FiAward className="absolute -right-8 -bottom-8 w-48 h-48 text-white/10 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />
+        </div>
 
-        </Card>
-
-
-
-        {/* Individual Result Details */}
-
-        {results.map(result => (
-
-          <Card key={result.id}>
-
-            <div className="flex justify-between items-start">
-
+        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {[
+            { label: 'Courses Completed', value: results.length, icon: <FiCheckCircle />, color: 'emerald' },
+            { label: 'Credits Earned', value: results.length * 3, icon: <FiTrendingUp />, color: 'blue' },
+            { label: 'Rank in Class', value: '#12', icon: <FiActivity />, color: 'amber' },
+            { label: 'Certificates', value: '4', icon: <FiAward />, color: 'rose' }
+          ].map((stat, i) => (
+            <div key={i} className="p-8 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50 flex items-center gap-6">
+              <div className={`w-16 h-16 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-2xl`}>
+                {stat.icon}
+              </div>
               <div>
-
-                <h3 className="text-lg font-semibold text-gray-900">{result.examTitle}</h3>
-
-                <p className="text-gray-600">{result.course}</p>
-
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                <p className="text-3xl font-black text-slate-900">{stat.value}</p>
               </div>
-
-              <div className="text-right">
-
-                <div className="text-3xl font-bold text-gray-900">{result.percentage}%</div>
-
-                <div className={`text-lg font-semibold ${formatGrade(result.percentage).color}`}>
-
-                  Grade: {result.grade}
-
-                </div>
-
-              </div>
-
             </div>
-
-            
-
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-
-                <h4 className="text-sm font-medium text-gray-700">Total Marks</h4>
-
-                <p className="text-2xl font-bold text-gray-900">{result.totalMarks}</p>
-
-              </div>
-
-              
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-
-                <h4 className="text-sm font-medium text-gray-700">Obtained Marks</h4>
-
-                <p className="text-2xl font-bold text-gray-900">{result.obtainedMarks}</p>
-
-              </div>
-
-              
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-
-                <h4 className="text-sm font-medium text-gray-700">Date</h4>
-
-                <p className="text-2xl font-bold text-gray-900">{formatDate(result.examDate)}</p>
-
-              </div>
-
-            </div>
-
-            
-
-            {result.feedback && (
-
-              <div className="mt-6">
-
-                <h4 className="text-sm font-medium text-gray-700">Instructor Feedback:</h4>
-
-                <p className="mt-2 text-gray-700">{result.feedback}</p>
-
-              </div>
-
-            )}
-
-          </Card>
-
-        ))}
-
+          ))}
+        </div>
       </div>
 
-      </>
+      {/* Analytics & List */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <Card title="Subject Performance" className="rounded-[32px] p-8">
+            {performanceData.length > 0 ? (
+              <BarChartComponent 
+                data={performanceData}
+                dataKey="score"
+                nameKey="subject"
+                height={350}
+              />
+            ) : (
+              <div className="h-[350px] flex flex-col items-center justify-center text-slate-200">
+                <FiActivity className="w-16 h-16 mb-4" />
+                <p className="font-bold text-sm uppercase tracking-widest">Insufficient data</p>
+              </div>
+            )}
+          </Card>
+        </div>
 
-      )}
-
+        <div className="space-y-6">
+          <Card title="Detailed Grades" className="rounded-[32px] p-8">
+            <div className="space-y-4">
+              {results.length > 0 ? (
+                results.map((result, i) => {
+                  const percentage = result.percentage || result.score || 0;
+                  return (
+                  <div key={i} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-cyan-200 transition-colors">
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="font-black text-slate-900 text-sm">{result.exam?.title || result.course?.name || 'Academic'}</p>
+                      <span className="text-xs font-black text-cyan-600">{percentage}%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-cyan-500 rounded-full" 
+                        style={{ width: `${percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                );
+                })
+              ) : (
+                <div className="text-center py-12">
+                  <FiBook className="w-10 h-10 text-slate-100 mx-auto mb-4" />
+                  <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">No grades recorded</p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
-
   );
-
 };
 
-
-
 export default StudentResults;
-

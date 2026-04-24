@@ -9,14 +9,14 @@ const ensureStaffOrAdmin = (req, res, next) => {
   if (!['staff', 'admin'].includes(req.user.role)) {
     return res.status(403).json({ message: 'Access denied. Staff/Admin only.' });
   }
-  next;
+  next();
 };
 
 const ensureStudent = (req, res, next) => {
   if (req.user.role !== 'student') {
     return res.status(403).json({ message: 'Access denied. Students only.' });
   }
-  next;
+  next();
 };
 
 // ================= REGISTRAR/STAFF ROUTES (No student middleware) =================
@@ -53,6 +53,9 @@ router.post('/admissions/:id/convert', ctrl.convertToStudent); // Convert to stu
 
 // Registrar routes - All Students Management
 router.get('/all', ctrl.getAllStudents); // Get all students
+router.post('/', ctrl.createStudent); // Create new student (for registrar)
+router.put('/:id', ctrl.updateStudent); // Update student
+router.delete('/:id', ctrl.deleteStudent); // Delete student
 
 // ================= REGISTRAR DEPARTMENT ROUTES =================
 
@@ -91,6 +94,10 @@ router.get('/profile', ctrl.getStudentProfile);
 router.put('/profile', ctrl.updateStudentProfile);
 
 router.get('/courses', ctrl.getStudentCourses);
+router.get('/exams', ctrl.getExams);
+router.get('/exams/:id', ctrl.getExamDetails);
+router.get('/exams/:id/my-submission', ctrl.getExamSubmission);
+router.post('/exams/:id/submit', ctrl.submitExam);
 router.get('/attendance', ctrl.getAttendanceRecords);
 router.get('/assignments', ctrl.getAssignments);
 router.get('/results', ctrl.getExamResults);

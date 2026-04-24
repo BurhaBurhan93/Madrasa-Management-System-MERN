@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import Card from "../../components/UIHelper/Card";
 import Input from "../../components/UIHelper/Input";
 import Button from "../../components/UIHelper/Button";
+import axios from 'axios';
 import { validatePassword } from '../../lib/utils';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const Security = () => {
   const [passwordData, setPasswordData] = useState({
@@ -12,6 +15,7 @@ const Security = () => {
   });
   
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [loginHistory, setLoginHistory] = useState([
     { id: 1, date: '2024-02-10 10:30 AM', ip: '192.168.1.100', location: 'Local', status: 'Success' },
     { id: 2, date: '2024-02-09 3:45 PM', ip: '203.0.113.45', location: 'Remote', status: 'Success' },
@@ -19,6 +23,11 @@ const Security = () => {
   ]);
 
   const [errors, setErrors] = useState({});
+
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    return { headers: { Authorization: `Bearer ${token}` } };
+  };
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -59,23 +68,54 @@ const Security = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmitPassword = (e) => {
+  const handleSubmitPassword = async (e) => {
     e.preventDefault();
     
-    if (validatePasswordForm()) {
-      // In a real app, you would send to the backend
+    if (!validatePasswordForm()) return;
+    
+    try {
+      setLoading(true);
+      const config = getConfig();
+      
+      // Note: Backend password update endpoint needs to be created
+      // This attempts to update via profile endpoint or a dedicated auth endpoint
+      await axios.put(`${API_BASE}/auth/password`, {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      }, config);
+      
       alert('Password updated successfully!');
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
+    } catch (err) {
+      console.error('[Security] Password update error:', err);
+      alert('Password update failed. Please verify your current password or try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const toggleTwoFactor = () => {
-    setTwoFactorEnabled(!twoFactorEnabled);
-    alert(`Two-factor authentication ${twoFactorEnabled ? 'disabled' : 'enabled'} successfully!`);
+  const toggleTwoFactor = async () => {
+    try {
+      setLoading(true);
+      const config = getConfig();
+      
+      // Note: Backend 2FA toggle endpoint needs to be created
+      await axios.post(`${API_BASE}/auth/2fa/toggle`, {
+        enabled: !twoFactorEnabled
+      }, config);
+      
+      setTwoFactorEnabled(!twoFactorEnabled);
+      alert(`Two-factor authentication ${!twoFactorEnabled ? 'enabled' : 'disabled'} successfully!`);
+    } catch (err) {
+      console.error('[Security] 2FA toggle error:', err);
+      alert('Failed to update 2FA settings. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

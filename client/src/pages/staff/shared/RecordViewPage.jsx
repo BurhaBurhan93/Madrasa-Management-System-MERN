@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../../../components/UIHelper/Button';
 import Card from '../../../components/UIHelper/Card';
-import ErrorPage from '../../../components/UIHelper/ErrorPage';
 import StaffPageLayout from './StaffPageLayout';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -73,7 +72,33 @@ const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, 
   }, [endpoint, id, readMode, readEndpoint]);
 
   if (loading) return <StaffPageLayout eyebrow="Record View" title={title} subtitle={subtitle}><div className="rounded-[26px] border border-slate-200 bg-white p-8 text-sm text-slate-500 shadow-sm">Loading record...</div></StaffPageLayout>;
-  if (error) return <StaffPageLayout eyebrow="Record View" title={title} subtitle={subtitle}><ErrorPage type="generic" title="Unable to load record" message={error} onRetry={() => window.location.reload()} showHomeButton={false} showBackButton={true} onBack={() => window.history.back()} /></StaffPageLayout>;
+  if (error) return (
+    <StaffPageLayout eyebrow="Record View" title={title} subtitle={subtitle}>
+      <Card className="rounded-[28px] border border-rose-200 bg-rose-50">
+        <div className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <svg className="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-rose-900">Unable to Load Record</h3>
+              <p className="mt-1 text-sm text-rose-700">{error}</p>
+              <div className="mt-3 flex gap-3">
+                <button onClick={() => window.location.reload()} className="inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
+                  Retry
+                </button>
+                <button onClick={() => window.history.back()} className="inline-flex items-center rounded-lg border border-rose-300 bg-white px-4 py-2 text-sm font-medium text-rose-700 hover:bg-rose-50 transition-colors">
+                  Go Back
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </StaffPageLayout>
+  );
 
   return (
     <StaffPageLayout eyebrow="Record View" title={title} subtitle={subtitle} actions={<>{listPath && <Button variant="outline" onClick={() => (window.location.href = listPath)}>Back To List</Button>}{editPath && <Button variant="primary" onClick={() => (window.location.href = editPath)}>Update Record</Button>}</>}>

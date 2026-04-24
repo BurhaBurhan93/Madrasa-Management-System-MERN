@@ -48,17 +48,13 @@ const AdminUsers = () => {
     }
 
     try {
-      console.log('Submitting form data:', formData);
-      
       if (editMode) {
         const updateData = { ...formData };
         if (!updateData.password) delete updateData.password;
-        const response = await axios.put(`http://localhost:5000/api/users/${currentUser._id}`, updateData);
-        console.log('Update response:', response.data);
+        await axios.put(`http://localhost:5000/api/users/${currentUser._id}`, updateData);
         alert('User updated successfully');
       } else {
-        const response = await axios.post('http://localhost:5000/api/users', formData);
-        console.log('Create response:', response.data);
+        await axios.post('http://localhost:5000/api/users', formData);
         alert('User created successfully');
       }
       resetForm();

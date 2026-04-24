@@ -16,12 +16,16 @@ import StudentLeave from '../pages/StudentLeave';
 import StudentLibrary from '../pages/StudentLibrary';
 import StudentComplaints from '../pages/StudentComplaints';
 import StudentExamAttempt from "../pages/StudentExamAttempt";
+import StudentExamResults from "../pages/StudentExamResults";
+import StudentTimetable from "../pages/StudentTimetable";
 import LearningResources from '../components/library/LearningResources';
 import BorrowedBooks from '../components/library/BorrowedBooks';
 import PurchaseHistory from '../components/library/PurchaseHistory';
 import TransactionHistory from '../components/finance/TransactionHistory';
 import HomeworkSubmission from '../components/assignments/HomeworkSubmission';
 import Communications from '../components/communications/Communications';
+import StudentEvents from '../pages/StudentEvents';
+import StudentHostel from '../pages/StudentHostel';
 
 const StudentRoutes = () => (
   <Route path="/" element={<StudentPanel />}>
@@ -35,6 +39,8 @@ const StudentRoutes = () => (
     <Route path="results" element={<StudentResults />} />
     <Route path="schedule" element={<StudentSchedule />} />
     <Route path="exams" element={<StudentExams />} />
+    <Route path="exam-results" element={<StudentExamResults />} />
+    <Route path="timetable" element={<StudentTimetable />} />
     <Route path="fees" element={<StudentFees />} />
     <Route path="education" element={<StudentEducation />} />
     <Route path="degrees" element={<StudentDegree />} />
@@ -45,6 +51,8 @@ const StudentRoutes = () => (
     <Route path="purchase" element={<PurchaseHistory />} />
     <Route path="transactions" element={<TransactionHistory />} />
     <Route path="complaints" element={<StudentComplaints />} />
+    <Route path="events" element={<StudentEvents />} />
+    <Route path="hostel/*" element={<StudentHostel />} />
     <Route path="communications" element={<Communications />} />
     <Route path="exams/:examId/attempt" element={<StudentExamAttempt />} />
   </Route>

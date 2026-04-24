@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Card from '../../../components/UIHelper/Card';
 import Badge from '../../../components/UIHelper/Badge';
 import Button from '../../../components/UIHelper/Button';
-import ErrorPage from '../../../components/UIHelper/ErrorPage';
 import axios from 'axios';
 
 const DataCorrection = () => {
@@ -48,8 +47,6 @@ const DataCorrection = () => {
 
   const fetchChangeLogs = async (studentId) => {
     try {
-      // This would call an audit log endpoint
-      // For now, we'll mock this - you'd need to create an AuditLog model
       setChangeLogs([]);
     } catch (err) {
       console.error('Failed to fetch change logs:', err);
@@ -131,13 +128,26 @@ const DataCorrection = () => {
 
   if (error && !loading) {
     return (
-      <ErrorPage 
-        type="generic" 
-        title="Unable to Load Data"
-        message={error}
-        onRetry={fetchStudents}
-        onHome={() => window.location.href = '/staff/dashboard'}
-      />
+      <div className="w-full bg-gray-50 min-h-screen p-6">
+        <Card className="rounded-[28px] border border-rose-200 bg-rose-50 mb-6">
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-rose-900">Unable to Load Data</h3>
+                <p className="mt-1 text-sm text-rose-700">{error}</p>
+                <button onClick={fetchStudents} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
     );
   }
 

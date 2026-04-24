@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FiAward, FiTrendingUp, FiTarget, FiCheckCircle, FiFileText, FiArrowRight } from 'react-icons/fi';
 import Card from '../components/UIHelper/Card';
 import Badge from '../components/UIHelper/Badge';
-import ErrorPage from '../components/UIHelper/ErrorPage';
+import Button from '../components/UIHelper/Button';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
+import { formatDate } from '../lib/utils';
 import axios from 'axios';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentExamResults = () => {
   const navigate = useNavigate();
@@ -35,7 +40,7 @@ const StudentExamResults = () => {
       setError(null);
       
       const config = getConfig();
-      const response = await axios.get('http://localhost:5000/api/student/exam-results', config);
+      const response = await axios.get(`${API_BASE}/student/exam-results`, config);
       
       const examResults = response.data || [];
       setResults(examResults);
@@ -94,162 +99,109 @@ const StudentExamResults = () => {
   };
 
   if (loading) {
-    return (
-      <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading exam results...</p>
-      </div>
-    );
-  }
-
-  if (error && !loading) {
-    return (
-      <ErrorPage 
-        type="generic" 
-        title="Unable to Load Results"
-        message={error}
-        onRetry={fetchExamResults}
-        onHome={() => navigate('/student/dashboard')}
-        showBackButton={false}
-      />
-    );
+    return <PageSkeleton variant="dashboard" />;
   }
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen p-6">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Exam Results</h1>
-        <p className="text-gray-600">View all your examination results with teacher information</p>
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Exam Results</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">View all your examination results with teacher information</p>
+        </div>
+        <Button 
+          variant="primary" 
+          className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2"
+          onClick={() => navigate('/student/exams')}
+        >
+          <FiFileText /> View All Exams
+        </Button>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-100 text-sm mb-1">Total Exams</p>
-              <p className="text-3xl font-bold">{stats.totalExams}</p>
-            </div>
-            <div className="text-blue-200">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-100 text-sm mb-1">Average Score</p>
-              <p className="text-3xl font-bold">{stats.averageScore}%</p>
-            </div>
-            <div className="text-green-200">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[
+          { label: 'Total Exams', value: stats.totalExams, icon: <FiFileText />, color: 'blue', bg: 'from-blue-500 to-blue-600' },
+          { label: 'Average Score', value: `${stats.averageScore}%`, icon: <FiTrendingUp />, color: 'emerald', bg: 'from-emerald-500 to-emerald-600' },
+          { label: 'Highest Score', value: stats.highestScore, icon: <FiTarget />, color: 'purple', bg: 'from-purple-500 to-purple-600' },
+          { label: 'Pass Rate', value: `${stats.passRate}%`, icon: <FiCheckCircle />, color: 'orange', bg: 'from-orange-500 to-orange-600' }
+        ].map((stat, i) => (
+          <div key={i} className={`relative overflow-hidden rounded-[32px] bg-gradient-to-br ${stat.bg} p-6 text-white shadow-xl shadow-slate-200/50`}>
+            <div className="relative z-10 flex items-center justify-between">
+              <div>
+                <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1">{stat.label}</p>
+                <p className="text-3xl font-black">{stat.value}</p>
+              </div>
+              <div className="text-white/50 text-3xl">{stat.icon}</div>
             </div>
           </div>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-100 text-sm mb-1">Highest Score</p>
-              <p className="text-3xl font-bold">{stats.highestScore}</p>
-            </div>
-            <div className="text-purple-200">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 3z" />
-              </svg>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-orange-100 text-sm mb-1">Pass Rate</p>
-              <p className="text-3xl font-bold">{stats.passRate}%</p>
-            </div>
-            <div className="text-orange-200">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-        </Card>
+        ))}
       </div>
 
       {/* Results Table */}
-      <Card className="mb-8">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exam Details</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teacher</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+      <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
+        <div className="overflow-x-auto -mx-8">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-100">
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Exam Details</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Subject</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Teacher</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Score</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Grade</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-slate-50">
               {results.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
-                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <p className="mt-2">No exam results found. Complete exams to see your results here.</p>
+                  <td colSpan="8" className="px-8 py-16 text-center">
+                    <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center text-slate-200 text-4xl mx-auto mb-4">
+                      <FiFileText />
+                    </div>
+                    <p className="text-slate-500 font-medium">No exam results found. Complete exams to see your results here.</p>
                   </td>
                 </tr>
               ) : (
                 results.map((result, index) => (
-                  <tr key={result._id || index} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4">
+                  <tr key={result._id || index} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="px-8 py-5">
                       <div>
-                        <p className="font-semibold text-gray-900">{result.examTitle || 'Exam'}</p>
-                        <p className="text-sm text-gray-500">{result.academicYear}</p>
+                        <p className="font-black text-slate-900">{result.examTitle || 'Exam'}</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{result.academicYear}</p>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-900">{result.subjectName || 'N/A'}</span>
+                    <td className="px-8 py-5">
+                      <span className="text-sm font-bold text-slate-700">{result.subjectName || 'N/A'}</span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm mr-2">
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 font-black text-sm">
                           {result.teacherName?.charAt(0) || 'T'}
                         </div>
-                        <span className="text-sm text-gray-900">{result.teacherName || 'N/A'}</span>
+                        <span className="text-sm font-bold text-slate-700">{result.teacherName || 'N/A'}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <Badge variant="info">{result.examType || 'General'}</Badge>
+                    <td className="px-8 py-5">
+                      <Badge variant="info" className="font-black uppercase tracking-widest text-[10px]">{result.examType || 'General'}</Badge>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-8 py-5">
                       <div>
-                        <p className="font-semibold text-gray-900">{result.score || 0} / {result.totalMarks || 0}</p>
-                        <p className="text-xs text-gray-500">
-                          {Math.round(((result.score || 0) / (result.totalMarks || 1)) * 100)}%
-                        </p>
+                        <p className="font-black text-slate-900">{result.score || 0} <span className="text-slate-400">/ {result.totalMarks || 0}</span></p>
+                        <p className="text-xs font-bold text-cyan-600">{Math.round(((result.score || 0) / (result.totalMarks || 1)) * 100)}%</p>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <Badge variant={getGradeColor(result.grade || 'N/A')}>
+                    <td className="px-8 py-5">
+                      <Badge variant={getGradeColor(result.grade || 'N/A')} className="font-black uppercase tracking-widest text-[10px]">
                         {result.grade || 'N/A'}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4">
-                      {getStatusBadge(result.score || 0, result.totalMarks || 0)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {formatDate(result.submittedAt || result.createdAt)}
-                    </td>
+                    <td className="px-8 py-5">{getStatusBadge(result.score || 0, result.totalMarks || 0)}</td>
+                    <td className="px-8 py-5 text-sm font-bold text-slate-500">{formatDate(result.submittedAt || result.createdAt)}</td>
                   </tr>
                 ))
               )}
@@ -260,30 +212,32 @@ const StudentExamResults = () => {
 
       {/* Performance Summary */}
       {results.length > 0 && (
-        <Card>
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">Performance Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-800 mb-2">Overall Performance</h4>
-              <p className="text-sm text-blue-700">
-                You have completed {stats.totalExams} exams with an average score of {stats.averageScore}%. 
-                Keep up the good work!
-              </p>
-            </div>
-            <div className="p-4 bg-green-50 rounded-lg">
-              <h4 className="font-medium text-green-800 mb-2">Achievement</h4>
-              <p className="text-sm text-green-700">
-                Your highest score is {stats.highestScore}. Congratulations on this achievement!
-              </p>
-            </div>
-            <div className="p-4 bg-purple-50 rounded-lg">
-              <h4 className="font-medium text-purple-800 mb-2">Success Rate</h4>
-              <p className="text-sm text-purple-700">
-                You have successfully passed {stats.passRate}% of your exams. Excellent progress!
-              </p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="p-8 bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-100 rounded-[32px]">
+            <h4 className="text-lg font-black text-blue-900 mb-3 flex items-center gap-2">
+              <FiTrendingUp className="text-blue-600" /> Overall Performance
+            </h4>
+            <p className="text-blue-800/80 font-medium text-sm leading-relaxed">
+              You have completed {stats.totalExams} exams with an average score of {stats.averageScore}%. Keep up the good work!
+            </p>
           </div>
-        </Card>
+          <div className="p-8 bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-100 rounded-[32px]">
+            <h4 className="text-lg font-black text-emerald-900 mb-3 flex items-center gap-2">
+              <FiAward className="text-emerald-600" /> Achievement
+            </h4>
+            <p className="text-emerald-800/80 font-medium text-sm leading-relaxed">
+              Your highest score is {stats.highestScore}. Congratulations on this outstanding achievement!
+            </p>
+          </div>
+          <div className="p-8 bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-100 rounded-[32px]">
+            <h4 className="text-lg font-black text-purple-900 mb-3 flex items-center gap-2">
+              <FiCheckCircle className="text-purple-600" /> Success Rate
+            </h4>
+            <p className="text-purple-800/80 font-medium text-sm leading-relaxed">
+              You have successfully passed {stats.passRate}% of your exams. Excellent progress!
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -52,22 +52,13 @@ const StaffPanel = () => {
   const menuItems = [
     { id: 'dashboard', icon: <FiHome size={19} />, path: '', label: 'Dashboard', type: 'link' },
     {
-      id: 'users',
-      icon: <FiUserPlus size={19} />,
-      label: 'User Management',
-      type: 'dropdown',
-      items: [
-        { id: 'users-list', label: 'All Users', path: 'users' },
-        { id: 'users-register', label: 'Register User', path: 'users/register' }
-      ]
-    },
-    {
       id: 'registrar',
       icon: <FiAward size={19} />,
       label: 'Registrar / Student Affairs',
       type: 'dropdown',
       items: [
-        { id: 'admissions', label: 'Admissions', path: 'registrar/admissions' },
+        { id: 'admissions', label: 'Student Admissions', path: 'registrar/admissions' },
+        { id: 'student-registration', label: 'Student Registration', path: 'registrar/student-registration' },
         { id: 'students', label: 'All Students', path: 'registrar/students' },
         { id: 'profiles', label: 'Student Profiles', path: 'registrar/profiles' },
         { id: 'class-assignment', label: 'Class Assignment', path: 'registrar/class-assignment' },
@@ -75,6 +66,10 @@ const StaffPanel = () => {
         { id: 'guardians', label: 'Guardian Management', path: 'registrar/guardians' },
         { id: 'education-history', label: 'Education History', path: 'registrar/education-history' },
         { id: 'documents', label: 'Documents Management', path: 'registrar/documents' },
+        { id: 'hostel', label: 'Hostel Management', path: 'registrar/hostel' },
+        { id: 'hostel-rooms', label: 'Hostel Rooms', path: 'registrar/hostel-rooms' },
+        { id: 'hostel-allocations', label: 'Room Allocations', path: 'registrar/hostel-allocations' },
+        { id: 'hostel-meals', label: 'Meal Management', path: 'registrar/hostel-meals' },
         { id: 'reports', label: 'Reports & Export', path: 'registrar/reports' }
       ]
     },

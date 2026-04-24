@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
 import ListPage from '../shared/ListPage';
+import Card from '../../../components/UIHelper/Card';
+import Badge from '../../../components/UIHelper/Badge';
+import { PieChartComponent, BarChartComponent } from '../../../components/UIHelper/ECharts';
+import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const studentAdmissionsConfig = {
   title: 'Student Admissions',
   subtitle: 'Manage new student admissions - Complete registration with all required information',
-  endpoint: '/students/admissions',
+  endpoint: '/student/admissions',
   columns: [
     { key: 'studentCode', header: 'Student Code' },
     { key: 'name', header: 'Student Name', render: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || '-' },
@@ -167,7 +174,175 @@ export const studentAdmissionsConfig = {
 };
 
 const StudentAdmissions = () => {
-  return <ListPage {...studentAdmissionsConfig} />;
+  const [admissionStats, setAdmissionStats] = useState({
+    total: 0,
+    pending: 0,
+    accepted: 0,
+    rejected: 0,
+    byDegree: [],
+    byMonth: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAdmissionStats();
+  }, []);
+
+  const fetchAdmissionStats = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+      const response = await axios.get(`${API_BASE}/student/admissions`, config);
+      const admissions = response.data || [];
+      
+      // Calculate statistics
+      const total = admissions.length;
+      const pending = admissions.filter(a => a.status === 'pending').length;
+      const accepted = admissions.filter(a => a.status === 'accepted').length;
+      const rejected = admissions.filter(a => a.status === 'rejected').length;
+      
+      // Group by degree
+      const degreeMap = {};
+      admissions.forEach(a => {
+        const degreeName = a.degree?.degreeName || 'Not Assigned';
+        degreeMap[degreeName] = (degreeMap[degreeName] || 0) + 1;
+      });
+      const byDegree = Object.entries(degreeMap).map(([name, count]) => ({ name, value: count }));
+      
+      // Group by month (last 6 months)
+      const monthMap = {};
+      const now = new Date();
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthMap[key] = 0;
+      }
+      admissions.forEach(a => {
+        if (a.createdAt) {
+          const date = new Date(a.createdAt);
+          const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          if (monthMap.hasOwnProperty(key)) {
+            monthMap[key]++;
+          }
+        }
+      });
+      const byMonth = Object.entries(monthMap).map(([month, count]) => ({
+        name: month,
+        value: count
+      }));
+      
+      setAdmissionStats({ total, pending, accepted, rejected, byDegree, byMonth });
+    } catch (error) {
+      console.error('[StudentAdmissions] Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <PageSkeleton variant="dashboard" />;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                <span className="text-xl">📚</span>
+              </div>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Applications</span>
+            </div>
+            <p className="text-3xl font-black text-slate-900">{admissionStats.total}</p>
+            <p className="text-sm text-slate-500 mt-1">All time admissions</p>
+          </div>
+        </Card>
+
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                <span className="text-xl">⏳</span>
+              </div>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Pending Review</span>
+            </div>
+            <p className="text-3xl font-black text-amber-600">{admissionStats.pending}</p>
+            <p className="text-sm text-slate-500 mt-1">Awaiting decision</p>
+          </div>
+        </Card>
+
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <span className="text-xl">✅</span>
+              </div>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Accepted</span>
+            </div>
+            <p className="text-3xl font-black text-emerald-600">{admissionStats.accepted}</p>
+            <p className="text-sm text-slate-500 mt-1">Approved admissions</p>
+          </div>
+        </Card>
+
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-red-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+                <span className="text-xl">❌</span>
+              </div>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Rejected</span>
+            </div>
+            <p className="text-3xl font-black text-red-600">{admissionStats.rejected}</p>
+            <p className="text-sm text-slate-500 mt-1">Declined applications</p>
+          </div>
+        </Card>
+      </div>
+
+      {/* Charts Section */}
+      {(admissionStats.byDegree.length > 0 || admissionStats.byMonth.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card title="Admissions by Degree">
+            {admissionStats.byDegree.length > 0 ? (
+              <PieChartComponent
+                data={admissionStats.byDegree}
+                height={300}
+              />
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-slate-400">
+                No degree data available
+              </div>
+            )}
+          </Card>
+
+          <Card title="Monthly Admissions Trend">
+            {admissionStats.byMonth.length > 0 ? (
+              <BarChartComponent
+                data={admissionStats.byMonth}
+                dataKey="value"
+                nameKey="name"
+                height={300}
+              />
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-slate-400">
+                No monthly data available
+              </div>
+            )}
+          </Card>
+        </div>
+      )}
+
+      {/* Admissions List */}
+      <ListPage {...studentAdmissionsConfig} />
+    </div>
+  );
 };
 
 export default StudentAdmissions;

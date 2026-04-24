@@ -42,6 +42,11 @@ const StudentSchema = new Schema({
   currentLevel: { type: String },
   status: { type: String, enum: ['active','inactive'], default: 'active' },
   
+  // Hostel Information
+  isHostelResident: { type: Boolean, default: false },
+  hostelRoom: { type: Schema.Types.ObjectId, ref: 'HostelRoom' },
+  hostelCheckInDate: { type: Date },
+  
   // Audit fields
   updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   
@@ -54,5 +59,6 @@ StudentSchema.index({ studentCode: 1 }, { unique: true });
 StudentSchema.index({ user: 1 });
 StudentSchema.index({ currentClass: 1 });
 StudentSchema.index({ firstName: 1, lastName: 1 });
+StudentSchema.index({ isHostelResident: 1 });
 
 module.exports = mongoose.model('Student', StudentSchema);

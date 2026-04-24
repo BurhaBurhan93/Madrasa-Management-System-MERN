@@ -1,32 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { 
+  FiActivity, 
+  FiCalendar, 
+  FiCheckCircle, 
+  FiXCircle, 
+  FiClock, 
+  FiFilter, 
+  FiPieChart,
+  FiArrowRight
+} from 'react-icons/fi';
 import Card from '../components/UIHelper/Card';
 import Badge from '../components/UIHelper/Badge';
+import Button from '../components/UIHelper/Button';
 import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
-import ErrorPage from '../components/UIHelper/ErrorPage';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { formatDate } from '../lib/utils';
-import axios from 'axios';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentAttendance = () => {
-  console.log('[StudentAttendance] Component initializing...');
   const navigate = useNavigate();
-  
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const courseIdParam = queryParams.get('courseId');
+
   const [attendanceData, setAttendanceData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
 
-  // Get API config with auth token
-  const getConfig = () => {
-    const token = localStorage.getItem('token');
-    console.log('[StudentAttendance] Token exists:', !!token);
-    return {
-      headers: { Authorization: `Bearer ${token}` }
-    };
-  };
-
   useEffect(() => {
-    console.log('[StudentAttendance] useEffect triggered - fetching data from API...');
     fetchAttendanceData();
   }, []);
 
@@ -34,228 +39,183 @@ const StudentAttendance = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('[StudentAttendance] Fetching attendance records from API...');
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const config = getConfig();
-      const response = await axios.get('http://localhost:5000/api/student/attendance', config);
-      
-      console.log('[StudentAttendance] API response:', response.data);
-      const records = response.data || [];
-      setAttendanceData(records);
+      const response = await axios.get(`${API_BASE}/student/attendance`, config);
+      setAttendanceData(response.data || []);
     } catch (err) {
-      console.error('[StudentAttendance] Error fetching attendance data:', err);
+      console.error('Error fetching attendance:', err);
       setError('Failed to fetch attendance records. Please try again.');
-      setAttendanceData([]);
+      setAttendanceData([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
 
-  // Calculate stats from actual data
   const stats = React.useMemo(() => {
-    const totalDays = attendanceData.length;
-    const present = attendanceData.filter(r => r.status === 'present').length;
-    const absent = attendanceData.filter(r => r.status === 'absent').length;
-    const late = attendanceData.filter(r => r.status === 'late').length;
-    const attendanceRate = totalDays > 0 ? Math.round(((present + late) / totalDays) * 100) : 0;
+    const data = courseIdParam 
+      ? attendanceData.filter(r => r.course?._id === courseIdParam || r.course === courseIdParam)
+      : attendanceData;
+      
+    const total = data.length;
+    const present = data.filter(r => r.status === 'present').length;
+    const absent = data.filter(r => r.status === 'absent').length;
+    const late = data.filter(r => r.status === 'late').length;
+    const rate = total > 0 ? Math.round(((present + late) / total) * 100) : 0;
     
-    return { totalDays, present, absent, late, attendanceRate };
-  }, [attendanceData]);
+    return { total, present, absent, late, rate, data };
+  }, [attendanceData, courseIdParam]);
 
-  // Calculate monthly stats from actual data
-  const monthlyStats = React.useMemo(() => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const data = months.map(month => ({ month, present: 0, absent: 0, late: 0 }));
-    
-    attendanceData.forEach(record => {
-      if (record.date) {
-        const date = new Date(record.date);
-        const monthIndex = date.getMonth();
-        if (monthIndex >= 0 && monthIndex < 12) {
-          if (record.status === 'present') data[monthIndex].present++;
-          else if (record.status === 'absent') data[monthIndex].absent++;
-          else if (record.status === 'late') data[monthIndex].late++;
-        }
-      }
-    });
-    
-    // Return last 6 months with data
-    return data.slice(-6);
-  }, [attendanceData]);
+  const chartData = [
+    { name: 'Present', value: stats.present, color: '#10B981' },
+    { name: 'Absent', value: stats.absent, color: '#EF4444' },
+    { name: 'Late', value: stats.late, color: '#F59E0B' }
+  ].filter(item => item.value > 0);
 
-  const filteredAttendance = attendanceData.filter(record => {
+  const filteredRecords = stats.data.filter(record => {
     if (filter === 'all') return true;
     return record.status === filter;
   });
 
-  const getStatusColor = (status) => {
+  const getStatusBadge = (status) => {
     switch (status) {
-      case 'present':
-        return 'success';
-      case 'absent':
-        return 'danger';
-      case 'late':
-        return 'warning';
-      default:
-        return 'default';
+      case 'present': return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">Present</Badge>;
+      case 'absent': return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">Absent</Badge>;
+      case 'late': return <Badge variant="warning" className="font-black uppercase tracking-widest text-[10px]">Late</Badge>;
+      default: return <Badge className="font-black uppercase tracking-widest text-[10px]">{status}</Badge>;
     }
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'present':
-        return 'Present';
-      case 'absent':
-        return 'Absent';
-      case 'late':
-        return 'Late';
-      default:
-        return status;
-    }
-  };
+  if (loading) {
+    return <PageSkeleton variant="table" />;
+  }
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
-      <div className="py-6 mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Attendance Records</h1>
-        <p className="text-gray-600">Track your attendance history and performance</p>
-      </div>
-
-      {error && !loading && (
-        <ErrorPage 
-          type="generic" 
-          title="Unable to Load Attendance"
-          message={error}
-          onRetry={fetchAttendanceData}
-          onHome={() => window.location.href = '/student/dashboard'}
-          showBackButton={false}
-        />
-      )}
-
-      {/* Quick Stats */}
-      <div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
-          <Card className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-blue-600">{stats.totalDays}</div>
-            <div className="text-xs sm:text-sm text-gray-600">Total Days</div>
-          </Card>
-          
-          <Card className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-green-600">{stats.present}</div>
-            <div className="text-xs sm:text-sm text-gray-600">Present</div>
-          </Card>
-          
-          <Card className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-red-600">{stats.absent}</div>
-            <div className="text-xs sm:text-sm text-gray-600">Absent</div>
-          </Card>
-          
-          <Card className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-yellow-600">{stats.late}</div>
-            <div className="text-xs sm:text-sm text-gray-600">Late</div>
-          </Card>
-          
-          <Card className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-purple-600">{stats.attendanceRate}%</div>
-            <div className="text-xs sm:text-sm text-gray-600">Rate</div>
-          </Card>
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Attendance</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">
+            {courseIdParam ? 'Course-specific attendance tracking' : 'Overall institutional attendance record'}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
+            {['all', 'present', 'absent', 'late'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  filter === f ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Attendance Chart */}
-      <div className="mb-8">
-        <Card title="Monthly Attendance Trend">
-          <BarChartComponent 
-            data={monthlyStats} 
-            dataKey="present" 
-            nameKey="month" 
-            title="Attendance by Month"
-          />
-        </Card>
+      {/* Stats Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[
+          { label: 'Overall Rate', value: `${stats.rate}%`, icon: <FiActivity />, color: 'cyan' },
+          { label: 'Days Present', value: stats.present, icon: <FiCheckCircle />, color: 'emerald' },
+          { label: 'Days Absent', value: stats.absent, icon: <FiXCircle />, color: 'rose' },
+          { label: 'Days Late', value: stats.late, icon: <FiClock />, color: 'amber' }
+        ].map((stat, i) => (
+          <div key={i} className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
+            <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
+              {stat.icon}
+            </div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+            <p className="text-2xl font-black text-slate-900">{stat.value}</p>
+          </div>
+        ))}
       </div>
 
-      {/* Filter Controls */}
-      <div className="flex flex-wrap items-center justify-between mb-6">
-        <div className="flex space-x-2 mb-4 md:mb-0">
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              filter === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter('present')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              filter === 'present'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Present
-          </button>
-          <button
-            onClick={() => setFilter('absent')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              filter === 'absent'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Absent
-          </button>
-          <button
-            onClick={() => setFilter('late')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              filter === 'late'
-                ? 'bg-yellow-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Late
-          </button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Attendance List */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card title="Attendance History" className="rounded-[32px] p-8">
+            <div className="space-y-4">
+              {filteredRecords.length > 0 ? (
+                filteredRecords.map((record, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-cyan-200 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        record.status === 'present' ? 'bg-emerald-100 text-emerald-600' : 
+                        record.status === 'absent' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600'
+                      }`}>
+                        <FiCalendar />
+                      </div>
+                      <div>
+                        <p className="font-black text-slate-900">{formatDate(record.date)}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                          {record.course?.name || 'General Session'}
+                        </p>
+                      </div>
+                    </div>
+                    {getStatusBadge(record.status)}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-20">
+                  <FiCalendar className="w-16 h-16 text-slate-100 mx-auto mb-4" />
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No records found</p>
+                </div>
+              )}
+            </div>
+          </Card>
         </div>
-      </div>
 
-      {/* Attendance Table */}
-      <div className="pb-8">
-        <Card>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAttendance.map((record) => (
-                <tr key={record.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatDate(record.date)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {record.course}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {record.time}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Badge variant={getStatusColor(record.status)}>
-                      {getStatusText(record.status)}
-                    </Badge>
-                  </td>
-                </tr>
+        {/* Analytics Sidebar */}
+        <div className="space-y-8">
+          <Card title="Distribution" className="rounded-[32px] p-8">
+            {chartData.length > 0 ? (
+              <PieChartComponent 
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                height={250}
+              />
+            ) : (
+              <div className="h-[250px] flex flex-col items-center justify-center text-slate-300">
+                <FiPieChart className="w-12 h-12 mb-4" />
+                <p className="font-bold text-sm">Insufficient data</p>
+              </div>
+            )}
+            <div className="mt-6 space-y-3">
+              {chartData.map((item, i) => (
+                <div key={i} className="flex justify-between items-center text-sm font-bold">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                    <span className="text-slate-600">{item.name}</span>
+                  </div>
+                  <span className="text-slate-900">{Math.round((item.value / stats.total) * 100)}%</span>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </Card>
+
+          <div className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 rounded-[32px] text-white shadow-2xl shadow-slate-200/50 relative overflow-hidden">
+            <div className="relative z-10">
+              <h3 className="text-xl font-black mb-2">Need Leave?</h3>
+              <p className="text-slate-400 text-sm font-medium mb-6">Apply for absence or medical leave through our portal.</p>
+              <Button 
+                variant="primary" 
+                className="w-full rounded-2xl py-4 bg-cyan-600 hover:bg-cyan-700 font-black text-xs uppercase tracking-widest"
+                onClick={() => navigate('/student/leave')}
+              >
+                Apply for Leave
+              </Button>
+            </div>
+            <FiCalendar className="absolute -right-4 -bottom-4 w-24 h-24 text-white/5 transform -rotate-12" />
+          </div>
         </div>
-      </Card>
       </div>
     </div>
   );

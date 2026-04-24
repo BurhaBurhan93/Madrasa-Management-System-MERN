@@ -124,6 +124,19 @@ import WasteTrackingCreate from '../pages/staff/Kitchen/WasteTrackingCreate';
 import WasteTrackingEdit from '../pages/staff/Kitchen/WasteTrackingEdit';
 import WasteTrackingView from '../pages/staff/Kitchen/WasteTrackingView';
 import StaffLeaveManagement from '../pages/StaffLeaveManagement';
+import StudentRegistration from '../pages/staff/registrar/StudentRegistration';
+import StudentsList from '../pages/staff/registrar/StudentsList';
+import StudentAdmissions from '../pages/staff/registrar/StudentAdmissions';
+import StudentProfiles from '../pages/staff/registrar/StudentProfiles';
+import ClassAssignment from '../pages/staff/registrar/ClassAssignment';
+import DataCorrection from '../pages/staff/registrar/DataCorrection';
+import GuardianManagement from '../pages/staff/registrar/GuardianManagement';
+import EducationHistory from '../pages/staff/registrar/EducationHistory';
+import DocumentsManagement from '../pages/staff/registrar/DocumentsManagement';
+import RegistrarReports from '../pages/staff/registrar/RegistrarReports';
+import HostelRooms from '../pages/staff/hostel/HostelRooms';
+import HostelAllocations from '../pages/staff/hostel/HostelAllocations';
+import HostelMeals from '../pages/staff/hostel/HostelMeals';
 
 const StaffRoutes = () => (
   <Route path="/staff/*" element={<StaffPanel />}>
@@ -254,6 +267,20 @@ const StaffRoutes = () => (
     <Route path="kitchen/waste/create" element={<WasteTrackingCreate />} />
     <Route path="kitchen/waste/edit/:id" element={<WasteTrackingEdit />} />
     <Route path="kitchen/waste/view/:id" element={<WasteTrackingView />} />
+    <Route path="registrar/hostel" element={<HostelAllocations />} />
+    <Route path="registrar/hostel-rooms" element={<HostelRooms />} />
+    <Route path="registrar/hostel-allocations" element={<HostelAllocations />} />
+    <Route path="registrar/hostel-meals" element={<HostelMeals />} />
+    <Route path="registrar/student-registration" element={<StudentRegistration />} />
+    <Route path="registrar/students" element={<StudentsList />} />
+    <Route path="registrar/admissions" element={<StudentAdmissions />} />
+    <Route path="registrar/profiles" element={<StudentProfiles />} />
+    <Route path="registrar/class-assignment" element={<ClassAssignment />} />
+    <Route path="registrar/data-correction" element={<DataCorrection />} />
+    <Route path="registrar/guardians" element={<GuardianManagement />} />
+    <Route path="registrar/education-history" element={<EducationHistory />} />
+    <Route path="registrar/documents" element={<DocumentsManagement />} />
+    <Route path="registrar/reports" element={<RegistrarReports />} />
     <Route path="leave" element={<StaffLeaveManagement />} />
   </Route>
 );

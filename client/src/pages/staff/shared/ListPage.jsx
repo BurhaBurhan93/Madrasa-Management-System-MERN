@@ -3,7 +3,6 @@ import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Badge from '../../../components/UIHelper/Badge';
 import DataTable from '../../../components/UIHelper/DataTable';
-import ErrorPage from '../../../components/UIHelper/ErrorPage';
 import StaffPageLayout from './StaffPageLayout';
 import RecordActionButtons from './RecordActionButtons';
 import StaffPagination from './StaffPagination';
@@ -207,7 +206,26 @@ const ListPage = ({ title, subtitle, endpoint, columns, createPath, editPathForR
           </div>
         </div>
       </Card>
-      {error && !loading && <ErrorPage type="generic" title="Unable to Load Data" message={error} onRetry={fetchItems} onHome={() => (window.location.href = '/staff/dashboard')} showBackButton={false} />}
+      {error && !loading && (
+        <Card className="rounded-[28px] border border-rose-200 bg-rose-50">
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-rose-900">Unable to Load Data</h3>
+                <p className="mt-1 text-sm text-rose-700">{error}</p>
+                <button onClick={fetchItems} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
       <Card className="rounded-[28px] border border-slate-200 shadow-none">
         <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>

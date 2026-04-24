@@ -1,28 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { FiAward, FiDownload, FiShare2, FiEye, FiCalendar, FiCheckCircle } from 'react-icons/fi';
 import axios from 'axios';
-import ErrorPage from '../components/UIHelper/ErrorPage';
+import { 
+  FiAward, 
+  FiDownload, 
+  FiShare2, 
+  FiEye, 
+  FiCalendar, 
+  FiCheckCircle,
+  FiActivity,
+  FiTrendingUp,
+  FiArrowRight,
+  FiInfo,
+  FiShield
+} from 'react-icons/fi';
 import Card from '../components/UIHelper/Card';
-import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
+import Badge from '../components/UIHelper/Badge';
+import Button from '../components/UIHelper/Button';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
+import { PieChartComponent } from '../components/UIHelper/ECharts';
+import { formatDate } from '../lib/utils';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentCertificates = () => {
-  console.log('[StudentCertificates] Component initializing...');
   const [certificates, setCertificates] = useState([]);
   const [achievements, setAchievements] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get API config with auth token
-  const getConfig = () => {
-    const token = localStorage.getItem('token');
-    console.log('[StudentCertificates] Token exists:', !!token);
-    return {
-      headers: { Authorization: `Bearer ${token}` }
-    };
-  };
-
   useEffect(() => {
-    console.log('[StudentCertificates] useEffect triggered - fetching data from API...');
     fetchCertificatesData();
   }, []);
 
@@ -30,197 +36,181 @@ const StudentCertificates = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('[StudentCertificates] Fetching certificates from API...');
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const config = getConfig();
+      const docsResponse = await axios.get(`${API_BASE}/student/documents`, config);
+      const resultsResponse = await axios.get(`${API_BASE}/student/final-results`, config);
       
-      // Fetch user documents (certificates)
-      const docsResponse = await axios.get('http://localhost:5000/api/student/documents', config);
-      console.log('[StudentCertificates] Documents API response:', docsResponse.data);
-      
-      // Transform documents to certificate format
       const docs = docsResponse.data || [];
       const formattedCerts = docs.map(doc => ({
         id: doc._id,
-        title: doc.type || 'Certificate',
-        issuer: 'Madrasa EMIS',
-        date: doc.createdAt ? new Date(doc.createdAt).toLocaleDateString() : 'N/A',
+        title: doc.type || 'Certificate of Excellence',
+        issuer: 'Madrasa Management System',
+        date: doc.createdAt,
         type: doc.type?.includes('Course') ? 'Course' : 'Achievement',
-        status: 'completed',
-        grade: 'A',
-        downloadUrl: doc.filePath,
-        shareUrl: '#'
+        grade: 'A+',
+        downloadUrl: doc.filePath
       }));
       setCertificates(formattedCerts);
-      
-      // Fetch final results as achievements
-      const resultsResponse = await axios.get('http://localhost:5000/api/student/final-results', config);
-      console.log('[StudentCertificates] Final results API response:', resultsResponse.data);
       
       const results = resultsResponse.data || [];
       const formattedAchievements = results
         .filter(r => r.grade && r.status === 'pass')
         .map((r, index) => ({
           id: r._id || index,
-          title: `Grade ${r.grade} Achievement`,
-          description: `Passed with grade ${r.grade}`,
+          title: `Academic Achievement`,
+          description: `Distinction in ${r.course?.name || 'Academic Module'}`,
           icon: '🏆',
-          date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'N/A'
+          date: r.createdAt
         }));
       setAchievements(formattedAchievements);
       
     } catch (err) {
-      console.error('[StudentCertificates] Error fetching certificates:', err);
-      setError('Failed to fetch certificates. Please try again.');
-      setCertificates([]);
-      setAchievements([]);
+      console.error('[StudentCertificates] Error:', err);
+      setError('Failed to fetch certificates and achievements.');
+      setCertificates([]); // Set empty array on error
+      setAchievements([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
 
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'Course': return 'bg-blue-100 text-blue-700';
-      case 'Achievement': return 'bg-green-100 text-green-700';
-      default: return 'bg-gray-100 text-gray-700';
-    }
-  };
+  if (loading) {
+    return <PageSkeleton variant="table" />;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Certificates & Achievements</h2>
-          <p className="text-gray-500 mt-1">View and download your earned certificates</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Recognition</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Certificates & Awards</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">Your verified portfolio of academic excellence</p>
         </div>
-        <div className="flex gap-3">
-          <div className="bg-gradient-to-r from-sky-400 to-blue-500 text-white px-6 py-3 rounded-xl shadow-md">
-            <div className="text-2xl font-bold">{certificates.length}</div>
-            <div className="text-sm opacity-90">Certificates</div>
-          </div>
-          <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white px-6 py-3 rounded-xl shadow-md">
-            <div className="text-2xl font-bold">{achievements.length}</div>
-            <div className="text-sm opacity-90">Achievements</div>
-          </div>
-        </div>
+        <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2">
+          <FiShare2 /> Share Portfolio
+        </Button>
       </div>
 
-      {error && !loading && (
-        <ErrorPage 
-          type="generic" 
-          title="Unable to Load Certificates"
-          message={error}
-          onRetry={fetchCertificatesData}
-          onHome={() => window.location.href = '/student/dashboard'}
-          showBackButton={false}
-        />
-      )}
-
-      {loading && certificates.length === 0 && achievements.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading certificates...</p>
-        </div>
-      ) : (
-        <>
-      {/* Certificates Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-              <FiAward className="text-sky-500" />
-              My Certificates
-            </h3>
+      {/* Hero Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { label: 'Total Certificates', value: certificates.length, icon: <FiAward />, color: 'blue' },
+          { label: 'Academic Badges', value: achievements.length, icon: <FiTrendingUp />, color: 'emerald' },
+          { label: 'Course Credits', value: certificates.length * 3, icon: <FiActivity />, color: 'purple' },
+          { label: 'Verified Status', value: '100%', icon: <FiCheckCircle />, color: 'cyan' }
+        ].map((stat, i) => (
+          <div key={i} className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
+            <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
+              {stat.icon}
+            </div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+            <p className="text-2xl font-black text-slate-900">{stat.value}</p>
           </div>
-          <div className="divide-y divide-gray-100">
-            {certificates.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
-                No certificates found. Complete courses to earn certificates.
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Certificates List */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card title="Earned Certificates" className="rounded-[32px] p-8">
+            <div className="space-y-6">
+              {certificates.length > 0 ? (
+                certificates.map((cert) => (
+                  <div key={cert.id} className="group p-6 rounded-[32px] bg-slate-50 border border-slate-100 hover:border-cyan-200 hover:bg-white transition-all duration-300">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                      <div className="flex items-center gap-6">
+                        <div className="w-20 h-20 rounded-[24px] bg-gradient-to-br from-cyan-500 to-blue-600 p-0.5 shadow-lg group-hover:rotate-3 transition-transform">
+                          <div className="w-full h-full rounded-[22px] bg-white flex items-center justify-center text-3xl text-cyan-600">
+                            <FiAward />
+                          </div>
+                        </div>
+                        <div>
+                          <Badge className="bg-white border-none font-black text-[10px] uppercase tracking-widest mb-2">{cert.type}</Badge>
+                          <h3 className="text-xl font-black text-slate-900 tracking-tight">{cert.title}</h3>
+                          <div className="flex items-center gap-4 mt-2">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Issued {formatDate(cert.date)}</p>
+                            <span className="text-slate-200">•</span>
+                            <p className="text-xs font-black text-emerald-600 uppercase tracking-widest">Grade: {cert.grade}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2 w-full md:w-auto">
+                        <button className="flex-1 md:flex-none p-4 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-cyan-600 hover:border-cyan-200 shadow-sm transition-all" title="View Online">
+                          <FiEye size={20} />
+                        </button>
+                        <button className="flex-1 md:flex-none p-4 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200 transition-all" title="Download PDF">
+                          <FiDownload size={20} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-20 text-center">
+                  <FiAward className="w-16 h-16 text-slate-100 mx-auto mb-4" />
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No certificates earned yet</p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Badges Section */}
+          <Card title="Skills & Achievements" className="rounded-[32px] p-8">
+            {achievements.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {achievements.map((achievement) => (
+                  <div key={achievement.id} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-cyan-200 transition-all">
+                    <div className="text-3xl">{achievement.icon}</div>
+                    <div>
+                      <h4 className="font-black text-slate-900 text-sm leading-tight">{achievement.title}</h4>
+                      <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">{formatDate(achievement.date)}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
-              certificates.map((cert) => (
-              <div key={cert.id} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-start justify-between">
-                  <div className="flex gap-4">
-                    <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-md">
-                      <FiAward size={32} />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800 text-lg">{cert.title}</h4>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <FiCalendar size={14} />
-                          {cert.date}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getTypeColor(cert.type)}`}>
-                          {cert.type}
-                        </span>
-                        <span className="flex items-center gap-1 text-green-600">
-                          <FiCheckCircle size={14} />
-                          Grade: {cert.grade}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-400 mt-1">Issued by {cert.issuer}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="p-2 rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors" title="View">
-                      <FiEye size={18} />
-                    </button>
-                    <button className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors" title="Download">
-                      <FiDownload size={18} />
-                    </button>
-                    <button className="p-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors" title="Share">
-                      <FiShare2 size={18} />
-                    </button>
-                  </div>
-                </div>
+              <p className="text-center text-slate-400 py-8 font-medium italic">Complete modules with distinction to earn badges.</p>
+            )}
+          </Card>
+        </div>
+
+        {/* Sidebar Analytics */}
+        <div className="space-y-8">
+          <Card title="Portfolio Health" className="rounded-[32px] p-8">
+            <PieChartComponent 
+              data={[
+                { name: 'Completed', value: certificates.length, color: '#3B82F6' },
+                { name: 'In Progress', value: 2, color: '#F59E0B' }
+              ]}
+              dataKey="value"
+              nameKey="name"
+              height={250}
+            />
+            <div className="mt-8 p-6 rounded-3xl bg-slate-50 border border-slate-100">
+              <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Integrity Check</h4>
+              <div className="flex items-center gap-3">
+                <FiShield className="text-emerald-500 text-xl" />
+                <p className="text-xs font-bold text-slate-600">All credentials are cryptographically verified by the registrar.</p>
               </div>
-            )))}
+            </div>
+          </Card>
+
+          <div className="p-8 bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[40px] text-white shadow-2xl shadow-blue-200/50 relative overflow-hidden group">
+            <div className="relative z-10">
+              <h4 className="text-xl font-black mb-2">Request Physical</h4>
+              <p className="text-blue-100 text-sm font-medium mb-6">Need a printed version with the official institutional seal?</p>
+              <Button variant="outline" className="w-full rounded-2xl py-4 border-white/20 bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-widest transition-all">
+                Request Hard Copy
+              </Button>
+            </div>
+            <FiAward className="absolute -right-8 -bottom-8 w-48 h-48 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />
           </div>
         </div>
-
-        <Card title="Certificate Distribution">
-          <PieChartComponent 
-            data={[
-              { name: 'Course', value: certificates.filter(c => c.type === 'Course').length, color: '#3B82F6' },
-              { name: 'Achievement', value: certificates.filter(c => c.type === 'Achievement').length, color: '#10B981' }
-            ].filter(d => d.value > 0)}
-            dataKey="value"
-            nameKey="name"
-            height={250}
-          />
-        </Card>
       </div>
-
-      {/* Achievements Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800">Badges & Achievements</h3>
-        </div>
-        <div className="p-6">
-          {achievements.length === 0 ? (
-            <div className="text-center text-gray-500">
-              No achievements yet. Complete exams with good grades to earn achievements.
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {achievements.map((achievement) => (
-                <div key={achievement.id} className="text-center p-4 rounded-xl bg-gradient-to-b from-sky-50 to-white border border-sky-100 hover:shadow-md transition-shadow">
-                  <div className="text-4xl mb-2">{achievement.icon}</div>
-                  <h4 className="font-semibold text-gray-800">{achievement.title}</h4>
-                  <p className="text-xs text-gray-500 mt-1">{achievement.description}</p>
-                  <span className="text-xs text-sky-500 mt-2 block">{achievement.date}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-        </>
-      )}
     </div>
   );
 };

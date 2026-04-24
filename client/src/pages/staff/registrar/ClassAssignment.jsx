@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ListPage from '../shared/ListPage';
+import StaffPageLayout from '../shared/StaffPageLayout';
+import Card from '../../../components/UIHelper/Card';
+import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
+import { PieChartComponent, BarChartComponent } from '../../../components/UIHelper/ECharts';
 import axios from 'axios';
 import Button from '../../../components/UIHelper/Button';
 import Modal from '../../../components/UIHelper/Modal';
+import { FiUsers, FiUserCheck, FiArrowRight, FiTrendingUp, FiAward } from 'react-icons/fi';
 
 export const classAssignmentConfig = {
   title: 'Class Assignment & Student Transfer',
   subtitle: 'Assign students to classes, manage transfers, and promotions',
-  endpoint: '/students/all',
+  endpoint: '/student/all',
   columns: [
     { key: 'studentCode', header: 'Student Code' },
     { key: 'name', header: 'Student Name', render: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.user?.name || '-' },
@@ -69,6 +74,72 @@ const ClassAssignment = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [newClass, setNewClass] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    assignedStudents: 0,
+    unassignedStudents: 0,
+    activeStudents: 0,
+    byClass: [],
+    byStatus: []
+  });
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+  useEffect(() => {
+    fetchClassAssignmentStats();
+  }, []);
+
+  const fetchClassAssignmentStats = async () => {
+    try {
+      setPageLoading(true);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+      const res = await fetch(`${API_BASE}/student/all`, config);
+      const data = await res.json();
+      
+      if (data.success || data.data) {
+        const students = data.data || [];
+        
+        const totalStudents = students.length;
+        const assignedStudents = students.filter(s => s.currentClass).length;
+        const unassignedStudents = totalStudents - assignedStudents;
+        const activeStudents = students.filter(s => s.status === 'active').length;
+        
+        // By Class
+        const classMap = {};
+        students.forEach(s => {
+          const className = s.currentClass?.className || 'Unassigned';
+          classMap[className] = (classMap[className] || 0) + 1;
+        });
+        const byClass = Object.entries(classMap)
+          .map(([name, value]) => ({ name, value }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 8);
+        
+        // By Status
+        const statusMap = {};
+        students.forEach(s => {
+          const status = s.status || 'unknown';
+          statusMap[status] = (statusMap[status] || 0) + 1;
+        });
+        const byStatus = Object.entries(statusMap).map(([name, value]) => ({ name, value }));
+        
+        setStats({
+          totalStudents,
+          assignedStudents,
+          unassignedStudents,
+          activeStudents,
+          byClass,
+          byStatus
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching class assignment stats:', err);
+    } finally {
+      setPageLoading(false);
+    }
+  };
 
   const getConfig = () => {
     const token = localStorage.getItem('token');
@@ -129,8 +200,89 @@ const ClassAssignment = () => {
     setShowPromoteModal(true);
   };
 
+  if (pageLoading) {
+    return (
+      <StaffPageLayout eyebrow="Registrar" title="Class Assignment & Student Transfer">
+        <PageSkeleton type="dashboard" />
+      </StaffPageLayout>
+    );
+  }
+
   return (
-    <>
+    <StaffPageLayout eyebrow="Registrar" title="Class Assignment & Student Transfer" subtitle="Assign students to classes, manage transfers, and promotions">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600 mb-1">Total Students</p>
+              <p className="text-2xl font-bold text-slate-900">{stats.totalStudents}</p>
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+              <FiUsers className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+        </Card>
+        
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600 mb-1">Assigned</p>
+              <p className="text-2xl font-bold text-slate-900">{stats.assignedStudents}</p>
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+              <FiUserCheck className="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+        </Card>
+        
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600 mb-1">Unassigned</p>
+              <p className="text-2xl font-bold text-slate-900">{stats.unassignedStudents}</p>
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+              <FiArrowRight className="w-6 h-6 text-amber-600" />
+            </div>
+          </div>
+        </Card>
+        
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-violet-50 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600 mb-1">Active Students</p>
+              <p className="text-2xl font-bold text-slate-900">{stats.activeStudents}</p>
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+              <FiTrendingUp className="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+        </Card>
+      </div>
+      
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <Card className="rounded-[28px] border border-slate-200 p-6">
+          <h3 className="text-base font-semibold text-gray-800 mb-4">Students by Class</h3>
+          {stats.byClass.length > 0 ? (
+            <BarChartComponent data={stats.byClass} dataKey="value" nameKey="name" height={250} />
+          ) : (
+            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
+          )}
+        </Card>
+        
+        <Card className="rounded-[28px] border border-slate-200 p-6">
+          <h3 className="text-base font-semibold text-gray-800 mb-4">Student Status Distribution</h3>
+          {stats.byStatus.length > 0 ? (
+            <PieChartComponent data={stats.byStatus} height={250} />
+          ) : (
+            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
+          )}
+        </Card>
+      </div>
+      
+      {/* List Page */}
       <ListPage 
         {...classAssignmentConfig} 
         customActions={{
@@ -229,7 +381,7 @@ const ClassAssignment = () => {
           </div>
         </div>
       </Modal>
-    </>
+    </StaffPageLayout>
   );
 };
 

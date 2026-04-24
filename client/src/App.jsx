@@ -43,6 +43,10 @@ import StudentEvents from './pages/StudentEvents';
 import StudentSettings from './pages/StudentSettings';
 import StudentExamResults from './pages/StudentExamResults';
 import StudentTimetable from './pages/StudentTimetable';
+import StudentHostel from './pages/StudentHostel';
+import StudentLeave from './pages/StudentLeave';
+import StudentDegree from './pages/StudentDegree';
+import StudentEducation from './pages/StudentEducation';
 import LearningResources from './components/library/LearningResources';
 import BorrowedBooks from './components/library/BorrowedBooks';
 import PurchaseHistory from './components/library/PurchaseHistory';
@@ -159,6 +163,8 @@ import Suppliers from './pages/staff/Kitchen/Suppliers';
 import WasteTracking from './pages/staff/Kitchen/WasteTracking';
 
 function App() {
+  console.log('App component rendering...');
+  console.log('Current path:', window.location.pathname);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
@@ -373,6 +379,8 @@ function App() {
             <Route path="exam-results" element={<StudentExamResults />} />
             <Route path="timetable" element={<StudentTimetable />} />
             <Route path="schedule" element={<StudentSchedule />} />
+            <Route path="degrees" element={<StudentDegree />} />
+            <Route path="education" element={<StudentEducation />} />
             <Route path="exams" element={<StudentExams />} />
             <Route path="fees" element={<StudentFees />} />
             <Route path="library" element={<StudentLibrary />} />
@@ -384,6 +392,8 @@ function App() {
             <Route path="communications" element={<Communications />} />
             <Route path="certificates" element={<StudentCertificates />} />
             <Route path="events" element={<StudentEvents />} />
+            <Route path="hostel" element={<StudentHostel />} />
+            <Route path="leave" element={<StudentLeave />} />
             <Route path="settings" element={<StudentSettings />} />
             <Route path="exams/:examId/attempt" element={<StudentExamAttempt />} />
           </Route>
