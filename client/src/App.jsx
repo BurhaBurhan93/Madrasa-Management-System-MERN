@@ -60,6 +60,8 @@ import StudentEvents from './pages/StudentEvents';
 import StudentSettings from './pages/StudentSettings';
 import StudentExamResults from './pages/StudentExamResults';
 import StudentTimetable from './pages/StudentTimetable';
+import StudentHostel from './pages/StudentHostel';
+import StudentLeave from './pages/StudentLeave';
 import LearningResources from './components/library/LearningResources';
 import BorrowedBooks from './components/library/BorrowedBooks';
 import PurchaseHistory from './components/library/PurchaseHistory';
@@ -192,6 +194,8 @@ function App() {
             <Route path="communications"      element={<Communications />} />
             <Route path="certificates"        element={<StudentCertificates />} />
             <Route path="events"              element={<StudentEvents />} />
+            <Route path="hostel"              element={<StudentHostel />} />
+            <Route path="leave"               element={<StudentLeave />} />
             <Route path="settings"            element={<StudentSettings />} />
           </Route>
 

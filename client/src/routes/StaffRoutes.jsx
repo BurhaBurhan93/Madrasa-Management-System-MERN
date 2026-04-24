@@ -123,7 +123,12 @@ import WasteTracking from '../pages/staff/Kitchen/WasteTracking';
 import WasteTrackingCreate from '../pages/staff/Kitchen/WasteTrackingCreate';
 import WasteTrackingEdit from '../pages/staff/Kitchen/WasteTrackingEdit';
 import WasteTrackingView from '../pages/staff/Kitchen/WasteTrackingView';
+import FoodRequest from '../pages/staff/Kitchen/FoodRequest';
+import KitchenReports from '../pages/staff/Kitchen/Reports';
 import StaffLeaveManagement from '../pages/StaffLeaveManagement';
+import StaffDashboard from '../pages/staff/StaffDashboard';
+import StaffStudents from '../pages/staff/StaffStudents';
+import StaffInventory from '../pages/staff/StaffInventory';
 import StudentRegistration from '../pages/staff/registrar/StudentRegistration';
 import StudentsList from '../pages/staff/registrar/StudentsList';
 import StudentAdmissions from '../pages/staff/registrar/StudentAdmissions';
@@ -138,9 +143,14 @@ import HostelRooms from '../pages/staff/hostel/HostelRooms';
 import HostelAllocations from '../pages/staff/hostel/HostelAllocations';
 import HostelMeals from '../pages/staff/hostel/HostelMeals';
 
-const StaffRoutes = () => (
+// exported as a plain Route element — used directly inside <Routes> in App.jsx
+const staffRoutes = (
   <Route path="/staff/*" element={<StaffPanel />}>
-    <Route index element={<StaffLibraryCategories />} />
+    <Route index element={<StaffDashboard />} />
+    <Route path="dashboard" element={<StaffDashboard />} />
+    <Route path="students" element={<StaffStudents />} />
+    <Route path="inventory" element={<StaffInventory />} />
+    <Route path="profile" element={<ComingSoon title="Staff Profile" />} />
     <Route path="library">
       <Route path="categories" element={<StaffLibraryCategories />} />
       <Route path="categories/create" element={<StaffLibraryCategoriesCreate />} />
@@ -267,6 +277,8 @@ const StaffRoutes = () => (
     <Route path="kitchen/waste/create" element={<WasteTrackingCreate />} />
     <Route path="kitchen/waste/edit/:id" element={<WasteTrackingEdit />} />
     <Route path="kitchen/waste/view/:id" element={<WasteTrackingView />} />
+    <Route path="kitchen/requests" element={<FoodRequest />} />
+    <Route path="kitchen/reports" element={<KitchenReports />} />
     <Route path="registrar/hostel" element={<HostelAllocations />} />
     <Route path="registrar/hostel-rooms" element={<HostelRooms />} />
     <Route path="registrar/hostel-allocations" element={<HostelAllocations />} />
@@ -285,5 +297,13 @@ const StaffRoutes = () => (
   </Route>
 );
 
-export default StaffRoutes;
+const ComingSoon = ({ title }) => (
+  <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 text-slate-400">
+    <div className="text-4xl">🚧</div>
+    <h2 className="text-xl font-semibold text-slate-700">{title}</h2>
+    <p className="text-sm">This page is coming soon.</p>
+  </div>
+);
+
+export default staffRoutes;
 
