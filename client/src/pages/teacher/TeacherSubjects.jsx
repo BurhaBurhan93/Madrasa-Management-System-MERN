@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Card from '../../components/UIHelper/Card';
-import Button from '../../components/UIHelper/Button';
-import Badge from '../../components/UIHelper/Badge';
 import Progress from '../../components/UIHelper/Progress';
+
+const Panel = ({ title, subtitle, children, className = '' }) => (
+  <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
+    {(title || subtitle) && (
+      <div className="mb-5">
+        {title && <h3 className="text-lg font-semibold text-slate-900">{title}</h3>}
+        {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+      </div>
+    )}
+    {children}
+  </div>
+);
+
+const statusVariants = {
+  active: 'bg-emerald-100 text-emerald-700',
+  completed: 'bg-sky-100 text-sky-700',
+  upcoming: 'bg-amber-100 text-amber-700',
+  inactive: 'bg-rose-100 text-rose-700',
+  default: 'bg-slate-100 text-slate-600',
+};
 
 const TeacherSubjects = () => {
   const navigate = useNavigate();
@@ -16,9 +33,7 @@ const TeacherSubjects = () => {
 
   const uniqueFields = ['all', ...new Set(subjects.map(s => s.field).filter(Boolean))];
 
-  useEffect(() => {
-    fetchSubjects();
-  }, []);
+  useEffect(() => { fetchSubjects(); }, []);
 
   const fetchSubjects = async () => {
     try {
@@ -35,7 +50,7 @@ const TeacherSubjects = () => {
   };
 
   const filteredSubjects = subjects
-    .filter((sub) => {
+    .filter(sub => {
       const matchStatus = filter === 'all' || (sub.status || 'active') === filter;
       const matchField = fieldFilter === 'all' || sub.field === fieldFilter;
       return matchStatus && matchField;
@@ -47,148 +62,123 @@ const TeacherSubjects = () => {
       return 0;
     });
 
-  const getStatusVariant = (status) => {
-    switch (status) {
-      case 'active': return 'success';
-      case 'completed': return 'primary';
-      case 'upcoming': return 'warning';
-      case 'inactive': return 'danger';
-      default: return 'default';
-    }
-  };
-
   const totalStudents = subjects.reduce((sum, s) => sum + (s.students || 0), 0);
   const totalHours = subjects.reduce((sum, s) => sum + (s.weeklyHours || 0), 0);
 
   if (loading) {
     return (
-      <div className="w-full bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading subjects...</p>
-        </div>
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-600" />
       </div>
     );
   }
 
+  const statCards = [
+    { label: 'Total Subjects', value: subjects.length, accent: 'bg-cyan-500' },
+    { label: 'Active Classes', value: subjects.filter(s => (s.status || s.isActive) === 'active' || s.isActive === true).length, accent: 'bg-emerald-500' },
+    { label: 'Total Students', value: totalStudents, accent: 'bg-violet-500' },
+    { label: 'Weekly Hours', value: totalHours, accent: 'bg-amber-500' },
+  ];
+
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
-      {/* HEADER */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Subjects</h1>
-        <p className="text-gray-600">Manage your teaching subjects and workload</p>
-      </div>
-
-      {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-blue-600">{subjects.length}</div>
-          <div className="text-sm text-gray-600">Total Subjects</div>
-        </Card>
-
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-green-600">
-            {subjects.filter(s => (s.status || s.isActive) === 'active' || s.isActive === true).length}
-          </div>
-          <div className="text-sm text-gray-600">Active Classes</div>
-        </Card>
-
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-purple-600">{totalStudents}</div>
-          <div className="text-sm text-gray-600">Total Students</div>
-        </Card>
-
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-yellow-600">{totalHours}</div>
-          <div className="text-sm text-gray-600">Weekly Hours</div>
-        </Card>
-      </div>
-
-      {/* FILTERS */}
-      <div className="flex flex-wrap justify-between items-center mb-6">
-        <div className="flex gap-2 mb-4 md:mb-0">
-          {['all','active','completed','upcoming','inactive'].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg font-medium ${
-                filter === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-            </button>
-          ))}
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-slate-900">My Subjects</h1>
+          <p className="mt-1 text-sm text-slate-500">Manage your teaching subjects and workload</p>
         </div>
 
-        <div className="flex gap-3">
-          <select
-            value={fieldFilter}
-            onChange={(e) => setFieldFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-300"
-          >
-            {uniqueFields.map(f => <option key={f} value={f}>{f === 'all' ? 'All Fields' : f}</option>)}
-          </select>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-300"
-          >
-            <option value="name">Sort by Name</option>
-            <option value="students">Sort by Students</option>
-            <option value="progress">Sort by Progress</option>
-          </select>
-        </div>
-      </div>
-
-      {/* SUBJECT CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredSubjects.length > 0 ? filteredSubjects.map((subject) => (
-          <Card key={subject.id || subject._id} className="hover:shadow-md transition-shadow">
-            <div className="p-4">
-
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-semibold">{subject.name || 'Unnamed Subject'}</h3>
-                  <p className="text-sm text-gray-500">{subject.code || 'N/A'}</p>
-                </div>
-                <Badge variant={getStatusVariant(subject.status || 'active')}>
-                  {subject.status || (subject.isActive ? 'active' : 'inactive')}
-                </Badge>
-              </div>
-
-              <div className="mt-4 space-y-1 text-sm text-gray-600">
-                <p>Credits: {subject.credits || 'N/A'}</p>
-                <p>Description: {subject.description || 'No description'}</p>
-              </div>
-
-              <div className="mt-4">
-                <Progress value={subject.progress || 50} max={100} label="Syllabus Progress" />
-              </div>
-
-              <div className="mt-6 flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" onClick={() => navigate(`/teacher/students?subjectId=${subject._id}`)}>
-                  Students
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => navigate(`/teacher/attendance?subjectId=${subject._id}`)}>
-                  Attendance
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => navigate(`/teacher/exams?subjectId=${subject._id}`)}>
-                  Exams
-                </Button>
-              </div>
-
+        {/* Stats */}
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
+          {statCards.map(c => (
+            <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
+              <p className="text-sm font-medium text-slate-500">{c.label}</p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{c.value}</p>
             </div>
-          </Card>
-        )) : (
-          <div className="col-span-3 text-center py-12 text-gray-500">
-            No subjects found
-          </div>
-        )}
-      </div>
+          ))}
+        </section>
 
+        {/* Filters */}
+        <Panel className="mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap gap-2">
+              {['all', 'active', 'completed', 'upcoming', 'inactive'].map(status => (
+                <button
+                  key={status}
+                  onClick={() => setFilter(status)}
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200 ${filter === status ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <select value={fieldFilter} onChange={e => setFieldFilter(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
+                {uniqueFields.map(f => <option key={f} value={f}>{f === 'all' ? 'All Fields' : f}</option>)}
+              </select>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
+                <option value="name">Sort by Name</option>
+                <option value="students">Sort by Students</option>
+                <option value="progress">Sort by Progress</option>
+              </select>
+            </div>
+          </div>
+        </Panel>
+
+        {/* Subject Cards */}
+        <section className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {filteredSubjects.length > 0 ? filteredSubjects.map(subject => {
+            const statusKey = subject.status || 'default';
+            const badgeClass = statusVariants[statusKey] || statusVariants.default;
+            return (
+              <div key={subject.id || subject._id} className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-slate-900">{subject.name || 'Unnamed Subject'}</h3>
+                    <p className="mt-1 text-sm text-slate-500">{subject.code || 'N/A'}</p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${badgeClass}`}>
+                    {subject.status || (subject.isActive ? 'active' : 'inactive')}
+                  </span>
+                </div>
+
+                <div className="mt-4 space-y-1 text-sm text-slate-600">
+                  <p><span className="text-slate-400">Credits:</span> {subject.credits || 'N/A'}</p>
+                  <p><span className="text-slate-400">Description:</span> {subject.description || 'No description'}</p>
+                </div>
+
+                <div className="mt-4">
+                  <Progress value={subject.progress || 50} max={100} label="Syllabus Progress" />
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {[
+                    { label: 'Students', path: `/teacher/students?subjectId=${subject._id}` },
+                    { label: 'Attendance', path: `/teacher/attendance?subjectId=${subject._id}` },
+                    { label: 'Exams', path: `/teacher/exams?subjectId=${subject._id}` },
+                  ].map(btn => (
+                    <button
+                      key={btn.label}
+                      onClick={() => navigate(btn.path)}
+                      className="rounded-2xl border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-all duration-200 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          }) : (
+            <div className="col-span-3 rounded-2xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500">
+              No subjects found
+            </div>
+          )}
+        </section>
+
+      </div>
     </div>
   );
 };

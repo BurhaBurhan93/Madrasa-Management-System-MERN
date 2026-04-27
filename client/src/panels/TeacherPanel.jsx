@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  FiHome, FiBookOpen, FiUsers, FiEdit, FiCalendar, FiClipboard, 
-  FiBarChart2, FiMessageSquare, FiUser, FiMenu, FiLogOut, 
-  FiSearch, FiBell, FiChevronDown
+import {
+  FiHome, FiBookOpen, FiCalendar, FiClipboard,
+  FiBarChart2, FiMessageSquare, FiUser, FiMenu, FiLogOut,
+  FiSearch, FiBell, FiChevronDown, FiUsers, FiEdit
 } from 'react-icons/fi';
 import useLocalStorage from '../hooks/useLocalStorage';
 
 const TeacherPanel = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-
   const [sidebarOpen, setSidebarOpen] = useLocalStorage('teacherSidebarOpen', true);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  useEffect(() => { fetchUserData(); }, []);
 
   const fetchUserData = async () => {
     try {
@@ -27,43 +23,30 @@ const TeacherPanel = () => {
       if (userId) {
         const res = await fetch(`http://localhost:5000/api/users/${userId}`);
         const data = await res.json();
-        if (data.success) {
-          setUser(data.data);
-        }
+        if (data.success) setUser(data.data);
       }
-    } catch (error) {
-      console.error('Error fetching user:', error);
+    } catch (e) {
+      console.error('Error fetching user:', e);
     } finally {
       setLoading(false);
     }
   };
 
-  /* ================= RESIZE HANDLER ================= */
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
-      }
+      if (window.innerWidth < 768) setSidebarOpen(false);
+      else setSidebarOpen(true);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [setSidebarOpen]);
 
-  /* ================= MENU WITH SUBMENU SUPPORT ================= */
   const menuItems = [
-    { 
-      id: 'dashboard', 
-      icon: <FiHome size={20} />, 
-      path: '', 
-      label: 'Dashboard',
-      type: 'link'
-    },
-    { 
-      id: 'academic', 
-      icon: <FiBookOpen size={20} />, 
+    { id: 'dashboard', icon: <FiHome size={19} />, path: '', label: 'Dashboard', type: 'link' },
+    {
+      id: 'academic',
+      icon: <FiBookOpen size={19} />,
       label: 'Academic',
       type: 'dropdown',
       items: [
@@ -73,9 +56,9 @@ const TeacherPanel = () => {
         { id: 'create-assignment', label: 'Create Assignment', path: 'create-assignments' },
       ]
     },
-    { 
-      id: 'attendance', 
-      icon: <FiCalendar size={20} />, 
+    {
+      id: 'attendance',
+      icon: <FiCalendar size={19} />,
       label: 'Attendance',
       type: 'dropdown',
       items: [
@@ -83,9 +66,9 @@ const TeacherPanel = () => {
         { id: 'attendance-reports', label: 'Attendance Reports', path: 'attendance-reports' },
       ]
     },
-    { 
-      id: 'exams', 
-      icon: <FiClipboard size={20} />, 
+    {
+      id: 'exams',
+      icon: <FiClipboard size={19} />,
       label: 'Exams',
       type: 'dropdown',
       items: [
@@ -93,9 +76,9 @@ const TeacherPanel = () => {
         { id: 'create-exam', label: 'Create Exam', path: 'exams/create' },
       ]
     },
-    { 
-      id: 'results', 
-      icon: <FiBarChart2 size={20} />, 
+    {
+      id: 'results',
+      icon: <FiBarChart2 size={19} />,
       label: 'Results',
       type: 'dropdown',
       items: [
@@ -103,9 +86,9 @@ const TeacherPanel = () => {
         { id: 'view-results', label: 'View Results', path: 'results/view-results' },
       ]
     },
-    { 
-      id: 'communications', 
-      icon: <FiMessageSquare size={20} />, 
+    {
+      id: 'communications',
+      icon: <FiMessageSquare size={19} />,
       label: 'Communications',
       type: 'dropdown',
       items: [
@@ -114,14 +97,9 @@ const TeacherPanel = () => {
     },
   ];
 
-  /* ================= HELPERS ================= */
   const handleNavigation = (path) => {
     navigate(path ? `/teacher/${path}` : '/teacher');
     if (window.innerWidth < 768) setSidebarOpen(false);
-  };
-
-  const toggleDropdown = (id) => {
-    setOpenDropdown(openDropdown === id ? null : id);
   };
 
   const isActive = (path) => {
@@ -129,227 +107,197 @@ const TeacherPanel = () => {
     return location.pathname.startsWith(`/teacher/${path}`);
   };
 
-  const isDropdownActive = (items) => {
-    return items.some(item => location.pathname.startsWith(`/teacher/${item.path}`));
-  };
+  const isDropdownActive = (items) => items.some(item => location.pathname.startsWith(`/teacher/${item.path}`));
+
+  useEffect(() => {
+    const activeDropdown = menuItems.find(item => item.type === 'dropdown' && isDropdownActive(item.items));
+    if (activeDropdown) setOpenDropdown(activeDropdown.id);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('userRole');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     navigate('/');
   };
 
-  /* ================= RENDER ================= */
+  const groupedMenu = useMemo(() => ([
+    { title: 'Overview', items: menuItems.slice(0, 1) },
+    { title: 'Teaching', items: menuItems.slice(1) },
+  ]), [location.pathname]);
+
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* SIDEBAR - Expandable with text and submenus */}
+    <div className="flex h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.9),_rgba(248,250,252,1)_42%,_rgba(241,245,249,1)_100%)]">
       <aside
-        className={`bg-white shadow-lg fixed md:relative z-30 h-screen transition-all duration-300 flex flex-col ${
-          sidebarOpen ? 'w-64' : 'w-20'
-        }`}
+        className={`fixed z-30 h-screen border-r border-white/70 bg-white/90 backdrop-blur-xl transition-all duration-300 md:relative ${sidebarOpen ? 'w-72' : 'w-24'}`}
       >
-        {/* Logo */}
-        <div className={`flex items-center h-16 border-b border-gray-100 ${sidebarOpen ? 'px-4' : 'justify-center'}`}>
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-cyan-200 to-cyan-400 text-white flex items-center justify-center text-lg font-bold shadow-md shrink-0">
-            M
-          </div>
-          {sidebarOpen && (
-            <div className="ml-3 overflow-hidden">
-              <div className="font-bold text-gray-800 whitespace-nowrap">Madrasa EMIS</div>
-              <div className="text-xs text-gray-500 whitespace-nowrap">Teacher Panel</div>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation - With text labels and submenus */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2">
-          <ul className="space-y-1">
-            {menuItems.map((item) => (
-              <li key={item.id}>
-                {item.type === 'link' ? (
-                  <button
-                    onClick={() => handleNavigation(item.path)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-                      isActive(item.path)
-                        ? 'bg-gradient-to-r from-cyan-200 to-cyan-400 text-white shadow-md'
-                        : 'text-gray-600 hover:bg-cyan-50 hover:text-cyan-600'
-                    }`}
-                    title={!sidebarOpen ? item.label : ''}
-                  >
-                    <span className="shrink-0">{item.icon}</span>
-                    {sidebarOpen && (
-                      <span className="text-sm font-medium whitespace-nowrap overflow-hidden">
-                        {item.label}
-                      </span>
-                    )}
-                  </button>
-                ) : (
-                  <div>
-                    <button
-                      onClick={() => sidebarOpen && toggleDropdown(item.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 ${
-                        isDropdownActive(item.items)
-                          ? 'bg-cyan-50 text-cyan-600'
-                          : 'text-gray-600 hover:bg-cyan-50 hover:text-cyan-600'
-                      }`}
-                      title={!sidebarOpen ? item.label : ''}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`shrink-0 ${isDropdownActive(item.items) ? 'text-cyan-500' : ''}`}>
-                          {item.icon}
-                        </span>
-                        {sidebarOpen && (
-                          <span className="text-sm font-medium whitespace-nowrap overflow-hidden">
-                            {item.label}
-                          </span>
-                        )}
-                      </div>
-                      {sidebarOpen && (
-                        <FiChevronDown 
-                          size={16} 
-                          className={`shrink-0 transition-transform duration-200 ${openDropdown === item.id ? 'rotate-180' : ''}`}
-                        />
-                      )}
-                    </button>
-                    
-                    {/* Submenu */}
-                    {sidebarOpen && openDropdown === item.id && (
-                      <ul className="mt-1 ml-9 space-y-1">
-                        {item.items.map((sub) => (
-                          <li key={sub.id}>
-                            <button
-                              onClick={() => handleNavigation(sub.path)}
-                              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                                isActive(sub.path)
-                                  ? 'bg-cyan-100 text-cyan-700 font-medium'
-                                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
-                              }`}
-                            >
-                              {sub.label}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        {/* Bottom - Profile & Logout */}
-        <div className="p-3 border-t border-gray-100">
-          {user && (
-            <div className={`mb-2 ${sidebarOpen ? 'px-3 py-2' : 'px-2 py-2'} bg-cyan-50 rounded-lg`}>
-              {sidebarOpen ? (
+        <div className="flex h-full flex-col">
+          {/* Logo */}
+          <div className={`border-b border-slate-200/80 px-4 py-5 ${sidebarOpen ? '' : 'flex justify-center'}`}>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
+                M
+              </div>
+              {sidebarOpen && (
                 <div>
-                  <div className="text-sm font-semibold text-gray-800 truncate">{user.name}</div>
-                  <div className="text-xs text-gray-500 truncate">{user.email}</div>
-                  <div className="text-xs text-cyan-600 mt-1">Role: {user.role}</div>
-                </div>
-              ) : (
-                <div className="flex justify-center">
-                  <FiUser size={20} className="text-cyan-600" />
+                  <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">Madrasa EMIS</div>
+                  <div className="mt-1 text-lg font-semibold text-slate-900">Teacher Workspace</div>
                 </div>
               )}
             </div>
-          )}
-          <button
-            onClick={() => handleNavigation('profile')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 mb-2 ${
-              isActive('profile')
-                ? 'bg-gradient-to-r from-cyan-200 to-cyan-400 text-white shadow-md'
-                : 'text-gray-600 hover:bg-cyan-50 hover:text-cyan-600'
-            }`}
-            title={!sidebarOpen ? 'Profile' : ''}
+          </div>
+
+          {/* Nav */}
+          <nav
+            className="flex-1 overflow-y-auto px-3 py-4 [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            <span className="shrink-0"><FiUser size={20} /></span>
-            {sidebarOpen && (
-              <span className="text-sm font-medium whitespace-nowrap overflow-hidden">Profile</span>
-            )}
-          </button>
-          <button
-            onClick={handleLogout}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-cyan-600 hover:bg-cyan-50 transition-all duration-200`}
-            title={!sidebarOpen ? 'Logout' : ''}
-          >
-            <span className="shrink-0"><FiLogOut size={20} /></span>
-            {sidebarOpen && (
-              <span className="text-sm font-medium whitespace-nowrap overflow-hidden">Logout</span>
-            )}
-          </button>
+            <div className="space-y-6">
+              {groupedMenu.map((group) => (
+                <div key={group.title}>
+                  {sidebarOpen && <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">{group.title}</p>}
+                  <ul className="space-y-1.5">
+                    {group.items.map((item) => {
+                      const activeDropdown = item.type === 'dropdown' && isDropdownActive(item.items);
+                      const activeLink = item.type === 'link' && isActive(item.path);
+                      const buttonBase = activeLink || activeDropdown
+                        ? 'border-cyan-200 bg-gradient-to-r from-cyan-50 via-sky-50 to-white text-cyan-700'
+                        : 'border-transparent text-slate-600 hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:text-slate-900 hover:shadow-sm';
+
+                      return (
+                        <li key={item.id}>
+                          {item.type === 'link' ? (
+                            <button
+                              onClick={() => handleNavigation(item.path)}
+                              className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${buttonBase}`}
+                              title={!sidebarOpen ? item.label : ''}
+                            >
+                              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all duration-200 ${activeLink ? 'bg-cyan-600 text-white shadow-[0_10px_25px_-18px_rgba(8,145,178,0.9)]' : 'bg-slate-100 text-slate-500 group-hover:bg-cyan-100 group-hover:text-cyan-700'}`}>
+                                {item.icon}
+                              </span>
+                              {sidebarOpen && <span className="text-[13px] font-medium">{item.label}</span>}
+                            </button>
+                          ) : (
+                            <div>
+                              <button
+                                onClick={() => sidebarOpen && setOpenDropdown(openDropdown === item.id ? null : item.id)}
+                                className={`group flex w-full items-center justify-between rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${buttonBase}`}
+                                title={!sidebarOpen ? item.label : ''}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all duration-200 ${activeDropdown ? 'bg-cyan-600 text-white shadow-[0_10px_25px_-18px_rgba(8,145,178,0.9)]' : 'bg-slate-100 text-slate-500 group-hover:bg-cyan-100 group-hover:text-cyan-700'}`}>
+                                    {item.icon}
+                                  </span>
+                                  {sidebarOpen && <span className="text-[13px] font-medium">{item.label}</span>}
+                                </div>
+                                {sidebarOpen && <FiChevronDown size={16} className={`transition-transform duration-200 ${openDropdown === item.id ? 'rotate-180 text-cyan-600' : 'text-slate-400 group-hover:text-slate-700'}`} />}
+                              </button>
+
+                              {sidebarOpen && openDropdown === item.id && (
+                                <ul className="mt-2 space-y-1 pl-4">
+                                  {item.items.map((sub) => {
+                                    const activeSub = isActive(sub.path);
+                                    return (
+                                      <li key={sub.id}>
+                                        <button
+                                          onClick={() => handleNavigation(sub.path)}
+                                          className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-[13px] transition-all duration-200 ${activeSub ? 'bg-cyan-100/80 font-medium text-cyan-800' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'}`}
+                                        >
+                                          <span className={`h-2.5 w-2.5 rounded-full transition-all duration-200 ${activeSub ? 'bg-cyan-500 shadow-[0_0_0_4px_rgba(34,211,238,0.15)]' : 'bg-slate-300 group-hover:bg-cyan-400'}`} />
+                                          <span>{sub.label}</span>
+                                        </button>
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
+                              )}
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </nav>
+
+          {/* Bottom */}
+          <div className="border-t border-slate-200/80 p-3">
+            <div className={`rounded-3xl border border-slate-200 bg-white/95 p-2 ${sidebarOpen ? '' : 'space-y-2'}`}>
+              <button
+                onClick={() => handleNavigation('profile')}
+                className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all duration-200 ${isActive('profile') ? 'bg-gradient-to-r from-cyan-50 to-sky-50 text-cyan-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                title={!sidebarOpen ? 'Profile' : ''}
+              >
+                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${isActive('profile') ? 'bg-cyan-600 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-cyan-100 group-hover:text-cyan-700'}`}>
+                  <FiUser size={18} />
+                </span>
+                {sidebarOpen && (
+                  <div>
+                    <p className="text-[13px] font-medium">Profile</p>
+                    <p className="text-xs text-slate-400">Account and identity</p>
+                  </div>
+                )}
+              </button>
+              <button
+                onClick={handleLogout}
+                className="group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-rose-600 transition-all duration-200 hover:bg-rose-50 hover:text-rose-700"
+                title={!sidebarOpen ? 'Logout' : ''}
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 transition-all duration-200 group-hover:bg-rose-100 group-hover:text-rose-600">
+                  <FiLogOut size={18} />
+                </span>
+                {sidebarOpen && (
+                  <div>
+                    <p className="text-[13px] font-medium">Logout</p>
+                    <p className="text-xs text-rose-300">Exit this workspace</p>
+                  </div>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       </aside>
 
-      {/* MOBILE OVERLAY */}
-      {sidebarOpen && (
-        <div
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/20 md:hidden z-20"
-          aria-hidden
-        />
-      )}
+      {sidebarOpen && <div onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-20 bg-slate-950/25 backdrop-blur-[1px] md:hidden" aria-hidden />}
 
-      {/* CONTENT */}
       <main className="flex-1 min-w-0 overflow-y-auto h-screen">
-        {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-100">
-          <div className="flex items-center justify-between px-6 py-3">
-            {/* Left - Toggle & Welcome */}
+        <header className="sticky top-0 z-20 border-b border-white/70 bg-white/72 backdrop-blur-xl">
+          <div className="flex items-center justify-between px-5 py-4 lg:px-8">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 aria-label="Toggle sidebar"
-                className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"
               >
                 <FiMenu size={20} />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">
-                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600">{user?.name || 'Teacher'}</span>!
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Teacher Console</p>
+                <h1 className="mt-1 text-lg font-semibold text-slate-900 lg:text-xl">
+                  Welcome back, <span className="bg-gradient-to-r from-cyan-600 to-sky-600 bg-clip-text text-transparent">{user?.name || 'Teacher'}</span>
                 </h1>
-                <p className="text-sm text-gray-500">Manage your classes and students efficiently</p>
+                <p className="mt-1 text-xs text-slate-500 lg:text-sm">Manage your classes and students efficiently.</p>
               </div>
             </div>
 
-            {/* Right - Search, Notifications, Profile */}
             <div className="flex items-center gap-3">
-              {/* Search */}
-              <div className="hidden md:flex items-center bg-gray-50 rounded-full px-4 py-2 border border-gray-100">
-                <FiSearch className="text-gray-400 mr-2" size={18} />
-                <input
-                  type="text"
-                  placeholder="Search students, classes..."
-                  className="bg-transparent outline-none text-sm text-gray-600 w-48"
-                />
+              <div className="hidden items-center rounded-full border border-slate-200 bg-white px-4 py-2.5 md:flex">
+                <FiSearch className="mr-2 text-slate-400" size={18} />
+                <input type="text" placeholder="Search students, classes..." className="w-48 bg-transparent text-sm text-slate-600 outline-none" />
               </div>
-
-              {/* Notifications */}
-              <button className="relative p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
-                <FiBell size={20} />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+              <button className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700">
+                <FiBell size={19} />
+                <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white" />
               </button>
-
-              {/* User Profile */}
-              {user && (
-                <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
-                  <div className="text-right hidden sm:block">
-                    <p className="text-sm font-semibold text-gray-700">{user.name}</p>
-                    <p className="text-xs text-gray-500">{user.role}</p>
-                  </div>
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-cyan-200 to-cyan-400 text-white flex items-center justify-center text-sm font-bold shadow-md">
-                    {user.name?.split(' ').map(n => n[0]).join('') || 'T'}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <div className="p-6">
+        <div className="p-5 lg:p-8">
           <Outlet />
         </div>
       </main>
