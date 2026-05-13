@@ -152,6 +152,7 @@ const StaffLibraryCategories = () => {
       
       {/* List Page */}
       <ListPage
+        embedded={true}
         title={libraryCategoriesConfig.title}
         subtitle={libraryCategoriesConfig.subtitle}
         endpoint={libraryCategoriesConfig.endpoint}

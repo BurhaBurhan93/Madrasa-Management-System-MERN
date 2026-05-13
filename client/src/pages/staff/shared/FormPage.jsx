@@ -4,18 +4,7 @@ import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
 import Select from '../../../components/UIHelper/Select';
 import StaffPageLayout from './StaffPageLayout';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-const parseJsonSafe = async (res) => {
-  const text = await res.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    const preview = text.slice(0, 200).replace(/\s+/g, ' ');
-    throw new Error(`API returned non-JSON (status ${res.status}). Response: ${preview}`);
-  }
-};
+import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 
 const formatFieldLabel = (label = '') => label.toLowerCase().replace(/\s+/g, ' ');
 
@@ -36,7 +25,7 @@ const RelationSelect = ({ field, value, onChange }) => {
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const res = await fetch(`${API_BASE}${field.relationEndpoint}`);
+        const res = await apiFetch(field.relationEndpoint);
         const data = await parseJsonSafe(res);
         const rows = data.data || data;
         setOptions(rows.map((row) => ({ value: field.relationValue ? field.relationValue(row) : (row._id || row.id), label: field.relationLabel(row) })));
@@ -64,7 +53,7 @@ const RelationSelect = ({ field, value, onChange }) => {
 const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
   const targetEndpoint = readEndpoint || endpoint;
   if (readMode === 'collection') {
-    const res = await fetch(`${API_BASE}${targetEndpoint}`);
+    const res = await apiFetch(targetEndpoint);
     const data = await parseJsonSafe(res);
     if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load');
     const rows = data.data || [];
@@ -73,7 +62,7 @@ const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
     return match;
   }
 
-  const res = await fetch(`${API_BASE}${targetEndpoint}/${id}`);
+  const res = await apiFetch(`${targetEndpoint}/${id}`);
   const data = await parseJsonSafe(res);
   if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load');
   return data.data;
@@ -118,7 +107,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
         throw new Error('Please correct the highlighted fields.');
       }
       const payload = mapFormToPayload ? mapFormToPayload(form) : form;
-      const res = await fetch(`${API_BASE}${endpoint}${mode === 'edit' ? `/${id}` : ''}`, {
+      const res = await apiFetch(`${endpoint}${mode === 'edit' ? `/${id}` : ''}`, {
         method: mode === 'edit' ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

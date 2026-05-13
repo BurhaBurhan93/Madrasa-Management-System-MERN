@@ -193,6 +193,7 @@ const StaffLibraryBorrowed = () => {
       
       {/* List Page */}
       <ListPage
+        embedded={true}
         title={libraryBorrowedConfig.title}
         subtitle={libraryBorrowedConfig.subtitle}
         endpoint={libraryBorrowedConfig.endpoint}

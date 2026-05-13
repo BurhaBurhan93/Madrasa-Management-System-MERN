@@ -212,7 +212,7 @@ const StaffLibrarySales = () => {
       </div>
       
       {/* List Page */}
-      <ListPage title={librarySalesConfig.title} subtitle={librarySalesConfig.subtitle} endpoint={librarySalesConfig.endpoint} columns={librarySalesConfig.columns} createPath="/staff/library/sales/create" editPathForRow={(row) => `/staff/library/sales/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/library/sales/view/${getId(row)}`} searchPlaceholder="Search sales..." clientSidePagination={true} />
+      <ListPage embedded={true} title={librarySalesConfig.title} subtitle={librarySalesConfig.subtitle} endpoint={librarySalesConfig.endpoint} columns={librarySalesConfig.columns} createPath="/staff/library/sales/create" editPathForRow={(row) => `/staff/library/sales/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/library/sales/view/${getId(row)}`} searchPlaceholder="Search sales..." clientSidePagination={true} />
     </StaffPageLayout>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   AreaChartComponent,
@@ -111,9 +112,12 @@ const upcomingEventsSeed = [
 ];
 
 const quickActionItems = [
-  { title: 'Review admissions', note: '12 applications need approval' },
-  { title: 'Check fee summary', note: 'Revenue is up 11 percent this month' },
-  { title: 'Resolve complaints', note: '3 cases are waiting for final review' },
+  { title: 'Review Admissions', note: '12 applications need approval', path: '/admin/users/register' },
+  { title: 'Check Fee Summary', note: 'Revenue is up 11% this month', path: '/admin/finance/fee-structure' },
+  { title: 'Manage Classes', note: 'Add new classes for next semester', path: '/admin/academic/classes' },
+  { title: 'Library Books', note: 'Add new books to library', path: '/admin/library/books' },
+  { title: 'System Settings', note: 'Update institution settings', path: '/admin/settings/general' },
+  { title: 'Resolve Complaints', note: '3 cases waiting for review', path: '/admin/complaints' },
 ];
 
 const StatCard = ({ label, value, note, accentClass, iconText }) => (
@@ -153,6 +157,7 @@ const Panel = ({ title, subtitle, children, className = '', dark = false }) => (
 );
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [quickStats, setQuickStats] = useState({
     totalStudents: 0,
     totalTeachers: 0,
@@ -282,13 +287,14 @@ const AdminDashboard = () => {
 
               <div className="mt-6 space-y-3">
                 {quickActionItems.map((item) => (
-                  <div
+                  <button
                     key={item.title}
-                    className="rounded-2xl border border-white/10 bg-slate-900/60 p-4"
+                    onClick={() => navigate(item.path)}
+                    className="w-full text-left rounded-2xl border border-white/10 bg-slate-900/60 p-4 hover:bg-slate-800/60 transition-colors"
                   >
                     <p className="font-medium text-white">{item.title}</p>
                     <p className="mt-1 text-sm text-slate-400">{item.note}</p>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>

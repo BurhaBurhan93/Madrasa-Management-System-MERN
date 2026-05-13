@@ -1,6 +1,5 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import StaffPanel from '../panels/StaffPanel';
 import StaffLibraryCategories from '../pages/staff/library/Categories';
 import StaffLibraryCategoriesCreate from '../pages/staff/library/CategoriesCreate';
 import StaffLibraryCategoriesEdit from '../pages/staff/library/CategoriesEdit';
@@ -129,6 +128,7 @@ import StaffLeaveManagement from '../pages/StaffLeaveManagement';
 import StaffDashboard from '../pages/staff/StaffDashboard';
 import StaffStudents from '../pages/staff/StaffStudents';
 import StaffInventory from '../pages/staff/StaffInventory';
+import StaffProfile from '../pages/staff/StaffProfile';
 import StudentRegistration from '../pages/staff/registrar/StudentRegistration';
 import StudentsList from '../pages/staff/registrar/StudentsList';
 import StudentAdmissions from '../pages/staff/registrar/StudentAdmissions';
@@ -143,50 +143,56 @@ import HostelRooms from '../pages/staff/hostel/HostelRooms';
 import HostelAllocations from '../pages/staff/hostel/HostelAllocations';
 import HostelMeals from '../pages/staff/hostel/HostelMeals';
 
-// exported as a plain Route element — used directly inside <Routes> in App.jsx
+const ComingSoon = ({ title }) => (
+  <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 text-slate-400">
+    <div className="text-4xl">Under Construction</div>
+    <h2 className="text-xl font-semibold text-slate-700">{title}</h2>
+    <p className="text-sm">This page is coming soon.</p>
+  </div>
+);
+
 const staffRoutes = (
-  <Route path="/staff/*" element={<StaffPanel />}>
+  <>
     <Route index element={<StaffDashboard />} />
     <Route path="dashboard" element={<StaffDashboard />} />
     <Route path="students" element={<StaffStudents />} />
     <Route path="inventory" element={<StaffInventory />} />
-    <Route path="profile" element={<ComingSoon title="Staff Profile" />} />
-    <Route path="library">
-      <Route path="categories" element={<StaffLibraryCategories />} />
-      <Route path="categories/create" element={<StaffLibraryCategoriesCreate />} />
-      <Route path="categories/edit/:id" element={<StaffLibraryCategoriesEdit />} />
-      <Route path="categories/view/:id" element={<StaffLibraryCategoriesView />} />
-      <Route path="books" element={<StaffLibraryBooks />} />
-      <Route path="books/create" element={<StaffLibraryBooksCreate />} />
-      <Route path="books/edit/:id" element={<StaffLibraryBooksEdit />} />
-      <Route path="books/view/:id" element={<StaffLibraryBooksView />} />
-      <Route path="borrowed" element={<StaffLibraryBorrowed />} />
-      <Route path="borrowed/create" element={<StaffLibraryBorrowedCreate />} />
-      <Route path="borrowed/edit/:id" element={<StaffLibraryBorrowedEdit />} />
-      <Route path="borrowed/view/:id" element={<StaffLibraryBorrowedView />} />
-      <Route path="purchases" element={<StaffLibraryPurchases />} />
-      <Route path="purchases/create" element={<StaffLibraryPurchasesCreate />} />
-      <Route path="purchases/edit/:id" element={<StaffLibraryPurchasesEdit />} />
-      <Route path="purchases/view/:id" element={<StaffLibraryPurchasesView />} />
-      <Route path="sales" element={<StaffLibrarySales />} />
-      <Route path="sales/create" element={<StaffLibrarySalesCreate />} />
-      <Route path="sales/edit/:id" element={<StaffLibrarySalesEdit />} />
-      <Route path="sales/view/:id" element={<StaffLibrarySalesView />} />
-      <Route path="reports" element={<StaffLibraryReports />} />
-    </Route>
-    <Route path="complaints">
-      <Route index element={<StaffComplaintsList />} />
-      <Route path="view/:id" element={<StaffComplaintsView />} />
-      <Route path="actions" element={<StaffComplaintActions />} />
-      <Route path="actions/create" element={<StaffComplaintActionsCreate />} />
-      <Route path="actions/edit/:id" element={<StaffComplaintActionsEdit />} />
-      <Route path="actions/view/:id" element={<StaffComplaintActionsView />} />
-      <Route path="feedback" element={<StaffComplaintFeedback />} />
-      <Route path="feedback/create" element={<StaffComplaintFeedbackCreate />} />
-      <Route path="feedback/edit/:id" element={<StaffComplaintFeedbackEdit />} />
-      <Route path="feedback/view/:id" element={<StaffComplaintFeedbackView />} />
-      <Route path="reports" element={<StaffComplaintReports />} />
-    </Route>
+    <Route path="profile" element={<StaffProfile />} />
+
+    <Route path="library/categories" element={<StaffLibraryCategories />} />
+    <Route path="library/categories/create" element={<StaffLibraryCategoriesCreate />} />
+    <Route path="library/categories/edit/:id" element={<StaffLibraryCategoriesEdit />} />
+    <Route path="library/categories/view/:id" element={<StaffLibraryCategoriesView />} />
+    <Route path="library/books" element={<StaffLibraryBooks />} />
+    <Route path="library/books/create" element={<StaffLibraryBooksCreate />} />
+    <Route path="library/books/edit/:id" element={<StaffLibraryBooksEdit />} />
+    <Route path="library/books/view/:id" element={<StaffLibraryBooksView />} />
+    <Route path="library/borrowed" element={<StaffLibraryBorrowed />} />
+    <Route path="library/borrowed/create" element={<StaffLibraryBorrowedCreate />} />
+    <Route path="library/borrowed/edit/:id" element={<StaffLibraryBorrowedEdit />} />
+    <Route path="library/borrowed/view/:id" element={<StaffLibraryBorrowedView />} />
+    <Route path="library/purchases" element={<StaffLibraryPurchases />} />
+    <Route path="library/purchases/create" element={<StaffLibraryPurchasesCreate />} />
+    <Route path="library/purchases/edit/:id" element={<StaffLibraryPurchasesEdit />} />
+    <Route path="library/purchases/view/:id" element={<StaffLibraryPurchasesView />} />
+    <Route path="library/sales" element={<StaffLibrarySales />} />
+    <Route path="library/sales/create" element={<StaffLibrarySalesCreate />} />
+    <Route path="library/sales/edit/:id" element={<StaffLibrarySalesEdit />} />
+    <Route path="library/sales/view/:id" element={<StaffLibrarySalesView />} />
+    <Route path="library/reports" element={<StaffLibraryReports />} />
+
+    <Route path="complaints" element={<StaffComplaintsList />} />
+    <Route path="complaints/view/:id" element={<StaffComplaintsView />} />
+    <Route path="complaints/actions" element={<StaffComplaintActions />} />
+    <Route path="complaints/actions/create" element={<StaffComplaintActionsCreate />} />
+    <Route path="complaints/actions/edit/:id" element={<StaffComplaintActionsEdit />} />
+    <Route path="complaints/actions/view/:id" element={<StaffComplaintActionsView />} />
+    <Route path="complaints/feedback" element={<StaffComplaintFeedback />} />
+    <Route path="complaints/feedback/create" element={<StaffComplaintFeedbackCreate />} />
+    <Route path="complaints/feedback/edit/:id" element={<StaffComplaintFeedbackEdit />} />
+    <Route path="complaints/feedback/view/:id" element={<StaffComplaintFeedbackView />} />
+    <Route path="complaints/reports" element={<StaffComplaintReports />} />
+
     <Route path="finance" element={<StaffFinanceIndex />} />
     <Route path="finance/transactions" element={<StaffFinanceTransactions />} />
     <Route path="finance/transactions/create" element={<StaffFinanceTransactionsCreate />} />
@@ -216,6 +222,7 @@ const staffRoutes = (
     <Route path="finance/reports/create" element={<StaffFinanceReportsCreate />} />
     <Route path="finance/reports/edit/:id" element={<StaffFinanceReportsEdit />} />
     <Route path="finance/reports/view/:id" element={<StaffFinanceReportsView />} />
+
     <Route path="payroll" element={<StaffPayrollIndex />} />
     <Route path="payroll/salary-structures" element={<StaffPayrollSalaryStructures />} />
     <Route path="payroll/salary-structures/create" element={<StaffPayrollSalaryStructuresCreate />} />
@@ -233,6 +240,7 @@ const staffRoutes = (
     <Route path="payroll/salary-advances/create" element={<StaffPayrollSalaryAdvancesCreate />} />
     <Route path="payroll/salary-advances/edit/:id" element={<StaffPayrollSalaryAdvancesEdit />} />
     <Route path="payroll/salary-advances/view/:id" element={<StaffPayrollSalaryAdvancesView />} />
+
     <Route path="hr/employees" element={<Employees />} />
     <Route path="hr/employees/edit/:id" element={<EmployeeEdit />} />
     <Route path="hr/employees/view/:id" element={<EmployeeView />} />
@@ -253,6 +261,7 @@ const staffRoutes = (
     <Route path="hr/leave" element={<LeaveManagement />} />
     <Route path="hr/payroll" element={<HRPayroll />} />
     <Route path="hr/reports" element={<HRReports />} />
+
     <Route path="kitchen/inventory" element={<Inventory />} />
     <Route path="kitchen/inventory/create" element={<InventoryCreate />} />
     <Route path="kitchen/inventory/edit/:id" element={<InventoryEdit />} />
@@ -279,6 +288,7 @@ const staffRoutes = (
     <Route path="kitchen/waste/view/:id" element={<WasteTrackingView />} />
     <Route path="kitchen/requests" element={<FoodRequest />} />
     <Route path="kitchen/reports" element={<KitchenReports />} />
+
     <Route path="registrar/hostel" element={<HostelAllocations />} />
     <Route path="registrar/hostel-rooms" element={<HostelRooms />} />
     <Route path="registrar/hostel-allocations" element={<HostelAllocations />} />
@@ -293,17 +303,9 @@ const staffRoutes = (
     <Route path="registrar/education-history" element={<EducationHistory />} />
     <Route path="registrar/documents" element={<DocumentsManagement />} />
     <Route path="registrar/reports" element={<RegistrarReports />} />
-    <Route path="leave" element={<StaffLeaveManagement />} />
-  </Route>
-);
 
-const ComingSoon = ({ title }) => (
-  <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 text-slate-400">
-    <div className="text-4xl">🚧</div>
-    <h2 className="text-xl font-semibold text-slate-700">{title}</h2>
-    <p className="text-sm">This page is coming soon.</p>
-  </div>
+    <Route path="leave" element={<StaffLeaveManagement />} />
+  </>
 );
 
 export default staffRoutes;
-

@@ -1,77 +1,119 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import AdminPanel from '../panels/AdminPanel';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import UserIndex from '../pages/admin/users/UserIndex';
+import UserRegister from '../pages/admin/users/UserRegister';
+import UserEdit from '../pages/admin/users/UserEdit';
+import AdminClasses from '../pages/admin/academic/AdminClasses';
+import AdminSubjects from '../pages/admin/academic/AdminSubjects';
+import AdminExams from '../pages/admin/academic/AdminExams';
+import AdminAttendanceDaily from '../pages/admin/attendance/AdminAttendanceDaily';
+import AdminFeeStructure from '../pages/admin/finance/AdminFeeStructure';
+import AdminPayments from '../pages/admin/finance/AdminPayments';
+import AdminLibraryBooks from '../pages/admin/library/AdminLibraryBooks';
+import AdminGeneralSettings from '../pages/admin/settings/AdminGeneralSettings';
+import AdminHREmployees from '../pages/admin/hr/AdminHREmployees';
+import AdminProfile from '../pages/admin/AdminProfile';
+import Students from '../pages/admin/users/Students';
+import Teachers from '../pages/admin/users/Teachers';
+import Staff from '../pages/admin/users/Staff';
+import RolesPermissions from '../pages/admin/users/RolesPermissions';
+import AuditLogs from '../pages/admin/users/AuditLogs';
 
-const AdminRoutes = () => (
-  <Route path="/admin/*" element={<AdminPanel />}>
-    <Route index element={<AdminDashboard />} />
-    <Route path="dashboard" element={<AdminDashboard />} />
-    
-    {/* User Management Routes */}
-    <Route path="users">
-      <Route index element={<div className="p-6"><h1 className="text-2xl font-bold">All Users</h1><p className="text-gray-600 mt-2">User management page coming soon...</p></div>} />
-      <Route path="students" element={<div className="p-6"><h1 className="text-2xl font-bold">Students</h1><p className="text-gray-600 mt-2">Student management page coming soon...</p></div>} />
-      <Route path="teachers" element={<div className="p-6"><h1 className="text-2xl font-bold">Teachers</h1><p className="text-gray-600 mt-2">Teacher management page coming soon...</p></div>} />
-      <Route path="staff" element={<div className="p-6"><h1 className="text-2xl font-bold">Staff</h1><p className="text-gray-600 mt-2">Staff management page coming soon...</p></div>} />
-    </Route>
-
-    {/* Academic Routes */}
-    <Route path="academic">
-      <Route path="classes" element={<div className="p-6"><h1 className="text-2xl font-bold">Classes</h1><p className="text-gray-600 mt-2">Class management page coming soon...</p></div>} />
-      <Route path="subjects" element={<div className="p-6"><h1 className="text-2xl font-bold">Subjects</h1><p className="text-gray-600 mt-2">Subject management page coming soon...</p></div>} />
-      <Route path="exams" element={<div className="p-6"><h1 className="text-2xl font-bold">Exams</h1><p className="text-gray-600 mt-2">Exam management page coming soon...</p></div>} />
-      <Route path="timetable" element={<div className="p-6"><h1 className="text-2xl font-bold">Timetable</h1><p className="text-gray-600 mt-2">Timetable management page coming soon...</p></div>} />
-    </Route>
-
-    {/* Attendance Routes */}
-    <Route path="attendance">
-      <Route path="daily" element={<div className="p-6"><h1 className="text-2xl font-bold">Daily Attendance</h1><p className="text-gray-600 mt-2">Daily attendance page coming soon...</p></div>} />
-      <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Attendance Reports</h1><p className="text-gray-600 mt-2">Attendance reports page coming soon...</p></div>} />
-      <Route path="settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Attendance Settings</h1><p className="text-gray-600 mt-2">Attendance settings page coming soon...</p></div>} />
-    </Route>
-
-    {/* Finance Routes */}
-    <Route path="finance">
-      <Route path="fee-structure" element={<div className="p-6"><h1 className="text-2xl font-bold">Fee Structure</h1><p className="text-gray-600 mt-2">Fee structure page coming soon...</p></div>} />
-      <Route path="payments" element={<div className="p-6"><h1 className="text-2xl font-bold">Payments</h1><p className="text-gray-600 mt-2">Payments page coming soon...</p></div>} />
-      <Route path="expenses" element={<div className="p-6"><h1 className="text-2xl font-bold">Expenses</h1><p className="text-gray-600 mt-2">Expenses page coming soon...</p></div>} />
-      <Route path="salaries" element={<div className="p-6"><h1 className="text-2xl font-bold">Salaries</h1><p className="text-gray-600 mt-2">Salaries page coming soon...</p></div>} />
-      <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Financial Reports</h1><p className="text-gray-600 mt-2">Financial reports page coming soon...</p></div>} />
-    </Route>
-
-    {/* Library Routes */}
-    <Route path="library">
-      <Route path="books" element={<div className="p-6"><h1 className="text-2xl font-bold">Books</h1><p className="text-gray-600 mt-2">Books management page coming soon...</p></div>} />
-      <Route path="categories" element={<div className="p-6"><h1 className="text-2xl font-bold">Categories</h1><p className="text-gray-600 mt-2">Categories page coming soon...</p></div>} />
-      <Route path="borrowed" element={<div className="p-6"><h1 className="text-2xl font-bold">Borrowed Books</h1><p className="text-gray-600 mt-2">Borrowed books page coming soon...</p></div>} />
-      <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Library Reports</h1><p className="text-gray-600 mt-2">Library reports page coming soon...</p></div>} />
-    </Route>
-
-    {/* Complaints Routes */}
-    <Route path="complaints">
-      <Route index element={<div className="p-6"><h1 className="text-2xl font-bold">All Complaints</h1><p className="text-gray-600 mt-2">All complaints page coming soon...</p></div>} />
-      <Route path="pending" element={<div className="p-6"><h1 className="text-2xl font-bold">Pending Complaints</h1><p className="text-gray-600 mt-2">Pending complaints page coming soon...</p></div>} />
-      <Route path="resolved" element={<div className="p-6"><h1 className="text-2xl font-bold">Resolved Complaints</h1><p className="text-gray-600 mt-2">Resolved complaints page coming soon...</p></div>} />
-    </Route>
-
-    {/* Reports Routes */}
-    <Route path="reports">
-      <Route path="academic" element={<div className="p-6"><h1 className="text-2xl font-bold">Academic Reports</h1><p className="text-gray-600 mt-2">Academic reports page coming soon...</p></div>} />
-      <Route path="financial" element={<div className="p-6"><h1 className="text-2xl font-bold">Financial Reports</h1><p className="text-gray-600 mt-2">Financial reports page coming soon...</p></div>} />
-      <Route path="attendance" element={<div className="p-6"><h1 className="text-2xl font-bold">Attendance Reports</h1><p className="text-gray-600 mt-2">Attendance reports page coming soon...</p></div>} />
-    </Route>
-
-    {/* Settings Routes */}
-    <Route path="settings">
-      <Route path="general" element={<div className="p-6"><h1 className="text-2xl font-bold">General Settings</h1><p className="text-gray-600 mt-2">General settings page coming soon...</p></div>} />
-      <Route path="academic" element={<div className="p-6"><h1 className="text-2xl font-bold">Academic Settings</h1><p className="text-gray-600 mt-2">Academic settings page coming soon...</p></div>} />
-      <Route path="notifications" element={<div className="p-6"><h1 className="text-2xl font-bold">Notifications</h1><p className="text-gray-600 mt-2">Notifications settings page coming soon...</p></div>} />
-    </Route>
-
-    {/* Profile Route */}
-    <Route path="profile" element={<div className="p-6"><h1 className="text-2xl font-bold">Admin Profile</h1><p className="text-gray-600 mt-2">Profile page coming soon...</p></div>} />
-  </Route>
+const ComingSoon = ({ title }) => (
+  <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 text-slate-400">
+    <div className="text-4xl">Under Construction</div>
+    <h2 className="text-xl font-semibold text-slate-700">{title}</h2>
+    <p className="text-sm">This page is coming soon.</p>
+  </div>
 );
 
-export default AdminRoutes;
+const adminRoutes = (
+  <>
+    <Route index element={<AdminDashboard />} />
+    <Route path="dashboard" element={<AdminDashboard />} />
+
+    <Route path="users" element={<UserIndex />} />
+    <Route path="users/register" element={<UserRegister />} />
+    <Route path="users/edit/:id" element={<UserEdit />} />
+    <Route path="users/students" element={<Students />} />
+    <Route path="users/teachers" element={<Teachers />} />
+    <Route path="users/staff" element={<Staff />} />
+    <Route path="users/roles" element={<RolesPermissions />} />
+    <Route path="users/audit" element={<AuditLogs />} />
+
+    <Route path="academic/classes" element={<AdminClasses />} />
+    <Route path="academic/subjects" element={<AdminSubjects />} />
+    <Route path="academic/exams" element={<AdminExams />} />
+    <Route path="academic/timetable" element={<ComingSoon title="Timetable" />} />
+    <Route path="academic/degrees" element={<ComingSoon title="Degrees" />} />
+    <Route path="academic/syllabus" element={<ComingSoon title="Syllabus" />} />
+    <Route path="academic/grading" element={<ComingSoon title="Grading System" />} />
+
+    <Route path="attendance/daily" element={<AdminAttendanceDaily />} />
+    <Route path="attendance/reports" element={<ComingSoon title="Attendance Reports" />} />
+    <Route path="attendance/settings" element={<ComingSoon title="Attendance Settings" />} />
+    <Route path="attendance/warnings" element={<ComingSoon title="Attendance Warnings" />} />
+    <Route path="attendance/corrections" element={<ComingSoon title="Attendance Corrections" />} />
+
+    <Route path="finance/fee-structure" element={<AdminFeeStructure />} />
+    <Route path="finance/payments" element={<AdminPayments />} />
+    <Route path="finance/expenses" element={<ComingSoon title="Expenses" />} />
+    <Route path="finance/salaries" element={<ComingSoon title="Salaries" />} />
+    <Route path="finance/accounts" element={<ComingSoon title="Accounts" />} />
+    <Route path="finance/transactions" element={<ComingSoon title="Transactions" />} />
+    <Route path="finance/reports" element={<ComingSoon title="Financial Reports" />} />
+
+    <Route path="library/books" element={<AdminLibraryBooks />} />
+    <Route path="library/categories" element={<ComingSoon title="Categories" />} />
+    <Route path="library/borrowed" element={<ComingSoon title="Borrowed Books" />} />
+    <Route path="library/purchases" element={<ComingSoon title="Purchases" />} />
+    <Route path="library/sales" element={<ComingSoon title="Sales" />} />
+    <Route path="library/reports" element={<ComingSoon title="Library Reports" />} />
+
+    <Route path="complaints" element={<ComingSoon title="All Complaints" />} />
+    <Route path="complaints/pending" element={<ComingSoon title="Pending Complaints" />} />
+    <Route path="complaints/resolved" element={<ComingSoon title="Resolved Complaints" />} />
+    <Route path="complaints/actions" element={<ComingSoon title="Complaint Actions" />} />
+    <Route path="complaints/feedback" element={<ComingSoon title="Complaint Feedback" />} />
+    <Route path="complaints/reports" element={<ComingSoon title="Complaint Reports" />} />
+
+    <Route path="hostel/rooms" element={<ComingSoon title="Hostel Rooms" />} />
+    <Route path="hostel/allocations" element={<ComingSoon title="Room Allocations" />} />
+    <Route path="hostel/meals" element={<ComingSoon title="Meal Management" />} />
+    <Route path="hostel/attendance" element={<ComingSoon title="Meal Attendance" />} />
+    <Route path="hostel/reports" element={<ComingSoon title="Hostel Reports" />} />
+
+    <Route path="hr/departments" element={<ComingSoon title="Departments" />} />
+    <Route path="hr/designations" element={<ComingSoon title="Designations" />} />
+    <Route path="hr/employees" element={<AdminHREmployees />} />
+    <Route path="hr/attendance" element={<ComingSoon title="Employee Attendance" />} />
+    <Route path="hr/leave" element={<ComingSoon title="Leave Management" />} />
+    <Route path="hr/payroll" element={<ComingSoon title="Payroll" />} />
+    <Route path="hr/reports" element={<ComingSoon title="HR Reports" />} />
+
+    <Route path="kitchen/inventory" element={<ComingSoon title="Kitchen Inventory" />} />
+    <Route path="kitchen/meals" element={<ComingSoon title="Meal Planning" />} />
+    <Route path="kitchen/menu" element={<ComingSoon title="Weekly Menu" />} />
+    <Route path="kitchen/suppliers" element={<ComingSoon title="Suppliers" />} />
+    <Route path="kitchen/waste" element={<ComingSoon title="Waste Tracking" />} />
+    <Route path="kitchen/reports" element={<ComingSoon title="Kitchen Reports" />} />
+
+    <Route path="reports/academic" element={<ComingSoon title="Academic Reports" />} />
+    <Route path="reports/financial" element={<ComingSoon title="Financial Reports" />} />
+    <Route path="reports/attendance" element={<ComingSoon title="Attendance Reports" />} />
+    <Route path="reports/operational" element={<ComingSoon title="Operational Reports" />} />
+    <Route path="reports/analytics" element={<ComingSoon title="Analytics Dashboard" />} />
+
+    <Route path="settings/general" element={<AdminGeneralSettings />} />
+    <Route path="settings/academic" element={<ComingSoon title="Academic Settings" />} />
+    <Route path="settings/notifications" element={<ComingSoon title="Notifications" />} />
+    <Route path="settings/security" element={<ComingSoon title="Security" />} />
+    <Route path="settings/backup" element={<ComingSoon title="Backup & Restore" />} />
+    <Route path="settings/api" element={<ComingSoon title="API Management" />} />
+
+    <Route path="profile" element={<AdminProfile />} />
+  </>
+);
+
+export default adminRoutes;

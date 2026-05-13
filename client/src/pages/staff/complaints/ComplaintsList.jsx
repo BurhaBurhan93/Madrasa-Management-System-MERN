@@ -230,6 +230,7 @@ const StaffComplaintsList = () => {
       
       {/* List Page */}
       <ListPage
+        embedded={true}
         title={complaintsConfig.title}
         subtitle={complaintsConfig.subtitle}
         endpoint={complaintsConfig.endpoint}

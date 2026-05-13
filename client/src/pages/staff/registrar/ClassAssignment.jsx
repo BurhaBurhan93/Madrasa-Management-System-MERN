@@ -284,6 +284,7 @@ const ClassAssignment = () => {
       
       {/* List Page */}
       <ListPage 
+        embedded={true}
         {...classAssignmentConfig} 
         customActions={{
           onTransfer: openTransferModal,

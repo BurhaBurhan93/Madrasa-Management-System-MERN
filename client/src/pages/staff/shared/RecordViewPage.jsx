@@ -2,18 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Button from '../../../components/UIHelper/Button';
 import Card from '../../../components/UIHelper/Card';
 import StaffPageLayout from './StaffPageLayout';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-const parseJsonSafe = async (res) => {
-  const text = await res.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    const preview = text.slice(0, 200).replace(/\s+/g, ' ');
-    throw new Error(`API returned non-JSON (status ${res.status}). Response: ${preview}`);
-  }
-};
+import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 
 const formatDisplayValue = (value) => {
   if (value === null || value === undefined || value === '') return '-';
@@ -35,7 +24,7 @@ const formatDisplayValue = (value) => {
 const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
   const targetEndpoint = readEndpoint || endpoint;
   if (readMode === 'collection') {
-    const res = await fetch(`${API_BASE}${targetEndpoint}`);
+    const res = await apiFetch(targetEndpoint);
     const data = await parseJsonSafe(res);
     if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load record');
     const rows = data.data || [];
@@ -44,7 +33,7 @@ const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
     return match;
   }
 
-  const res = await fetch(`${API_BASE}${targetEndpoint}/${id}`);
+  const res = await apiFetch(`${targetEndpoint}/${id}`);
   const data = await parseJsonSafe(res);
   if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load record');
   return data.data;

@@ -209,7 +209,7 @@ const StaffComplaintFeedback = () => {
       </div>
       
       {/* List Page */}
-      <ListPage title={complaintFeedbackConfig.title} subtitle={complaintFeedbackConfig.subtitle} endpoint={complaintFeedbackConfig.endpoint} columns={complaintFeedbackConfig.columns} createPath="/staff/complaints/feedback/create" editPathForRow={(row) => `/staff/complaints/feedback/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/complaints/feedback/view/${getId(row)}`} searchPlaceholder="Search complaint feedback..." clientSidePagination={true} />
+      <ListPage embedded={true} title={complaintFeedbackConfig.title} subtitle={complaintFeedbackConfig.subtitle} endpoint={complaintFeedbackConfig.endpoint} columns={complaintFeedbackConfig.columns} createPath="/staff/complaints/feedback/create" editPathForRow={(row) => `/staff/complaints/feedback/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/complaints/feedback/view/${getId(row)}`} searchPlaceholder="Search complaint feedback..." clientSidePagination={true} />
     </StaffPageLayout>
   );
 };

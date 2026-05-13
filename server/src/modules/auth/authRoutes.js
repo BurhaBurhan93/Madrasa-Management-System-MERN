@@ -23,7 +23,7 @@ router.post('/demo-login', (req, res) => {
   };
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET || 'demo-dev-secret',
     { expiresIn: '24h' }
   );
   res.json({ success: true, token, user });

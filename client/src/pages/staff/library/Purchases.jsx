@@ -220,7 +220,7 @@ const StaffLibraryPurchases = () => {
       </div>
       
       {/* List Page */}
-      <ListPage title={libraryPurchasesConfig.title} subtitle={libraryPurchasesConfig.subtitle} endpoint={libraryPurchasesConfig.endpoint} columns={libraryPurchasesConfig.columns} createPath="/staff/library/purchases/create" editPathForRow={(row) => `/staff/library/purchases/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/library/purchases/view/${getId(row)}`} searchPlaceholder="Search purchases..." clientSidePagination={true} />
+      <ListPage embedded={true} title={libraryPurchasesConfig.title} subtitle={libraryPurchasesConfig.subtitle} endpoint={libraryPurchasesConfig.endpoint} columns={libraryPurchasesConfig.columns} createPath="/staff/library/purchases/create" editPathForRow={(row) => `/staff/library/purchases/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/library/purchases/view/${getId(row)}`} searchPlaceholder="Search purchases..." clientSidePagination={true} />
     </StaffPageLayout>
   );
 };

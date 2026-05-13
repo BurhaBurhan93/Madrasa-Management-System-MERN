@@ -206,6 +206,7 @@ const StaffLibraryBooks = () => {
       
       {/* List Page */}
       <ListPage
+        embedded={true}
         title={libraryBooksConfig.title}
         subtitle={libraryBooksConfig.subtitle}
         endpoint={libraryBooksConfig.endpoint}

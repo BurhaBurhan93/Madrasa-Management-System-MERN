@@ -15,12 +15,9 @@ import Home from './pages/Home';
 import AdminPanel from './panels/AdminPanel';
 import StudentPanel from './panels/StudentPanel';
 import TeacherPanel from './panels/TeacherPanel';
+import StaffPanel from './panels/StaffPanel';
 
-// Admin
-import AdminDashboard from './pages/admin/AdminDashboard';
-import UserIndex from './pages/admin/users/UserIndex';
-import UserRegister from './pages/admin/users/UserRegister';
-import UserEdit from './pages/admin/users/UserEdit';
+import AdminRoutes from './routes/AdminRoutes';
 
 // Teacher
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
@@ -111,37 +108,7 @@ function App() {
 
           {/* ── Admin ── */}
           <Route path="/admin/*" element={<ProtectedRoute allowedRoles={['admin']}><AdminPanel /></ProtectedRoute>}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="users" element={<UserIndex />} />
-            <Route path="users/register" element={<UserRegister />} />
-            <Route path="users/edit/:id" element={<UserEdit />} />
-            <Route path="academic/classes"    element={<ComingSoon title="Classes" />} />
-            <Route path="academic/subjects"   element={<ComingSoon title="Subjects" />} />
-            <Route path="academic/exams"      element={<ComingSoon title="Exams" />} />
-            <Route path="academic/timetable"  element={<ComingSoon title="Timetable" />} />
-            <Route path="attendance/daily"    element={<ComingSoon title="Daily Attendance" />} />
-            <Route path="attendance/reports"  element={<ComingSoon title="Attendance Reports" />} />
-            <Route path="attendance/settings" element={<ComingSoon title="Attendance Settings" />} />
-            <Route path="finance/fee-structure" element={<ComingSoon title="Fee Structure" />} />
-            <Route path="finance/payments"    element={<ComingSoon title="Payments" />} />
-            <Route path="finance/expenses"    element={<ComingSoon title="Expenses" />} />
-            <Route path="finance/salaries"    element={<ComingSoon title="Salaries" />} />
-            <Route path="finance/reports"     element={<ComingSoon title="Financial Reports" />} />
-            <Route path="library/books"       element={<ComingSoon title="Books" />} />
-            <Route path="library/categories"  element={<ComingSoon title="Categories" />} />
-            <Route path="library/borrowed"    element={<ComingSoon title="Borrowed Books" />} />
-            <Route path="library/reports"     element={<ComingSoon title="Library Reports" />} />
-            <Route path="complaints"          element={<ComingSoon title="All Complaints" />} />
-            <Route path="complaints/pending"  element={<ComingSoon title="Pending Complaints" />} />
-            <Route path="complaints/resolved" element={<ComingSoon title="Resolved Complaints" />} />
-            <Route path="reports/academic"    element={<ComingSoon title="Academic Reports" />} />
-            <Route path="reports/financial"   element={<ComingSoon title="Financial Reports" />} />
-            <Route path="reports/attendance"  element={<ComingSoon title="Attendance Reports" />} />
-            <Route path="settings/general"    element={<ComingSoon title="General Settings" />} />
-            <Route path="settings/academic"   element={<ComingSoon title="Academic Settings" />} />
-            <Route path="settings/notifications" element={<ComingSoon title="Notifications" />} />
-            <Route path="profile"             element={<ComingSoon title="Admin Profile" />} />
+            {AdminRoutes}
           </Route>
 
           {/* ── Teacher ── */}
@@ -167,7 +134,9 @@ function App() {
           </Route>
 
           {/* ── Staff — fully controlled by StaffRoutes ── */}
-          {staffRoutes}
+          <Route path="/staff/*" element={<ProtectedRoute allowedRoles={['staff']}><StaffPanel /></ProtectedRoute>}>
+            {staffRoutes}
+          </Route>
 
           {/* ── Student ── */}
           <Route path="/student/*" element={<StudentPanel />}>

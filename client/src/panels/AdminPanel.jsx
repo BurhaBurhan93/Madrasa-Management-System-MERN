@@ -1,24 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import useLocalStorage from '../hooks/useLocalStorage';
 import {
-  FiHome, FiUsers, FiBookOpen, FiCalendar, FiDollarSign,
-  FiUser, FiMenu, FiLogOut, FiSearch, FiBell, FiSettings,
-  FiBarChart2, FiLayers, FiClipboard, FiChevronDown
+  FiHome, FiUsers, FiBookOpen, FiCalendar, FiDollarSign, FiUser, FiMenu, FiLogOut,
+  FiSearch, FiBell, FiChevronDown, FiSettings, FiBarChart2, FiLayers, FiClipboard,
+  FiAward, FiPackage, FiCoffee, FiInbox, FiUserPlus, FiBook, FiFileText, FiDatabase,
+  FiMonitor, FiShield, FiActivity, FiTrendingUp, FiCheckCircle, FiAlertCircle
 } from 'react-icons/fi';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 const AdminPanel = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [sidebarOpen, setSidebarOpen] = useLocalStorage('adminSidebarOpen', true);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [user] = useLocalStorage('adminUser', {
-    name: 'Admin User',
-    role: 'Administrator',
-    adminId: 'ADM2024001',
-    email: 'admin@madrasa.edu',
-  });
+  const [user, setUser] = useState(null);
+  const [, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = () => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setUser(parsed);
+      }
+    } catch (e) {
+      console.error('Error reading user:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -31,20 +45,13 @@ const AdminPanel = () => {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [setSidebarOpen]);
 
-  /* ================= MENU WITH SUBMENU SUPPORT ================= */
   const menuItems = [
-    { 
-      id: 'dashboard', 
-      icon: <FiHome size={20} />, 
-      path: '', 
-      label: 'Dashboard',
-      type: 'link'
-    },
-    { 
-      id: 'users', 
-      icon: <FiUsers size={20} />, 
+    { id: 'dashboard', icon: <FiHome size={19} />, path: 'dashboard', label: 'Dashboard', type: 'link' },
+    {
+      id: 'users',
+      icon: <FiUsers size={19} />,
       label: 'User Management',
       type: 'dropdown',
       items: [
@@ -52,11 +59,14 @@ const AdminPanel = () => {
         { id: 'students', label: 'Students', path: 'users/students' },
         { id: 'teachers', label: 'Teachers', path: 'users/teachers' },
         { id: 'staff', label: 'Staff', path: 'users/staff' },
+        { id: 'register', label: 'Register New User', path: 'users/register' },
+        { id: 'roles', label: 'Roles & Permissions', path: 'users/roles' },
+        { id: 'audit', label: 'Audit Logs', path: 'users/audit' },
       ]
     },
-    { 
-      id: 'academic', 
-      icon: <FiBookOpen size={20} />, 
+    {
+      id: 'academic',
+      icon: <FiBookOpen size={19} />,
       label: 'Academic',
       type: 'dropdown',
       items: [
@@ -64,22 +74,27 @@ const AdminPanel = () => {
         { id: 'subjects', label: 'Subjects', path: 'academic/subjects' },
         { id: 'exams', label: 'Exams', path: 'academic/exams' },
         { id: 'timetable', label: 'Timetable', path: 'academic/timetable' },
+        { id: 'degrees', label: 'Degrees', path: 'academic/degrees' },
+        { id: 'syllabus', label: 'Syllabus', path: 'academic/syllabus' },
+        { id: 'grading', label: 'Grading System', path: 'academic/grading' },
       ]
     },
-    { 
-      id: 'attendance', 
-      icon: <FiCalendar size={20} />, 
+    {
+      id: 'attendance',
+      icon: <FiCalendar size={19} />,
       label: 'Attendance',
       type: 'dropdown',
       items: [
         { id: 'daily', label: 'Daily Attendance', path: 'attendance/daily' },
         { id: 'reports', label: 'Reports', path: 'attendance/reports' },
         { id: 'settings', label: 'Settings', path: 'attendance/settings' },
+        { id: 'warnings', label: 'Attendance Warnings', path: 'attendance/warnings' },
+        { id: 'corrections', label: 'Corrections', path: 'attendance/corrections' },
       ]
     },
-    { 
-      id: 'finance', 
-      icon: <FiDollarSign size={20} />, 
+    {
+      id: 'finance',
+      icon: <FiDollarSign size={19} />,
       label: 'Finance',
       type: 'dropdown',
       items: [
@@ -87,63 +102,113 @@ const AdminPanel = () => {
         { id: 'payments', label: 'Payments', path: 'finance/payments' },
         { id: 'expenses', label: 'Expenses', path: 'finance/expenses' },
         { id: 'salaries', label: 'Salaries', path: 'finance/salaries' },
-        { id: 'reports', label: 'Reports', path: 'finance/reports' },
+        { id: 'accounts', label: 'Accounts', path: 'finance/accounts' },
+        { id: 'transactions', label: 'Transactions', path: 'finance/transactions' },
+        { id: 'reports', label: 'Financial Reports', path: 'finance/reports' },
       ]
     },
-    { 
-      id: 'library', 
-      icon: <FiLayers size={20} />, 
+    {
+      id: 'library',
+      icon: <FiBook size={19} />,
       label: 'Library',
       type: 'dropdown',
       items: [
         { id: 'books', label: 'Books', path: 'library/books' },
         { id: 'categories', label: 'Categories', path: 'library/categories' },
         { id: 'borrowed', label: 'Borrowed Books', path: 'library/borrowed' },
-        { id: 'library-reports', label: 'Reports', path: 'library/reports' },
+        { id: 'purchases', label: 'Purchases', path: 'library/purchases' },
+        { id: 'sales', label: 'Sales', path: 'library/sales' },
+        { id: 'reports', label: 'Reports', path: 'library/reports' },
       ]
     },
-    { 
-      id: 'complaints', 
-      icon: <FiClipboard size={20} />, 
+    {
+      id: 'complaints',
+      icon: <FiInbox size={19} />,
       label: 'Complaints',
       type: 'dropdown',
       items: [
         { id: 'all-complaints', label: 'All Complaints', path: 'complaints' },
         { id: 'pending', label: 'Pending', path: 'complaints/pending' },
         { id: 'resolved', label: 'Resolved', path: 'complaints/resolved' },
+        { id: 'actions', label: 'Actions', path: 'complaints/actions' },
+        { id: 'feedback', label: 'Feedback', path: 'complaints/feedback' },
+        { id: 'reports', label: 'Reports', path: 'complaints/reports' },
       ]
     },
-    { 
-      id: 'reports', 
-      icon: <FiBarChart2 size={20} />, 
+    {
+      id: 'hostel',
+      icon: <FiHome size={19} />,
+      label: 'Hostel',
+      type: 'dropdown',
+      items: [
+        { id: 'rooms', label: 'Rooms', path: 'hostel/rooms' },
+        { id: 'allocations', label: 'Allocations', path: 'hostel/allocations' },
+        { id: 'meals', label: 'Meals', path: 'hostel/meals' },
+        { id: 'attendance', label: 'Meal Attendance', path: 'hostel/attendance' },
+        { id: 'reports', label: 'Reports', path: 'hostel/reports' },
+      ]
+    },
+    {
+      id: 'hr',
+      icon: <FiUserPlus size={19} />,
+      label: 'HR Management',
+      type: 'dropdown',
+      items: [
+        { id: 'departments', label: 'Departments', path: 'hr/departments' },
+        { id: 'designations', label: 'Designations', path: 'hr/designations' },
+        { id: 'employees', label: 'Employees', path: 'hr/employees' },
+        { id: 'attendance', label: 'Employee Attendance', path: 'hr/attendance' },
+        { id: 'leave', label: 'Leave Management', path: 'hr/leave' },
+        { id: 'payroll', label: 'Payroll', path: 'hr/payroll' },
+        { id: 'reports', label: 'HR Reports', path: 'hr/reports' },
+      ]
+    },
+    {
+      id: 'kitchen',
+      icon: <FiCoffee size={19} />,
+      label: 'Kitchen',
+      type: 'dropdown',
+      items: [
+        { id: 'inventory', label: 'Inventory', path: 'kitchen/inventory' },
+        { id: 'meals', label: 'Meal Planning', path: 'kitchen/meals' },
+        { id: 'menu', label: 'Weekly Menu', path: 'kitchen/menu' },
+        { id: 'suppliers', label: 'Suppliers', path: 'kitchen/suppliers' },
+        { id: 'waste', label: 'Waste Tracking', path: 'kitchen/waste' },
+        { id: 'reports', label: 'Reports', path: 'kitchen/reports' },
+      ]
+    },
+    {
+      id: 'reports',
+      icon: <FiBarChart2 size={19} />,
       label: 'Reports',
       type: 'dropdown',
       items: [
-        { id: 'academic-reports', label: 'Academic Reports', path: 'reports/academic' },
-        { id: 'financial-reports', label: 'Financial Reports', path: 'reports/financial' },
-        { id: 'attendance-reports', label: 'Attendance Reports', path: 'reports/attendance' },
+        { id: 'academic', label: 'Academic Reports', path: 'reports/academic' },
+        { id: 'financial', label: 'Financial Reports', path: 'reports/financial' },
+        { id: 'attendance', label: 'Attendance Reports', path: 'reports/attendance' },
+        { id: 'operational', label: 'Operational Reports', path: 'reports/operational' },
+        { id: 'analytics', label: 'Analytics Dashboard', path: 'reports/analytics' },
       ]
     },
-    { 
-      id: 'settings', 
-      icon: <FiSettings size={20} />, 
-      label: 'Settings',
+    {
+      id: 'settings',
+      icon: <FiSettings size={19} />,
+      label: 'System Settings',
       type: 'dropdown',
       items: [
         { id: 'general', label: 'General Settings', path: 'settings/general' },
-        { id: 'academic-settings', label: 'Academic Settings', path: 'settings/academic' },
+        { id: 'academic', label: 'Academic Settings', path: 'settings/academic' },
         { id: 'notifications', label: 'Notifications', path: 'settings/notifications' },
+        { id: 'security', label: 'Security', path: 'settings/security' },
+        { id: 'backup', label: 'Backup & Restore', path: 'settings/backup' },
+        { id: 'api', label: 'API Management', path: 'settings/api' },
       ]
     },
   ];
 
   const handleNavigation = (path) => {
-    navigate(path ? `/admin/${path}` : '/admin');
+    navigate(`/admin/${path}`);
     if (window.innerWidth < 768) setSidebarOpen(false);
-  };
-
-  const toggleDropdown = (id) => {
-    setOpenDropdown(openDropdown === id ? null : id);
   };
 
   const isActive = (path) => {
@@ -151,209 +216,197 @@ const AdminPanel = () => {
     return location.pathname.startsWith(`/admin/${path}`);
   };
 
-  const isDropdownActive = (items) => {
-    return items.some(item => location.pathname.startsWith(`/admin/${item.path}`));
-  };
+  const isDropdownActive = (items) => items.some((item) => location.pathname.startsWith(`/admin/${item.path}`));
+
+  useEffect(() => {
+    const activeDropdown = menuItems.find((item) => item.type === 'dropdown' && isDropdownActive(item.items));
+    if (activeDropdown) {
+      setOpenDropdown(activeDropdown.id);
+    }
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('userRole');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    navigate('/');
   };
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* SIDEBAR - Expandable with text and submenus */}
-      <aside
-        className={`bg-white shadow-lg fixed md:relative z-30 h-screen transition-all duration-300 flex flex-col ${
-          sidebarOpen ? 'w-64' : 'w-20'
-        }`}
-      >
-        {/* Logo */}
-        <div className={`flex items-center h-16 border-b border-gray-100 ${sidebarOpen ? 'px-4' : 'justify-center'}`}>
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-cyan-200 to-cyan-400 text-white flex items-center justify-center text-lg font-bold shadow-md shrink-0">
-            M
-          </div>
-          {sidebarOpen && (
-            <div className="ml-3 overflow-hidden">
-              <div className="font-bold text-gray-800 whitespace-nowrap">Madrasa EMIS</div>
-              <div className="text-xs text-gray-500 whitespace-nowrap">Admin Panel</div>
-            </div>
-          )}
-        </div>
+  const groupedMenu = useMemo(() => ([
+    { title: 'Overview', items: menuItems.slice(0, 3) },
+    { title: 'Operations', items: menuItems.slice(3, 8) },
+    { title: 'Management', items: menuItems.slice(8) }
+  ]), [location.pathname]);
 
-        {/* Navigation - With text labels and submenus */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2">
-          <ul className="space-y-1">
-            {menuItems.map((item) => (
-              <li key={item.id}>
-                {item.type === 'link' ? (
-                  <button
-                    onClick={() => handleNavigation(item.path)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-                      isActive(item.path)
-                        ? 'bg-gradient-to-r from-cyan-200 to-cyan-400 text-white shadow-md'
-                        : 'text-gray-600 hover:bg-cyan-50 hover:text-cyan-600'
-                    }`}
-                    title={!sidebarOpen ? item.label : ''}
-                  >
-                    <span className="shrink-0">{item.icon}</span>
-                    {sidebarOpen && (
-                      <span className="text-sm font-medium whitespace-nowrap overflow-hidden">
-                        {item.label}
-                      </span>
-                    )}
-                  </button>
-                ) : (
-                  <div>
-                    <button
-                      onClick={() => sidebarOpen && toggleDropdown(item.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 ${
-                        isDropdownActive(item.items)
-                          ? 'bg-cyan-50 text-cyan-600'
-                          : 'text-gray-600 hover:bg-cyan-50 hover:text-cyan-600'
-                      }`}
-                      title={!sidebarOpen ? item.label : ''}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`shrink-0 ${isDropdownActive(item.items) ? 'text-cyan-500' : ''}`}>
-                          {item.icon}
-                        </span>
-                        {sidebarOpen && (
-                          <span className="text-sm font-medium whitespace-nowrap overflow-hidden">
-                            {item.label}
-                          </span>
-                        )}
-                      </div>
-                      {sidebarOpen && (
-                        <FiChevronDown 
-                          size={16} 
-                          className={`shrink-0 transition-transform duration-200 ${openDropdown === item.id ? 'rotate-180' : ''}`}
-                        />
-                      )}
-                    </button>
-                    
-                    {/* Submenu */}
-                    {sidebarOpen && openDropdown === item.id && (
-                      <ul className="mt-1 ml-9 space-y-1">
-                        {item.items.map((sub) => (
-                          <li key={sub.id}>
+  return (
+    <div className="flex h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.9),_rgba(248,250,252,1)_42%,_rgba(241,245,249,1)_100%)]">
+      <aside
+        className={`fixed z-30 h-screen border-r border-white/70 bg-white/90 backdrop-blur-xl transition-all duration-300 md:relative ${sidebarOpen ? 'w-72' : 'w-24'}`}
+      >
+        <div className="flex h-full flex-col">
+          <div className={`border-b border-slate-200/80 px-4 py-5 ${sidebarOpen ? '' : 'flex justify-center'}`}>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
+                M
+              </div>
+              {sidebarOpen && (
+                <div>
+                  <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">Madrasa EMIS</div>
+                  <div className="mt-1 text-lg font-semibold text-slate-900">Admin Workspace</div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <nav
+            className="flex-1 overflow-y-auto px-3 py-4 [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div className="space-y-6">
+              {groupedMenu.map((group) => (
+                <div key={group.title}>
+                  {sidebarOpen && <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">{group.title}</p>}
+                  <ul className="space-y-1.5">
+                    {group.items.map((item) => {
+                      const activeDropdown = item.type === 'dropdown' && isDropdownActive(item.items);
+                      const activeLink = item.type === 'link' && isActive(item.path);
+                      const buttonBase = activeLink || activeDropdown
+                        ? 'border-cyan-200 bg-gradient-to-r from-cyan-50 via-sky-50 to-white text-cyan-700 '
+                        : 'border-transparent text-slate-600 hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:text-slate-900 hover:shadow-sm';
+
+                      return (
+                        <li key={item.id}>
+                          {item.type === 'link' ? (
                             <button
-                              onClick={() => handleNavigation(sub.path)}
-                              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                                isActive(sub.path)
-                                  ? 'bg-cyan-100 text-cyan-700 font-medium'
-                                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
-                              }`}
+                              onClick={() => handleNavigation(item.path)}
+                              className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${buttonBase}`}
+                              title={!sidebarOpen ? item.label : ''}
                             >
-                              {sub.label}
+                              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all duration-200 ${activeLink ? 'bg-cyan-600 text-white shadow-[0_10px_25px_-18px_rgba(8,145,178,0.9)]' : 'bg-slate-100 text-slate-500 group-hover:bg-cyan-100 group-hover:text-cyan-700'}`}>
+                                {item.icon}
+                              </span>
+                              {sidebarOpen && <span className="text-[13px] font-medium">{item.label}</span>}
                             </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                          ) : (
+                            <div>
+                              <button
+                                onClick={() => sidebarOpen && setOpenDropdown(openDropdown === item.id ? null : item.id)}
+                                className={`group flex w-full items-center justify-between rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${buttonBase}`}
+                                title={!sidebarOpen ? item.label : ''}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all duration-200 ${activeDropdown ? 'bg-cyan-600 text-white shadow-[0_10px_25px_-18px_rgba(8,145,178,0.9)]' : 'bg-slate-100 text-slate-500 group-hover:bg-cyan-100 group-hover:text-cyan-700'}`}>
+                                    {item.icon}
+                                  </span>
+                                  {sidebarOpen && <span className="text-[13px] font-medium">{item.label}</span>}
+                                </div>
+                                {sidebarOpen && <FiChevronDown size={16} className={`transition-transform duration-200 ${openDropdown === item.id ? 'rotate-180 text-cyan-600' : 'text-slate-400 group-hover:text-slate-700'}`} />}
+                              </button>
+
+                              {sidebarOpen && openDropdown === item.id && (
+                                <ul className="mt-2 space-y-1 pl-4">
+                                  {item.items.map((sub) => {
+                                    const activeSub = isActive(sub.path);
+                                    return (
+                                      <li key={sub.id}>
+                                        <button
+                                          onClick={() => handleNavigation(sub.path)}
+                                          className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-[13px] transition-all duration-200 ${activeSub ? 'bg-cyan-100/80 font-medium text-cyan-800' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'}`}
+                                        >
+                                          <span className={`h-2.5 w-2.5 rounded-full transition-all duration-200 ${activeSub ? 'bg-cyan-500 shadow-[0_0_0_4px_rgba(34,211,238,0.15)]' : 'bg-slate-300 group-hover:bg-cyan-400'}`} />
+                                          <span>{sub.label}</span>
+                                        </button>
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
+                              )}
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </nav>
+
+          <div className="border-t border-slate-200/80 p-3">
+            <div className={`rounded-3xl border border-slate-200 bg-white/95 p-2 ${sidebarOpen ? '' : 'space-y-2'}`}>
+              <button
+                onClick={() => handleNavigation('profile')}
+                className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all duration-200 ${isActive('profile') ? 'bg-gradient-to-r from-cyan-50 to-sky-50 text-cyan-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                title={!sidebarOpen ? 'Profile' : ''}
+              >
+                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${isActive('profile') ? 'bg-cyan-600 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-cyan-100 group-hover:text-cyan-700'}`}>
+                  <FiUser size={18} />
+                </span>
+                {sidebarOpen && (
+                  <div>
+                    <p className="text-[13px] font-medium">Profile</p>
+                    <p className="text-xs text-slate-400">Account and identity</p>
                   </div>
                 )}
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        {/* Bottom - Profile & Logout */}
-        <div className="p-3 border-t border-gray-100">
-          <button
-            onClick={() => handleNavigation('profile')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 mb-2 ${
-              isActive('profile')
-                ? 'bg-gradient-to-r from-cyan-200 to-cyan-400 text-white shadow-md'
-                : 'text-gray-600 hover:bg-cyan-50 hover:text-cyan-600'
-            }`}
-            title={!sidebarOpen ? 'Profile' : ''}
-          >
-            <span className="shrink-0"><FiUser size={20} /></span>
-            {sidebarOpen && (
-              <span className="text-sm font-medium whitespace-nowrap overflow-hidden">Profile</span>
-            )}
-          </button>
-          <button
-            onClick={handleLogout}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-cyan-600 hover:bg-cyan-50 transition-all duration-200`}
-            title={!sidebarOpen ? 'Logout' : ''}
-          >
-            <span className="shrink-0"><FiLogOut size={20} /></span>
-            {sidebarOpen && (
-              <span className="text-sm font-medium whitespace-nowrap overflow-hidden">Logout</span>
-            )}
-          </button>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-rose-600 transition-all duration-200 hover:bg-rose-50 hover:text-rose-700"
+                title={!sidebarOpen ? 'Logout' : ''}
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 transition-all duration-200 group-hover:bg-rose-100 group-hover:text-rose-600">
+                  <FiLogOut size={18} />
+                </span>
+                {sidebarOpen && (
+                  <div>
+                    <p className="text-[13px] font-medium">Logout</p>
+                    <p className="text-xs text-rose-300">Exit this workspace</p>
+                  </div>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       </aside>
 
-      {/* MOBILE OVERLAY */}
-      {sidebarOpen && (
-        <div
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/20 md:hidden z-20"
-          aria-hidden
-        />
-      )}
+      {sidebarOpen && <div onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-20 bg-slate-950/25 backdrop-blur-[1px] md:hidden" aria-hidden />}
 
-      {/* CONTENT */}
       <main className="flex-1 min-w-0 overflow-y-auto h-screen">
-        {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-100">
-          <div className="flex items-center justify-between px-6 py-3">
-            {/* Left - Toggle & Welcome */}
+        <header className="sticky top-0 z-20 border-b border-white/70 bg-white/72 backdrop-blur-xl">
+          <div className="flex items-center justify-between px-5 py-4 lg:px-8">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 aria-label="Toggle sidebar"
-                className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"
               >
                 <FiMenu size={20} />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">
-                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600">{user.name}</span>!
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Admin Console</p>
+                <h1 className="mt-1 text-lg font-semibold text-slate-900 lg:text-xl">
+                  Welcome back, <span className="bg-gradient-to-r from-cyan-600 to-sky-600 bg-clip-text text-transparent">{user?.name || 'Administrator'}</span>
                 </h1>
-                <p className="text-sm text-gray-500">Manage your institution efficiently</p>
+                <p className="mt-1 text-xs text-slate-500 lg:text-sm">Manage the entire institution with a cleaner workspace and faster navigation.</p>
               </div>
             </div>
 
-            {/* Right - Search, Notifications, Profile */}
             <div className="flex items-center gap-3">
-              {/* Search */}
-              <div className="hidden md:flex items-center bg-gray-50 rounded-full px-4 py-2 border border-gray-100">
-                <FiSearch className="text-gray-400 mr-2" size={18} />
-                <input
-                  type="text"
-                  placeholder="Search users, courses..."
-                  className="bg-transparent outline-none text-sm text-gray-600 w-48"
-                />
+              <div className="hidden items-center rounded-full border border-slate-200 bg-white px-4 py-2.5 md:flex">
+                <FiSearch className="mr-2 text-slate-400" size={18} />
+                <input type="text" placeholder="Search modules, users, reports..." className="w-48 bg-transparent text-sm text-slate-600 outline-none" />
               </div>
-
-              {/* Notifications */}
-              <button className="relative p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
-                <FiBell size={20} />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+              <button className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700">
+                <FiBell size={19} />
+                <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white" />
               </button>
-
-              {/* User Profile */}
-              <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-semibold text-gray-700">{user.name}</p>
-                  <p className="text-xs text-gray-500">{user.role}</p>
-                </div>
-                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-cyan-200 to-cyan-400 text-white flex items-center justify-center text-sm font-bold shadow-md">
-                  {user.name?.[0] || 'A'}
-                </div>
-              </div>
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <div className="p-6">
+        <div className="p-5 lg:p-8">
           <Outlet />
         </div>
       </main>

@@ -193,7 +193,7 @@ const StaffComplaintActions = () => {
       </div>
       
       {/* List Page */}
-      <ListPage title={complaintActionsConfig.title} subtitle={complaintActionsConfig.subtitle} endpoint={complaintActionsConfig.endpoint} columns={complaintActionsConfig.columns} createPath="/staff/complaints/actions/create" editPathForRow={(row) => `/staff/complaints/actions/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/complaints/actions/view/${getId(row)}`} searchPlaceholder="Search complaint actions..." clientSidePagination={true} />
+      <ListPage embedded={true} title={complaintActionsConfig.title} subtitle={complaintActionsConfig.subtitle} endpoint={complaintActionsConfig.endpoint} columns={complaintActionsConfig.columns} createPath="/staff/complaints/actions/create" editPathForRow={(row) => `/staff/complaints/actions/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/complaints/actions/view/${getId(row)}`} searchPlaceholder="Search complaint actions..." clientSidePagination={true} />
     </StaffPageLayout>
   );
 };

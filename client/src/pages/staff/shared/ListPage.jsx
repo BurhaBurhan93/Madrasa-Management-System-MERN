@@ -6,18 +6,8 @@ import DataTable from '../../../components/UIHelper/DataTable';
 import StaffPageLayout from './StaffPageLayout';
 import RecordActionButtons from './RecordActionButtons';
 import StaffPagination from './StaffPagination';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-const parseJsonSafe = async (res) => {
-  const text = await res.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    const preview = text.slice(0, 200).replace(/\s+/g, ' ');
-    throw new Error(`API returned non-JSON (status ${res.status}). Response: ${preview}`);
-  }
-};
+import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
+import { FiDownload } from 'react-icons/fi';
 
 const getCellValue = (row, key) => {
   const value = row?.[key];
@@ -45,7 +35,24 @@ const renderStatusBadge = (value) => (
   </Badge>
 );
 
-const ListPage = ({ title, subtitle, endpoint, columns, createPath, editPathForRow, viewPathForRow, deleteEnabled = true, searchPlaceholder = 'Search...', clientSidePagination = false, extraActionItemsForRow }) => {
+const ListPage = ({
+  title,
+  subtitle,
+  endpoint,
+  columns,
+  createPath,
+  editPathForRow,
+  viewPathForRow,
+  deleteEnabled = true,
+  searchPlaceholder = 'Search...',
+  clientSidePagination = false,
+  extraActionItemsForRow,
+  eyebrow = 'Reusable Staff Table',
+  headerContent = null,
+  extraActions = null,
+  enableExport = false,
+  embedded = false
+}) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -70,7 +77,7 @@ const ListPage = ({ title, subtitle, endpoint, columns, createPath, editPathForR
       }
       if (query.trim()) params.set('search', query.trim());
 
-      const res = await fetch(`${API_BASE}${endpoint}?${params.toString()}`);
+      const res = await apiFetch(`${endpoint}?${params.toString()}`);
       const data = await parseJsonSafe(res);
       if (!res.ok) throw new Error(data.message || `Request failed (status ${res.status})`);
       const records = data.data || data || [];
@@ -93,7 +100,7 @@ const ListPage = ({ title, subtitle, endpoint, columns, createPath, editPathForR
 
     setDeletingId(row?._id);
     try {
-      const res = await fetch(`${API_BASE}${endpoint}/${row._id}`, { method: 'DELETE' });
+      const res = await apiFetch(`${endpoint}/${row._id}`, { method: 'DELETE' });
       const data = await parseJsonSafe(res);
       if (!res.ok) throw new Error(data.message || 'Delete failed');
       await fetchItems();
@@ -176,8 +183,40 @@ const ListPage = ({ title, subtitle, endpoint, columns, createPath, editPathForR
 
   const totalForPagination = clientSidePagination ? filteredSortedItems.length : total;
 
-  return (
-    <StaffPageLayout eyebrow="Reusable Staff Table" title={title} subtitle={subtitle} actions={createPath ? <Button variant="primary" onClick={() => (window.location.href = createPath)}>Add New</Button> : null}>
+  const handleExport = () => {
+    const exportableColumns = columns.filter((column) => column.key && !String(column.key).startsWith('__'));
+    const rows = filteredSortedItems.map((row) =>
+      exportableColumns
+        .map((column) => `"${getCellValue(row, column.key).replace(/"/g, '""')}"`)
+        .join(',')
+    );
+    const csv = [
+      exportableColumns.map((column) => `"${column.header}"`).join(','),
+      ...rows
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${title.toLowerCase().replace(/[^a-z0-9]+/gi, '-')}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const pageActions = (
+    <div className="flex flex-wrap items-center justify-end gap-3">
+      {enableExport ? <Button variant="outline" icon={FiDownload} onClick={handleExport}>Export CSV</Button> : null}
+      {extraActions}
+      {createPath ? <Button variant="primary" onClick={() => (window.location.href = createPath)}>Add New</Button> : null}
+    </div>
+  );
+
+  const content = (
+    <>
+      {headerContent}
       <Card className="rounded-[28px] border border-slate-200 shadow-none">
         <div className="rounded-[24px] border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-cyan-50/40 p-4 lg:p-5">
           <div className="mb-4 flex flex-wrap items-center gap-3">
@@ -235,12 +274,26 @@ const ListPage = ({ title, subtitle, endpoint, columns, createPath, editPathForR
           {deletingId && <div className="text-sm text-rose-600">Deleting selected record...</div>}
         </div>
         <div className="overflow-x-auto rounded-[24px] border border-slate-200 bg-white">
-          {loading ? <div className="p-6 text-sm text-slate-500">Loading data...</div> : (
+          {loading ? <div className="p-6 text-sm text-slate-500">Loading data...</div> : visibleItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+              <div className="rounded-full bg-slate-100 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-500">No Records</div>
+              <h3 className="mt-4 text-xl font-black text-slate-900">Nothing matches your current filters</h3>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">Try changing the search terms, switching the filter column, or create the first record for this module.</p>
+            </div>
+          ) : (
             <DataTable columns={columnsWithActions.map((column) => ({ ...column, sortable: column.key !== '__actions' && column.key !== '__index' && column.sortable !== false }))} data={visibleItems} rowClassName="odd:bg-white even:bg-slate-50/30 hover:bg-cyan-50/40" cellClassName="align-middle" headerClassName="bg-slate-100 text-slate-700" sortKey={sortKey} sortDirection={sortDirection} onSort={handleSort} />
           )}
         </div>
       </Card>
       <StaffPagination page={page} limit={limit} total={totalForPagination} onPageChange={setPage} onPageSizeChange={(value) => { setLimit(value); setPage(1); }} />
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <StaffPageLayout eyebrow={eyebrow} title={title} subtitle={subtitle} actions={pageActions}>
+      {content}
     </StaffPageLayout>
   );
 };
