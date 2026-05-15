@@ -4,8 +4,16 @@ const Employee = require('../../models/Employee');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'madrasa-dev-secret';
+const DEMO_ACCOUNTS = {
+  admin: { email: 'admin@gmail.com', password: 'admin1234' },
+  student: { email: 'student@gmail.com', password: 'student1234' },
+  teacher: { email: 'teacher@gmail.com', password: 'teacher1234' },
+  staff: { email: 'staff@gmail.com', password: 'staff1234' }
+};
+
 const STAFF_MODULES_BY_EMPLOYEE_TYPE = {
-  admin: ['dashboard', 'profile', 'registrar', 'students', 'inventory', 'library', 'complaints', 'finance', 'payroll', 'kitchen', 'hr'],
+  admin: ['dashboard', 'profile', 'registrar', 'students', 'inventory', 'library', 'complaints', 'finance', 'payroll', 'kitchen', 'hr', 'hostel'],
   finance: ['dashboard', 'profile', 'finance', 'payroll'],
   registrar: ['dashboard', 'profile', 'registrar', 'students', 'inventory'],
   hr: ['dashboard', 'profile', 'hr', 'payroll'],
@@ -54,6 +62,43 @@ const buildAuthUser = (user, profile = {}, staffModules = []) => ({
   ...profile
 });
 
+const createToken = (user) => jwt.sign(
+  { id: user._id, email: user.email, role: user.role },
+  JWT_SECRET,
+  { expiresIn: '24h' }
+);
+
+const getRoleProfile = async (user) => {
+  let profile = {};
+  let employee = null;
+
+  if (user.role === 'student') {
+    const student = await Student.findOne({ $or: [{ user: user._id }, { userId: user._id }] });
+    if (student) {
+      profile = {
+        studentId: student.studentCode || student.studentId,
+        enrollmentDate: student.admissionDate || student.enrollmentDate,
+        status: student.status
+      };
+    }
+  } else if (user.role === 'teacher' || user.role === 'staff') {
+    employee = await Employee.findOne({ $or: [{ user: user._id }, { userId: user._id }] })
+      .populate('department', 'departmentName departmentCode')
+      .populate('designation', 'designationTitle');
+    if (employee) {
+      profile = {
+        employeeId: employee.employeeCode || employee.employeeId,
+        employeeType: employee.employeeType,
+        department: employee.department?.departmentName || employee.department,
+        designation: employee.designation?.designationTitle || employee.designation,
+        joinDate: employee.joiningDate || employee.joinDate
+      };
+    }
+  }
+
+  return { profile, employee };
+};
+
 // Login user
 const login = async (req, res) => {
   try {
@@ -80,38 +125,9 @@ const login = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
-    process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
+    const token = createToken(user);
 
-    // Get additional profile info based on role
-    let profile = {};
-    let employee = null;
-    if (role === 'student') {
-      const student = await Student.findOne({ $or: [{ user: user._id }, { userId: user._id }] });
-      if (student) {
-        profile = {
-          studentId: student.studentCode || student.studentId,
-          enrollmentDate: student.admissionDate || student.enrollmentDate,
-          status: student.status
-        };
-      }
-    } else if (role === 'teacher' || role === 'staff') {
-      employee = await Employee.findOne({ $or: [{ user: user._id }, { userId: user._id }] })
-        .populate('department', 'departmentName departmentCode')
-        .populate('designation', 'designationTitle');
-      if (employee) {
-        profile = {
-          employeeId: employee.employeeCode || employee.employeeId,
-          employeeType: employee.employeeType,
-          department: employee.department?.departmentName || employee.department,
-          designation: employee.designation?.designationTitle || employee.designation,
-          joinDate: employee.joiningDate || employee.joinDate
-        };
-      }
-    }
+    const { profile, employee } = await getRoleProfile(user);
 
     const staffModules = getStaffModules(user, employee);
 
@@ -121,6 +137,48 @@ const login = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// Demo login uses the real database demo accounts so protected APIs get a real user id.
+const demoLogin = async (req, res) => {
+  try {
+    const { role } = req.body;
+    const demoAccount = DEMO_ACCOUNTS[role];
+
+    if (!demoAccount) {
+      return res.status(400).json({ success: false, message: 'Invalid demo role' });
+    }
+
+    const user = await User.findOne({ email: demoAccount.email }).populate({
+      path: 'roles',
+      populate: { path: 'permissions', select: 'name description' }
+    });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: `Demo ${role} account was not found. Run npm run seed:accounts in the server folder.`
+      });
+    }
+
+    const isMatch = await bcrypt.compare(demoAccount.password, user.password);
+    if (!isMatch || user.role !== role) {
+      return res.status(401).json({
+        success: false,
+        message: `Demo ${role} account exists but its email, password, or role does not match the expected seed data.`
+      });
+    }
+
+    const { profile, employee } = await getRoleProfile(user);
+    const staffModules = getStaffModules(user, employee);
+
+    res.json({
+      success: true,
+      token: createToken(user),
+      user: buildAuthUser(user, profile, staffModules)
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -192,26 +250,7 @@ const getMe = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    let profile = {};
-    let employee = null;
-    if (user.role === 'student') {
-      const student = await Student.findOne({ $or: [{ user: user._id }, { userId: user._id }] });
-      if (student) {
-        profile = { studentId: student.studentCode || student.studentId, status: student.status };
-      }
-    } else if (user.role === 'teacher' || user.role === 'staff') {
-      employee = await Employee.findOne({ $or: [{ user: user._id }, { userId: user._id }] })
-        .populate('department', 'departmentName departmentCode')
-        .populate('designation', 'designationTitle');
-      if (employee) {
-        profile = {
-          employeeId: employee.employeeCode || employee.employeeId,
-          employeeType: employee.employeeType,
-          department: employee.department?.departmentName || employee.department,
-          designation: employee.designation?.designationTitle || employee.designation
-        };
-      }
-    }
+    const { profile, employee } = await getRoleProfile(user);
 
     res.json({
       user: buildAuthUser(user, profile, getStaffModules(user, employee))
@@ -222,6 +261,7 @@ const getMe = async (req, res) => {
 };
 
 module.exports = {
+  demoLogin,
   login,
   register,
   getMe

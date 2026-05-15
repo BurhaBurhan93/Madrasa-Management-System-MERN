@@ -3,9 +3,7 @@ import Card from '../UIHelper/Card';
 import Button from '../UIHelper/Button';
 import Input from '../UIHelper/Input';
 import Badge from '../UIHelper/Badge';
-import axios from 'axios';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import api from '../../lib/api';
 
 const Communications = () => {
   const [activeTab, setActiveTab] = useState('messages');
@@ -24,11 +22,6 @@ const Communications = () => {
     anonymous: false
   });
 
-  const getConfig = () => {
-    const token = localStorage.getItem('token');
-    return { headers: { Authorization: `Bearer ${token}` } };
-  };
-
   useEffect(() => {
     fetchMessages();
   }, []);
@@ -36,45 +29,31 @@ const Communications = () => {
   const fetchMessages = async () => {
     try {
       setLoading(true);
-      const config = getConfig();
-      
-      // Fetch complaints as messages (using existing complaints API)
-      const complaintsRes = await axios.get(`${API_BASE}/student/complaints`, config);
-      const complaintMessages = (complaintsRes.data || []).map(c => ({
-        id: c._id,
-        sender: 'Student Affairs',
-        subject: c.subject || 'Complaint Response',
-        content: c.description || c.resolution || 'Your complaint has been received.',
-        date: c.createdAt ? new Date(c.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        status: c.complaintStatus === 'resolved' ? 'read' : 'unread',
-        priority: c.priorityLevel || 'medium'
-      }));
-      
-      setMessages(complaintMessages);
-      
-      // Use exams and assignments as announcements
-      const [examsRes, assignmentsRes] = await Promise.all([
-        axios.get(`${API_BASE}/student/exams`, config),
-        axios.get(`${API_BASE}/student/assignments`, config)
+      const [messagesRes, announcementsRes] = await Promise.all([
+        api.get('/communications/messages'),
+        api.get('/communications/announcements')
       ]);
-      
-      const examAnnouncements = (examsRes.data || []).map(e => ({
-        id: `exam-${e._id || e.id}`,
-        title: e.title || 'Examination Scheduled',
-        content: `New examination scheduled for ${e.subject || 'your course'}. Duration: ${e.duration || 'N/A'} minutes.`,
-        date: e.date || new Date().toISOString(),
-        priority: 'high'
-      }));
-      
-      const assignmentAnnouncements = (assignmentsRes.data || []).filter(a => a.status !== 'submitted').map(a => ({
-        id: `assignment-${a._id || a.id}`,
-        title: a.title || 'Assignment Due',
-        content: `Assignment due on ${a.dueDate ? new Date(a.dueDate).toLocaleDateString() : 'soon'}`,
-        date: a.dueDate || new Date().toISOString(),
+
+      const messageRows = (messagesRes.data?.data || []).map((item) => ({
+        id: item._id,
+        sender: item.sender?.name || item.sender?.email || 'System',
+        subject: item.subject,
+        content: item.content,
+        date: item.createdAt ? new Date(item.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        status: item.status || 'unread',
         priority: 'medium'
       }));
-      
-      setAnnouncements([...examAnnouncements.slice(0, 2), ...assignmentAnnouncements.slice(0, 2)]);
+
+      const announcementRows = (announcementsRes.data?.data || []).map((item) => ({
+        id: item._id,
+        title: item.title,
+        content: item.content,
+        date: item.createdAt || new Date().toISOString(),
+        priority: item.priority || 'medium'
+      }));
+
+      setMessages(messageRows);
+      setAnnouncements(announcementRows);
     } catch (err) {
       console.error('[Communications] Error fetching messages:', err);
     } finally {
@@ -82,19 +61,57 @@ const Communications = () => {
     }
   };
 
+  const fetchFallbackStudentUpdates = async () => {
+    try {
+      const [complaintsRes, examsRes, assignmentsRes] = await Promise.all([
+        api.get('/student/complaints'),
+        api.get('/student/exams'),
+        api.get('/student/assignments')
+      ]);
+
+      const complaintMessages = (complaintsRes.data?.data || []).map((c) => ({
+        id: c._id,
+        sender: 'Student Affairs',
+        subject: c.subject || c.title || 'Complaint Response',
+        content: c.description || c.resolution || 'Your complaint has been received.',
+        date: c.createdAt ? new Date(c.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        status: c.complaintStatus === 'resolved' ? 'read' : 'unread',
+        priority: c.priorityLevel || 'medium'
+      }));
+
+      setMessages(complaintMessages);
+
+      const examAnnouncements = (examsRes.data?.data || []).map((e) => ({
+        id: `exam-${e._id || e.id}`,
+        title: e.title || 'Examination Scheduled',
+        content: `New examination scheduled for ${e.subject || 'your course'}. Duration: ${e.duration || 'N/A'} minutes.`,
+        date: e.date || new Date().toISOString(),
+        priority: 'high'
+      }));
+
+      const assignmentAnnouncements = (assignmentsRes.data?.data || []).filter((a) => a.status !== 'submitted').map((a) => ({
+        id: `assignment-${a._id || a.id}`,
+        title: a.title || 'Assignment Due',
+        content: `Assignment due on ${a.dueDate ? new Date(a.dueDate).toLocaleDateString() : 'soon'}`,
+        date: a.dueDate || new Date().toISOString(),
+        priority: 'medium'
+      }));
+
+      setAnnouncements([...examAnnouncements.slice(0, 2), ...assignmentAnnouncements.slice(0, 2)]);
+    } catch (err) {
+      console.error('[Communications] Error fetching fallback updates:', err);
+    }
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const config = getConfig();
-      
-      // Submit as a complaint
-      await axios.post(`${API_BASE}/student/complaints`, {
-        title: message.title,
-        description: message.content,
-        category: 'general',
-        priority: 'medium'
-      }, config);
+      await api.post('/communications/messages', {
+        recipientRole: message.recipient || 'admin',
+        subject: message.title,
+        content: message.content
+      });
       
       alert('Message sent successfully!');
       setMessage({ title: '', content: '', recipient: '' });
@@ -111,15 +128,11 @@ const Communications = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const config = getConfig();
-      
-      // Submit as a complaint with feedback category
-      await axios.post(`${API_BASE}/student/complaints`, {
-        title: feedback.title,
-        description: feedback.content,
-        category: feedback.type,
-        priority: 'medium'
-      }, config);
+      await api.post('/communications/messages', {
+        recipientRole: 'admin',
+        subject: `[${feedback.type}] ${feedback.title}`,
+        content: `${feedback.anonymous ? '(Anonymous feedback)\n\n' : ''}${feedback.content}`
+      });
       
       alert('Feedback submitted successfully!');
       setFeedback({ type: 'general', title: '', content: '', anonymous: false });

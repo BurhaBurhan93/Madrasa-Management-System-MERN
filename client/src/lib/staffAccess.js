@@ -8,6 +8,7 @@ const MODULE_ALIASES = {
   library: 'library',
   complaints: 'complaints',
   kitchen: 'kitchen',
+  hostel: 'registrar',
   registrar: 'registrar',
   students: 'students',
   inventory: 'inventory',
@@ -16,7 +17,7 @@ const MODULE_ALIASES = {
 };
 
 const MODULES_BY_EMPLOYEE_TYPE = {
-  admin: ['dashboard', 'profile', 'registrar', 'students', 'inventory', 'library', 'complaints', 'finance', 'payroll', 'kitchen', 'hr'],
+  admin: ['dashboard', 'profile', 'registrar', 'students', 'inventory', 'library', 'complaints', 'finance', 'payroll', 'kitchen', 'hr', 'hostel'],
   finance: ['dashboard', 'profile', 'finance', 'payroll'],
   registrar: ['dashboard', 'profile', 'registrar', 'students', 'inventory'],
   hr: ['dashboard', 'profile', 'hr', 'payroll'],

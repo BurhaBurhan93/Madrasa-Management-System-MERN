@@ -154,9 +154,10 @@ const seedDatabase = async () => {
         user: employeeUsers[i]._id,
         employeeCode: `EMP-${2024000 + i + 1}`,
         fullName: employeeUsers[i].name,
+        gender: 'male',
+        phoneNumber: 'N/A',
+        email: employeeUsers[i].email,
         employeeType: employeeUsers[i].role === 'teacher' ? 'teacher' : 'support',
-        designation: employeeUsers[i].role === 'teacher' ? 'Teacher' : 'Staff',
-        department: employeeUsers[i].role === 'teacher' ? 'Academics' : 'Administration',
         joiningDate: new Date(),
         baseSalary: 40000 + i * 1000
       });

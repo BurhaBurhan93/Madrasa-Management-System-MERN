@@ -26,16 +26,24 @@ exports.getMessages = async (req, res) => {
 // Send a message
 exports.sendMessage = async (req, res) => {
   try {
-    const { recipientRole, subject, content } = req.body;
+    const { recipientRole, recipient: recipientInput, subject, title, content } = req.body;
+    const targetRole = recipientRole || recipientInput || 'admin';
+    const messageSubject = subject || title;
+
+    if (!messageSubject || !content) {
+      return res.status(400).json({ success: false, message: 'Subject and content are required' });
+    }
     
     // Find a recipient based on role (e.g., admin or teacher)
     // In a real app, you might want to specify which teacher or admin
     let recipient;
-    if (recipientRole === 'admin') {
+    if (targetRole === 'admin') {
       recipient = await User.findOne({ role: 'admin' });
-    } else if (recipientRole === 'teacher') {
+    } else if (targetRole === 'teacher') {
       // For now, just find any teacher
       recipient = await User.findOne({ role: 'teacher' });
+    } else if (targetRole === 'staff') {
+      recipient = await User.findOne({ role: 'staff' });
     }
 
     if (!recipient) {
@@ -45,7 +53,7 @@ exports.sendMessage = async (req, res) => {
     const newMessage = new Message({
       sender: req.user.id,
       recipient: recipient._id,
-      subject,
+      subject: messageSubject,
       content
     });
 
@@ -89,13 +97,20 @@ exports.getAnnouncements = async (req, res) => {
   try {
     const announcements = await Announcement.find({
       isActive: true,
-      $or: [
-        { targetRoles: req.user.role },
-        { targetRoles: { $size: 0 } } // empty means for all roles
-      ],
-      $or: [
-        { expiresAt: { $gt: new Date() } },
-        { expiresAt: null }
+      $and: [
+        {
+          $or: [
+            { targetRoles: req.user.role },
+            { targetRoles: { $size: 0 } } // empty means for all roles
+          ]
+        },
+        {
+          $or: [
+            { expiresAt: { $gt: new Date() } },
+            { expiresAt: null },
+            { expiresAt: { $exists: false } }
+          ]
+        }
       ]
     })
     .populate('createdBy', 'name role')

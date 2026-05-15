@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FiLock, FiZap, FiEye, FiEyeOff } from 'react-icons/fi';
 import { getUserRole, isTokenValid, saveAuth } from '../../lib/auth';
+import api from '../../lib/api';
 
 const redirectByRole = (navigate, role) => {
   const rolePaths = {
@@ -16,6 +17,7 @@ const redirectByRole = (navigate, role) => {
 
 const Login = ({ setIsAuthenticated, setUserRole }) => {
   const [selectedRole, setSelectedRole] = useState('student');
+  const [selectedStaffAccount, setSelectedStaffAccount] = useState('support');
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -39,17 +41,39 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
     { id: 'staff', label: 'Staff', color: 'from-sky-300 to-blue-400', icon: '⚙️', description: 'Staff Portal' },
   ];
 
+  const staffDemoAccounts = {
+    support: { label: 'Support Staff', username: 'staff@gmail.com', password: 'staff1234' },
+    finance: { label: 'Finance Staff', username: 'finance@gmail.com', password: 'finance1234' },
+    registrar: { label: 'Registrar Staff', username: 'registrar@gmail.com', password: 'registrar1234' },
+    hr: { label: 'HR Staff', username: 'hr@gmail.com', password: 'hr1234' },
+    library: { label: 'Library Staff', username: 'library@gmail.com', password: 'library1234' },
+    kitchen: { label: 'Kitchen Staff', username: 'kitchen@gmail.com', password: 'kitchen1234' },
+    payroll: { label: 'Payroll Staff', username: 'payroll@gmail.com', password: 'payroll1234' },
+    complaints: { label: 'Complaints Staff', username: 'complaints@gmail.com', password: 'complaints1234' },
+    inventory: { label: 'Inventory Staff', username: 'inventory@gmail.com', password: 'inventory1234' },
+    hostel: { label: 'Hostel Staff', username: 'hostel@gmail.com', password: 'hostel1234' },
+    all: { label: 'All Staff Modules', username: 'staff.all@gmail.com', password: 'staffall1234' }
+  };
+
   const demoCredentials = {
     admin: { username: 'admin@gmail.com', password: 'admin1234' },
     student: { username: 'student@gmail.com', password: 'student1234' },
     teacher: { username: 'teacher@gmail.com', password: 'teacher1234' },
-    staff: { username: 'staff@gmail.com', password: 'staff1234' }
+    staff: staffDemoAccounts[selectedStaffAccount]
   };
 
   const handleRoleSelect = (roleId) => {
     setSelectedRole(roleId);
     setErrors({});
     setFormData({ username: '', password: '' });
+  };
+
+  const handleStaffAccountSelect = (accountId) => {
+    setSelectedStaffAccount(accountId);
+    const creds = staffDemoAccounts[accountId];
+    if (selectedRole === 'staff' && creds) {
+      setFormData({ username: creds.username, password: creds.password });
+    }
   };
 
   const fillDemoCredentials = () => {
@@ -101,68 +125,29 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
 
     setIsLoading(true);
 
-    // Check if using demo credentials - bypass backend
-    const demoCreds = demoCredentials[selectedRole];
-    const isDemoMode = formData.username === demoCreds.username && 
-                       formData.password === demoCreds.password;
-
-    if (isDemoMode) {
-      try {
-        const response = await axios.post('http://localhost:5000/api/auth/demo-login', {
-          role: selectedRole
-        });
-
-        const { token, user } = response.data;
-        saveAuth(token, user, selectedRole);
-        localStorage.setItem('isDemoMode', 'true');
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-        if (setIsAuthenticated) {
-          setIsAuthenticated(true);
-        }
-        if (setUserRole) {
-          setUserRole(selectedRole);
-        }
-
-        redirectByRole(navigate, selectedRole);
-        return;
-      } catch (error) {
-        console.error('Demo login error:', error);
-        setErrors({
-          general: error.response?.data?.message || 'Demo login failed. Please make sure the backend server is running.'
-        });
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
-
-    // Normal login flow with backend
     try {
-      // Call backend API for login
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await api.post('/auth/login', {
         email: formData.username,
         password: formData.password,
         role: selectedRole
       });
 
       const { token, user } = response.data;
+      const authenticatedRole = user?.role || selectedRole;
       
-      // Store token and user info
-      saveAuth(token, user, selectedRole);
+      saveAuth(token, user, authenticatedRole);
       localStorage.removeItem('isDemoMode');
       
-      // Set axios default header for future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
       if (setIsAuthenticated) {
         setIsAuthenticated(true);
       }
       if (setUserRole) {
-        setUserRole(selectedRole);
+        setUserRole(authenticatedRole);
       }
 
-      redirectByRole(navigate, selectedRole);
+      redirectByRole(navigate, authenticatedRole);
     } catch (error) {
       console.error('Login error:', error);
       setErrors({ 
@@ -224,6 +209,26 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
                 </button>
               ))}
             </div>
+
+            {selectedRole === 'staff' && (
+              <div className="mt-6">
+                <label htmlFor="staffAccount" className="block text-sm font-medium text-gray-700 mb-2">
+                  Staff demo account
+                </label>
+                <select
+                  id="staffAccount"
+                  value={selectedStaffAccount}
+                  onChange={(event) => handleStaffAccountSelect(event.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                >
+                  {Object.entries(staffDemoAccounts).map(([id, account]) => (
+                    <option key={id} value={id}>
+                      {account.label} - {account.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="mt-8">
               <button

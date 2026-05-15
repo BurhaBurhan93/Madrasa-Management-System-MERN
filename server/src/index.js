@@ -72,6 +72,8 @@ app.use('/api/kitchen', kitchenRoutes);
 console.log('[Routes] ✓ /api/kitchen registered');
 app.use('/api/hostel', hostelRoutes);
 console.log('[Routes] ✓ /api/hostel registered');
+app.use('/api/communications', communicationRoutes);
+console.log('[Routes] ✓ /api/communications registered');
 app.use('/api', examRoutes);
 console.log('[Routes] ✓ /api (examRoutes) registered');
 
