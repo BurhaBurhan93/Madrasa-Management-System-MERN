@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
+const { authorizeRoles } = require('../../middleware/auth');
 const Book = require('../../models/Book');
 const BookCategory = require('../../models/BookCategory');
 const BorrowedBook = require('../../models/BorrowedBook');
 
-router.use(auth);
+router.use(auth, authorizeRoles('staff', 'admin'));
 
 // ── Categories ────────────────────────────────────────────
 router.get('/categories', async (req, res) => {

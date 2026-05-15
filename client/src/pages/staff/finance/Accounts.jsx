@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiCheckCircle, FiDollarSign, FiPieChart, FiSlash, FiWallet } from 'react-icons/fi';
+import { FiCheckCircle, FiCreditCard, FiDollarSign, FiPieChart, FiSlash } from 'react-icons/fi';
 import ListPage from '../shared/ListPage';
 import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupCountByKey } from '../shared/StaffAnalyticsContent';
 import { staffApi } from '../../../api/staffApi';
@@ -56,7 +56,7 @@ const Accounts = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: 'Total Accounts', value: accounts.length, helper: 'All finance accounts in the ledger', tone: 'blue', icon: FiWallet },
+            { label: 'Total Accounts', value: accounts.length, helper: 'All finance accounts in the ledger', tone: 'blue', icon: FiCreditCard },
             { label: 'Active Accounts', value: activeCount, helper: 'Ready for transaction use', tone: 'emerald', icon: FiCheckCircle },
             { label: 'Inactive Accounts', value: inactiveCount, helper: 'Currently unavailable or retired', tone: 'rose', icon: FiSlash },
             { label: 'Total Balance', value: formatCurrency(totalBalance), helper: `Avg ${formatCurrency(averageBalance)} per account`, tone: 'violet', icon: FiDollarSign },

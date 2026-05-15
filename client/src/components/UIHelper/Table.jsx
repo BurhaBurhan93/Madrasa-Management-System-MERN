@@ -1,6 +1,63 @@
 import React from 'react';
 
-const Table = ({ children, className = '' }) => {
+const Table = ({
+  children,
+  className = '',
+  columns,
+  data = [],
+  onRowClick,
+  emptyMessage = 'No records found',
+}) => {
+  if (columns) {
+    return (
+      <div className="overflow-x-auto">
+        <table className={`min-w-full divide-y divide-gray-200 ${className}`}>
+          <thead className="bg-gray-50">
+            <tr>
+              {columns.map((column) => (
+                <th
+                  key={column.key}
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                >
+                  {column.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {data.length > 0 ? data.map((row, rowIndex) => (
+              <tr
+                key={row.id || row._id || rowIndex}
+                onClick={() => onRowClick?.(row)}
+                className={onRowClick ? 'cursor-pointer hover:bg-gray-50' : 'hover:bg-gray-50'}
+              >
+                {columns.map((column) => {
+                  const value = row[column.key];
+                  return (
+                    <td
+                      key={column.key}
+                      className="px-4 py-3 text-sm text-gray-600"
+                      onClick={(event) => column.key === 'actions' && event.stopPropagation()}
+                    >
+                      {column.render ? column.render(value, row) : value}
+                    </td>
+                  );
+                })}
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan={columns.length} className="px-4 py-8 text-center text-sm text-gray-500">
+                  {emptyMessage}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className={`min-w-full divide-y divide-gray-200 ${className}`}>

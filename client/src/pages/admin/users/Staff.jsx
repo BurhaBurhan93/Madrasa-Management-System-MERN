@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BasicPageTemplate from '../../templates/BasicPageTemplate';
-import { Badge } from '../../components/UIHelper';
+import BasicPageTemplate from '../../../templates/BasicPageTemplate';
+import { Badge } from '../../../components/UIHelper';
 
 const Staff = () => {
   const navigate = useNavigate();

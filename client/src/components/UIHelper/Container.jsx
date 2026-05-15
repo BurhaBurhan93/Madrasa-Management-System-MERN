@@ -1,5 +1,5 @@
 import React from 'react';
-import { theme } from '../theme';
+import { theme } from '../../theme';
 
 const Container = ({ children, className = '', maxWidth = '7xl' }) => {
   const maxWidths = {

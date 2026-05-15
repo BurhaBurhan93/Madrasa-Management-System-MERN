@@ -17,6 +17,7 @@ const Button = ({
   className = '',
   type = 'button',
   icon: Icon,
+  color,
   iconPosition = 'left',
   fullWidth = false,
   ...props 
@@ -113,6 +114,13 @@ const Button = ({
     `,
   };
 
+  const colorVariants = {
+    red: variants.danger,
+    green: variants.success,
+    yellow: variants.warning,
+    blue: variants.primary,
+  };
+
   // Size configurations
   const sizes = {
     xs: 'h-7 px-3 text-xs',
@@ -134,7 +142,7 @@ const Button = ({
   // Build final class string
   const classes = `
     ${baseClasses}
-    ${variants[variant] || variants.primary}
+    ${colorVariants[color] || variants[variant] || variants.primary}
     ${sizes[size] || sizes.md}
     ${className}
   `.trim().replace(/\s+/g, ' ');
@@ -171,13 +179,23 @@ const Button = ({
       )}
       
       {!loading && Icon && iconPosition === 'left' && (
-        <Icon size={iconSizes[size] || 18} className="mr-2" />
+        React.isValidElement(Icon)
+          ? React.cloneElement(Icon, {
+              size: Icon.props.size || iconSizes[size] || 18,
+              className: `mr-2 ${Icon.props.className || ''}`.trim(),
+            })
+          : <Icon size={iconSizes[size] || 18} className="mr-2" />
       )}
       
       {children}
       
       {!loading && Icon && iconPosition === 'right' && (
-        <Icon size={iconSizes[size] || 18} className="ml-2" />
+        React.isValidElement(Icon)
+          ? React.cloneElement(Icon, {
+              size: Icon.props.size || iconSizes[size] || 18,
+              className: `ml-2 ${Icon.props.className || ''}`.trim(),
+            })
+          : <Icon size={iconSizes[size] || 18} className="ml-2" />
       )}
     </button>
   );

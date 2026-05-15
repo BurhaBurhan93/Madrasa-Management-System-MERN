@@ -1,9 +1,10 @@
 ﻿const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
+const { authorizeRoles } = require('../../middleware/auth');
 const ctrl = require('./financeController');
 
-router.use(auth);
+router.use(auth, authorizeRoles('staff', 'admin'));
 
 // Transactions
 router.get('/transactions', ctrl.listTransactions);

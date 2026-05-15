@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiUsers, FiSearch, FiFilter, FiDownload, FiPlus, FiEdit, FiEye, FiTrash2 } from 'react-icons/fi';
-import { Table, Button, Card, Input, Select, Badge, Modal, Loading } from '../../components/UIHelper';
+import { Table, Button, Card, Input, Select, Badge, Modal, Loading } from '../../../components/UIHelper';
 
 const Students = () => {
   const navigate = useNavigate();
@@ -138,7 +138,7 @@ const Students = () => {
           </div>
           <Select
             value={selectedClass}
-            onChange={setSelectedClass}
+            onChange={(e) => setSelectedClass(e.target.value)}
             options={[
               { value: '', label: 'All Classes' },
               { value: '8th', label: '8th Class' },
@@ -149,7 +149,7 @@ const Students = () => {
           />
           <Select
             value={selectedStatus}
-            onChange={setSelectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
             options={[
               { value: '', label: 'All Status' },
               { value: 'Active', label: 'Active' },

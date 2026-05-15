@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiShield, FiUsers, FiCheck, FiX } from 'react-icons/fi';
-import { Table, Button, Card, Input, Badge, Modal, Loading } from '../../components/UIHelper';
+import { Table, Button, Card, Input, Badge, Modal, Loading } from '../../../components/UIHelper';
 
 const RolesPermissions = () => {
   const navigate = useNavigate();

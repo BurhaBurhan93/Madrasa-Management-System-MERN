@@ -6,6 +6,8 @@ import {
   FiUsers, FiPackage, FiDollarSign, FiUserPlus, FiCoffee, FiAward
 } from 'react-icons/fi';
 import useLocalStorage from '../hooks/useLocalStorage';
+import { clearAuth } from '../lib/auth';
+import { canAccessStaffPath, filterStaffMenuItems } from '../lib/staffAccess';
 
 const StaffPanel = () => {
   const navigate = useNavigate();
@@ -46,7 +48,7 @@ const StaffPanel = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [setSidebarOpen]);
 
-  const menuItems = [
+  const rawMenuItems = [
     { id: 'dashboard', icon: <FiHome size={19} />, path: 'dashboard', label: 'Dashboard', type: 'link' },
     {
       id: 'registrar',
@@ -160,6 +162,10 @@ const StaffPanel = () => {
     }
   ];
 
+  const menuItems = useMemo(() => (
+    user ? filterStaffMenuItems(rawMenuItems, user) : []
+  ), [user]);
+
   const handleNavigation = (path) => {
     navigate(`/staff/${path}`);
     if (window.innerWidth < 768) setSidebarOpen(false);
@@ -177,21 +183,19 @@ const StaffPanel = () => {
     if (activeDropdown) {
       setOpenDropdown(activeDropdown.id);
     }
-  }, [location.pathname]);
+  }, [location.pathname, menuItems]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    navigate('/');
+    clearAuth();
+    navigate('/login');
   };
 
   const groupedMenu = useMemo(() => ([
     { title: 'Overview', items: menuItems.slice(0, 4) },
     { title: 'Operations', items: menuItems.slice(4) }
-  ]), [location.pathname]);
+  ]), [menuItems]);
+
+  const hasRouteAccess = !user || canAccessStaffPath(location.pathname, user);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.9),_rgba(248,250,252,1)_42%,_rgba(241,245,249,1)_100%)]">
@@ -360,11 +364,18 @@ const StaffPanel = () => {
         </header>
 
         <div className="p-5 lg:p-8">
-          <Outlet />
+          {hasRouteAccess ? <Outlet /> : <AccessDenied />}
         </div>
       </main>
     </div>
   );
 };
+
+const AccessDenied = () => (
+  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-8 text-amber-900">
+    <h2 className="text-xl font-semibold">Access restricted</h2>
+    <p className="mt-2 text-sm">This staff account does not have permission for this module.</p>
+  </div>
+);
 
 export default StaffPanel;

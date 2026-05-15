@@ -1,10 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FiLock, FiZap, FiEye, FiEyeOff } from 'react-icons/fi';
-import { saveAuth } from '../../lib/auth';
+import { getUserRole, isTokenValid, saveAuth } from '../../lib/auth';
 
-const Login = ({ setIsAuthenticated }) => {
+const redirectByRole = (navigate, role) => {
+  const rolePaths = {
+    admin: '/admin/dashboard',
+    student: '/student/dashboard',
+    teacher: '/teacher',
+    staff: '/staff/dashboard',
+  };
+  navigate(rolePaths[role] || '/', { replace: true });
+};
+
+const Login = ({ setIsAuthenticated, setUserRole }) => {
   const [selectedRole, setSelectedRole] = useState('student');
   const [formData, setFormData] = useState({
     username: '',
@@ -15,6 +25,12 @@ const Login = ({ setIsAuthenticated }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isTokenValid()) {
+      redirectByRole(navigate, getUserRole());
+    }
+  }, [navigate]);
 
   const roles = [
     { id: 'admin', label: 'Admin', color: 'from-cyan-400 to-cyan-600', icon: '👑', description: 'System Administrator' },
@@ -104,23 +120,11 @@ const Login = ({ setIsAuthenticated }) => {
         if (setIsAuthenticated) {
           setIsAuthenticated(true);
         }
-
-        switch (selectedRole) {
-          case 'admin':
-            navigate('/admin/dashboard');
-            break;
-          case 'student':
-            navigate('/student/dashboard');
-            break;
-          case 'teacher':
-            navigate('/teacher');
-            break;
-          case 'staff':
-            navigate('/staff/dashboard');
-            break;
-          default:
-            navigate('/');
+        if (setUserRole) {
+          setUserRole(selectedRole);
         }
+
+        redirectByRole(navigate, selectedRole);
         return;
       } catch (error) {
         console.error('Demo login error:', error);
@@ -154,24 +158,11 @@ const Login = ({ setIsAuthenticated }) => {
       if (setIsAuthenticated) {
         setIsAuthenticated(true);
       }
-
-      // Navigate based on role
-      switch (selectedRole) {
-        case 'admin':
-          navigate('/admin/dashboard');
-          break;
-        case 'student':
-          navigate('/student/dashboard');
-          break;
-        case 'teacher':
-          navigate('/teacher');
-          break;
-        case 'staff':
-          navigate('/staff/dashboard');
-          break;
-        default:
-          navigate('/');
+      if (setUserRole) {
+        setUserRole(selectedRole);
       }
+
+      redirectByRole(navigate, selectedRole);
     } catch (error) {
       console.error('Login error:', error);
       setErrors({ 

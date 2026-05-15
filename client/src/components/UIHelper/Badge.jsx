@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Badge = ({ children, variant = 'default', className = '' }) => {
+const Badge = ({ children, variant = 'default', color, className = '' }) => {
   const variantClasses = {
     default: 'bg-gray-100 text-gray-800',
     primary: 'bg-blue-100 text-blue-800',
@@ -11,8 +11,17 @@ const Badge = ({ children, variant = 'default', className = '' }) => {
     secondary: 'bg-purple-100 text-purple-800'
   };
 
+  const colorClasses = {
+    gray: variantClasses.default,
+    blue: variantClasses.primary,
+    green: variantClasses.success,
+    yellow: variantClasses.warning,
+    red: variantClasses.danger,
+    purple: variantClasses.secondary,
+  };
+
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variantClasses[variant]} ${className}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClasses[color] || variantClasses[variant] || variantClasses.default} ${className}`}>
       {children}
     </span>
   );

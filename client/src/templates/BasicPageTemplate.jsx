@@ -128,7 +128,7 @@ const BasicPageTemplate = ({
             <Select
               key={index}
               value={activeFilters[filter.key] || ''}
-              onChange={(value) => setActiveFilters(prev => ({ ...prev, [filter.key]: value }))}
+              onChange={(e) => setActiveFilters(prev => ({ ...prev, [filter.key]: e.target.value }))}
               options={[
                 { value: '', label: `All ${filter.label}` },
                 ...filter.options

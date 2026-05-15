@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiSearch, FiFilter, FiDownload, FiUser, FiDatabase, FiCalendar, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
-import { Table, Button, Card, Input, Select, Badge, Loading } from '../../components/UIHelper';
+import { Table, Button, Card, Input, Select, Badge, Loading } from '../../../components/UIHelper';
 
 const AuditLogs = () => {
   const [logs, setLogs] = useState([]);
@@ -144,7 +144,7 @@ const AuditLogs = () => {
           </div>
           <Select
             value={selectedAction}
-            onChange={setSelectedAction}
+            onChange={(e) => setSelectedAction(e.target.value)}
             options={[
               { value: '', label: 'All Actions' },
               { value: 'CREATE', label: 'Create' },
@@ -157,7 +157,7 @@ const AuditLogs = () => {
           />
           <Select
             value={selectedUser}
-            onChange={setSelectedUser}
+            onChange={(e) => setSelectedUser(e.target.value)}
             options={[
               { value: '', label: 'All Users' },
               { value: 'admin@madrasa.edu', label: 'Admin' },
@@ -169,7 +169,7 @@ const AuditLogs = () => {
           />
           <Select
             value={dateRange}
-            onChange={setDateRange}
+            onChange={(e) => setDateRange(e.target.value)}
             options={[
               { value: '', label: 'All Dates' },
               { value: '2024-01-15', label: 'Jan 15, 2024' },

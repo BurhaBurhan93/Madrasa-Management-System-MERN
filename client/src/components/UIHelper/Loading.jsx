@@ -31,3 +31,4 @@ const LoadingOverlay = ({ isLoading, children }) => {
 };
 
 export { LoadingSpinner, LoadingOverlay };
+export default LoadingSpinner;

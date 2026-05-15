@@ -13,8 +13,9 @@ const {
   getLibraryStats, getComplaintStats
 } = require('./staffController');
 const auth = require('../../middleware/auth');
+const { authorizeRoles } = require('../../middleware/auth');
 
-router.use(auth);
+router.use(auth, authorizeRoles('staff', 'admin'));
 
 // Dashboard
 router.get('/dashboard', getDashboardStats);

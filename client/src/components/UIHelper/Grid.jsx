@@ -1,5 +1,5 @@
 import React from 'react';
-import { theme } from '../theme';
+import { theme } from '../../theme';
 
 const Grid = ({ children, className = '', cols = 1, gap = 6 }) => {
   const colClasses = {

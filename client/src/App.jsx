@@ -96,14 +96,29 @@ function App() {
     return children;
   };
 
+  const RoleLanding = () => {
+    if (loading) return <div className="flex h-screen items-center justify-center text-slate-500">Loading...</div>;
+    if (!isTokenValid()) return <Home />;
+
+    const role = getUserRole();
+    const rolePaths = {
+      admin: '/admin/dashboard',
+      staff: '/staff/dashboard',
+      teacher: '/teacher',
+      student: '/student/dashboard',
+    };
+
+    return <Navigate to={rolePaths[role] || '/login'} replace />;
+  };
+
   return (
     <ExamProvider>
       <Router>
         <Routes>
 
           {/* ── Public ── */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/" element={<RoleLanding />} />
+          <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
           <Route path="/register" element={<Register />} />
 
           {/* ── Admin ── */}
@@ -112,7 +127,7 @@ function App() {
           </Route>
 
           {/* ── Teacher ── */}
-          <Route path="/teacher/*" element={<TeacherPanel />}>
+          <Route path="/teacher/*" element={<ProtectedRoute allowedRoles={['teacher']}><TeacherPanel /></ProtectedRoute>}>
             <Route index element={<TeacherDashboard />} />
             <Route path="subjects"            element={<TeacherSubjects />} />
             <Route path="profile"             element={<TeacherProfile />} />
@@ -139,7 +154,7 @@ function App() {
           </Route>
 
           {/* ── Student ── */}
-          <Route path="/student/*" element={<StudentPanel />}>
+          <Route path="/student/*" element={<ProtectedRoute allowedRoles={['student']}><StudentPanel /></ProtectedRoute>}>
             <Route index element={<StudentDashboard />} />
             <Route path="dashboard"           element={<StudentDashboard />} />
             <Route path="profile"             element={<StudentProfile />} />

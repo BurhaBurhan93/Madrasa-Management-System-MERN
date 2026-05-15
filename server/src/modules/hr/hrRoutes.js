@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
+const { authorizeRoles } = require('../../middleware/auth');
 const hrController = require('./hrController');
 
-router.use(auth);
+router.use(auth, authorizeRoles('staff', 'admin'));
 
 router.get('/departments', hrController.getAllDepartments);
 router.get('/departments/:id', hrController.getDepartmentById);

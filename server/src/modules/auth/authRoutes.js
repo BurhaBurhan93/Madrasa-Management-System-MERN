@@ -20,6 +20,8 @@ router.post('/demo-login', (req, res) => {
     name: `Demo ${role.charAt(0).toUpperCase() + role.slice(1)}`,
     email: `${role}@gmail.com`,
     role,
+    permissions: role === 'staff' ? ['staff:registrar', 'staff:library', 'staff:complaints'] : [],
+    staffModules: role === 'staff' ? ['dashboard', 'profile', 'registrar', 'students', 'library', 'complaints'] : [],
   };
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
