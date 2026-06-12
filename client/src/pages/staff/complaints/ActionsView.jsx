@@ -5,7 +5,7 @@ import { complaintActionsConfig } from './Actions';
 
 const ComplaintActionsView = () => {
   const { id } = useParams();
-  return <RecordViewPage title="Complaint Action Details" subtitle={complaintActionsConfig.subtitle} endpoint={complaintActionsConfig.endpoint} id={id} fields={complaintActionsConfig.formFields} listPath="/staff/complaints/actions" editPath={`/staff/complaints/actions/edit/${id}`} readMode="collection" readEndpoint={complaintActionsConfig.endpoint} />;
+  return <RecordViewPage title="Complaint Action Details" subtitle={complaintActionsConfig.subtitle} endpoint={complaintActionsConfig.endpoint} id={id} fields={complaintActionsConfig.formFields} listPath="/staff/complaints/actions" editPath={`/staff/complaints/actions/edit/${id}`} />;
 };
 
 export default ComplaintActionsView;

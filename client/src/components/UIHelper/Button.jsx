@@ -1,5 +1,5 @@
 import React from 'react';
-import { theme } from '../../theme';
+import { useTheme } from '../../contexts/ThemeContext.jsx';
 
 /**
  * Button Component
@@ -17,10 +17,14 @@ const Button = ({
   className = '',
   type = 'button',
   icon: Icon,
+  color,
   iconPosition = 'left',
   fullWidth = false,
   ...props 
 }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   // Base button classes
   const baseClasses = `
     inline-flex items-center justify-center 
@@ -36,42 +40,67 @@ const Button = ({
   const variants = {
     // Primary: Blue gradient (main action buttons)
     primary: `
-      bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800
+      bg-gradient-to-r from-cyan-600 via-sky-600 to-blue-700
       text-white
-      shadow-md shadow-blue-500/30
-      hover:shadow-lg hover:shadow-blue-500/40
+      shadow-md shadow-cyan-500/25
+      hover:shadow-lg hover:shadow-cyan-500/35
       hover:translate-y-[-1px]
       active:translate-y-0
-      focus:ring-blue-500
+      focus:ring-cyan-500
     `,
     
     // Secondary: Light gray (secondary actions)
-    secondary: `
-      bg-gray-100
-      text-gray-700
-      border border-gray-200
-      hover:bg-gray-200
-      hover:border-gray-300
-      focus:ring-gray-400
-    `,
+    secondary: isDark
+      ? `
+        bg-slate-800
+        text-slate-100
+        border border-slate-700
+        hover:bg-slate-700
+        hover:border-slate-600
+        focus:ring-slate-500
+      `
+      : `
+        bg-slate-100
+        text-slate-700
+        border border-slate-200
+        hover:bg-slate-200
+        hover:border-slate-300
+        focus:ring-slate-400
+      `,
     
     // Outline: Bordered style
-    outline: `
-      bg-transparent
-      text-blue-600
-      border-2 border-blue-600
-      hover:bg-blue-50
-      focus:ring-blue-500
-    `,
+    outline: isDark
+      ? `
+        bg-transparent
+        text-cyan-200
+        border-2 border-cyan-500
+        hover:bg-cyan-950/40
+        focus:ring-cyan-500
+      `
+      : `
+        bg-transparent
+        text-cyan-700
+        border-2 border-cyan-600
+        hover:bg-cyan-50
+        focus:ring-cyan-500
+      `,
     
     // Ghost: Minimal style
-    ghost: `
-      bg-transparent
-      text-gray-600
-      hover:bg-gray-100
-      hover:text-gray-900
-      focus:ring-gray-400
-    `,
+    ghost: isDark
+      ? `
+        bg-transparent
+        text-slate-300
+        hover:bg-slate-800
+        hover:text-white
+        focus:ring-slate-500
+      `
+      : `
+        bg-transparent
+        text-slate-600
+        hover:bg-slate-100
+        hover:text-slate-900
+        focus:ring-slate-400
+      `,
     
     // Danger: Red for destructive actions
     danger: `
@@ -104,13 +133,28 @@ const Button = ({
     `,
     
     // White: For dark backgrounds
-    white: `
-      bg-white
-      text-gray-800
-      shadow-md
-      hover:bg-gray-50
-      focus:ring-gray-400
-    `,
+    white: isDark
+      ? `
+        bg-slate-100
+        text-slate-900
+        shadow-md
+        hover:bg-white
+        focus:ring-slate-500
+      `
+      : `
+        bg-white
+        text-slate-800
+        shadow-md
+        hover:bg-slate-50
+        focus:ring-slate-400
+      `,
+  };
+
+  const colorVariants = {
+    red: variants.danger,
+    green: variants.success,
+    yellow: variants.warning,
+    blue: variants.primary,
   };
 
   // Size configurations
@@ -134,7 +178,7 @@ const Button = ({
   // Build final class string
   const classes = `
     ${baseClasses}
-    ${variants[variant] || variants.primary}
+    ${colorVariants[color] || variants[variant] || variants.primary}
     ${sizes[size] || sizes.md}
     ${className}
   `.trim().replace(/\s+/g, ' ');
@@ -171,13 +215,23 @@ const Button = ({
       )}
       
       {!loading && Icon && iconPosition === 'left' && (
-        <Icon size={iconSizes[size] || 18} className="mr-2" />
+        React.isValidElement(Icon)
+          ? React.cloneElement(Icon, {
+              size: Icon.props.size || iconSizes[size] || 18,
+              className: `mr-2 ${Icon.props.className || ''}`.trim(),
+            })
+          : <Icon size={iconSizes[size] || 18} className="mr-2" />
       )}
       
       {children}
       
       {!loading && Icon && iconPosition === 'right' && (
-        <Icon size={iconSizes[size] || 18} className="ml-2" />
+        React.isValidElement(Icon)
+          ? React.cloneElement(Icon, {
+              size: Icon.props.size || iconSizes[size] || 18,
+              className: `ml-2 ${Icon.props.className || ''}`.trim(),
+            })
+          : <Icon size={iconSizes[size] || 18} className="ml-2" />
       )}
     </button>
   );

@@ -1,34 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { 
+  FiEdit, 
+  FiClock, 
+  FiCalendar, 
+  FiCheckCircle, 
+  FiAlertCircle, 
+  FiSearch, 
+  FiFilter, 
+  FiArrowRight,
+  FiFileText,
+  FiUpload,
+  FiTrendingUp,
+  FiList,
+  FiClock as FiClockIcon,
+  FiCheckCircle as FiCheckIcon
+} from 'react-icons/fi';
 import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
 import Badge from '../components/UIHelper/Badge';
-import ErrorPage from '../components/UIHelper/ErrorPage';
-import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
+import { BarChartComponent, PieChartComponent } from '../components/UIHelper/ECharts';
 import { formatDate } from '../lib/utils';
-import axios from 'axios';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentAssignments = () => {
-  console.log('[StudentAssignments] Component initializing...');
   const navigate = useNavigate();
-  
   const [assignments, setAssignments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('dueDate');
-
-  // Get API config with auth token
-  const getConfig = () => {
-    const token = localStorage.getItem('token');
-    console.log('[StudentAssignments] Token exists:', !!token);
-    return {
-      headers: { Authorization: `Bearer ${token}` }
-    };
-  };
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    console.log('[StudentAssignments] useEffect triggered - fetching data from API...');
     fetchAssignmentsData();
   }, []);
 
@@ -36,471 +42,269 @@ const StudentAssignments = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('[StudentAssignments] Fetching assignments from API...');
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const config = getConfig();
-      const response = await axios.get('http://localhost:5000/api/student/assignments', config);
-      
-      console.log('[StudentAssignments] API response:', response.data);
-      setAssignments(response.data || []);
+      const response = await axios.get(`${API_BASE}/student/assignments`, config);
+      const assignmentsData = response.data || [];
+      setAssignments(assignmentsData);
     } catch (err) {
-      console.error('[StudentAssignments] Error fetching assignments:', err);
+      console.error('Error fetching assignments:', err);
       setError('Failed to fetch assignments. Please try again.');
-      setAssignments([]);
+      setAssignments([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredAssignments = assignments
-    .filter(assignment => {
-      if (filter === 'all') return true;
-      return assignment.status === filter;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'dueDate') {
-        return new Date(a.dueDate) - new Date(b.dueDate);
-      } else if (sortBy === 'course') {
-        return a.course.localeCompare(b.course);
-      } else if (sortBy === 'title') {
-        return a.title.localeCompare(b.title);
-      }
-      return 0;
-    });
+  // Calculate assignment stats
+  const assignmentStats = useMemo(() => {
+    const total = assignments.length;
+    const pending = assignments.filter(a => a.status === 'pending').length;
+    const submitted = assignments.filter(a => a.status === 'submitted').length;
+    const overdue = assignments.filter(a => a.status === 'overdue').length;
+    const completionRate = total > 0 ? Math.round((submitted / total) * 100) : 0;
+    
+    return { total, pending, submitted, overdue, completionRate };
+  }, [assignments]);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'submitted':
-        return 'success';
-      case 'pending':
-        return 'primary';
-      case 'in-progress':
-        return 'warning';
-      case 'overdue':
-        return 'danger';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'submitted':
-        return 'Submitted';
-      case 'pending':
-        return 'Pending';
-      case 'in-progress':
-        return 'In Progress';
-      case 'overdue':
-        return 'Overdue';
-      default:
-        return status;
-    }
-  };
-
-  const handleViewAssignment = (assignmentId) => {
-    console.log('[StudentAssignments] Viewing assignment:', assignmentId);
-    navigate(`/assignments/${assignmentId}`);
-  };
-
-  const [showSubmissionModal, setShowSubmissionModal] = useState(null);
-  const [submissionData, setSubmissionData] = useState({
-    file: null,
-    notes: ''
+  const filteredAssignments = assignments.filter(assignment => {
+    const matchesFilter = filter === 'all' || assignment.status === filter;
+    const matchesSearch = assignment.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          assignment.subject?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesSearch;
   });
 
-  const handleShowSubmissionModal = (assignmentId) => {
-    console.log('[StudentAssignments] Opening submission modal for:', assignmentId);
-    setShowSubmissionModal(assignmentId);
-  };
-
-  const handleHideSubmissionModal = () => {
-    console.log('[StudentAssignments] Closing submission modal');
-    setShowSubmissionModal(null);
-    setSubmissionData({ file: null, notes: '' });
-  };
-
-  const handleSubmissionChange = (e) => {
-    const { name, value, files } = e.target;
-    console.log(`[StudentAssignments] Submission input changed - ${name}`);
-    if (name === 'file') {
-      setSubmissionData(prev => ({ ...prev, [name]: files[0] }));
-    } else {
-      setSubmissionData(prev => ({ ...prev, [name]: value }));
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'submitted':
+        return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">Submitted</Badge>;
+      case 'pending':
+        return <Badge variant="primary" className="font-black uppercase tracking-widest text-[10px]">Pending</Badge>;
+      case 'overdue':
+        return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">Overdue</Badge>;
+      default:
+        return <Badge className="font-black uppercase tracking-widest text-[10px]">{status}</Badge>;
     }
   };
 
-  const handleSubmitAssignment = async (assignmentId) => {
-    console.log('[StudentAssignments] Submitting assignment:', assignmentId);
-    try {
-      setLoading(true);
-      const config = getConfig();
-      
-      // Create form data for file upload
-      const formData = new FormData();
-      if (submissionData.file) {
-        formData.append('file', submissionData.file);
-      }
-      formData.append('notes', submissionData.notes);
-      
-      // Submit to backend API
-      await axios.post(`http://localhost:5000/api/student/assignments/${assignmentId}/submit`, formData, {
-        ...config,
-        headers: {
-          ...config.headers,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
-      console.log('[StudentAssignments] Assignment submitted successfully');
-      
-      // Update local state
-      setAssignments(prev => prev.map(ass => 
-        ass.id === assignmentId || ass._id === assignmentId
-          ? { ...ass, status: 'submitted', submitted: true, submissionDate: new Date().toISOString().split('T')[0] }
-          : ass
-      ));
-      
-      // Close modal and reset form
-      handleHideSubmissionModal();
-      alert('Assignment submitted successfully!');
-    } catch (err) {
-      console.error('[StudentAssignments] Error submitting assignment:', err);
-      alert('Error submitting assignment: ' + (err.response?.data?.message || err.message));
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (loading) {
+    return <PageSkeleton variant="table" />;
+  }
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
-      <div className="py-6 mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Assignments</h1>
-        <p className="text-gray-600">Manage and track your assignments</p>
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Assignments</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">Track and submit your coursework</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Search tasks..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-12 pr-6 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none w-full sm:w-64 font-medium text-sm transition-all shadow-sm"
+            />
+          </div>
+          <div className="flex p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
+            {['all', 'pending', 'submitted'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  filter === f ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {error && !loading && (
-        <ErrorPage 
-          type="generic" 
-          title="Unable to Load Assignments"
-          message={error}
-          onRetry={fetchAssignmentsData}
-          onHome={() => window.location.href = '/student/dashboard'}
-          showBackButton={false}
-        />
-      )}
-
-      {loading && assignments.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading assignments...</p>
-        </div>
-      ) : (
-      <div>
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="text-center">
-          <div className="text-2xl sm:text-3xl font-bold text-blue-600">{assignments.length}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Total Assignments</div>
-        </Card>
-        
-        <Card className="text-center">
-          <div className="text-2xl sm:text-3xl font-bold text-green-600">
-            {assignments.filter(a => a.status === 'submitted').length}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-slate-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+                <FiList className="w-5 h-5 text-slate-600" />
+              </div>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total</span>
+            </div>
+            <p className="text-3xl font-black text-slate-900">{assignmentStats.total}</p>
+            <p className="text-sm text-slate-500 mt-1">All assignments</p>
           </div>
-          <div className="text-xs sm:text-sm text-gray-600">Submitted</div>
         </Card>
-        
-        <Card className="text-center">
-          <div className="text-2xl sm:text-3xl font-bold text-yellow-600">
-            {assignments.filter(a => a.status === 'pending' || a.status === 'in-progress').length}
+
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                <FiClockIcon className="w-5 h-5 text-blue-600" />
+              </div>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Pending</span>
+            </div>
+            <p className="text-3xl font-black text-blue-600">{assignmentStats.pending}</p>
+            <p className="text-sm text-slate-500 mt-1">Need submission</p>
           </div>
-          <div className="text-xs sm:text-sm text-gray-600">In Progress</div>
         </Card>
-        
-        <Card className="text-center">
-          <div className="text-2xl sm:text-3xl font-bold text-red-600">
-            {assignments.filter(a => a.status === 'overdue').length}
+
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <FiCheckIcon className="w-5 h-5 text-emerald-600" />
+              </div>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Submitted</span>
+            </div>
+            <p className="text-3xl font-black text-emerald-600">{assignmentStats.submitted}</p>
+            <p className="text-sm text-slate-500 mt-1">Completed</p>
           </div>
-          <div className="text-xs sm:text-sm text-gray-600">Overdue</div>
+        </Card>
+
+        <Card className="relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-rose-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
+                <FiAlertCircle className="w-5 h-5 text-rose-600" />
+              </div>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Overdue</span>
+            </div>
+            <p className="text-3xl font-black text-rose-600">{assignmentStats.overdue}</p>
+            <p className="text-sm text-slate-500 mt-1">Past deadline</p>
+          </div>
         </Card>
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <Card title="Assignment Status Distribution">
-          <PieChartComponent 
-            data={[
-              { name: 'Submitted', value: assignments.filter(a => a.status === 'submitted').length, color: '#10B981' },
-              { name: 'Pending', value: assignments.filter(a => a.status === 'pending').length, color: '#3B82F6' },
-              { name: 'In Progress', value: assignments.filter(a => a.status === 'in-progress').length, color: '#F59E0B' },
-              { name: 'Overdue', value: assignments.filter(a => a.status === 'overdue').length, color: '#EF4444' }
-            ].filter(d => d.value > 0)}
-            dataKey="value"
-            nameKey="name"
-            height={250}
-          />
-        </Card>
+      {assignments.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card title="Assignment Status Distribution" className="rounded-[32px] p-8">
+            <PieChartComponent
+              data={[
+                { name: 'Pending', value: assignmentStats.pending },
+                { name: 'Submitted', value: assignmentStats.submitted },
+                { name: 'Overdue', value: assignmentStats.overdue }
+              ].filter(item => item.value > 0)}
+              height={300}
+            />
+          </Card>
 
-        <Card title="Assignments by Course">
-          <BarChartComponent 
-            data={Array.from(new Set(assignments.map(a => a.course))).map(course => ({
-              name: course?.substring(0, 15) || 'Unknown',
-              value: assignments.filter(a => a.course === course).length
-            }))}
-            dataKey="value"
-            nameKey="name"
-            height={250}
-          />
-        </Card>
-      </div>
-
-      {/* Filters and Sort */}
-      <div className="flex flex-wrap items-center justify-between mb-6">
-        <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              filter === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter('pending')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              filter === 'pending'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Pending
-          </button>
-          <button
-            onClick={() => setFilter('in-progress')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              filter === 'in-progress'
-                ? 'bg-yellow-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            In Progress
-          </button>
-          <button
-            onClick={() => setFilter('submitted')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              filter === 'submitted'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Submitted
-          </button>
-          <button
-            onClick={() => setFilter('overdue')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              filter === 'overdue'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Overdue
-          </button>
-        </div>
-        
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option value="dueDate">Sort by Due Date</option>
-          <option value="course">Sort by Course</option>
-          <option value="title">Sort by Title</option>
-        </select>
-      </div>
-
-      {/* Assignments List */}
-      <div className="space-y-6">
-        {filteredAssignments.map((assignment) => (
-          <Card key={assignment.id} className="hover:shadow-md transition-shadow">
-            <div className="flex flex-col sm:flex-col md:flex-row md:items-center justify-between">
-              <div className="flex-1 mb-4 md:mb-0 md:pr-4">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900">{assignment.title}</h3>
-                <div className="flex flex-col sm:flex-row sm:items-center mt-1 space-y-2 sm:space-y-0 sm:space-x-4">
-                  <span className="text-sm text-gray-600">{assignment.course}</span>
-                  <Badge variant={getStatusColor(assignment.status)}>
-                    {getStatusText(assignment.status)}
-                  </Badge>
-                  {assignment.submitted && assignment.submissionDate && (
-                    <span className="text-sm text-green-600">
-                      Submitted: {formatDate(assignment.submissionDate)}
-                    </span>
-                  )}
-                </div>
-                <p className="mt-2 text-sm text-gray-600">{assignment.description}</p>
-                
-                {assignment.attachments && assignment.attachments.length > 0 && (
-                  <div className="mt-3">
-                    <span className="text-xs font-medium text-gray-500">Attachments:</span>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {assignment.attachments.map((file, index) => (
-                        <span 
-                          key={index}
-                          className="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800"
-                        >
-                          {file.name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex flex-col items-start sm:items-end space-y-3">
-                <div className="text-left sm:text-right">
-                  <p className="text-sm text-gray-600">Due Date</p>
-                  <p className={`font-medium ${
-                    assignment.status === 'overdue' ? 'text-red-600' : 'text-gray-900'
-                  }`}>
-                    {formatDate(assignment.dueDate)}
-                  </p>
-                </div>
-                
-                <div className="text-left sm:text-right">
-                  <p className="text-sm text-gray-600">Max Points</p>
-                  <p className="font-medium text-gray-900">{assignment.maxPoints}</p>
-                </div>
-                
-                <div className="flex space-x-2">
-                  {assignment.status === 'overdue' ? (
-                    <Button variant="outline" disabled>
-                      Past Due
-                    </Button>
-                  ) : assignment.status === 'submitted' ? (
-                    <Button variant="outline" disabled>
-                      View Submission
-                    </Button>
-                  ) : (
-                    <>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => handleViewAssignment(assignment.id)}
-                      >
-                        View Details
-                      </Button>
-                      <Button 
-                        onClick={() => handleShowSubmissionModal(assignment.id)}
-                      >
-                        Submit
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
+          <Card title="Completion Rate Overview" className="rounded-[32px] p-8">
+            <BarChartComponent
+              data={[
+                { name: 'Completion Rate', value: assignmentStats.completionRate }
+              ]}
+              dataKey="value"
+              nameKey="name"
+              height={300}
+            />
+            <div className="text-center mt-4">
+              <p className="text-4xl font-black text-slate-900">{assignmentStats.completionRate}%</p>
+              <p className="text-sm text-slate-500 font-bold uppercase tracking-widest">Overall Completion</p>
             </div>
           </Card>
-        ))}
-      </div>
-      
-      {/* Assignment Submission Modal */}
-      {showSubmissionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Submit Assignment
-                </h3>
-                <button 
-                  onClick={handleHideSubmissionModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Assignment
-                  </label>
-                  <p className="text-gray-900 font-medium">
-                    {assignments.find(a => a.id === showSubmissionModal)?.title}
-                  </p>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Attach File
-                  </label>
-                  <div className="flex items-center space-x-2">
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg className="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                        <p className="text-sm text-gray-500">
-                          <span className="font-semibold">Click to upload</span> or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          PDF, DOC, DOCX, TXT, PNG, JPG (MAX. 10MB)
-                        </p>
-                      </div>
-                      <input 
-                        id="file-upload" 
-                        name="file" 
-                        type="file" 
-                        className="hidden" 
-                        onChange={handleSubmissionChange}
-                      />
-                    </label>
-                  </div>
-                  {submissionData.file && (
-                    <div className="mt-2 p-2 bg-blue-50 rounded-lg">
-                      <p className="text-sm text-blue-800 truncate">{submissionData.file.name}</p>
-                    </div>
-                  )}
-                </div>
-                
-                <div>
-                  <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-                    Notes (Optional)
-                  </label>
-                  <textarea
-                    id="notes"
-                    name="notes"
-                    rows={4}
-                    value={submissionData.notes}
-                    onChange={handleSubmissionChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Add any additional notes for your instructor..."
-                  />
-                </div>
-                
-                <div className="flex justify-end space-x-3 pt-4">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleHideSubmissionModal}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    onClick={() => handleSubmitAssignment(showSubmissionModal)}
-                  >
-                    Submit Assignment
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       )}
+
+      {/* Assignments List */}
+      <div className="grid grid-cols-1 gap-6">
+        {filteredAssignments.length > 0 ? (
+          filteredAssignments.map((assignment) => (
+            <Card key={assignment._id} className="group relative overflow-hidden rounded-[32px] p-0 border-none bg-white shadow-xl shadow-slate-200/50 hover:shadow-2xl transition-all duration-300">
+              <div className="flex flex-col md:flex-row">
+                {/* Left side - Subject & Status */}
+                <div className={`md:w-64 p-8 flex flex-col justify-between items-center text-center ${
+                  assignment.status === 'submitted' ? 'bg-emerald-50' : 
+                  assignment.status === 'overdue' ? 'bg-rose-50' : 'bg-blue-50'
+                }`}>
+                  <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center text-3xl mb-4 ${
+                    assignment.status === 'submitted' ? 'bg-white text-emerald-600' : 
+                    assignment.status === 'overdue' ? 'bg-white text-rose-600' : 'bg-white text-blue-600'
+                  } shadow-sm group-hover:scale-110 transition-transform`}>
+                    <FiFileText />
+                  </div>
+                  <div>
+                    <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-1 ${
+                      assignment.status === 'submitted' ? 'text-emerald-600' : 
+                      assignment.status === 'overdue' ? 'text-rose-600' : 'text-blue-600'
+                    }`}>
+                      {assignment.subject?.name || 'Academic'}
+                    </p>
+                    <div className="mt-2">{getStatusBadge(assignment.status)}</div>
+                  </div>
+                </div>
+
+                {/* Right side - Content */}
+                <div className="flex-1 p-8 flex flex-col md:flex-row justify-between items-center gap-8">
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2">{assignment.title}</h3>
+                    <p className="text-slate-500 text-sm font-medium line-clamp-2 italic mb-4">
+                      {assignment.description || "Complete the exercises from chapter 4 and submit your reflections on the core concepts discussed in class."}
+                    </p>
+                    <div className="flex flex-wrap justify-center md:justify-start gap-6">
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        <FiCalendar className="text-cyan-500" />
+                        Due: {formatDate(assignment.dueDate)}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        <FiClock className="text-cyan-500" />
+                        Time: 11:59 PM
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="shrink-0 flex flex-col gap-3 w-full md:w-48">
+                    {assignment.status !== 'submitted' ? (
+                      <Button 
+                        variant="primary" 
+                        className="rounded-2xl py-4 font-black text-xs uppercase tracking-widest bg-slate-900 hover:bg-slate-800 shadow-xl shadow-slate-200 flex items-center justify-center gap-2"
+                        onClick={() => navigate(`/student/homework-submission?id=${assignment._id}`)}
+                      >
+                        <FiUpload /> Submit Now
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="outline" 
+                        className="rounded-2xl py-4 font-black text-xs uppercase tracking-widest border-slate-200 text-emerald-600 flex items-center justify-center gap-2"
+                        disabled
+                      >
+                        <FiCheckCircle /> Completed
+                      </Button>
+                    )}
+                    <Button 
+                      variant="outline" 
+                      className="rounded-2xl py-4 font-black text-xs uppercase tracking-widest border-slate-100 bg-slate-50 hover:bg-white transition-all"
+                      onClick={() => navigate(`/student/assignments/${assignment._id}`)}
+                    >
+                      View Details
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <div className="py-24 text-center">
+            <div className="w-24 h-24 bg-slate-50 rounded-[32px] flex items-center justify-center text-slate-200 text-5xl mx-auto mb-6 border border-slate-100">
+              <FiEdit />
+            </div>
+            <h3 className="text-2xl font-black text-slate-900 mb-2">No Assignments Found</h3>
+            <p className="text-slate-500 font-medium">You're all caught up! No pending tasks at the moment.</p>
+          </div>
+        )}
       </div>
-      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../../components/UIHelper/Card';
-import axios from 'axios';
+import api from '../../../lib/api';
 
 const UserIndex = () => {
   const [users, setUsers] = useState([]);
@@ -16,7 +16,7 @@ const UserIndex = () => {
   const fetchUsers = async () => {
     try {
       const params = filterRole ? { role: filterRole } : {};
-      const res = await axios.get('http://localhost:5000/api/users', { params });
+      const res = await api.get('/users', { params });
       setUsers(res.data.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -28,7 +28,7 @@ const UserIndex = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/users/${id}`);
+      await api.delete(`/users/${id}`);
       alert('User deleted successfully');
       fetchUsers();
     } catch (error) {
@@ -56,7 +56,7 @@ const UserIndex = () => {
           <p className="text-gray-600 mt-1">Manage all system users</p>
         </div>
         <button
-          onClick={() => navigate('/staff/users/register')}
+          onClick={() => navigate('/admin/users/register')}
           className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg"
         >
           ➕ Add New User
@@ -101,7 +101,7 @@ const UserIndex = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onClick={() => navigate(`/staff/users/edit/${user._id}`)} className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
+                    <button onClick={() => navigate(`/admin/users/edit/${user._id}`)} className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
                     <button onClick={() => handleDelete(user._id)} className="text-red-600 hover:text-red-900">Delete</button>
                   </td>
                 </tr>

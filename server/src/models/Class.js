@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const ClassSchema = new Schema({
   code: { type: String, trim: true },
   name: { type: String, required: true, trim: true },
+  image: { type: String },
   type: { type: String, enum: ['boys','girls','mixed'], default: 'mixed' },
   teacher: { type: Schema.Types.ObjectId, ref: 'User' },
   maxStudents: { type: Number },

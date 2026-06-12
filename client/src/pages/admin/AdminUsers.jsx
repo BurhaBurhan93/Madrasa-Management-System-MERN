@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../../components/UIHelper/Card';
-import axios from 'axios';
+import api from '../../lib/api';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -24,7 +24,7 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       const params = filterRole ? { role: filterRole } : {};
-      const res = await axios.get('http://localhost:5000/api/users', { params });
+      const res = await api.get('/users', { params });
       setUsers(res.data.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -48,17 +48,13 @@ const AdminUsers = () => {
     }
 
     try {
-      console.log('Submitting form data:', formData);
-      
       if (editMode) {
         const updateData = { ...formData };
         if (!updateData.password) delete updateData.password;
-        const response = await axios.put(`http://localhost:5000/api/users/${currentUser._id}`, updateData);
-        console.log('Update response:', response.data);
+        await api.put(`/users/${currentUser._id}`, updateData);
         alert('User updated successfully');
       } else {
-        const response = await axios.post('http://localhost:5000/api/users', formData);
-        console.log('Create response:', response.data);
+        await api.post('/users', formData);
         alert('User created successfully');
       }
       resetForm();
@@ -92,7 +88,7 @@ const AdminUsers = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/users/${id}`);
+      await api.delete(`/users/${id}`);
       alert('User deleted successfully');
       fetchUsers();
     } catch (error) {

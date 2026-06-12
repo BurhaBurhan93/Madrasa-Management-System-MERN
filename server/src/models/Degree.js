@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const DegreeSchema = new Schema({
   name: { type: String, required: true, trim: true },
+  image: { type: String },
   deletedAt: { type: Date, default: null, index: true }
 }, { timestamps: true });
 

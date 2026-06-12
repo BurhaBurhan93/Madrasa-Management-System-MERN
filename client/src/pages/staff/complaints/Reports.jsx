@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Card from '../../../components/UIHelper/Card';
-import ErrorPage from '../../../components/UIHelper/ErrorPage';
 import { PieChartComponent, BarChartComponent } from '../../../components/UIHelper/ECharts';
 
 const StaffComplaintReports = () => {
-  console.log('[StaffComplaintReports] Component initializing...');
   const [summary, setSummary] = useState({
     total: 0,
     open: 0,
@@ -16,15 +14,12 @@ const StaffComplaintReports = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Get API config with auth token
   const getConfig = () => {
     const token = localStorage.getItem('token');
-    console.log('[StaffComplaintReports] Token exists:', !!token);
     return { headers: { Authorization: `Bearer ${token}` } };
   };
 
   useEffect(() => {
-    console.log('[StaffComplaintReports] useEffect triggered - fetching data from API...');
     fetchComplaintStats();
   }, []);
 
@@ -32,15 +27,13 @@ const StaffComplaintReports = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('[StaffComplaintReports] Fetching complaint stats from API...');
       
       const config = getConfig();
       const response = await axios.get('http://localhost:5000/api/staff/complaints/stats', config);
       
-      console.log('[StaffComplaintReports] Stats API response:', response.data);
       setSummary(response.data);
     } catch (err) {
-      console.error('[StaffComplaintReports] Error fetching stats:', err);
+      console.error('Error fetching complaint stats:', err);
       setError('Failed to fetch complaint statistics. Please try again.');
     } finally {
       setLoading(false);
@@ -55,14 +48,24 @@ const StaffComplaintReports = () => {
       </div>
 
       {error && !loading && (
-        <ErrorPage 
-          type="generic" 
-          title="Unable to Load Reports"
-          message={error}
-          onRetry={fetchComplaintStats}
-          onHome={() => window.location.href = '/staff/dashboard'}
-          showBackButton={false}
-        />
+        <Card className="rounded-[28px] border border-rose-200 bg-rose-50 mb-6">
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-rose-900">Unable to Load Reports</h3>
+                <p className="mt-1 text-sm text-rose-700">{error}</p>
+                <button onClick={fetchComplaintStats} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
       )}
 
       {loading ? (

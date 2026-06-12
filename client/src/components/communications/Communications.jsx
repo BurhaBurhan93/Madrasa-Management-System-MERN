@@ -1,58 +1,148 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../UIHelper/Card';
 import Button from '../UIHelper/Button';
 import Input from '../UIHelper/Input';
+import Badge from '../UIHelper/Badge';
+import api from '../../lib/api';
 
 const Communications = () => {
   const [activeTab, setActiveTab] = useState('messages');
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [message, setMessage] = useState({
     title: '',
     content: '',
     recipient: ''
   });
+  const [feedback, setFeedback] = useState({
+    type: 'general',
+    title: '',
+    content: '',
+    anonymous: false
+  });
 
-  // Mock data for messages
-  const messages = [
-    {
-      id: 1,
-      sender: 'Admin',
-      subject: 'Important Notice',
-      content: 'Please submit your assignment by tomorrow.',
-      date: '2024-02-10',
-      status: 'unread'
-    },
-    {
-      id: 2,
-      sender: 'Teacher',
-      subject: 'Exam Schedule',
-      content: 'Mid-term exams will start from next week.',
-      date: '2024-02-09',
-      status: 'read'
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
+  const fetchMessages = async () => {
+    try {
+      setLoading(true);
+      const [messagesRes, announcementsRes] = await Promise.all([
+        api.get('/communications/messages'),
+        api.get('/communications/announcements')
+      ]);
+
+      const messageRows = (messagesRes.data?.data || []).map((item) => ({
+        id: item._id,
+        sender: item.sender?.name || item.sender?.email || 'System',
+        subject: item.subject,
+        content: item.content,
+        date: item.createdAt ? new Date(item.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        status: item.status || 'unread',
+        priority: 'medium'
+      }));
+
+      const announcementRows = (announcementsRes.data?.data || []).map((item) => ({
+        id: item._id,
+        title: item.title,
+        content: item.content,
+        date: item.createdAt || new Date().toISOString(),
+        priority: item.priority || 'medium'
+      }));
+
+      setMessages(messageRows);
+      setAnnouncements(announcementRows);
+    } catch (err) {
+      console.error('[Communications] Error fetching messages:', err);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const announcements = [
-    {
-      id: 1,
-      title: 'Holiday Notice',
-      content: 'School will remain closed on Monday for holiday.',
-      date: '2024-02-10',
-      priority: 'high'
-    },
-    {
-      id: 2,
-      title: 'Library Hours',
-      content: 'Extended library hours during exam period.',
-      date: '2024-02-08',
-      priority: 'medium'
+  const fetchFallbackStudentUpdates = async () => {
+    try {
+      const [complaintsRes, examsRes, assignmentsRes] = await Promise.all([
+        api.get('/student/complaints'),
+        api.get('/student/exams'),
+        api.get('/student/assignments')
+      ]);
+
+      const complaintMessages = (complaintsRes.data?.data || []).map((c) => ({
+        id: c._id,
+        sender: 'Student Affairs',
+        subject: c.subject || c.title || 'Complaint Response',
+        content: c.description || c.resolution || 'Your complaint has been received.',
+        date: c.createdAt ? new Date(c.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        status: c.complaintStatus === 'resolved' ? 'read' : 'unread',
+        priority: c.priorityLevel || 'medium'
+      }));
+
+      setMessages(complaintMessages);
+
+      const examAnnouncements = (examsRes.data?.data || []).map((e) => ({
+        id: `exam-${e._id || e.id}`,
+        title: e.title || 'Examination Scheduled',
+        content: `New examination scheduled for ${e.subject || 'your course'}. Duration: ${e.duration || 'N/A'} minutes.`,
+        date: e.date || new Date().toISOString(),
+        priority: 'high'
+      }));
+
+      const assignmentAnnouncements = (assignmentsRes.data?.data || []).filter((a) => a.status !== 'submitted').map((a) => ({
+        id: `assignment-${a._id || a.id}`,
+        title: a.title || 'Assignment Due',
+        content: `Assignment due on ${a.dueDate ? new Date(a.dueDate).toLocaleDateString() : 'soon'}`,
+        date: a.dueDate || new Date().toISOString(),
+        priority: 'medium'
+      }));
+
+      setAnnouncements([...examAnnouncements.slice(0, 2), ...assignmentAnnouncements.slice(0, 2)]);
+    } catch (err) {
+      console.error('[Communications] Error fetching fallback updates:', err);
     }
-  ];
+  };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    // Handle sending message
-    alert('Message sent successfully!');
-    setMessage({ title: '', content: '', recipient: '' });
+    try {
+      setLoading(true);
+      await api.post('/communications/messages', {
+        recipientRole: message.recipient || 'admin',
+        subject: message.title,
+        content: message.content
+      });
+      
+      alert('Message sent successfully!');
+      setMessage({ title: '', content: '', recipient: '' });
+      fetchMessages(); // Refresh messages
+    } catch (err) {
+      console.error('[Communications] Error sending message:', err);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitFeedback = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      await api.post('/communications/messages', {
+        recipientRole: 'admin',
+        subject: `[${feedback.type}] ${feedback.title}`,
+        content: `${feedback.anonymous ? '(Anonymous feedback)\n\n' : ''}${feedback.content}`
+      });
+      
+      alert('Feedback submitted successfully!');
+      setFeedback({ type: 'general', title: '', content: '', anonymous: false });
+      fetchMessages(); // Refresh
+    } catch (err) {
+      console.error('[Communications] Error submitting feedback:', err);
+      alert('Failed to submit feedback. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleMessageChange = (e) => {
@@ -63,11 +153,20 @@ const Communications = () => {
     }));
   };
 
+  const handleFeedbackChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFeedback(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
-      <div className="py-6 mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Communications</h1>
-        <p className="text-gray-600">Manage your messages, announcements, and notifications</p>
+    <div className="w-full">
+      <div className="mb-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Communications</p>
+        <h1 className="mt-2 text-2xl font-bold text-slate-900">Messages & Announcements</h1>
+        <p className="mt-1 text-slate-500">Manage your messages, announcements, and notifications</p>
       </div>
 
       <div>
@@ -122,25 +221,36 @@ const Communications = () => {
       {/* Tab Content */}
       {activeTab === 'messages' && (
         <div className="space-y-4">
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Messages</h2>
+          <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
+            <h2 className="text-xl font-black text-slate-900 mb-6">Messages</h2>
             <div className="space-y-4">
-              {messages.map(msg => (
-                <div key={msg.id} className={`p-4 rounded-lg border-l-4 ${
-                  msg.status === 'unread' ? 'bg-blue-50 border-blue-500' : 'bg-gray-50 border-gray-300'
-                }`}>
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">{msg.subject}</h3>
-                      <p className="text-gray-600 mt-1">{msg.content}</p>
-                    </div>
-                    <div className="text-right sm:text-right">
-                      <p className="text-sm text-gray-500">{msg.sender}</p>
-                      <p className="text-xs text-gray-400">{msg.date}</p>
+              {messages.length > 0 ? (
+                messages.map(msg => (
+                  <div key={msg.id} className={`p-6 rounded-3xl border-l-4 ${
+                    msg.status === 'unread' ? 'bg-blue-50 border-blue-500' : 'bg-slate-50 border-slate-300'
+                  } hover:shadow-md transition-shadow cursor-pointer`}>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant={msg.priority === 'high' ? 'danger' : msg.priority === 'medium' ? 'warning' : 'primary'} className="font-black text-[10px] uppercase tracking-widest">
+                            {msg.priority}
+                          </Badge>
+                          <h3 className="font-black text-slate-900">{msg.subject}</h3>
+                        </div>
+                        <p className="text-slate-600 text-sm leading-relaxed">{msg.content}</p>
+                      </div>
+                      <div className="text-right sm:text-right">
+                        <p className="text-sm font-bold text-slate-500">{msg.sender}</p>
+                        <p className="text-xs text-slate-400 font-medium">{msg.date}</p>
+                      </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center py-12 bg-slate-50 rounded-3xl">
+                  <p className="text-slate-400 font-medium">No messages yet</p>
                 </div>
-              ))}
+              )}
             </div>
           </Card>
         </div>
@@ -148,20 +258,26 @@ const Communications = () => {
 
       {activeTab === 'announcements' && (
         <div className="space-y-4">
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Announcements</h2>
+          <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
+            <h2 className="text-xl font-black text-slate-900 mb-6">Announcements</h2>
             <div className="space-y-4">
-              {announcements.map(announcement => (
-                <div key={announcement.id} className={`p-4 rounded-lg border-l-4 ${
-                  announcement.priority === 'high' ? 'bg-red-50 border-red-500' :
-                  announcement.priority === 'medium' ? 'bg-yellow-50 border-yellow-500' :
-                  'bg-green-50 border-green-500'
-                }`}>
-                  <h3 className="font-medium text-gray-900">{announcement.title}</h3>
-                  <p className="text-gray-600 mt-2">{announcement.content}</p>
-                  <p className="text-xs text-gray-600 mt-2">{announcement.date}</p>
+              {announcements.length > 0 ? (
+                announcements.map(announcement => (
+                  <div key={announcement.id} className={`p-6 rounded-3xl border-l-4 ${
+                    announcement.priority === 'high' ? 'bg-rose-50 border-rose-500' :
+                    announcement.priority === 'medium' ? 'bg-amber-50 border-amber-500' :
+                    'bg-emerald-50 border-emerald-500'
+                  }`}>
+                    <h3 className="font-black text-slate-900 mb-2">{announcement.title}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">{announcement.content}</p>
+                    <p className="text-xs text-slate-400 font-medium mt-3">{new Date(announcement.date).toLocaleDateString()}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12 bg-slate-50 rounded-3xl">
+                  <p className="text-slate-400 font-medium">No announcements at this time</p>
                 </div>
-              ))}
+              )}
             </div>
           </Card>
         </div>
@@ -169,9 +285,9 @@ const Communications = () => {
 
       {activeTab === 'send' && (
         <div className="space-y-4">
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Send Message</h2>
-            <form onSubmit={handleSendMessage} className="space-y-4">
+          <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
+            <h2 className="text-xl font-black text-slate-900 mb-6">Send Message</h2>
+            <form onSubmit={handleSendMessage} className="space-y-6">
               <Input
                 label="Recipient"
                 id="recipient"
@@ -180,6 +296,7 @@ const Communications = () => {
                 value={message.recipient}
                 onChange={handleMessageChange}
                 placeholder="Enter recipient (teacher/admin)"
+                className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
               />
               
               <Input
@@ -190,10 +307,11 @@ const Communications = () => {
                 value={message.title}
                 onChange={handleMessageChange}
                 placeholder="Enter subject"
+                className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
               />
               
               <div className="space-y-2">
-                <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="content" className="block text-sm font-black text-slate-700 uppercase tracking-widest">
                   Message Content
                 </label>
                 <textarea
@@ -202,17 +320,27 @@ const Communications = () => {
                   rows={6}
                   value={message.content}
                   onChange={handleMessageChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-slate-50 font-medium resize-none"
                   placeholder="Write your message here..."
                 />
               </div>
               
-              <div className="flex justify-end space-x-3">
-                <Button type="button" variant="outline">
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  className="rounded-2xl px-6 py-3 font-black text-xs uppercase tracking-widest"
+                  onClick={() => setMessage({ title: '', content: '', recipient: '' })}
+                >
                   Cancel
                 </Button>
-                <Button type="submit">
-                  Send Message
+                <Button 
+                  type="submit" 
+                  variant="primary"
+                  className="rounded-2xl bg-slate-900 hover:bg-slate-800 px-6 py-3 font-black text-xs uppercase tracking-widest"
+                  disabled={loading}
+                >
+                  {loading ? 'Sending...' : 'Send Message'}
                 </Button>
               </div>
             </form>
@@ -222,14 +350,19 @@ const Communications = () => {
       
       {activeTab === 'feedback' && (
         <div className="space-y-4">
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Submit Feedback</h2>
-            <form onSubmit={handleSendMessage} className="space-y-4">
+          <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
+            <h2 className="text-xl font-black text-slate-900 mb-6">Submit Feedback</h2>
+            <form onSubmit={handleSubmitFeedback} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-black text-slate-700 uppercase tracking-widest mb-2">
                   Type of Feedback
                 </label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <select 
+                  name="type"
+                  value={feedback.type}
+                  onChange={handleFeedbackChange}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-slate-50 font-medium"
+                >
                   <option value="complaint">Complaint</option>
                   <option value="suggestion">Suggestion</option>
                   <option value="general">General Feedback</option>
@@ -240,74 +373,91 @@ const Communications = () => {
               <Input
                 label="Subject"
                 id="feedback-title"
-                name="feedback-title"
+                name="title"
                 type="text"
-                value={message.title}
-                onChange={handleMessageChange}
+                value={feedback.title}
+                onChange={handleFeedbackChange}
                 placeholder="Enter subject of your feedback"
+                className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
               />
               
               <div className="space-y-2">
-                <label htmlFor="feedback-content" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="feedback-content" className="block text-sm font-black text-slate-700 uppercase tracking-widest">
                   Feedback Content
                 </label>
                 <textarea
                   id="feedback-content"
                   name="content"
                   rows={6}
-                  value={message.content}
-                  onChange={handleMessageChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  value={feedback.content}
+                  onChange={handleFeedbackChange}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-slate-50 font-medium resize-none"
                   placeholder="Share your feedback or suggestions..."
                 />
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   id="anonymous"
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  name="anonymous"
+                  checked={feedback.anonymous}
+                  onChange={handleFeedbackChange}
+                  className="w-5 h-5 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
                 />
-                <label htmlFor="anonymous" className="text-sm text-gray-600">
+                <label htmlFor="anonymous" className="text-sm font-medium text-slate-600">
                   Submit anonymously
                 </label>
               </div>
               
-              <div className="flex justify-end space-x-3">
-                <Button type="button" variant="outline">
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  className="rounded-2xl px-6 py-3 font-black text-xs uppercase tracking-widest"
+                  onClick={() => setFeedback({ type: 'general', title: '', content: '', anonymous: false })}
+                >
                   Cancel
                 </Button>
-                <Button type="submit">
-                  Submit Feedback
+                <Button 
+                  type="submit" 
+                  variant="primary"
+                  className="rounded-2xl bg-slate-900 hover:bg-slate-800 px-6 py-3 font-black text-xs uppercase tracking-widest"
+                  disabled={loading}
+                >
+                  {loading ? 'Submitting...' : 'Submit Feedback'}
                 </Button>
               </div>
             </form>
           </Card>
           
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Previous Feedback</h2>
+          <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
+            <h2 className="text-xl font-black text-slate-900 mb-6">Previous Feedback</h2>
             <div className="space-y-4">
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900">Cafeteria Food Quality</h3>
-                    <p className="text-sm text-gray-600 mt-1">Suggestion • Submitted Feb 10, 2024</p>
+              {messages.length > 0 ? (
+                messages.slice(0, 3).map(msg => (
+                  <div key={msg.id} className={`p-6 rounded-3xl border-l-4 ${
+                    msg.status === 'unread' ? 'bg-blue-50 border-blue-500' : 'bg-slate-50 border-slate-300'
+                  }`}>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                      <div className="flex-1">
+                        <h3 className="font-black text-slate-900">{msg.subject}</h3>
+                        <p className="text-slate-600 mt-2 text-sm leading-relaxed">{msg.content}</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant={msg.status === 'unread' ? 'primary' : 'success'} className="font-black text-[10px] uppercase tracking-widest">
+                          {msg.status}
+                        </Badge>
+                        <p className="text-xs text-slate-400 mt-1 font-medium">{msg.date}</p>
+                      </div>
+                    </div>
                   </div>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Resolved</span>
+                ))
+              ) : (
+                <div className="text-center py-12 bg-slate-50 rounded-3xl">
+                  <p className="text-slate-400 font-medium">No previous feedback found</p>
                 </div>
-                <p className="text-gray-700 mt-2">The food quality in the cafeteria could be improved. More variety would be appreciated.</p>
-              </div>
-              
-              <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900">Library Noise Level</h3>
-                    <p className="text-sm text-gray-600 mt-1">Complaint • Submitted Feb 5, 2024</p>
-                  </div>
-                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">In Progress</span>
-                </div>
-                <p className="text-gray-700 mt-2">The noise level in the library is too high, making it difficult to concentrate.</p>
-              </div>
+              )}
             </div>
           </Card>
         </div>

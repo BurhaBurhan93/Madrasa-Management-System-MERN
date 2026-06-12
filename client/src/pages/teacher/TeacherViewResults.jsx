@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Card from '../../components/UIHelper/Card';
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
-const gradeColors = { 'A+': 'bg-green-100 text-green-700', A: 'bg-green-100 text-green-700', B: 'bg-blue-100 text-blue-700', C: 'bg-yellow-100 text-yellow-700', D: 'bg-orange-100 text-orange-700', F: 'bg-red-100 text-red-700' };
+const gradeColors = {
+  'A+': 'bg-emerald-100 text-emerald-700', A: 'bg-emerald-100 text-emerald-700',
+  B: 'bg-sky-100 text-sky-700', C: 'bg-amber-100 text-amber-700',
+  D: 'bg-orange-100 text-orange-700', F: 'bg-rose-100 text-rose-700'
+};
 
 const TeacherViewResults = () => {
   const [results, setResults] = useState([]);
@@ -45,95 +48,102 @@ const TeacherViewResults = () => {
     avg: results.length > 0 ? (results.reduce((s, r) => s + (r.totalScore || 0), 0) / results.length).toFixed(1) : 0,
   };
 
+  const selectCls = 'w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100';
+
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">View Results</h1>
-        <p className="text-gray-500">Filter and view student exam results</p>
-      </div>
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
-      {/* Filters */}
-      <Card>
-        <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-          <div>
-            <label className="text-sm font-medium text-gray-700 block mb-1">Exam</label>
-            <select value={filters.examId} onChange={e => setFilters({ ...filters, examId: e.target.value })} className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500">
-              <option value="">All Exams</option>
-              {exams.map(e => <option key={e._id} value={e._id}>{e.title}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-gray-700 block mb-1">Subject</label>
-            <select value={filters.subjectId} onChange={e => setFilters({ ...filters, subjectId: e.target.value })} className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500">
-              <option value="">All Subjects</option>
-              {subjects.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-gray-700 block mb-1">Class</label>
-            <select value={filters.classId} onChange={e => setFilters({ ...filters, classId: e.target.value })} className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500">
-              <option value="">All Classes</option>
-              {classes.map(c => <option key={c._id} value={c._id}>{c.name} {c.section}</option>)}
-            </select>
-          </div>
-          <button onClick={fetchResults} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium">Search</button>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-slate-900">View Results</h1>
+          <p className="mt-1 text-sm text-slate-500">Filter and view student exam results</p>
         </div>
-      </Card>
 
-      {/* Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Total', value: stats.total, color: 'text-gray-700' },
-          { label: 'Passed', value: stats.pass, color: 'text-green-600' },
-          { label: 'Failed', value: stats.fail, color: 'text-red-600' },
-          { label: 'Average', value: stats.avg, color: 'text-blue-600' },
-        ].map(c => (
-          <Card key={c.label} className="text-center">
-            <div className={`text-2xl font-bold ${c.color}`}>{c.value}</div>
-            <div className="text-sm text-gray-500">{c.label}</div>
-          </Card>
-        ))}
-      </div>
+        {/* Filters */}
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4 items-end">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-500">Exam</label>
+              <select value={filters.examId} onChange={e => setFilters({ ...filters, examId: e.target.value })} className={selectCls}>
+                <option value="">All Exams</option>
+                {exams.map(e => <option key={e._id} value={e._id}>{e.title}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-500">Subject</label>
+              <select value={filters.subjectId} onChange={e => setFilters({ ...filters, subjectId: e.target.value })} className={selectCls}>
+                <option value="">All Subjects</option>
+                {subjects.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-500">Class</label>
+              <select value={filters.classId} onChange={e => setFilters({ ...filters, classId: e.target.value })} className={selectCls}>
+                <option value="">All Classes</option>
+                {classes.map(c => <option key={c._id} value={c._id}>{c.name} {c.section}</option>)}
+              </select>
+            </div>
+            <button onClick={fetchResults} className="rounded-2xl bg-cyan-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700">
+              Search
+            </button>
+          </div>
+        </div>
 
-      {/* Table */}
-      <Card>
-        {loading ? <div className="p-8 text-center text-gray-500">Loading...</div> : (
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-3 text-left">#</th>
-                <th className="p-3 text-left">Student</th>
-                <th className="p-3 text-left">Exam</th>
-                <th className="p-3 text-left">Subject</th>
-                <th className="p-3 text-left">Score</th>
-                <th className="p-3 text-left">Grade</th>
-                <th className="p-3 text-left">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {results.length === 0 ? (
-                <tr><td colSpan="7" className="p-8 text-center text-gray-500">No results found. Use filters above to search.</td></tr>
-              ) : results.map((r, i) => (
-                <tr key={r._id} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{i + 1}</td>
-                  <td className="p-3 font-medium">{r.student?.user?.name || '-'}</td>
-                  <td className="p-3">{r.exam?.title || '-'}</td>
-                  <td className="p-3">{r.subject?.name || '-'}</td>
-                  <td className="p-3 font-semibold">{r.totalScore}</td>
-                  <td className="p-3">
-                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${gradeColors[r.grade] || 'bg-gray-100 text-gray-700'}`}>{r.grade}</span>
-                  </td>
-                  <td className="p-3">
-                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${r.status === 'pass' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {r.status}
-                    </span>
-                  </td>
+        {/* Stats */}
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6">
+          {[
+            { label: 'Total', value: stats.total, accent: 'bg-cyan-500' },
+            { label: 'Passed', value: stats.pass, accent: 'bg-emerald-500' },
+            { label: 'Failed', value: stats.fail, accent: 'bg-rose-500' },
+            { label: 'Average', value: stats.avg, accent: 'bg-sky-500' },
+          ].map(c => (
+            <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
+              <p className="text-sm font-medium text-slate-500">{c.label}</p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{c.value}</p>
+            </div>
+          ))}
+        </section>
+
+        {/* Table */}
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          {loading ? (
+            <div className="flex h-32 items-center justify-center text-slate-500">Loading...</div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50">
+                  {['#', 'Student', 'Exam', 'Subject', 'Score', 'Grade', 'Status'].map(h => (
+                    <th key={h} className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {results.length === 0 ? (
+                  <tr><td colSpan="7" className="p-8 text-center text-slate-500">No results found. Use filters above to search.</td></tr>
+                ) : results.map((r, i) => (
+                  <tr key={r._id} className="transition-colors duration-150 hover:bg-slate-50">
+                    <td className="p-4 text-slate-500">{i + 1}</td>
+                    <td className="p-4 font-medium text-slate-900">{r.student?.user?.name || '-'}</td>
+                    <td className="p-4 text-slate-600">{r.exam?.title || '-'}</td>
+                    <td className="p-4 text-slate-600">{r.subject?.name || '-'}</td>
+                    <td className="p-4 font-semibold text-slate-900">{r.totalScore}</td>
+                    <td className="p-4">
+                      <span className={`rounded-full px-3 py-1 text-xs font-medium ${gradeColors[r.grade] || 'bg-slate-100 text-slate-600'}`}>{r.grade}</span>
+                    </td>
+                    <td className="p-4">
+                      <span className={`rounded-full px-3 py-1 text-xs font-medium ${r.status === 'pass' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                        {r.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+      </div>
     </div>
   );
 };

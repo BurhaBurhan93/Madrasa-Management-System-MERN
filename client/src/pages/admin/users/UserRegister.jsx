@@ -1,17 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../../components/UIHelper/Card';
-import axios from 'axios';
+import api from '../../../lib/api';
 
 const UserRegister = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '', fatherName: '', grandfatherName: '', email: '', password: '', role: 'student',
-    phone: '', whatsapp: '', dob: '', bloodType: '', idNumber: '',
+    phone: '', whatsapp: '', dob: '', bloodType: '', idNumber: '', image: '',
     permanentAddress: { province: '', district: '', village: '' },
     currentAddress: { province: '', district: '', village: '' },
     status: 'active'
   });
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, image: reader.result });
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +33,7 @@ const UserRegister = () => {
       if (!payload.bloodType) delete payload.bloodType;
       if (!payload.dob) delete payload.dob;
       if (!payload.idNumber) delete payload.idNumber;
-      await axios.post('http://localhost:5000/api/users', payload);
+      await api.post('/users', payload);
       alert('User created successfully');
       navigate('/staff/users');
     } catch (error) {
@@ -55,6 +68,27 @@ const UserRegister = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Grandfather Name</label>
                 <input type="text" value={formData.grandfatherName} onChange={(e) => setFormData({ ...formData, grandfatherName: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Profile Image */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📷 Profile Image</h3>
+            <div className="flex items-center gap-6">
+              <div className="flex-shrink-0">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Preview" className="h-24 w-24 rounded-full object-cover border-4 border-blue-200 shadow" />
+                ) : (
+                  <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-3xl">
+                    👤
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
+                <input type="file" accept="image/*" onChange={handleImageChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700 file:font-medium file:text-sm" />
+                <p className="text-xs text-gray-500 mt-1">JPG, PNG or GIF. Max 2MB recommended.</p>
               </div>
             </div>
           </div>

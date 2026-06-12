@@ -18,6 +18,8 @@ export { default as Search } from './Search';
 export { default as Notifications } from './Notifications';
 export { default as Table } from './Table';
 export { default as DataTable } from './DataTable';
+export { default as EnhancedTable } from './EnhancedTable';
+export { default as Form } from './Form';
 
 // Chart Components
 export {
@@ -43,6 +45,9 @@ export { default as AgGridTable } from './AgGridTable';
 // Layout Components
 export { default as Container } from './Container';
 export { default as Grid } from './Grid';
+
+// Dashboard Components
+export { default as DashboardWidget, StatCard, ChartWidget, ProgressWidget } from './DashboardWidget';
 
 // Typography Components
 export {

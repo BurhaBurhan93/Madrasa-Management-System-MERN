@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const BookCategorySchema = new Schema({
   name: { type: String, required: true, trim: true },
   description: { type: String },
+  image: { type: String },
   deletedAt: { type: Date, default: null, index: true }
 }, { timestamps: true });
 

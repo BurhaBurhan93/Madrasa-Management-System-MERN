@@ -5,19 +5,9 @@ import DataTable from '../../../components/UIHelper/DataTable';
 import Modal from '../../../components/UIHelper/Modal';
 import Input from '../../../components/UIHelper/Input';
 import Select from '../../../components/UIHelper/Select';
-import ErrorPage from '../../../components/UIHelper/ErrorPage';
+import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-const parseJsonSafe = async (res) => {
-  const text = await res.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    const preview = text.slice(0, 200).replace(/\s+/g, ' ');
-    throw new Error(`API returned non-JSON (status ${res.status}). Response: ${preview}`);
-  }
-};
 
 const CrudPage = ({
   title,
@@ -53,7 +43,7 @@ const CrudPage = ({
       params.set('limit', String(limit));
       if (query.trim()) params.set('search', query.trim());
 
-      const res = await fetch(`${API_BASE}${endpoint}?${params.toString()}`);
+      const res = await apiFetch(`${endpoint}?${params.toString()}`);
       const data = await parseJsonSafe(res);
       if (!res.ok || !data.success) {
         throw new Error(data.message || `Request failed (status ${res.status})`);
@@ -92,7 +82,7 @@ const CrudPage = ({
     const ok = window.confirm('Are you sure you want to delete this record?');
     if (!ok) return;
     try {
-      const res = await fetch(`${API_BASE}${endpoint}/${row._id}`, { method: 'DELETE' });
+      const res = await apiFetch(`${endpoint}/${row._id}`, { method: 'DELETE' });
       const data = await parseJsonSafe(res);
       if (!res.ok || !data.success) throw new Error(data.message || 'Delete failed');
       fetchItems();
@@ -106,7 +96,7 @@ const CrudPage = ({
     setFormError('');
     try {
       const payload = mapFormToPayload ? mapFormToPayload(form) : form;
-      const res = await fetch(`${API_BASE}${endpoint}${isEdit ? `/${activeId}` : ''}`, {
+      const res = await apiFetch(`${endpoint}${isEdit ? `/${activeId}` : ''}`, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -147,14 +137,24 @@ const CrudPage = ({
       </Card>
 
       {error && !loading && (
-        <ErrorPage 
-          type="generic" 
-          title="Unable to Load Data"
-          message={error}
-          onRetry={fetchItems}
-          onHome={() => window.location.href = '/staff/dashboard'}
-          showBackButton={false}
-        />
+        <Card className="rounded-[28px] border border-rose-200 bg-rose-50 mb-6">
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-rose-900">Unable to Load Data</h3>
+                <p className="mt-1 text-sm text-rose-700">{error}</p>
+                <button onClick={fetchItems} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
       )}
 
       <Card>

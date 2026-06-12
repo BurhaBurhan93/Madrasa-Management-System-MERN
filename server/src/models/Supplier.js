@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const SupplierSchema = new Schema({
   name: { type: String, required: true, trim: true },
+  image: { type: String },
   phone: { type: String, trim: true },
   address: { type: String, trim: true },
   itemsSupplied: [{ type: String }],

@@ -1,36 +1,35 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { 
+  FiBook, 
+  FiAward, 
+  FiAlertCircle, 
+  FiActivity, 
+  FiTrendingUp, 
+  FiCheckCircle,
+  FiMapPin,
+  FiCalendar,
+  FiArrowRight,
+  FiInfo,
+  FiMessageSquare
+} from 'react-icons/fi';
 import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
-import Input from '../components/UIHelper/Input';
-import ErrorPage from '../components/UIHelper/ErrorPage';
-import { FiPlus, FiEdit2, FiTrash2, FiGraduationCap, FiBook } from 'react-icons/fi';
+import Badge from '../components/UIHelper/Badge';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
-import axios from 'axios';
+import { formatDate } from '../lib/utils';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentEducation = () => {
-  console.log('[StudentEducation] Component initializing...');
+  const navigate = useNavigate();
   const [educationHistory, setEducationHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({
-    previousDegree: '',
-    previousInstitution: '',
-    location: ''
-  });
-
-  // Get API config with auth token
-  const getConfig = () => {
-    const token = localStorage.getItem('token');
-    console.log('[StudentEducation] Token exists:', !!token);
-    return {
-      headers: { Authorization: `Bearer ${token}` }
-    };
-  };
 
   useEffect(() => {
-    console.log('[StudentEducation] useEffect triggered - fetching data from API...');
     fetchEducationData();
   }, []);
 
@@ -38,232 +37,178 @@ const StudentEducation = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('[StudentEducation] Fetching education records from API...');
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const config = getConfig();
-      const response = await axios.get('http://localhost:5000/api/student/education', config);
-      
-      console.log('[StudentEducation] API response:', response.data);
+      const response = await axios.get(`${API_BASE}/student/education`, config);
       setEducationHistory(response.data || []);
     } catch (err) {
-      console.error('[StudentEducation] Error fetching education data:', err);
+      console.error('Error fetching education data:', err);
       setError('Failed to fetch education records. Please try again.');
-      setEducationHistory([]);
+      setEducationHistory([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    console.log(`[StudentEducation] Input changed - ${name}:`, value);
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const institutionsCount = new Set(educationHistory.map(e => e.previousInstitution)).size;
+  const certificationsCount = educationHistory.filter(e => 
+    e.previousDegree?.toLowerCase().includes('diploma') || 
+    e.previousDegree?.toLowerCase().includes('certificate') ||
+    e.previousDegree?.toLowerCase().includes('degree')
+  ).length;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('[StudentEducation] Form submitted - editingId:', editingId, 'formData:', formData);
-    
-    try {
-      setLoading(true);
-      const config = getConfig();
-      
-      if (editingId) {
-        console.log('[StudentEducation] Updating existing record:', editingId);
-        const response = await axios.put(`http://localhost:5000/api/student/education/${editingId}`, formData, config);
-        console.log('[StudentEducation] Record updated successfully:', response.data);
-      } else {
-        console.log('[StudentEducation] Creating new record');
-        const response = await axios.post('http://localhost:5000/api/student/education', formData, config);
-        console.log('[StudentEducation] New record created:', response.data);
-      }
-      
-      // Refresh data from API
-      await fetchEducationData();
-      
-      console.log('[StudentEducation] Resetting form state');
-      setShowForm(false);
-      setEditingId(null);
-      setFormData({ previousDegree: '', previousInstitution: '', location: '' });
-      console.log('[StudentEducation] Form submission completed successfully');
-    } catch (err) {
-      console.error('[StudentEducation] Error in handleSubmit:', err);
-      alert('Error saving education record: ' + (err.response?.data?.message || err.message));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEdit = (edu) => {
-    console.log('[StudentEducation] Edit clicked for record:', edu._id, edu);
-    setFormData({ previousDegree: edu.previousDegree, previousInstitution: edu.previousInstitution, location: edu.location });
-    setEditingId(edu._id);
-    setShowForm(true);
-    console.log('[StudentEducation] Edit mode activated for:', edu._id);
-  };
-
-  const handleDelete = async (id) => {
-    console.log('[StudentEducation] Delete clicked for record:', id);
-    if (window.confirm('Delete this record?')) {
-      console.log('[StudentEducation] Confirming delete for:', id);
-      try {
-        setLoading(true);
-        const config = getConfig();
-        await axios.delete(`http://localhost:5000/api/student/education/${id}`, config);
-        console.log('[StudentEducation] Record deleted from API');
-        
-        // Refresh data from API
-        await fetchEducationData();
-        console.log('[StudentEducation] Delete operation completed');
-      } catch (err) {
-        console.error('[StudentEducation] Error deleting record:', err);
-        alert('Error deleting record: ' + (err.response?.data?.message || err.message));
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      console.log('[StudentEducation] Delete cancelled by user');
-    }
-  };
-
-  console.log('[StudentEducation] Rendering with', educationHistory.length, 'records');
+  if (loading && educationHistory.length === 0) {
+    return <PageSkeleton variant="table" />;
+  }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Education History</h1>
-        <p className="text-gray-600 mt-1">Manage your previous education and academic background</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Records</p>
-              <p className="text-3xl font-bold text-blue-600">{educationHistory.length}</p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-full"><FiBook className="w-6 h-6 text-blue-600" /></div>
-          </div>
-        </Card>
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Certifications</p>
-              <p className="text-3xl font-bold text-green-600">{educationHistory.filter(e => e.previousDegree?.toLowerCase().includes('diploma') || e.previousDegree?.toLowerCase().includes('certificate')).length}</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-full"><FiGraduationCap className="w-6 h-6 text-green-600" /></div>
-          </div>
-        </Card>
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Institutions</p>
-              <p className="text-3xl font-bold text-purple-600">{new Set(educationHistory.map(e => e.previousInstitution)).size}</p>
-            </div>
-            <div className="p-3 bg-purple-100 rounded-full"><FiBook className="w-6 h-6 text-purple-600" /></div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <Card title="Education by Institution">
-          <BarChartComponent 
-            data={Array.from(new Set(educationHistory.map(e => e.previousInstitution))).map(inst => ({
-              name: inst?.substring(0, 15) || 'Unknown',
-              value: educationHistory.filter(e => e.previousInstitution === inst).length
-            }))}
-            dataKey="value"
-            nameKey="name"
-            height={250}
-          />
-        </Card>
-
-        <Card title="Degree Types">
-          <PieChartComponent 
-            data={[
-              { name: 'High School', value: educationHistory.filter(e => e.previousDegree?.toLowerCase().includes('school')).length, color: '#3B82F6' },
-              { name: 'Bachelor', value: educationHistory.filter(e => e.previousDegree?.toLowerCase().includes('bachelor')).length, color: '#10B981' },
-              { name: 'Master', value: educationHistory.filter(e => e.previousDegree?.toLowerCase().includes('master')).length, color: '#8B5CF6' },
-              { name: 'Certificate', value: educationHistory.filter(e => e.previousDegree?.toLowerCase().includes('certificate') || e.previousDegree?.toLowerCase().includes('diploma')).length, color: '#F59E0B' }
-            ].filter(d => d.value > 0)}
-            dataKey="value"
-            nameKey="name"
-            height={250}
-          />
-        </Card>
-      </div>
-
-      <div className="mb-6">
-        <Button onClick={() => setShowForm(!showForm)}>
-          <FiPlus className="mr-2" /> {showForm ? 'Cancel' : 'Add Education Record'}
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Education History</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">Your verified academic background and qualifications</p>
+        </div>
+        <Button 
+          variant="outline" 
+          className="rounded-2xl border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-2 font-black text-xs uppercase tracking-widest"
+          onClick={() => navigate('/student/communications')}
+        >
+          <FiMessageSquare /> Contact Registrar
         </Button>
       </div>
 
-      {showForm && (
-        <Card className="mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">{editingId ? 'Edit' : 'Add'} Education Record</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label="Degree/Certificate" name="previousDegree" value={formData.previousDegree} onChange={handleInputChange} placeholder="e.g., High School Diploma" />
-              <Input label="Institution" name="previousInstitution" value={formData.previousInstitution} onChange={handleInputChange} placeholder="e.g., Kabul High School" />
-            </div>
-            <Input label="Location" name="location" value={formData.location} onChange={handleInputChange} placeholder="e.g., Kabul, Afghanistan" />
-            <div className="flex space-x-4">
-              <Button type="submit">{editingId ? 'Update' : 'Add'} Record</Button>
-              <Button variant="outline" onClick={() => { setShowForm(false); setEditingId(null); setFormData({ previousDegree: '', previousInstitution: '', location: '' }); }}>Cancel</Button>
-            </div>
-          </form>
-        </Card>
-      )}
+      {/* Info Banner */}
+      <div className="p-8 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-200 rounded-[32px] relative overflow-hidden">
+        <div className="flex items-start gap-6 relative z-10">
+          <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl text-amber-600 shrink-0">
+            <FiAlertCircle />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-black text-amber-900 mb-2">Read-Only Verification</h3>
+            <p className="text-amber-800/80 font-medium leading-relaxed max-w-2xl">
+              Your academic background is verified and managed by the Registrar's office. 
+              To update your records or add new certifications, please submit a formal request with supporting documentation.
+            </p>
+          </div>
+        </div>
+        <FiInfo className="absolute -right-8 -bottom-8 w-48 h-48 text-amber-500/5 transform rotate-12" />
+      </div>
 
-      <Card title="Previous Education Records">
-        {educationHistory.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FiGraduationCap className="w-10 h-10 text-gray-400" />
+      {/* Stats Summary Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { label: 'Total Records', value: educationHistory.length, icon: <FiBook />, color: 'blue' },
+          { label: 'Certifications', value: certificationsCount, icon: <FiAward />, color: 'emerald' },
+          { label: 'Institutions', value: institutionsCount, icon: <FiTrendingUp />, color: 'purple' },
+          { label: 'Verified Status', value: '100%', icon: <FiCheckCircle />, color: 'cyan' }
+        ].map((stat, i) => (
+          <div key={i} className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
+            <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
+              {stat.icon}
             </div>
-            <p className="text-gray-500">No education records found.</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+            <p className="text-2xl font-black text-slate-900">{stat.value}</p>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Degree/Certificate</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Institution</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Added Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {educationHistory.map((edu) => (
-                  <tr key={edu._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                          <FiGraduationCap className="text-blue-600" />
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Education Records List */}
+        <div className="lg:col-span-2">
+          <Card title="Verified Academic Records" className="rounded-[32px] p-8">
+            <div className="space-y-6">
+              {educationHistory.length > 0 ? (
+                educationHistory.map((edu, i) => (
+                  <div key={i} className="group p-6 rounded-[32px] bg-slate-50 border border-slate-100 hover:border-cyan-200 hover:bg-white transition-all duration-300">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl text-cyan-600 group-hover:scale-110 transition-transform">
+                          <FiAward />
                         </div>
-                        <span className="text-sm font-medium text-gray-900">{edu.previousDegree}</span>
+                        <div>
+                          <h3 className="text-xl font-black text-slate-900 tracking-tight">{edu.previousDegree}</h3>
+                          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                            {edu.previousInstitution}
+                          </p>
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{edu.previousInstitution}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{edu.location}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{new Date(edu.createdAt).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 text-sm font-medium">
-                      <div className="flex space-x-3">
-                        <button onClick={() => handleEdit(edu)} className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"><FiEdit2 size={18} /></button>
-                        <button onClick={() => handleDelete(edu._id)} className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"><FiTrash2 size={18} /></button>
+                      <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">Verified</Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400">
+                          <FiMapPin />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Location</p>
+                          <p className="text-sm font-black text-slate-700">{edu.location || 'Not Specified'}</p>
+                        </div>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400">
+                          <FiCalendar />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Added On</p>
+                          <p className="text-sm font-black text-slate-700">{formatDate(edu.createdAt)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400">
+                          <FiCheckCircle />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
+                          <p className="text-sm font-black text-emerald-600">Document Verified</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-20">
+                  <FiAward className="w-16 h-16 text-slate-100 mx-auto mb-4" />
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No education history found</p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Sidebar Analytics */}
+        <div className="space-y-8">
+          <Card title="Institution Distribution" className="rounded-[32px] p-8">
+            <BarChartComponent 
+              data={Array.from(new Set(educationHistory.map(e => e.previousInstitution))).map(inst => ({
+                name: inst?.substring(0, 15) || 'Unknown',
+                value: educationHistory.filter(e => e.previousInstitution === inst).length
+              }))}
+              dataKey="value"
+              nameKey="name"
+              height={250}
+            />
+          </Card>
+
+          <div className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 rounded-[32px] text-white shadow-2xl shadow-slate-200/50 relative overflow-hidden group">
+            <div className="relative z-10">
+              <h4 className="text-xl font-black mb-2">Academic Support</h4>
+              <p className="text-slate-400 text-sm font-medium mb-6">Need help with document verification or credit transfers?</p>
+              <Button 
+                variant="primary" 
+                className="w-full rounded-2xl py-4 bg-cyan-600 hover:bg-cyan-700 font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-cyan-900/20"
+                onClick={() => navigate('/student/communications')}
+              >
+                Get Support
+              </Button>
+            </div>
+            <FiBook className="absolute -right-6 -bottom-6 w-32 h-32 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />
           </div>
-        )}
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

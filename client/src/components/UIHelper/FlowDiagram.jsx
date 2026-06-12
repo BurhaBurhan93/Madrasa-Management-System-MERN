@@ -19,7 +19,7 @@ import {
   NodeResizer,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { theme } from '../theme';
+import { theme } from '../../theme';
 
 // Custom Node Types
 const nodeTypes = {

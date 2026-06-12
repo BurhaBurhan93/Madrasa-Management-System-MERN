@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Card from '../../components/UIHelper/Card';
-import Button from '../../components/UIHelper/Button';
 import { FiEye, FiCheck } from 'react-icons/fi';
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
-const statusColors = { open: 'bg-red-100 text-red-700', in_progress: 'bg-yellow-100 text-yellow-700', closed: 'bg-green-100 text-green-700' };
-const priorityColors = { high: 'bg-red-100 text-red-700', medium: 'bg-yellow-100 text-yellow-700', low: 'bg-blue-100 text-blue-700' };
+const statusColors = {
+  open: 'bg-rose-100 text-rose-700',
+  in_progress: 'bg-amber-100 text-amber-700',
+  closed: 'bg-emerald-100 text-emerald-700'
+};
+const priorityColors = {
+  high: 'bg-rose-100 text-rose-700',
+  medium: 'bg-amber-100 text-amber-700',
+  low: 'bg-sky-100 text-sky-700'
+};
 
 const AssignedComplaints = () => {
   const [complaints, setComplaints] = useState([]);
@@ -47,97 +53,120 @@ const AssignedComplaints = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Assigned Complaints</h1>
-        <p className="text-gray-500">Complaints assigned to you for resolution</p>
-      </div>
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        {[
-          { label: 'Total', value: stats.total, color: 'text-gray-700' },
-          { label: 'Open', value: stats.open, color: 'text-red-600' },
-          { label: 'In Progress', value: stats.inProgress, color: 'text-yellow-600' },
-          { label: 'Closed', value: stats.closed, color: 'text-green-600' },
-        ].map(c => (
-          <Card key={c.label} className="text-center">
-            <div className={`text-2xl font-bold ${c.color}`}>{c.value}</div>
-            <div className="text-sm text-gray-500">{c.label}</div>
-          </Card>
-        ))}
-      </div>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-slate-900">Assigned Complaints</h1>
+          <p className="mt-1 text-sm text-slate-500">Complaints assigned to you for resolution</p>
+        </div>
 
-      {/* Filters */}
-      <div className="flex gap-3">
-        <input type="text" placeholder="Search complaints..." value={search} onChange={e => setSearch(e.target.value)} className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500 flex-1" />
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500">
-          <option value="">All Status</option>
-          <option value="open">Open</option>
-          <option value="in_progress">In Progress</option>
-          <option value="closed">Closed</option>
-        </select>
-      </div>
+        {/* Stats */}
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
+          {[
+            { label: 'Total', value: stats.total, accent: 'bg-cyan-500' },
+            { label: 'Open', value: stats.open, accent: 'bg-rose-500' },
+            { label: 'In Progress', value: stats.inProgress, accent: 'bg-amber-500' },
+            { label: 'Closed', value: stats.closed, accent: 'bg-emerald-500' },
+          ].map(c => (
+            <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
+              <p className="text-sm font-medium text-slate-500">{c.label}</p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{c.value}</p>
+            </div>
+          ))}
+        </section>
 
-      {/* Table */}
-      <Card>
-        {loading ? <div className="p-8 text-center text-gray-500">Loading...</div> : (
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-3 text-left">Code</th>
-                <th className="p-3 text-left">Subject</th>
-                <th className="p-3 text-left">Priority</th>
-                <th className="p-3 text-left">Status</th>
-                <th className="p-3 text-left">Date</th>
-                <th className="p-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr><td colSpan="6" className="p-8 text-center text-gray-500">No complaints assigned to you</td></tr>
-              ) : filtered.map(c => (
-                <tr key={c._id} className="border-t hover:bg-gray-50">
-                  <td className="p-3 font-medium text-green-600">{c.complaintCode}</td>
-                  <td className="p-3">{c.subject}</td>
-                  <td className="p-3"><span className={`px-2 py-1 text-xs rounded-full font-medium ${priorityColors[c.priorityLevel]}`}>{c.priorityLevel}</span></td>
-                  <td className="p-3"><span className={`px-2 py-1 text-xs rounded-full font-medium ${statusColors[c.complaintStatus]}`}>{c.complaintStatus}</span></td>
-                  <td className="p-3 text-gray-500">{new Date(c.submittedDate).toLocaleDateString()}</td>
-                  <td className="p-3 flex gap-2">
-                    <button onClick={() => setSelected(c)} className="text-blue-600 hover:text-blue-800"><FiEye size={18} /></button>
-                    {c.complaintStatus !== 'closed' && (
-                      <button onClick={() => updateStatus(c._id, 'closed')} className="text-green-600 hover:text-green-800"><FiCheck size={18} /></button>
-                    )}
-                  </td>
+        {/* Filters */}
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-wrap gap-3">
+            <input type="text" placeholder="Search complaints..." value={search} onChange={e => setSearch(e.target.value)} className="flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100" />
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
+              <option value="">All Status</option>
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          {loading ? (
+            <div className="flex h-32 items-center justify-center text-slate-500">Loading...</div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50">
+                  {['Code', 'Subject', 'Priority', 'Status', 'Date', 'Actions'].map(h => (
+                    <th key={h} className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filtered.length === 0 ? (
+                  <tr><td colSpan="6" className="p-8 text-center text-slate-500">No complaints assigned to you</td></tr>
+                ) : filtered.map(c => (
+                  <tr key={c._id} className="transition-colors duration-150 hover:bg-slate-50">
+                    <td className="p-4 font-medium text-cyan-600">{c.complaintCode}</td>
+                    <td className="p-4 text-slate-700">{c.subject}</td>
+                    <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-medium ${priorityColors[c.priorityLevel]}`}>{c.priorityLevel}</span></td>
+                    <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[c.complaintStatus]}`}>{c.complaintStatus}</span></td>
+                    <td className="p-4 text-slate-500">{new Date(c.submittedDate).toLocaleDateString()}</td>
+                    <td className="p-4">
+                      <div className="flex gap-2">
+                        <button onClick={() => setSelected(c)} className="flex h-8 w-8 items-center justify-center rounded-xl border border-sky-200 bg-sky-50 text-sky-600 transition-all duration-200 hover:bg-sky-100"><FiEye size={15} /></button>
+                        {c.complaintStatus !== 'closed' && (
+                          <button onClick={() => updateStatus(c._id, 'closed')} className="flex h-8 w-8 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-600 transition-all duration-200 hover:bg-emerald-100"><FiCheck size={15} /></button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+      </div>
 
       {/* Detail Modal */}
       {selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6 space-y-4">
-            <div className="flex justify-between items-start">
-              <h2 className="text-xl font-bold">{selected.subject}</h2>
-              <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-gray-700 text-xl">×</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl">
+            <div className="mb-5 flex items-start justify-between">
+              <h2 className="text-lg font-semibold text-slate-900">{selected.subject}</h2>
+              <button onClick={() => setSelected(null)} className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100">×</button>
             </div>
-            <div className="space-y-2 text-sm">
-              <p><span className="font-medium">Code:</span> {selected.complaintCode}</p>
-              <p><span className="font-medium">Category:</span> {selected.complaintCategory || '-'}</p>
-              <p><span className="font-medium">Priority:</span> <span className={`px-2 py-0.5 rounded-full text-xs ${priorityColors[selected.priorityLevel]}`}>{selected.priorityLevel}</span></p>
-              <p><span className="font-medium">Status:</span> <span className={`px-2 py-0.5 rounded-full text-xs ${statusColors[selected.complaintStatus]}`}>{selected.complaintStatus}</span></p>
-              <p><span className="font-medium">Description:</span></p>
-              <p className="text-gray-600 bg-gray-50 p-3 rounded-lg">{selected.description || 'No description'}</p>
+            <div className="space-y-3 text-sm">
+              {[
+                { label: 'Code', value: selected.complaintCode },
+                { label: 'Category', value: selected.complaintCategory || '-' },
+              ].map(row => (
+                <div key={row.label} className="flex justify-between">
+                  <span className="text-slate-400">{row.label}:</span>
+                  <span className="font-medium text-slate-700">{row.value}</span>
+                </div>
+              ))}
+              <div className="flex justify-between">
+                <span className="text-slate-400">Priority:</span>
+                <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${priorityColors[selected.priorityLevel]}`}>{selected.priorityLevel}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Status:</span>
+                <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${statusColors[selected.complaintStatus]}`}>{selected.complaintStatus}</span>
+              </div>
+              <div>
+                <p className="mb-2 text-slate-400">Description:</p>
+                <p className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-slate-600">{selected.description || 'No description'}</p>
+              </div>
             </div>
             {selected.complaintStatus !== 'closed' && (
-              <div className="flex gap-3 justify-end pt-2">
+              <div className="mt-5 flex justify-end gap-3">
                 {selected.complaintStatus === 'open' && (
-                  <Button variant="secondary" onClick={() => updateStatus(selected._id, 'in_progress')}>Mark In Progress</Button>
+                  <button onClick={() => updateStatus(selected._id, 'in_progress')} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100">Mark In Progress</button>
                 )}
-                <Button onClick={() => updateStatus(selected._id, 'closed')}>Mark Resolved</Button>
+                <button onClick={() => updateStatus(selected._id, 'closed')} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700">Mark Resolved</button>
               </div>
             )}
           </div>

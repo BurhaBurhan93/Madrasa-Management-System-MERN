@@ -1,8 +1,12 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
+import { useTheme } from '../../contexts/ThemeContext.jsx';
 
 const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   if (!isOpen) return null;
+
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const sizeClasses = {
     sm: 'max-w-sm',
@@ -13,15 +17,15 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]}`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+      <div className={`w-full rounded-3xl border shadow-2xl ${isDark ? 'border-slate-700 bg-slate-900 text-slate-100' : 'border-slate-200 bg-white text-slate-900'} ${sizeClasses[size]}`}>
         {(title || onClose) && (
-          <div className="flex items-center justify-between p-4 border-b">
-            {title && <h3 className="text-lg font-semibold text-gray-900">{title}</h3>}
+          <div className={`flex items-center justify-between border-b p-4 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+            {title && <h3 className={`text-lg font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{title}</h3>}
             {onClose && (
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                className={`focus:outline-none ${isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-400 hover:text-slate-500'}`}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

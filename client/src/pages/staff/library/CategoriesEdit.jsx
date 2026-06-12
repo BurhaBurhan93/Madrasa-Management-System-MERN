@@ -5,7 +5,7 @@ import { libraryCategoriesConfig } from './Categories';
 
 const CategoriesEdit = () => {
   const { id } = useParams();
-  return <FormPage titleCreate="Create Category" titleEdit="Edit Category" endpoint={libraryCategoriesConfig.endpoint} formFields={libraryCategoriesConfig.formFields} initialForm={libraryCategoriesConfig.initialForm} mapRowToForm={libraryCategoriesConfig.mapRowToForm} mode="edit" id={id} onSavedPath="/staff/library/categories" readMode="collection" readEndpoint={libraryCategoriesConfig.endpoint} />;
+  return <FormPage titleCreate="Create Category" titleEdit="Edit Category" endpoint={libraryCategoriesConfig.endpoint} formFields={libraryCategoriesConfig.formFields} initialForm={libraryCategoriesConfig.initialForm} mapRowToForm={libraryCategoriesConfig.mapRowToForm} mode="edit" id={id} onSavedPath="/staff/library/categories" />;
 };
 
 export default CategoriesEdit;

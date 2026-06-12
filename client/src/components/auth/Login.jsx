@@ -1,17 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FiLock, FiZap, FiEye, FiEyeOff } from 'react-icons/fi';
+import { getUserRole, isTokenValid, saveAuth } from '../../lib/auth';
+import api from '../../lib/api';
 
-const Login = ({ setIsAuthenticated }) => {
+const redirectByRole = (navigate, role) => {
+  const rolePaths = {
+    admin: '/admin/dashboard',
+    student: '/student/dashboard',
+    teacher: '/teacher',
+    staff: '/staff/dashboard',
+  };
+  navigate(rolePaths[role] || '/', { replace: true });
+};
+
+const Login = ({ setIsAuthenticated, setUserRole }) => {
   const [selectedRole, setSelectedRole] = useState('student');
+  const [selectedStaffAccount, setSelectedStaffAccount] = useState('support');
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isTokenValid()) {
+      redirectByRole(navigate, getUserRole());
+    }
+  }, [navigate]);
 
   const roles = [
     { id: 'admin', label: 'Admin', color: 'from-cyan-400 to-cyan-600', icon: '👑', description: 'System Administrator' },
@@ -20,17 +41,39 @@ const Login = ({ setIsAuthenticated }) => {
     { id: 'staff', label: 'Staff', color: 'from-sky-300 to-blue-400', icon: '⚙️', description: 'Staff Portal' },
   ];
 
+  const staffDemoAccounts = {
+    support: { label: 'Support Staff', username: 'staff@gmail.com', password: 'staff1234' },
+    finance: { label: 'Finance Staff', username: 'finance@gmail.com', password: 'finance1234' },
+    registrar: { label: 'Registrar Staff', username: 'registrar@gmail.com', password: 'registrar1234' },
+    hr: { label: 'HR Staff', username: 'hr@gmail.com', password: 'hr1234' },
+    library: { label: 'Library Staff', username: 'library@gmail.com', password: 'library1234' },
+    kitchen: { label: 'Kitchen Staff', username: 'kitchen@gmail.com', password: 'kitchen1234' },
+    payroll: { label: 'Payroll Staff', username: 'payroll@gmail.com', password: 'payroll1234' },
+    complaints: { label: 'Complaints Staff', username: 'complaints@gmail.com', password: 'complaints1234' },
+    inventory: { label: 'Inventory Staff', username: 'inventory@gmail.com', password: 'inventory1234' },
+    hostel: { label: 'Hostel Staff', username: 'hostel@gmail.com', password: 'hostel1234' },
+    all: { label: 'All Staff Modules', username: 'staff.all@gmail.com', password: 'staffall1234' }
+  };
+
   const demoCredentials = {
     admin: { username: 'admin@gmail.com', password: 'admin1234' },
     student: { username: 'student@gmail.com', password: 'student1234' },
     teacher: { username: 'teacher@gmail.com', password: 'teacher1234' },
-    staff: { username: 'staff@gmail.com', password: 'staff1234' }
+    staff: staffDemoAccounts[selectedStaffAccount]
   };
 
   const handleRoleSelect = (roleId) => {
     setSelectedRole(roleId);
     setErrors({});
     setFormData({ username: '', password: '' });
+  };
+
+  const handleStaffAccountSelect = (accountId) => {
+    setSelectedStaffAccount(accountId);
+    const creds = staffDemoAccounts[accountId];
+    if (selectedRole === 'staff' && creds) {
+      setFormData({ username: creds.username, password: creds.password });
+    }
   };
 
   const fillDemoCredentials = () => {
@@ -82,99 +125,29 @@ const Login = ({ setIsAuthenticated }) => {
 
     setIsLoading(true);
 
-    // Check if using demo credentials - bypass backend
-    const demoCreds = demoCredentials[selectedRole];
-    const isDemoMode = formData.username === demoCreds.username && 
-                       formData.password === demoCreds.password;
-
-    if (isDemoMode) {
-      console.log('Demo mode: Bypassing database connection');
-      
-      // Create mock user data
-      const mockUser = {
-        _id: `demo-${selectedRole}-001`,
-        name: `Demo ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`,
-        email: demoCreds.username,
-        role: selectedRole
-      };
-      
-      // Store auth data
-      localStorage.setItem('token', 'demo-token-' + selectedRole);
-      localStorage.setItem('userId', mockUser._id);
-      localStorage.setItem('userRole', selectedRole);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('isDemoMode', 'true');
-      
-      if (setIsAuthenticated) {
-        setIsAuthenticated(true);
-      }
-
-      // Navigate based on role
-      switch (selectedRole) {
-        case 'admin':
-          navigate('/admin/dashboard');
-          break;
-        case 'student':
-          navigate('/student/dashboard');
-          break;
-        case 'teacher':
-          navigate('/teacher');
-          break;
-        case 'staff':
-          navigate('/staff');
-          break;
-        default:
-          navigate('/');
-      }
-      
-      setIsLoading(false);
-      return;
-    }
-
-    // Normal login flow with backend
     try {
-      // Call backend API for login
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await api.post('/auth/login', {
         email: formData.username,
         password: formData.password,
         role: selectedRole
       });
 
       const { token, user } = response.data;
+      const authenticatedRole = user?.role || selectedRole;
       
-      // Store token and user info
-      localStorage.setItem('token', token);
-      localStorage.setItem('userId', user.id || user._id);
-      localStorage.setItem('userRole', selectedRole);
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('isAuthenticated', 'true');
+      saveAuth(token, user, authenticatedRole);
       localStorage.removeItem('isDemoMode');
       
-      // Set axios default header for future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
       if (setIsAuthenticated) {
         setIsAuthenticated(true);
       }
-
-      // Navigate based on role
-      switch (selectedRole) {
-        case 'admin':
-          navigate('/admin/dashboard');
-          break;
-        case 'student':
-          navigate('/student/dashboard');
-          break;
-        case 'teacher':
-          navigate('/teacher');
-          break;
-        case 'staff':
-          navigate('/staff');
-          break;
-        default:
-          navigate('/');
+      if (setUserRole) {
+        setUserRole(authenticatedRole);
       }
+
+      redirectByRole(navigate, authenticatedRole);
     } catch (error) {
       console.error('Login error:', error);
       setErrors({ 
@@ -237,6 +210,26 @@ const Login = ({ setIsAuthenticated }) => {
               ))}
             </div>
 
+            {selectedRole === 'staff' && (
+              <div className="mt-6">
+                <label htmlFor="staffAccount" className="block text-sm font-medium text-gray-700 mb-2">
+                  Staff demo account
+                </label>
+                <select
+                  id="staffAccount"
+                  value={selectedStaffAccount}
+                  onChange={(event) => handleStaffAccountSelect(event.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                >
+                  {Object.entries(staffDemoAccounts).map(([id, account]) => (
+                    <option key={id} value={id}>
+                      {account.label} - {account.username}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="mt-8">
               <button
                 type="button"
@@ -291,19 +284,28 @@ const Login = ({ setIsAuthenticated }) => {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                   Password
                 </label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition-colors ${
-                    errors.password 
-                      ? 'border-red-500 focus:ring-red-200' 
-                      : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'
-                  }`}
-                  placeholder="Enter your password"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition-colors pr-10 ${
+                      errors.password 
+                        ? 'border-red-500 focus:ring-red-200' 
+                        : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'
+                    }`}
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                  </button>
+                </div>
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password}</p>
                 )}
@@ -328,15 +330,18 @@ const Login = ({ setIsAuthenticated }) => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full bg-gradient-to-r ${getRoleColor()} text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200`}
+                className={`w-full bg-gradient-to-r ${getRoleColor()} text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 flex items-center justify-center gap-2`}
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Signing in...
-                  </div>
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Signing in...</span>
+                  </>
                 ) : (
-                  `Sign In as ${getRoleLabel()}`
+                  <>
+                    <FiLock size={18} />
+                    <span>Sign In as {getRoleLabel()}</span>
+                  </>
                 )}
               </button>
 
@@ -344,19 +349,11 @@ const Login = ({ setIsAuthenticated }) => {
                 <button
                   type="button"
                   onClick={fillDemoCredentials}
-                  className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors flex items-center justify-center gap-2"
                 >
+                  <FiZap size={18} />
                   Use Demo Credentials
                 </button>
-              </div>
-
-              <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
-                  Don't have an account?{' '}
-                  <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-                    Register here
-                  </a>
-                </p>
               </div>
             </form>
           </div>

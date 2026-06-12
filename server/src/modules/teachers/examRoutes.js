@@ -1,44 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
+const { authorizeRoles } = require('../../middleware/auth');
 const ctrl = require('./examController');
 
-const ensureTeacher = (req, res, next) => {
-  if (req.user.role !== 'teacher' && req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Teachers only' });
-  }
-  next();
-};
+// Teacher exam routes (teacher/admin only)
+router.get('/teacher/exams', auth, authorizeRoles('teacher', 'admin'), ctrl.getExams);
+router.post('/teacher/exams', auth, authorizeRoles('teacher', 'admin'), ctrl.createExam);
+router.get('/teacher/exams/:id', auth, authorizeRoles('teacher', 'admin'), ctrl.getExamById);
+router.put('/teacher/exams/:id', auth, authorizeRoles('teacher', 'admin'), ctrl.updateExam);
+router.delete('/teacher/exams/:id', auth, authorizeRoles('teacher', 'admin'), ctrl.deleteExam);
+router.put('/teacher/exams/:id/publish', auth, authorizeRoles('teacher', 'admin'), ctrl.publishExam);
+router.put('/teacher/exams/:id/close', auth, authorizeRoles('teacher', 'admin'), ctrl.closeExam);
+router.get('/teacher/exams/:examId/questions', auth, authorizeRoles('teacher', 'admin'), ctrl.getQuestions);
+router.post('/teacher/exams/:examId/questions', auth, authorizeRoles('teacher', 'admin'), ctrl.addQuestion);
+router.put('/teacher/exams/:examId/questions/:questionId', auth, authorizeRoles('teacher', 'admin'), ctrl.updateQuestion);
+router.delete('/teacher/exams/:examId/questions/:questionId', auth, authorizeRoles('teacher', 'admin'), ctrl.deleteQuestion);
+router.get('/teacher/exams/:examId/submissions', auth, authorizeRoles('teacher', 'admin'), ctrl.getSubmissions);
 
-const ensureStudent = (req, res, next) => {
-  if (req.user.role !== 'student' && req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Students only' });
-  }
-  next();
-};
-
-// ===== TEACHER ROUTES =====
-router.get('/teacher/exams', auth, ensureTeacher, ctrl.getExams);
-router.post('/teacher/exams', auth, ensureTeacher, ctrl.createExam);
-router.get('/teacher/exams/:id', auth, ensureTeacher, ctrl.getExamById);
-router.put('/teacher/exams/:id', auth, ensureTeacher, ctrl.updateExam);
-router.delete('/teacher/exams/:id', auth, ensureTeacher, ctrl.deleteExam);
-router.put('/teacher/exams/:id/publish', auth, ensureTeacher, ctrl.publishExam);
-router.put('/teacher/exams/:id/close', auth, ensureTeacher, ctrl.closeExam);
-
-// Questions
-router.get('/teacher/exams/:examId/questions', auth, ensureTeacher, ctrl.getQuestions);
-router.post('/teacher/exams/:examId/questions', auth, ensureTeacher, ctrl.addQuestion);
-router.put('/teacher/exams/:examId/questions/:questionId', auth, ensureTeacher, ctrl.updateQuestion);
-router.delete('/teacher/exams/:examId/questions/:questionId', auth, ensureTeacher, ctrl.deleteQuestion);
-
-// Submissions
-router.get('/teacher/exams/:examId/submissions', auth, ensureTeacher, ctrl.getSubmissions);
-
-// ===== STUDENT ROUTES =====
-router.get('/student/exams', auth, ensureStudent, ctrl.getPublishedExams);
-router.get('/student/exams/:id', auth, ensureStudent, ctrl.getExamForAttempt);
-router.post('/student/exams/:id/submit', auth, ensureStudent, ctrl.submitExam);
-router.get('/student/exams/:id/my-submission', auth, ensureStudent, ctrl.getMySubmission);
+router.get('/student/exams', auth, ctrl.getPublishedExams);
+router.get('/student/exams/:id', auth, ctrl.getExamForAttempt);
+router.post('/student/exams/:id/submit', auth, ctrl.submitExam);
+router.get('/student/exams/:id/my-submission', auth, ctrl.getMySubmission);
 
 module.exports = router;

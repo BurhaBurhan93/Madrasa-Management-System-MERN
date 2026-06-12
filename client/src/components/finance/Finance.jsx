@@ -3,10 +3,14 @@ import Card from '../UIHelper/Card';
 import Badge from '../UIHelper/Badge';
 import Button from '../UIHelper/Button';
 import Progress from '../UIHelper/Progress';
+import { formatDate } from '../../lib/utils';
+import { PageSkeleton } from '../UIHelper/SkeletonLoader';
 import axios from 'axios';
+import { FiCreditCard, FiDollarSign, FiCheckCircle, FiActivity, FiTrendingUp } from 'react-icons/fi';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const Finance = () => {
-  console.log('[Finance] Component initializing...');
   const [feeStructure, setFeeStructure] = useState({
     tuition: 0,
     accommodation: 0,
@@ -16,20 +20,17 @@ const Finance = () => {
     miscellaneous: 0
   });
   const [payments, setPayments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get API config with auth token
   const getConfig = () => {
     const token = localStorage.getItem('token');
-    console.log('[Finance] Token exists:', !!token);
     return {
       headers: { Authorization: `Bearer ${token}` }
     };
   };
 
   useEffect(() => {
-    console.log('[Finance] useEffect triggered - fetching data from API...');
     fetchFinanceData();
   }, []);
 
@@ -37,24 +38,32 @@ const Finance = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('[Finance] Fetching finance data from API...');
       
       const config = getConfig();
       
-      // Fetch fee payments
-      const paymentsResponse = await axios.get('http://localhost:5000/api/student/fee-payments', config);
-      console.log('[Finance] Payments API response:', paymentsResponse.data);
+      // Fetch fee payments from student API
+      const paymentsResponse = await axios.get(`${API_BASE}/student/fees`, config);
       setPayments(paymentsResponse.data || []);
       
-      // Fetch fee structure (if available)
+      // Try to fetch fee structure, fallback to calculating from payments
       try {
-        const feeStructureResponse = await axios.get('http://localhost:5000/api/student/fee-structure', config);
-        console.log('[Finance] Fee structure API response:', feeStructureResponse.data);
+        const feeStructureResponse = await axios.get(`${API_BASE}/student/fee-structure`, config);
         if (feeStructureResponse.data) {
           setFeeStructure(feeStructureResponse.data);
         }
       } catch (feeErr) {
+        // If fee structure endpoint doesn't exist, calculate from payments
         console.log('[Finance] Fee structure not available, using calculated values');
+        const totalFromPayments = (paymentsResponse.data || []).reduce((sum, p) => sum + (p.amount || 0), 0);
+        // Estimate fee structure based on payment history
+        setFeeStructure({
+          tuition: Math.round(totalFromPayments * 0.6),
+          accommodation: Math.round(totalFromPayments * 0.2),
+          meals: Math.round(totalFromPayments * 0.1),
+          library: Math.round(totalFromPayments * 0.05),
+          sports: Math.round(totalFromPayments * 0.03),
+          miscellaneous: Math.round(totalFromPayments * 0.02)
+        });
       }
     } catch (err) {
       console.error('[Finance] Error fetching finance data:', err);
@@ -68,10 +77,12 @@ const Finance = () => {
   const statusColors = {
     completed: 'success',
     pending: 'warning',
-    failed: 'danger'
+    failed: 'danger',
+    paid: 'success'
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -85,226 +96,163 @@ const Finance = () => {
 
   const calculatePaid = () => {
     return payments
-      .filter(payment => payment.status === 'completed')
-      .reduce((sum, payment) => sum + payment.amount, 0);
+      .filter(payment => payment.status === 'completed' || payment.status === 'paid')
+      .reduce((sum, payment) => sum + (payment.amount || 0), 0);
   };
 
   const calculateBalance = () => {
-    return calculateTotal() - calculatePaid();
+    return Math.max(0, calculateTotal() - calculatePaid());
   };
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
-      <div className="py-6 mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Fees & Payments</h1>
-        <p className="text-gray-600">Manage your fee payments and view payment history</p>
-      </div>
-
+    <div className="w-full space-y-8">
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
+        <div className="mb-4 p-4 bg-rose-50 border border-rose-200 rounded-2xl">
+          <p className="text-rose-700 font-medium">{error}</p>
         </div>
       )}
 
       {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading finance data...</p>
-        </div>
+        <PageSkeleton variant="dashboard" />
       ) : (
-      <div>
-      {/* Financial Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card className="text-center">
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Total Amount</h3>
-          <p className="text-2xl font-bold text-gray-900">${calculateTotal().toLocaleString()}</p>
-        </Card>
-        
-        <Card className="text-center">
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Paid Amount</h3>
-          <p className="text-2xl font-bold text-green-600">${calculatePaid().toLocaleString()}</p>
-        </Card>
-        
-        <Card className="text-center">
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Balance Due</h3>
-          <p className="text-2xl font-bold text-red-600">${calculateBalance().toLocaleString()}</p>
-        </Card>
-        
-        <Card className="text-center">
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Payment Progress</h3>
-          <div className="mt-2">
-            <Progress 
-              value={Math.round((calculatePaid() / calculateTotal()) * 100)} 
-              max={100} 
-              className="mb-2" 
-            />
-            <p className="text-sm text-gray-600">
-              {Math.round((calculatePaid() / calculateTotal()) * 100)}%
-            </p>
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Fee Structure */}
-        <div>
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Fee Structure</h2>
-            <div className="space-y-3">
-              {Object.entries(feeStructure).map(([key, value]) => (
-                <div key={key} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                  <span className="capitalize text-gray-700">
-                    {key.replace(/([A-Z])/g, ' $1').trim()}
-                  </span>
-                  <span className="font-medium">${value.toLocaleString()}</span>
-                </div>
-              ))}
-              <div className="flex justify-between items-center pt-3 border-t border-gray-200">
-                <span className="font-semibold text-gray-900">Total</span>
-                <span className="font-bold text-lg">${calculateTotal().toLocaleString()}</span>
+        <div className="space-y-8">
+          {/* Financial Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl mb-4">
+                <FiDollarSign />
               </div>
-            </div>
-          </Card>
-
-          {/* Payment Methods */}
-          <Card className="mt-6">
-            <h2 className="text-xl font-semibold mb-4">Payment Methods</h2>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-medium">Credit/Debit Card</p>
-                    <p className="text-sm text-gray-600">Visa, Mastercard, American Express</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-medium">Bank Transfer</p>
-                    <p className="text-sm text-gray-600">Direct bank to bank transfer</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
-                    <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-medium">Cash Payment</p>
-                    <p className="text-sm text-gray-600">Pay at cashier desk</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Payment History */}
-        <div>
-          <Card>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Payment History</h2>
-              <Button variant="primary">
-                Make Payment
-              </Button>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Amount</p>
+              <p className="text-3xl font-black text-slate-900">${calculateTotal().toLocaleString()}</p>
             </div>
             
-            <div className="space-y-4">
-              {payments.map(payment => (
-                <div key={payment.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium text-gray-900">{payment.description}</h3>
-                      <p className="text-sm text-gray-600">Receipt: {payment.receiptNo}</p>
-                    </div>
-                    <Badge variant={statusColors[payment.status]}>
-                      {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
-                    </Badge>
-                  </div>
-                  
-                  <div className="mt-3 grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Date</p>
-                      <p className="font-medium">{formatDate(payment.date)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Amount</p>
-                      <p className="font-medium text-lg font-bold text-gray-900">${payment.amount.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Method</p>
-                      <p className="font-medium">{payment.method}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-4">
+                <FiCheckCircle />
+              </div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Paid Amount</p>
+              <p className="text-3xl font-black text-emerald-600">${calculatePaid().toLocaleString()}</p>
             </div>
-          </Card>
-
-          {/* Outstanding Balance */}
-          {calculateBalance() > 0 && (
-            <Card className="mt-6">
-              <h2 className="text-xl font-semibold mb-4">Outstanding Balance</h2>
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium text-red-800">Amount Due</p>
-                    <p className="text-2xl font-bold text-red-900">${calculateBalance().toLocaleString()}</p>
-                  </div>
-                  <Button variant="danger">
-                    Pay Now
-                  </Button>
-                </div>
-                <p className="text-sm text-red-700 mt-2">
-                  Payment due by March 15, 2024 to avoid late fees.
+            
+            <div className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
+              <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mb-4">
+                <FiTrendingUp />
+              </div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Balance Due</p>
+              <p className="text-3xl font-black text-rose-600">${calculateBalance().toLocaleString()}</p>
+            </div>
+            
+            <div className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
+              <div className="w-14 h-14 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-2xl mb-4">
+                <FiActivity />
+              </div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Payment Progress</p>
+              <div className="mt-2">
+                <Progress 
+                  value={Math.round((calculatePaid() / Math.max(calculateTotal(), 1)) * 100)} 
+                  max={100} 
+                  className="mb-2 h-2" 
+                />
+                <p className="text-sm font-black text-slate-900">
+                  {Math.round((calculatePaid() / Math.max(calculateTotal(), 1)) * 100)}%
                 </p>
               </div>
-            </Card>
-          )}
-        </div>
-      </div>
-
-      {/* Fee Policies */}
-      <div className="mt-8">
-        <Card>
-          <h3 className="text-xl font-semibold mb-4">Fee Policies</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-800">Late Payment Policy</h4>
-              <p className="text-sm text-blue-700 mt-1">A late fee of 5% will be charged on outstanding balances after due date.</p>
-            </div>
-            <div className="p-4 bg-green-50 rounded-lg">
-              <h4 className="font-medium text-green-800">Refund Policy</h4>
-              <p className="text-sm text-green-700 mt-1">Full refunds available within 30 days of enrollment, partial refunds after 30 days.</p>
-            </div>
-            <div className="p-4 bg-yellow-50 rounded-lg">
-              <h4 className="font-medium text-yellow-800">Payment Plan</h4>
-              <p className="text-sm text-yellow-700 mt-1">Installment plans available upon request for students facing financial difficulties.</p>
-            </div>
-            <div className="p-4 bg-purple-50 rounded-lg">
-              <h4 className="font-medium text-purple-800">Scholarships</h4>
-              <p className="text-sm text-purple-700 mt-1">Merit-based scholarships available for students with excellent academic performance.</p>
             </div>
           </div>
-        </Card>
-      </div>
-      </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Fee Structure */}
+            <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
+              <h2 className="text-xl font-black text-slate-900 mb-6">Fee Structure</h2>
+              <div className="space-y-4">
+                {Object.entries(feeStructure).map(([key, value]) => (
+                  <div key={key} className="flex justify-between items-center py-3 border-b border-slate-100 last:border-b-0">
+                    <span className="capitalize text-slate-600 font-medium">
+                      {key.replace(/([A-Z])/g, ' $1').trim()}
+                    </span>
+                    <span className="font-black text-slate-900">${value.toLocaleString()}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between items-center pt-4 border-t-2 border-slate-200">
+                  <span className="font-black text-slate-900">Total</span>
+                  <span className="font-black text-xl text-cyan-600">${calculateTotal().toLocaleString()}</span>
+                </div>
+              </div>
+            </Card>
+
+            {/* Payment History */}
+            <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-black text-slate-900">Payment History</h2>
+                <Button 
+                  variant="primary" 
+                  className="rounded-2xl bg-cyan-600 hover:bg-cyan-700 font-black text-xs uppercase tracking-widest"
+                >
+                  Make Payment
+                </Button>
+              </div>
+              
+              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                {payments.length === 0 ? (
+                  <div className="text-center py-12 bg-slate-50 rounded-3xl">
+                    <FiCreditCard className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                    <p className="text-slate-400 font-medium">No payments recorded yet</p>
+                  </div>
+                ) : (
+                  payments.map(payment => (
+                    <div key={payment._id || payment.id} className="border border-slate-100 rounded-2xl p-4 hover:shadow-md transition-shadow bg-white">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h3 className="font-black text-slate-900 text-sm">{payment.description || 'Fee Payment'}</h3>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                            Receipt: {payment.receiptNo || payment._id?.slice(-8) || 'N/A'}
+                          </p>
+                        </div>
+                        <Badge variant={statusColors[payment.status] || 'default'} className="font-black text-[10px] uppercase tracking-widest">
+                          {payment.status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-50">
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date</p>
+                          <p className="font-medium text-slate-900 text-sm">{formatDate(payment.paymentDate || payment.date || payment.createdAt)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount</p>
+                          <p className="font-black text-lg text-slate-900">${(payment.amount || 0).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
+          </div>
+
+          {/* Outstanding Balance Alert */}
+          {calculateBalance() > 0 && (
+            <div className="p-8 bg-gradient-to-r from-rose-500 to-rose-600 rounded-[32px] text-white shadow-xl shadow-rose-200/50">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-3xl">
+                    <FiTrendingUp />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black">Outstanding Balance</h3>
+                    <p className="text-rose-100 font-medium text-sm mt-1">${calculateBalance().toLocaleString()} due for current semester</p>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="rounded-2xl px-8 py-4 bg-white text-rose-600 hover:bg-rose-50 font-black text-xs uppercase tracking-widest border-white transition-all"
+                >
+                  Pay Now
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

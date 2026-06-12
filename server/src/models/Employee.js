@@ -27,7 +27,7 @@ const EmployeeSchema = new Schema({
   emergencyContactPhone: { type: String, trim: true },
   
   // Employment Details
-  employeeType: { type: String, enum: ['teacher','admin','support','kitchen','security'], default: 'support' },
+  employeeType: { type: String, enum: ['teacher','admin','finance','registrar','hr','librarian','kitchen','security','support','maintenance'], default: 'support' },
   department: { type: Schema.Types.ObjectId, ref: 'Department' },
   designation: { type: Schema.Types.ObjectId, ref: 'Designation' },
   joiningDate: { type: Date, required: true },
@@ -59,7 +59,5 @@ const EmployeeSchema = new Schema({
   
   status: { type: String, enum: ['active','inactive'], default: 'active' }
 }, { timestamps: true });
-
-EmployeeSchema.index({ employeeCode: 1 }, { unique: true });
 
 module.exports = mongoose.model('Employee', EmployeeSchema);

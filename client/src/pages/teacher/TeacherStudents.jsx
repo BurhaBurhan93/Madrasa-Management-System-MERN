@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Card from '../../components/UIHelper/Card';
-import Button from '../../components/UIHelper/Button';
-import Badge from '../../components/UIHelper/Badge';
 import { useNavigate } from 'react-router-dom';
 
 const TeacherStudents = () => {
@@ -34,7 +31,7 @@ const TeacherStudents = () => {
     }
   };
 
-  const filteredStudents = students.filter((student) => {
+  const filteredStudents = students.filter(student => {
     const matchesStatus = selectedStatus === 'all' || student.status === selectedStatus;
     const matchesSearch =
       (student.user?.name || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -51,147 +48,114 @@ const TeacherStudents = () => {
 
   if (loading) {
     return (
-      <div className="w-full bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading students...</p>
-        </div>
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-600" />
       </div>
     );
   }
 
+  const statCards = [
+    { label: 'Total Students', value: stats.total, accent: 'bg-cyan-500' },
+    { label: 'Active', value: stats.active, accent: 'bg-emerald-500' },
+    { label: 'Inactive', value: stats.inactive, accent: 'bg-rose-500' },
+    { label: 'My Subjects', value: stats.subjects, accent: 'bg-violet-500' },
+  ];
+
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
-      {/* HEADER */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">My Students</h1>
-        <p className="text-gray-600">Students enrolled in your classes</p>
-      </div>
-
-      {/* STATS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-blue-600">{stats.total}</div>
-          <div className="text-sm text-gray-600">Total Students</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-green-600">{stats.active}</div>
-          <div className="text-sm text-gray-600">Active</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-red-600">{stats.inactive}</div>
-          <div className="text-sm text-gray-600">Inactive</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-purple-600">{stats.subjects}</div>
-          <div className="text-sm text-gray-600">My Subjects</div>
-        </Card>
-      </div>
-
-      {/* FILTERS */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        <input
-          type="text"
-          placeholder="Search by name or code..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-green-500 flex-1"
-        />
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-green-500"
-        >
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-        <select
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
-          className="px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-green-500"
-        >
-          <option value="all">All Subjects</option>
-          {subjects.map((sub) => (
-            <option key={sub._id} value={sub._id}>{sub.name}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* STUDENTS GRID */}
-      {filteredStudents.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">
-          <p className="text-xl">No students found</p>
-          <p className="text-sm mt-2">Register students via Staff Panel → User Management</p>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-slate-900">My Students</h1>
+          <p className="mt-1 text-sm text-slate-500">Students enrolled in your classes</p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredStudents.map((student) => (
-            <Card key={student._id} className="hover:shadow-md transition-shadow">
-              <div className="p-4">
 
-                {/* Header */}
-                <div className="flex justify-between items-start">
+        {/* Stats */}
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
+          {statCards.map(c => (
+            <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
+              <p className="text-sm font-medium text-slate-500">{c.label}</p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{c.value}</p>
+            </div>
+          ))}
+        </section>
+
+        {/* Filters */}
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-wrap gap-3">
+            <input
+              type="text"
+              placeholder="Search by name or code..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100"
+            />
+            <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <select value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
+              <option value="all">All Subjects</option>
+              {subjects.map(sub => <option key={sub._id} value={sub._id}>{sub.name}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* Students Grid */}
+        {filteredStudents.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-16 text-center">
+            <p className="text-lg font-medium text-slate-500">No students found</p>
+            <p className="mt-2 text-sm text-slate-400">Register students via Staff Panel → User Management</p>
+          </div>
+        ) : (
+          <section className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {filteredStudents.map(student => (
+              <div key={student._id} className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-full bg-gradient-to-r from-green-400 to-green-600 text-white flex items-center justify-center text-lg font-bold">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-sky-600 text-lg font-bold text-white">
                       {student.user?.name?.[0] || 'S'}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-800">{student.user?.name || 'Unknown'}</h3>
-                      <p className="text-xs text-gray-500">{student.studentCode || 'N/A'}</p>
+                      <h3 className="font-semibold text-slate-900">{student.user?.name || 'Unknown'}</h3>
+                      <p className="text-xs text-slate-500">{student.studentCode || 'N/A'}</p>
                     </div>
                   </div>
-                  <Badge variant={student.status === 'active' ? 'success' : 'danger'}>
+                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${student.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                     {student.status}
-                  </Badge>
+                  </span>
                 </div>
 
-                {/* Info */}
-                <div className="mt-4 space-y-2 text-sm text-gray-600">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Class:</span>
-                    <span className="font-medium">{student.currentClass?.name || 'Not Assigned'} {student.currentClass?.section || ''}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Level:</span>
-                    <span className="font-medium">{student.currentLevel || 'N/A'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Email:</span>
-                    <span className="font-medium truncate ml-2">{student.user?.email || 'N/A'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Admission:</span>
-                    <span className="font-medium">{student.admissionDate ? new Date(student.admissionDate).toLocaleDateString() : 'N/A'}</span>
-                  </div>
+                <div className="mt-4 space-y-2 text-sm">
+                  {[
+                    { label: 'Class', value: `${student.currentClass?.name || 'Not Assigned'} ${student.currentClass?.section || ''}` },
+                    { label: 'Level', value: student.currentLevel || 'N/A' },
+                    { label: 'Email', value: student.user?.email || 'N/A' },
+                    { label: 'Admission', value: student.admissionDate ? new Date(student.admissionDate).toLocaleDateString() : 'N/A' },
+                  ].map(row => (
+                    <div key={row.label} className="flex justify-between">
+                      <span className="text-slate-400">{row.label}:</span>
+                      <span className="font-medium text-slate-700 truncate ml-2">{row.value}</span>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Buttons */}
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => navigate('/teacher/attendance')}
-                  >
+                <div className="mt-5 flex gap-2">
+                  <button onClick={() => navigate('/teacher/attendance')} className="flex-1 rounded-2xl border border-slate-200 py-2 text-xs font-medium text-slate-600 transition-all duration-200 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700">
                     Mark Attendance
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => navigate('/teacher/results/enter-marks')}
-                  >
+                  </button>
+                  <button onClick={() => navigate('/teacher/results/enter-marks')} className="flex-1 rounded-2xl border border-slate-200 py-2 text-xs font-medium text-slate-600 transition-all duration-200 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700">
                     Enter Marks
-                  </Button>
+                  </button>
                 </div>
-
               </div>
-            </Card>
-          ))}
-        </div>
-      )}
+            ))}
+          </section>
+        )}
+
+      </div>
     </div>
   );
 };

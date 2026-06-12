@@ -1,87 +1,38 @@
 import React, { useState, useEffect } from 'react';
-
 import axios from 'axios';
-
 import Card from '../../../components/UIHelper/Card';
-
-import ErrorPage from '../../../components/UIHelper/ErrorPage';
-
 import { PieChartComponent, BarChartComponent } from '../../../components/UIHelper/ECharts';
 
-
-
 const StaffLibraryReports = () => {
-
-  console.log('[StaffLibraryReports] Component initializing...');
-
   const [data, setData] = useState({
-
     totalBooks: 0,
-
     borrowed: 0,
-
     returned: 0,
-
     lowStock: 0
-
   });
-
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState(null);
 
-
-
-  // Get API config with auth token
-
   const getConfig = () => {
-
     const token = localStorage.getItem('token');
-
-    console.log('[StaffLibraryReports] Token exists:', !!token);
-
     return { headers: { Authorization: `Bearer ${token}` } };
-
   };
 
-
-
   useEffect(() => {
-
-    console.log('[StaffLibraryReports] useEffect triggered - fetching data from API...');
-
     fetchLibraryStats();
-
   }, []);
 
-
-
   const fetchLibraryStats = async () => {
-
     try {
-
       setLoading(true);
-
       setError(null);
-
-      console.log('[StaffLibraryReports] Fetching library stats from API...');
-
       
-
       const config = getConfig();
-
       const response = await axios.get('http://localhost:5000/api/staff/library/stats', config);
-
       
-
-      console.log('[StaffLibraryReports] Stats API response:', response.data);
-
       setData(response.data);
-
     } catch (err) {
-
-      console.error('[StaffLibraryReports] Error fetching stats:', err);
-
+      console.error('Error fetching library stats:', err);
       setError('Failed to fetch library statistics. Please try again.');
 
     } finally {
@@ -115,23 +66,24 @@ const StaffLibraryReports = () => {
 
 
       {error && !loading && (
-
-        <ErrorPage 
-
-          type="generic" 
-
-          title="Unable to Load Reports"
-
-          message={error}
-
-          onRetry={fetchLibraryStats}
-
-          onHome={() => window.location.href = '/staff/dashboard'}
-
-          showBackButton={false}
-
-        />
-
+        <Card className="rounded-[28px] border border-rose-200 bg-rose-50 mb-6">
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-rose-900">Unable to Load Reports</h3>
+                <p className="mt-1 text-sm text-rose-700">{error}</p>
+                <button onClick={fetchLibraryStats} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
       )}
 
 

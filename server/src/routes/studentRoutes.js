@@ -8,7 +8,18 @@ const {
   getAssignments,
   getExamResults,
   getFeePayments,
-  submitComplaint
+  submitComplaint,
+  getStudentComplaints,
+  getStudentLeaves,
+  createStudentLeave,
+  getStudentEducation,
+  createStudentEducation,
+  getStudentDegrees,
+  getBooks,
+  getBorrowedBooks,
+  getStudentDocuments,
+  getStudentFinalResults,
+  getExams
 } = require('../controllers/studentController');
 const authenticateToken = require('../middleware/auth');
 
@@ -40,6 +51,30 @@ router.get('/results', getExamResults);
 router.get('/fees', getFeePayments);
 
 // Student communication routes
+router.get('/complaints', getStudentComplaints);
 router.post('/complaints', submitComplaint);
+
+// Student leave routes
+router.get('/leaves', getStudentLeaves);
+router.post('/leaves', createStudentLeave);
+
+// Student education routes
+router.get('/education', getStudentEducation);
+router.post('/education', createStudentEducation);
+
+// Student degree routes
+router.get('/degrees', getStudentDegrees);
+
+// Student library routes
+router.get('/books', getBooks);
+router.get('/borrowed-books', getBorrowedBooks);
+
+// Student documents routes
+router.get('/documents', getStudentDocuments);
+
+// Student exam routes
+router.get('/exams', getExams);
+router.get('/exam-results', getExamResults);
+router.get('/final-results', getStudentFinalResults);
 
 module.exports = router;

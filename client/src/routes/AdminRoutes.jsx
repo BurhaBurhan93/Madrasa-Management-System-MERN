@@ -1,77 +1,164 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import AdminPanel from '../panels/AdminPanel';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import UserIndex from '../pages/admin/users/UserIndex';
+import UserRegister from '../pages/admin/users/UserRegister';
+import UserEdit from '../pages/admin/users/UserEdit';
+import AdminClasses from '../pages/admin/academic/AdminClasses';
+import AdminSubjects from '../pages/admin/academic/AdminSubjects';
+import AdminExams from '../pages/admin/academic/AdminExams';
+import AdminTimetable from '../pages/admin/academic/AdminTimetable';
+import AdminDegrees from '../pages/admin/academic/AdminDegrees';
+import AdminSyllabus from '../pages/admin/academic/AdminSyllabus';
+import AdminGrading from '../pages/admin/academic/AdminGrading';
+import AdminAttendanceDaily from '../pages/admin/attendance/AdminAttendanceDaily';
+import AdminAttendanceReports from '../pages/admin/attendance/AdminAttendanceReports';
+import AdminAttendanceSettings from '../pages/admin/attendance/AdminAttendanceSettings';
+import AdminAttendanceWarnings from '../pages/admin/attendance/AdminAttendanceWarnings';
+import AdminAttendanceCorrections from '../pages/admin/attendance/AdminAttendanceCorrections';
+import AdminFeeStructure from '../pages/admin/finance/AdminFeeStructure';
+import AdminPayments from '../pages/admin/finance/AdminPayments';
+import AdminExpenses from '../pages/admin/finance/AdminExpenses';
+import AdminSalaries from '../pages/admin/finance/AdminSalaries';
+import AdminAccounts from '../pages/admin/finance/AdminAccounts';
+import AdminTransactions from '../pages/admin/finance/AdminTransactions';
+import AdminFinanceReports from '../pages/admin/finance/AdminFinanceReports';
+import AdminLibraryBooks from '../pages/admin/library/AdminLibraryBooks';
+import AdminLibraryCategories from '../pages/admin/library/AdminLibraryCategories';
+import AdminBorrowedBooks from '../pages/admin/library/AdminBorrowedBooks';
+import AdminPurchases from '../pages/admin/library/AdminPurchases';
+import AdminSales from '../pages/admin/library/AdminSales';
+import AdminLibraryReports from '../pages/admin/library/AdminLibraryReports';
+import AdminComplaints from '../pages/admin/complaints/AdminComplaints';
+import AdminComplaintsPending from '../pages/admin/complaints/AdminComplaintsPending';
+import AdminComplaintsResolved from '../pages/admin/complaints/AdminComplaintsResolved';
+import AdminComplaintActions from '../pages/admin/complaints/AdminComplaintActions';
+import AdminComplaintFeedback from '../pages/admin/complaints/AdminComplaintFeedback';
+import AdminComplaintReports from '../pages/admin/complaints/AdminComplaintReports';
+import AdminGeneralSettings from '../pages/admin/settings/AdminGeneralSettings';
+import AdminAcademicSettings from '../pages/admin/settings/AdminAcademicSettings';
+import AdminNotificationsSettings from '../pages/admin/settings/AdminNotificationsSettings';
+import AdminSecuritySettings from '../pages/admin/settings/AdminSecuritySettings';
+import AdminBackupSettings from '../pages/admin/settings/AdminBackupSettings';
+import AdminAPISettings from '../pages/admin/settings/AdminAPISettings';
+import AdminKitchenInventory from '../pages/admin/kitchen/AdminKitchenInventory';
+import AdminKitchenMeals from '../pages/admin/kitchen/AdminKitchenMeals';
+import AdminKitchenMenu from '../pages/admin/kitchen/AdminKitchenMenu';
+import AdminKitchenSuppliers from '../pages/admin/kitchen/AdminKitchenSuppliers';
+import AdminKitchenWaste from '../pages/admin/kitchen/AdminKitchenWaste';
+import AdminKitchenReports from '../pages/admin/kitchen/AdminKitchenReports';
+import AdminHREmployees from '../pages/admin/hr/AdminHREmployees';
+import AdminHRDepartments from '../pages/admin/hr/AdminHRDepartments';
+import AdminHRDesignations from '../pages/admin/hr/AdminHRDesignations';
+import AdminHRAttendance from '../pages/admin/hr/AdminHRAttendance';
+import AdminHRLeave from '../pages/admin/hr/AdminHRLeave';
+import AdminHRPayroll from '../pages/admin/hr/AdminHRPayroll';
+import AdminHRReports from '../pages/admin/hr/AdminHRReports';
+import AdminHostelRooms from '../pages/admin/hostel/AdminHostelRooms';
+import AdminHostelAllocations from '../pages/admin/hostel/AdminHostelAllocations';
+import AdminHostelMeals from '../pages/admin/hostel/AdminHostelMeals';
+import AdminHostelAttendance from '../pages/admin/hostel/AdminHostelAttendance';
+import AdminHostelReports from '../pages/admin/hostel/AdminHostelReports';
+import AdminProfile from '../pages/admin/AdminProfile';
+import Students from '../pages/admin/users/Students';
+import Teachers from '../pages/admin/users/Teachers';
+import Staff from '../pages/admin/users/Staff';
+import RolesPermissions from '../pages/admin/users/RolesPermissions';
+import AuditLogs from '../pages/admin/users/AuditLogs';
+import AdminAcademicReports from '../pages/admin/reports/AdminAcademicReports';
+import AdminFinancialReports from '../pages/admin/reports/AdminFinancialReports';
+import AdminAttendanceReportsPage from '../pages/admin/reports/AdminAttendanceReportsPage';
+import AdminOperationalReports from '../pages/admin/reports/AdminOperationalReports';
+import AdminAnalyticsDashboard from '../pages/admin/reports/AdminAnalyticsDashboard';
 
-const AdminRoutes = () => (
-  <Route path="/admin/*" element={<AdminPanel />}>
+// Simple placeholder components exist in their respective folders
+
+const adminRoutes = (
+  <>
     <Route index element={<AdminDashboard />} />
     <Route path="dashboard" element={<AdminDashboard />} />
-    
-    {/* User Management Routes */}
-    <Route path="users">
-      <Route index element={<div className="p-6"><h1 className="text-2xl font-bold">All Users</h1><p className="text-gray-600 mt-2">User management page coming soon...</p></div>} />
-      <Route path="students" element={<div className="p-6"><h1 className="text-2xl font-bold">Students</h1><p className="text-gray-600 mt-2">Student management page coming soon...</p></div>} />
-      <Route path="teachers" element={<div className="p-6"><h1 className="text-2xl font-bold">Teachers</h1><p className="text-gray-600 mt-2">Teacher management page coming soon...</p></div>} />
-      <Route path="staff" element={<div className="p-6"><h1 className="text-2xl font-bold">Staff</h1><p className="text-gray-600 mt-2">Staff management page coming soon...</p></div>} />
-    </Route>
 
-    {/* Academic Routes */}
-    <Route path="academic">
-      <Route path="classes" element={<div className="p-6"><h1 className="text-2xl font-bold">Classes</h1><p className="text-gray-600 mt-2">Class management page coming soon...</p></div>} />
-      <Route path="subjects" element={<div className="p-6"><h1 className="text-2xl font-bold">Subjects</h1><p className="text-gray-600 mt-2">Subject management page coming soon...</p></div>} />
-      <Route path="exams" element={<div className="p-6"><h1 className="text-2xl font-bold">Exams</h1><p className="text-gray-600 mt-2">Exam management page coming soon...</p></div>} />
-      <Route path="timetable" element={<div className="p-6"><h1 className="text-2xl font-bold">Timetable</h1><p className="text-gray-600 mt-2">Timetable management page coming soon...</p></div>} />
-    </Route>
+    <Route path="users" element={<UserIndex />} />
+    <Route path="users/register" element={<UserRegister />} />
+    <Route path="users/edit/:id" element={<UserEdit />} />
+    <Route path="users/students" element={<Students />} />
+    <Route path="users/teachers" element={<Teachers />} />
+    <Route path="users/staff" element={<Staff />} />
+    <Route path="users/roles" element={<RolesPermissions />} />
+    <Route path="users/audit" element={<AuditLogs />} />
 
-    {/* Attendance Routes */}
-    <Route path="attendance">
-      <Route path="daily" element={<div className="p-6"><h1 className="text-2xl font-bold">Daily Attendance</h1><p className="text-gray-600 mt-2">Daily attendance page coming soon...</p></div>} />
-      <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Attendance Reports</h1><p className="text-gray-600 mt-2">Attendance reports page coming soon...</p></div>} />
-      <Route path="settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Attendance Settings</h1><p className="text-gray-600 mt-2">Attendance settings page coming soon...</p></div>} />
-    </Route>
+    <Route path="academic/classes" element={<AdminClasses />} />
+    <Route path="academic/subjects" element={<AdminSubjects />} />
+    <Route path="academic/exams" element={<AdminExams />} />
+    <Route path="academic/timetable" element={<AdminTimetable />} />
+    <Route path="academic/degrees" element={<AdminDegrees />} />
+    <Route path="academic/syllabus" element={<AdminSyllabus />} />
+    <Route path="academic/grading" element={<AdminGrading />} />
 
-    {/* Finance Routes */}
-    <Route path="finance">
-      <Route path="fee-structure" element={<div className="p-6"><h1 className="text-2xl font-bold">Fee Structure</h1><p className="text-gray-600 mt-2">Fee structure page coming soon...</p></div>} />
-      <Route path="payments" element={<div className="p-6"><h1 className="text-2xl font-bold">Payments</h1><p className="text-gray-600 mt-2">Payments page coming soon...</p></div>} />
-      <Route path="expenses" element={<div className="p-6"><h1 className="text-2xl font-bold">Expenses</h1><p className="text-gray-600 mt-2">Expenses page coming soon...</p></div>} />
-      <Route path="salaries" element={<div className="p-6"><h1 className="text-2xl font-bold">Salaries</h1><p className="text-gray-600 mt-2">Salaries page coming soon...</p></div>} />
-      <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Financial Reports</h1><p className="text-gray-600 mt-2">Financial reports page coming soon...</p></div>} />
-    </Route>
+    <Route path="attendance/daily" element={<AdminAttendanceDaily />} />
+    <Route path="attendance/reports" element={<AdminAttendanceReports />} />
+    <Route path="attendance/settings" element={<AdminAttendanceSettings />} />
+    <Route path="attendance/warnings" element={<AdminAttendanceWarnings />} />
+    <Route path="attendance/corrections" element={<AdminAttendanceCorrections />} />
 
-    {/* Library Routes */}
-    <Route path="library">
-      <Route path="books" element={<div className="p-6"><h1 className="text-2xl font-bold">Books</h1><p className="text-gray-600 mt-2">Books management page coming soon...</p></div>} />
-      <Route path="categories" element={<div className="p-6"><h1 className="text-2xl font-bold">Categories</h1><p className="text-gray-600 mt-2">Categories page coming soon...</p></div>} />
-      <Route path="borrowed" element={<div className="p-6"><h1 className="text-2xl font-bold">Borrowed Books</h1><p className="text-gray-600 mt-2">Borrowed books page coming soon...</p></div>} />
-      <Route path="reports" element={<div className="p-6"><h1 className="text-2xl font-bold">Library Reports</h1><p className="text-gray-600 mt-2">Library reports page coming soon...</p></div>} />
-    </Route>
+    <Route path="finance/fee-structure" element={<AdminFeeStructure />} />
+    <Route path="finance/payments" element={<AdminPayments />} />
+    <Route path="finance/expenses" element={<AdminExpenses />} />
+    <Route path="finance/salaries" element={<AdminSalaries />} />
+    <Route path="finance/accounts" element={<AdminAccounts />} />
+    <Route path="finance/transactions" element={<AdminTransactions />} />
+    <Route path="finance/reports" element={<AdminFinanceReports />} />
 
-    {/* Complaints Routes */}
-    <Route path="complaints">
-      <Route index element={<div className="p-6"><h1 className="text-2xl font-bold">All Complaints</h1><p className="text-gray-600 mt-2">All complaints page coming soon...</p></div>} />
-      <Route path="pending" element={<div className="p-6"><h1 className="text-2xl font-bold">Pending Complaints</h1><p className="text-gray-600 mt-2">Pending complaints page coming soon...</p></div>} />
-      <Route path="resolved" element={<div className="p-6"><h1 className="text-2xl font-bold">Resolved Complaints</h1><p className="text-gray-600 mt-2">Resolved complaints page coming soon...</p></div>} />
-    </Route>
+    <Route path="library/books" element={<AdminLibraryBooks />} />
+    <Route path="library/categories" element={<AdminLibraryCategories />} />
+    <Route path="library/borrowed" element={<AdminBorrowedBooks />} />
+    <Route path="library/purchases" element={<AdminPurchases />} />
+    <Route path="library/sales" element={<AdminSales />} />
+    <Route path="library/reports" element={<AdminLibraryReports />} />
 
-    {/* Reports Routes */}
-    <Route path="reports">
-      <Route path="academic" element={<div className="p-6"><h1 className="text-2xl font-bold">Academic Reports</h1><p className="text-gray-600 mt-2">Academic reports page coming soon...</p></div>} />
-      <Route path="financial" element={<div className="p-6"><h1 className="text-2xl font-bold">Financial Reports</h1><p className="text-gray-600 mt-2">Financial reports page coming soon...</p></div>} />
-      <Route path="attendance" element={<div className="p-6"><h1 className="text-2xl font-bold">Attendance Reports</h1><p className="text-gray-600 mt-2">Attendance reports page coming soon...</p></div>} />
-    </Route>
+    <Route path="complaints" element={<AdminComplaints />} />
+    <Route path="complaints/pending" element={<AdminComplaintsPending />} />
+    <Route path="complaints/resolved" element={<AdminComplaintsResolved />} />
+    <Route path="complaints/actions" element={<AdminComplaintActions />} />
+    <Route path="complaints/feedback" element={<AdminComplaintFeedback />} />
+    <Route path="complaints/reports" element={<AdminComplaintReports />} />
 
-    {/* Settings Routes */}
-    <Route path="settings">
-      <Route path="general" element={<div className="p-6"><h1 className="text-2xl font-bold">General Settings</h1><p className="text-gray-600 mt-2">General settings page coming soon...</p></div>} />
-      <Route path="academic" element={<div className="p-6"><h1 className="text-2xl font-bold">Academic Settings</h1><p className="text-gray-600 mt-2">Academic settings page coming soon...</p></div>} />
-      <Route path="notifications" element={<div className="p-6"><h1 className="text-2xl font-bold">Notifications</h1><p className="text-gray-600 mt-2">Notifications settings page coming soon...</p></div>} />
-    </Route>
+    <Route path="hostel/rooms" element={<AdminHostelRooms />} />
+    <Route path="hostel/allocations" element={<AdminHostelAllocations />} />
+    <Route path="hostel/meals" element={<AdminHostelMeals />} />
+    <Route path="hostel/attendance" element={<AdminHostelAttendance />} />
+    <Route path="hostel/reports" element={<AdminHostelReports />} />
 
-    {/* Profile Route */}
-    <Route path="profile" element={<div className="p-6"><h1 className="text-2xl font-bold">Admin Profile</h1><p className="text-gray-600 mt-2">Profile page coming soon...</p></div>} />
-  </Route>
+    <Route path="hr/departments" element={<AdminHRDepartments />} />
+    <Route path="hr/designations" element={<AdminHRDesignations />} />
+    <Route path="hr/employees" element={<AdminHREmployees />} />
+    <Route path="hr/attendance" element={<AdminHRAttendance />} />
+    <Route path="hr/leave" element={<AdminHRLeave />} />
+    <Route path="hr/payroll" element={<AdminHRPayroll />} />
+    <Route path="hr/reports" element={<AdminHRReports />} />
+
+    <Route path="kitchen/inventory" element={<AdminKitchenInventory />} />
+    <Route path="kitchen/meals" element={<AdminKitchenMeals />} />
+    <Route path="kitchen/menu" element={<AdminKitchenMenu />} />
+    <Route path="kitchen/suppliers" element={<AdminKitchenSuppliers />} />
+    <Route path="kitchen/waste" element={<AdminKitchenWaste />} />
+    <Route path="kitchen/reports" element={<AdminKitchenReports />} />
+
+    <Route path="reports/academic" element={<AdminAcademicReports />} />
+    <Route path="reports/financial" element={<AdminFinancialReports />} />
+    <Route path="reports/attendance" element={<AdminAttendanceReportsPage />} />
+    <Route path="reports/operational" element={<AdminOperationalReports />} />
+    <Route path="reports/analytics" element={<AdminAnalyticsDashboard />} />
+
+    <Route path="settings/general" element={<AdminGeneralSettings />} />
+    <Route path="settings/academic" element={<AdminAcademicSettings />} />
+    <Route path="settings/notifications" element={<AdminNotificationsSettings />} />
+    <Route path="settings/security" element={<AdminSecuritySettings />} />
+    <Route path="settings/backup" element={<AdminBackupSettings />} />
+    <Route path="settings/api" element={<AdminAPISettings />} />
+
+    <Route path="profile" element={<AdminProfile />} />
+  </>
 );
 
-export default AdminRoutes;
+export default adminRoutes;

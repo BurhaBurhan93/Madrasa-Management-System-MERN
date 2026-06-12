@@ -1,26 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { FiCalendar, FiClock, FiMapPin, FiUsers, FiPlus } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import ErrorPage from '../components/UIHelper/ErrorPage';
+import { 
+  FiCalendar, 
+  FiClock, 
+  FiMapPin, 
+  FiUsers, 
+  FiPlus, 
+  FiActivity, 
+  FiArrowRight,
+  FiFilter,
+  FiAward,
+  FiInfo
+} from 'react-icons/fi';
+import Card from '../components/UIHelper/Card';
+import Badge from '../components/UIHelper/Badge';
+import Button from '../components/UIHelper/Button';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
+import { BarChartComponent, PieChartComponent } from '../components/UIHelper/ECharts';
+import { formatDate } from '../lib/utils';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentEvents = () => {
-  console.log('[StudentEvents] Component initializing...');
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
 
-  // Get API config with auth token
-  const getConfig = () => {
-    const token = localStorage.getItem('token');
-    console.log('[StudentEvents] Token exists:', !!token);
-    return {
-      headers: { Authorization: `Bearer ${token}` }
-    };
-  };
-
   useEffect(() => {
-    console.log('[StudentEvents] useEffect triggered - fetching data from API...');
     fetchEventsData();
   }, []);
 
@@ -28,33 +37,24 @@ const StudentEvents = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('[StudentEvents] Fetching events from API...');
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const config = getConfig();
+      const examsResponse = await axios.get(`${API_BASE}/student/exams`, config);
+      const assignmentsResponse = await axios.get(`${API_BASE}/student/assignments`, config);
       
-      // Fetch exams as events
-      const examsResponse = await axios.get('http://localhost:5000/api/student/exams', config);
-      console.log('[StudentEvents] Exams API response:', examsResponse.data);
-      
-      // Fetch assignments with due dates as events
-      const assignmentsResponse = await axios.get('http://localhost:5000/api/student/assignments', config);
-      console.log('[StudentEvents] Assignments API response:', assignmentsResponse.data);
-      
-      // Transform exams to events format
       const examEvents = (examsResponse.data || []).map(exam => ({
         id: `exam-${exam._id || exam.id}`,
-        title: exam.title || 'Exam',
-        date: exam.date || exam.publishDate || new Date().toISOString().split('T')[0],
-        time: exam.time || '09:00 AM',
-        location: exam.location || 'Exam Hall',
-        type: exam.type === 'final' ? 'Competition' : 'Workshop',
-        attendees: 0,
-        description: exam.description || `Exam: ${exam.title}`,
+        title: exam.title || 'Examination',
+        date: exam.date || exam.publishDate || new Date().toISOString(),
+        time: exam.startTime || '09:00 AM',
+        location: exam.location || 'Examination Hall',
+        type: 'Examination',
+        description: exam.description || `Module assessment: ${exam.title}`,
         status: exam.status === 'completed' ? 'completed' : 'upcoming',
-        source: 'exam'
+        color: 'rose'
       }));
       
-      // Transform assignments to events format
       const assignmentEvents = (assignmentsResponse.data || [])
         .filter(a => a.dueDate)
         .map(assignment => ({
@@ -62,25 +62,22 @@ const StudentEvents = () => {
           title: assignment.title || 'Assignment Due',
           date: assignment.dueDate,
           time: '11:59 PM',
-          location: 'Online',
-          type: 'Meeting',
-          attendees: 0,
-          description: assignment.description || `Assignment due: ${assignment.title}`,
+          location: 'Submission Portal',
+          type: 'Assignment',
+          description: assignment.description || `Submission deadline: ${assignment.title}`,
           status: assignment.status === 'submitted' ? 'completed' : 'upcoming',
-          source: 'assignment'
+          color: 'blue'
         }));
       
-      // Combine and sort by date
-      const allEvents = [...examEvents, ...assignmentEvents].sort((a, b) => 
+      const combinedEvents = [...examEvents, ...assignmentEvents].sort((a, b) => 
         new Date(a.date) - new Date(b.date)
       );
       
-      setEvents(allEvents);
-      console.log('[StudentEvents] Combined events:', allEvents.length);
+      setEvents(combinedEvents);
     } catch (err) {
-      console.error('[StudentEvents] Error fetching events:', err);
+      console.error('[StudentEvents] Error:', err);
       setError('Failed to fetch events. Please try again.');
-      setEvents([]);
+      setEvents([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -91,158 +88,179 @@ const StudentEvents = () => {
     return event.status === filter;
   });
 
-  const getTypeColor = (type) => {
-    const colors = {
-      'Competition': 'bg-purple-100 text-purple-700',
-      'Workshop': 'bg-blue-100 text-blue-700',
-      'Meeting': 'bg-orange-100 text-orange-700',
-      'Celebration': 'bg-green-100 text-green-700',
-    };
-    return colors[type] || 'bg-gray-100 text-gray-700';
-  };
+  if (loading) {
+    return <PageSkeleton variant="table" />;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Events & Activities</h2>
-          <p className="text-gray-500 mt-1">Stay updated with school events and activities</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Calendar & Events</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">Stay synchronized with institutional activities</p>
         </div>
-        <div className="flex gap-3">
-          <select 
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-          >
-            <option value="all">All Events</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="completed">Completed</option>
-          </select>
-          <button className="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-md transition-shadow flex items-center gap-2">
-            <FiPlus size={16} />
-            Add to Calendar
-          </button>
+        <div className="flex items-center gap-3">
+          <div className="flex p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
+            {['all', 'upcoming', 'completed'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  filter === f ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+          <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2">
+            <FiPlus /> Add Event
+          </Button>
         </div>
       </div>
 
-      {error && !loading && (
-        <ErrorPage 
-          type="generic" 
-          title="Unable to Load Events"
-          message={error}
-          onRetry={fetchEventsData}
-          onHome={() => window.location.href = '/student/dashboard'}
-          showBackButton={false}
-        />
-      )}
-
-      {loading && events.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading events...</p>
-        </div>
-      ) : (
-      <div>
-      {/* Events Calendar View */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Events List */}
-        <div className="lg:col-span-2 space-y-4">
-          {filteredEvents.map((event) => (
-            <div key={event.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-              <div className="flex gap-4">
-                {/* Date Box */}
-                <div className="shrink-0">
-                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex flex-col items-center justify-center shadow-md">
-                    <span className="text-xs font-medium uppercase">
-                      {new Date(event.date).toLocaleString('default', { month: 'short' })}
-                    </span>
-                    <span className="text-xl font-bold">
-                      {new Date(event.date).getDate()}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Event Details */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold text-gray-800 text-lg">{event.title}</h3>
-                      <p className="text-gray-500 text-sm mt-1">{event.description}</p>
+        <div className="lg:col-span-2 space-y-6">
+          <Card title="Institutional Timeline" className="rounded-[32px] p-8">
+            <div className="space-y-8">
+              {filteredEvents.length > 0 ? (
+                filteredEvents.map((event) => (
+                  <div key={event.id} className="group flex gap-8">
+                    {/* Date Sidebar */}
+                    <div className="flex flex-col items-center gap-2 w-16">
+                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        {new Date(event.date).toLocaleString('default', { month: 'short' })}
+                      </div>
+                      <div className={`w-14 h-14 rounded-2xl bg-${event.color === 'rose' ? 'rose-50 text-rose-600' : 'blue-50 text-blue-600'} flex items-center justify-center text-xl font-black shadow-sm group-hover:scale-110 transition-transform`}>
+                        {new Date(event.date).getDate()}
+                      </div>
+                      <div className="flex-1 w-px bg-slate-100 mt-2"></div>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(event.type)}`}>
-                      {event.type}
-                    </span>
-                  </div>
 
-                  <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <FiClock size={14} className="text-sky-500" />
-                      {event.time}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FiMapPin size={14} className="text-sky-500" />
-                      {event.location}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FiUsers size={14} className="text-sky-500" />
-                      {event.attendees} attending
-                    </span>
+                    {/* Content Card */}
+                    <div className="flex-1 p-6 rounded-3xl bg-slate-50 border border-slate-100 group-hover:border-cyan-200 group-hover:bg-white transition-all duration-300">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <Badge className={`bg-${event.color === 'rose' ? 'rose-100 text-rose-600' : 'blue-100 text-blue-600'} border-none font-black text-[10px] uppercase tracking-widest mb-2`}>
+                            {event.type}
+                          </Badge>
+                          <h3 className="text-xl font-black text-slate-900 tracking-tight">{event.title}</h3>
+                        </div>
+                        <Badge variant={event.status === 'completed' ? 'success' : 'primary'}>
+                          {event.status?.toUpperCase()}
+                        </Badge>
+                      </div>
+                      
+                      <p className="text-sm font-medium text-slate-500 italic mb-6">
+                        {event.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-6 border-t border-slate-100 pt-6">
+                        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                          <FiClock className="text-cyan-500" /> {event.time}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                          <FiMapPin className="text-cyan-500" /> {event.location}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest ml-auto group-hover:text-cyan-600 transition-colors cursor-pointer">
+                          Details <FiArrowRight />
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="py-20 text-center">
+                  <FiCalendar className="w-16 h-16 text-slate-100 mx-auto mb-4" />
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No events scheduled</p>
                 </div>
-              </div>
+              )}
             </div>
-          ))}
+          </Card>
         </div>
 
-        {/* Sidebar - Quick Stats */}
-        <div className="space-y-4">
-          {/* Upcoming Events Count */}
-          <div className="bg-gradient-to-br from-sky-400 to-blue-500 rounded-2xl p-6 text-white shadow-md">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 bg-white/20 rounded-xl">
-                <FiCalendar size={24} />
-              </div>
-              <div>
-                <p className="text-white/80 text-sm">Upcoming Events</p>
-                <p className="text-3xl font-bold">{events.filter(e => e.status === 'upcoming').length}</p>
+        {/* Sidebar Info */}
+        <div className="space-y-8">
+          {/* Event Statistics Chart */}
+          <Card title="Event Statistics" className="rounded-[32px] p-8">
+            <PieChartComponent 
+              data={[
+                { name: 'Upcoming', value: events.filter(e => e.status === 'upcoming').length, color: '#3B82F6' },
+                { name: 'Completed', value: events.filter(e => e.status === 'completed').length, color: '#10B981' },
+                { name: 'Examinations', value: events.filter(e => e.type === 'Examination').length, color: '#F43F5E' },
+                { name: 'Assignments', value: events.filter(e => e.type === 'Assignment').length, color: '#F59E0B' }
+              ].filter(item => item.value > 0)}
+              height={250}
+            />
+          </Card>
+
+          <Card title="Monthly Activity" className="rounded-[32px] p-8">
+            <BarChartComponent 
+              data={[
+                { name: 'This Month', value: events.filter(e => {
+                  const eventDate = new Date(e.date);
+                  const now = new Date();
+                  return eventDate.getMonth() === now.getMonth();
+                }).length },
+                { name: 'Next Month', value: events.filter(e => {
+                  const eventDate = new Date(e.date);
+                  const nextMonth = new Date();
+                  nextMonth.setMonth(nextMonth.getMonth() + 1);
+                  return eventDate.getMonth() === nextMonth.getMonth();
+                }).length },
+                { name: 'Completed', value: events.filter(e => e.status === 'completed').length }
+              ].filter(item => item.value > 0)}
+              dataKey="value"
+              nameKey="name"
+              height={250}
+            />
+          </Card>
+
+          {/* Today Card */}
+          <div className="p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-[40px] text-white shadow-2xl shadow-slate-200/50 text-center relative overflow-hidden group">
+            <div className="relative z-10">
+              <p className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em] mb-4">Today's Date</p>
+              <h2 className="text-7xl font-black tracking-tighter mb-2">{new Date().getDate()}</h2>
+              <p className="text-xl font-bold text-slate-300">
+                {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
+              </p>
+              <div className="mt-8 flex justify-center">
+                <Badge variant="primary" className="px-4 py-2">System Active</Badge>
               </div>
             </div>
-            <p className="text-sm text-white/80">You have events this month</p>
+            <FiCalendar className="absolute -right-8 -bottom-8 w-48 h-48 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />
           </div>
 
-          {/* Event Types */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-800 mb-4">Event Categories</h3>
-            <div className="space-y-3">
-              {['Competition', 'Workshop', 'Meeting', 'Celebration'].map((type) => {
-                const count = events.filter(e => e.type === type).length;
-                return (
-                  <div key={type} className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">{type}</span>
-                    <span className="px-2 py-1 bg-gray-100 rounded-lg text-xs font-medium text-gray-600">
-                      {count}
-                    </span>
+          <Card title="Quick Stats" className="rounded-[32px] p-8">
+            <div className="space-y-6">
+              {[
+                { label: 'Upcoming', value: events.filter(e => e.status === 'upcoming').length, color: 'blue' },
+                { label: 'Completed', value: events.filter(e => e.status === 'completed').length, color: 'emerald' },
+                { label: 'Examinations', value: events.filter(e => e.type === 'Examination').length, color: 'rose' }
+              ].map((stat, i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full bg-${stat.color}-500`}></div>
+                    <span className="text-sm font-bold text-slate-600">{stat.label}</span>
                   </div>
-                );
-              })}
+                  <span className="font-black text-slate-900">{stat.value}</span>
+                </div>
+              ))}
             </div>
-          </div>
+          </Card>
 
-          {/* Today's Date */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
-            <p className="text-gray-500 text-sm mb-2">Today</p>
-            <p className="text-3xl font-bold text-gray-800">
-              {new Date().getDate()}
-            </p>
-            <p className="text-gray-600">
-              {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
-            </p>
-          </div>
+          <Card className="rounded-[32px] p-8 bg-blue-600 text-white border-none shadow-xl shadow-blue-200/50">
+            <h4 className="text-xl font-black mb-2">Need a Hall?</h4>
+            <p className="text-blue-100 text-sm font-medium mb-6">Planning a study group or event? Request room booking through Student Affairs.</p>
+            <Button variant="outline" className="w-full rounded-2xl py-4 border-white/20 bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-widest transition-all">
+              Request Booking
+            </Button>
+          </Card>
         </div>
       </div>
-      </div>
-      )}
     </div>
   );
 };

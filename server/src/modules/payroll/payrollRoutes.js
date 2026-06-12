@@ -1,6 +1,10 @@
 ﻿const express = require('express');
 const router = express.Router();
+const auth = require('../../middleware/auth');
+const { authorizeRoles } = require('../../middleware/auth');
 const ctrl = require('./payrollController');
+
+router.use(auth, authorizeRoles('admin', 'staff'));
 
 // Employees list for relation dropdowns
 router.get('/employees', ctrl.listEmployees);

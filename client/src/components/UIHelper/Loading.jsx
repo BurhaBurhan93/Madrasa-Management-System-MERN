@@ -1,6 +1,9 @@
 import React from 'react';
+import { useTheme } from '../../contexts/ThemeContext.jsx';
 
 const LoadingSpinner = ({ size = 'md', className = '' }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const sizes = {
     sm: 'w-4 h-4',
     md: 'w-8 h-8',
@@ -10,7 +13,7 @@ const LoadingSpinner = ({ size = 'md', className = '' }) => {
 
   return (
     <div className="flex items-center justify-center">
-      <div className={`${sizes[size]} animate-spin rounded-full border-4 border-blue-500 border-t-transparent ${className}`}></div>
+      <div className={`${sizes[size]} animate-spin rounded-full border-4 ${isDark ? 'border-cyan-400 border-t-transparent' : 'border-cyan-600 border-t-transparent'} ${className}`}></div>
     </div>
   );
 };
@@ -22,7 +25,7 @@ const LoadingOverlay = ({ isLoading, children }) => {
 
   return (
     <div className="relative">
-      <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+      <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/75 backdrop-blur-sm dark:bg-slate-950/70">
         <LoadingSpinner size="lg" />
       </div>
       {children}
@@ -31,3 +34,4 @@ const LoadingOverlay = ({ isLoading, children }) => {
 };
 
 export { LoadingSpinner, LoadingOverlay };
+export default LoadingSpinner;

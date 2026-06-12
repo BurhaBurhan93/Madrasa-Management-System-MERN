@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Card from '../../components/UIHelper/Card';
-import Button from '../../components/UIHelper/Button';
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+const inputCls = 'w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100';
 
 const TeacherEditQuestion = () => {
   const { examId, questionId } = useParams();
@@ -34,56 +33,60 @@ const TeacherEditQuestion = () => {
     } catch (e) { alert('Failed to update question'); } finally { setLoading(false); }
   };
 
-  if (!form) return <div className="p-8 text-center text-gray-500">Loading...</div>;
+  if (!form) return <div className="flex h-64 items-center justify-center"><div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-600" /></div>;
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Edit Question</h1>
-      </div>
-      <Card>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
-            <textarea value={form.question} onChange={e => setForm({ ...form, question: e.target.value })} required rows="3" className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Marks</label>
-            <input type="number" value={form.marks} onChange={e => setForm({ ...form, marks: e.target.value })} min="1" className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500" />
-          </div>
-          {form.questionType === 'mcq' && (
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Options</label>
-              {form.options.map((opt, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="text-sm font-medium w-6">{String.fromCharCode(65 + i)}.</span>
-                  <input type="text" value={opt} onChange={e => { const o = [...form.options]; o[i] = e.target.value; setForm({ ...form, options: o }); }} className="flex-1 border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500" />
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-slate-900">Edit Question</h1>
+        </div>
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-500">Question Text</label>
+              <textarea value={form.question} onChange={e => setForm({ ...form, question: e.target.value })} required rows="3" className={inputCls} />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-500">Marks</label>
+              <input type="number" value={form.marks} onChange={e => setForm({ ...form, marks: e.target.value })} min="1" className={inputCls} />
+            </div>
+            {form.questionType === 'mcq' && (
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-slate-500">Options</label>
+                {form.options.map((opt, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span className="w-6 text-sm font-medium text-slate-500">{String.fromCharCode(65 + i)}.</span>
+                    <input type="text" value={opt} onChange={e => { const o = [...form.options]; o[i] = e.target.value; setForm({ ...form, options: o }); }} className={inputCls} />
+                  </div>
+                ))}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-500">Correct Answer</label>
+                  <select value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })} className={inputCls}>
+                    <option value="">Select correct option</option>
+                    {form.options.filter(o => o.trim()).map((opt, i) => <option key={i} value={opt}>{String.fromCharCode(65 + i)}. {opt}</option>)}
+                  </select>
                 </div>
-              ))}
+              </div>
+            )}
+            {form.questionType === 'truefalse' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Correct Answer</label>
-                <select value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })} className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500">
-                  <option value="">Select correct option</option>
-                  {form.options.filter(o => o.trim()).map((opt, i) => <option key={i} value={opt}>{String.fromCharCode(65 + i)}. {opt}</option>)}
+                <label className="mb-1 block text-xs font-medium text-slate-500">Correct Answer</label>
+                <select value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })} className={inputCls}>
+                  <option value="True">True</option>
+                  <option value="False">False</option>
                 </select>
               </div>
+            )}
+            <div className="flex justify-end gap-3 pt-2">
+              <button type="button" onClick={() => navigate(`/teacher/exams/${examId}`)} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100">Cancel</button>
+              <button type="submit" disabled={loading} className="rounded-2xl bg-cyan-600 px-5 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700 disabled:opacity-60">
+                {loading ? 'Saving...' : 'Update Question'}
+              </button>
             </div>
-          )}
-          {form.questionType === 'truefalse' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Correct Answer</label>
-              <select value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })} className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500">
-                <option value="True">True</option>
-                <option value="False">False</option>
-              </select>
-            </div>
-          )}
-          <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="secondary" onClick={() => navigate(`/teacher/exams/${examId}`)}>Cancel</Button>
-            <Button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Update Question'}</Button>
-          </div>
-        </form>
-      </Card>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

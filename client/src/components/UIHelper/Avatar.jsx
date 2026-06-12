@@ -1,6 +1,9 @@
 import React from 'react';
+import { useTheme } from '../../contexts/ThemeContext.jsx';
 
 const Avatar = ({ src, alt, size = 'md', className = '' }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const sizeClasses = {
     xs: 'w-6 h-6 text-xs',
     sm: 'w-8 h-8 text-sm',
@@ -30,7 +33,7 @@ const Avatar = ({ src, alt, size = 'md', className = '' }) => {
 
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full bg-blue-500 flex items-center justify-center text-white font-medium ${className}`}
+      className={`${sizeClasses[size]} flex items-center justify-center rounded-full font-medium text-white ${isDark ? 'bg-gradient-to-br from-cyan-500 to-blue-600' : 'bg-gradient-to-br from-blue-500 to-cyan-600'} ${className}`}
     >
       {initials}
     </div>
