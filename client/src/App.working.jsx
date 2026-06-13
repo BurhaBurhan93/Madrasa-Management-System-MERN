@@ -51,7 +51,7 @@ import Communications from './components/communications/Communications';
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
 
 // ================= STAFF PAGES =================
-import StaffDashboard from './pages/staff/StaffDashboard';
+import StaffDashboard from './pages/staff/StaffDashboard_fixed';
 
 function App() {
   console.log('App component rendering...');

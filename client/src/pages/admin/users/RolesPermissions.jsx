@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiShield, FiUsers, FiCheck, FiX } from 'react-icons/fi';
-import { Table, Button, Card, Input, Badge, Modal, Loading } from '../../../components/UIHelper';
+import { FiShield, FiUsers, FiCheck, FiX, FiUserPlus } from 'react-icons/fi';
+import { Table, Button, Card, Input, Badge, Modal, Loading, CreateUserModal } from '../../../components/UIHelper';
 
 const RolesPermissions = () => {
   const navigate = useNavigate();
@@ -9,6 +9,7 @@ const RolesPermissions = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showCreateUser, setShowCreateUser] = useState(false);
   const [newRole, setNewRole] = useState({ name: '', description: '', permissions: [] });
 
   const permissionsList = [
@@ -174,12 +175,20 @@ const RolesPermissions = () => {
           <h1 className="text-2xl font-bold text-slate-900">Roles & Permissions</h1>
           <p className="text-slate-600">Manage user roles and their system permissions</p>
         </div>
-        <Button
-          onClick={() => setShowRoleModal(true)}
-          icon={<FiShield size={18} />}
-        >
-          Create New Role
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => setShowCreateUser(true)}
+            icon={<FiUserPlus size={18} />}
+          >
+            Create User
+          </Button>
+          <Button
+            onClick={() => setShowRoleModal(true)}
+            icon={<FiShield size={18} />}
+          >
+            Create New Role
+          </Button>
+        </div>
       </div>
 
       <Card className="p-6">
@@ -279,6 +288,11 @@ const RolesPermissions = () => {
           </div>
         </div>
       </Modal>
+
+      <CreateUserModal
+        isOpen={showCreateUser}
+        onClose={() => setShowCreateUser(false)}
+      />
     </div>
   );
 };

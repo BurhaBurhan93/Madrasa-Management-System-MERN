@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../../components/UIHelper/Card';
 import api from '../../lib/api';
+import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -302,12 +303,7 @@ const AdminUsers = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                    <input
-                      type="date"
-                      value={formData.dob}
-                      onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                    <CalendarDatePicker value={formData.dob} onChange={(date) => setFormData({ ...formData, dob: date })} placeholder="Select date" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Blood Type</label>

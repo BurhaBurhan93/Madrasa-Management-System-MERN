@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiSave, FiX, FiUser, FiBriefcase, FiDollarSign, FiPhone, FiMapPin } from 'react-icons/fi';
+import { FiSave, FiX, FiUser, FiBriefcase, FiDollarSign, FiPhone, FiMapPin, FiPlus } from 'react-icons/fi';
+import { CreateUserModal } from '../../../components/UIHelper';
+import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-// All available positions/roles in the system
 const POSITIONS = [
   { id: 'teacher', label: 'Teacher', description: 'Teaching staff for classes and subjects', color: 'blue' },
   { id: 'admin', label: 'Admin', description: 'Administrative and management staff', color: 'purple' },
@@ -18,6 +17,18 @@ const POSITIONS = [
   { id: 'maintenance', label: 'Maintenance', description: 'Maintenance and facilities', color: 'teal' }
 ];
 
+const getRoleForPosition = (positionId) => {
+  if (positionId === 'admin') return 'admin';
+  if (positionId === 'teacher') return 'teacher';
+  return 'staff';
+};
+
+const getRoleLabel = (role) => ({
+  admin: 'Admin',
+  teacher: 'Teacher',
+  staff: 'Staff'
+}[role] || 'Staff');
+
 const EmployeeRegistration = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -25,6 +36,7 @@ const EmployeeRegistration = () => {
   const [departments, setDepartments] = useState([]);
   const [designations, setDesignations] = useState([]);
   const [errors, setErrors] = useState({});
+  const [showCreateUser, setShowCreateUser] = useState(false);
 
   const [form, setForm] = useState({
     user: '',
@@ -39,6 +51,8 @@ const EmployeeRegistration = () => {
     phoneNumber: '',
     secondaryPhone: '',
     email: '',
+    accountEmail: '',
+    accountPassword: '',
     currentAddress: '',
     permanentAddress: '',
     emergencyContactName: '',
@@ -74,9 +88,9 @@ const EmployeeRegistration = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${API_BASE}/users?role=staff`);
-      if (res.ok) {
-        const data = await res.json();
+      const res = await apiFetch('/users?role=staff');
+      const data = await parseJsonSafe(res);
+      if (data.success) {
         setUsers(data.data || []);
       }
     } catch (err) {
@@ -86,9 +100,9 @@ const EmployeeRegistration = () => {
 
   const fetchDepartments = async () => {
     try {
-      const res = await fetch(`${API_BASE}/hr/departments`);
-      if (res.ok) {
-        const data = await res.json();
+      const res = await apiFetch('/hr/departments');
+      const data = await parseJsonSafe(res);
+      if (data.success) {
         setDepartments(data.data || []);
       }
     } catch (err) {
@@ -98,9 +112,9 @@ const EmployeeRegistration = () => {
 
   const fetchDesignations = async () => {
     try {
-      const res = await fetch(`${API_BASE}/hr/designations`);
-      if (res.ok) {
-        const data = await res.json();
+      const res = await apiFetch('/hr/designations');
+      const data = await parseJsonSafe(res);
+      if (data.success) {
         setDesignations(data.data || []);
       }
     } catch (err) {
@@ -123,7 +137,11 @@ const EmployeeRegistration = () => {
         : [...current, positionId];
       
       let newPrimary = prev.primaryPosition;
-      if (positionId === prev.primaryPosition && updated.length > 0) {
+      if (updated.length === 0) {
+        newPrimary = '';
+      } else if (positionId === prev.primaryPosition && !updated.includes(positionId)) {
+        newPrimary = updated[0];
+      } else if (!newPrimary || !updated.includes(newPrimary)) {
         newPrimary = updated[0];
       }
       
@@ -143,6 +161,23 @@ const EmployeeRegistration = () => {
     if (!form.joiningDate) newErrors.joiningDate = 'Joining date is required';
     if (!form.baseSalary) newErrors.baseSalary = 'Base salary is required';
     if (form.selectedPositions.length === 0) newErrors.selectedPositions = 'Select at least one position';
+    if (!form.primaryPosition || !form.selectedPositions.includes(form.primaryPosition)) {
+      newErrors.primaryPosition = 'Select a primary position';
+    }
+
+    if (!form.user) {
+      if (!form.accountEmail?.trim()) {
+        newErrors.accountEmail = 'Account email is required';
+      } else if (!/^\S+@\S+\.\S+$/.test(form.accountEmail)) {
+        newErrors.accountEmail = 'Enter a valid email address';
+      }
+
+      if (!form.accountPassword) {
+        newErrors.accountPassword = 'Account password is required';
+      } else if (form.accountPassword.length < 6) {
+        newErrors.accountPassword = 'Password must be at least 6 characters';
+      }
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -156,21 +191,26 @@ const EmployeeRegistration = () => {
     try {
       let userId = form.user;
       if (!userId) {
-        const userRes = await fetch(`${API_BASE}/users`, {
+        const userRole = getRoleForPosition(form.primaryPosition);
+        const userRes = await apiFetch('/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: form.fullName,
-            email: form.email || `${form.employeeCode.toLowerCase().replace(/[^a-z0-9]/g, '')}@madrasa.edu`,
-            password: form.cnic || 'password123',
-            role: 'staff',
-            phone: form.phoneNumber
+            email: form.accountEmail.trim(),
+            password: form.accountPassword,
+            role: userRole,
+            phone: form.phoneNumber,
+            employeeCode: form.employeeCode,
+            skipProfile: true
           })
         });
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          userId = userData.data?._id;
+        if (!userRes.ok) {
+          const userError = await userRes.json();
+          throw new Error(userError.message || 'Failed to create user account');
         }
+        const userData = await userRes.json();
+        userId = userData.data?._id;
       }
 
       const employeeData = {
@@ -186,8 +226,10 @@ const EmployeeRegistration = () => {
 
       delete employeeData.selectedPositions;
       delete employeeData.primaryPosition;
+      delete employeeData.accountEmail;
+      delete employeeData.accountPassword;
 
-      const res = await fetch(`${API_BASE}/hr/employees`, {
+      const res = await apiFetch('/hr/employees', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(employeeData)
@@ -246,7 +288,8 @@ const EmployeeRegistration = () => {
         <select
           value={form[name]}
           onChange={(e) => handleChange(name, e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-slate-100 disabled:text-slate-500"
+          disabled={extra.disabled}
         >
           {options.map((opt, idx) => (
             <option key={idx} value={typeof opt === 'object' ? opt.value : opt}>
@@ -259,16 +302,18 @@ const EmployeeRegistration = () => {
           value={form[name]}
           onChange={(e) => handleChange(name, e.target.value)}
           rows={extra.rows || 3}
-          className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-slate-100 disabled:text-slate-500"
           placeholder={extra.placeholder}
+          disabled={extra.disabled}
         />
       ) : (
         <input
           type={type}
           value={form[name]}
           onChange={(e) => handleChange(name, e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-slate-100 disabled:text-slate-500"
           placeholder={extra.placeholder}
+          disabled={extra.disabled}
         />
       )}
       {errors[name] && <p className="text-red-600 text-xs mt-1">{errors[name]}</p>}
@@ -277,9 +322,17 @@ const EmployeeRegistration = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Employee Registration</h1>
-        <p className="text-slate-600">Register new employee with complete information and position assignments</p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Employee Registration</h1>
+          <p className="text-slate-600">Register new employee with complete information and position assignments</p>
+        </div>
+        <button
+          onClick={() => setShowCreateUser(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 text-sm font-medium"
+        >
+          <FiPlus size={16} /> Create User
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -343,7 +396,7 @@ const EmployeeRegistration = () => {
                 );
               })}
             </div>
-            <div className="mt-4 flex items-center gap-4 text-sm">
+            <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
               <span className="text-slate-600">
                 Selected: <strong className="text-slate-900">{form.selectedPositions.length}</strong> positions
               </span>
@@ -351,7 +404,46 @@ const EmployeeRegistration = () => {
               <span className="text-slate-600">
                 Primary Role: <strong className="text-cyan-700">{POSITIONS.find(p => p.id === form.primaryPosition)?.label || 'None'}</strong>
               </span>
+              <span className="text-slate-400">|</span>
+              <span className="text-slate-600">
+                Login Role: <strong className="text-cyan-700">{getRoleLabel(getRoleForPosition(form.primaryPosition))}</strong>
+              </span>
             </div>
+          </div>
+        </div>
+
+        {/* Account Information */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="px-6 py-4 bg-gradient-to-r from-cyan-50 to-sky-50 border-b border-slate-200">
+            <div className="flex items-center gap-2">
+              <FiUser className="text-cyan-600" />
+              <h2 className="text-lg font-semibold text-slate-900">Account Information *</h2>
+            </div>
+            <p className="text-sm text-slate-600 mt-1">Create a login account for the employee. If an account already exists, link it instead.</p>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {renderField('Link Existing User Account', 'user', 'select', 
+                [{ value: '', label: 'Create new user account' }, ...users.map(u => ({ value: u._id, label: `${u.name} (${u.email})` }))])}
+              {renderField('Account Email *', 'accountEmail', 'email', null, {
+                required: !form.user,
+                disabled: !!form.user,
+                placeholder: 'employee@madrasa.edu'
+              })}
+              {renderField('Account Password *', 'accountPassword', 'password', null, {
+                required: !form.user,
+                disabled: !!form.user,
+                placeholder: 'At least 6 characters'
+              })}
+              <div className="lg:col-span-1">
+                <label className="block text-sm font-medium text-slate-700 mb-1">Login Role</label>
+                <div className="w-full px-3 py-2 rounded-lg border border-cyan-200 bg-cyan-50 text-sm font-semibold text-cyan-800">
+                  {getRoleLabel(getRoleForPosition(form.primaryPosition))}
+                </div>
+                <p className="text-xs text-slate-500 mt-1">Based on the selected primary position.</p>
+              </div>
+            </div>
+            {errors.primaryPosition && <p className="text-red-600 text-xs mt-2">{errors.primaryPosition}</p>}
           </div>
         </div>
 
@@ -365,8 +457,6 @@ const EmployeeRegistration = () => {
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {renderField('User Account (if exists)', 'user', 'select', 
-                [{ value: '', label: 'Create new user account' }, ...users.map(u => ({ value: u._id, label: `${u.name} (${u.email})` }))])}
               {renderField('Employee Code *', 'employeeCode', 'text', null, { required: true, placeholder: 'e.g., EMP-2024-001' })}
               {renderField('Full Name *', 'fullName', 'text', null, { required: true })}
               {renderField('Full Name (Arabic)', 'fullNameArabic')}
@@ -506,6 +596,12 @@ const EmployeeRegistration = () => {
           </button>
         </div>
       </form>
+
+      <CreateUserModal
+        isOpen={showCreateUser}
+        onClose={() => setShowCreateUser(false)}
+        onSuccess={() => fetchUsers()}
+      />
     </div>
   );
 };

@@ -618,6 +618,18 @@ exports.rejectLeave = async (req, res) => {
   }
 };
 
+exports.updateLeave = async (req, res) => {
+  try {
+    const leave = await Leave.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+      .populate('employee', 'fullName employeeCode')
+      .populate('leaveType', 'leaveTypeName leaveCode');
+    if (!leave) return res.status(404).json({ success: false, message: 'Leave not found' });
+    res.status(200).json({ success: true, message: 'Leave updated successfully', data: leave });
+  } catch (error) {
+    res.status(400).json({ success: false, message: 'Error updating leave', error: error.message });
+  }
+};
+
 exports.deleteLeave = async (req, res) => {
   try {
     const leave = await Leave.findByIdAndDelete(req.params.id);

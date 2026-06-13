@@ -12,6 +12,7 @@ const ExpenseSchema = new Schema({
   paidTo: { type: String, trim: true },
   approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   approvalStatus: { type: String, enum: ['pending','approved','rejected'], default: 'pending' },
+  receiptImage: { type: String },
   remarks: { type: String }
 }, { timestamps: true });
 

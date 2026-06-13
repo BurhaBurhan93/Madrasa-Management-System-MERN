@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../../../components/UIHelper/Card';
 import { FiCalendar, FiBook, FiUsers, FiClipboard, FiPlus, FiEdit2, FiTrash2, FiSearch, FiFilter } from 'react-icons/fi';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const AdminExams = () => {
   const [exams, setExams] = useState([
@@ -367,12 +368,7 @@ const AdminExams = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Exam Date *</label>
-                <input
-                  type="date"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                  value={newExam.date}
-                  onChange={(e) => setNewExam({...newExam, date: e.target.value})}
-                />
+                <CalendarDatePicker value={newExam.date} onChange={(date) => setNewExam({...newExam, date: date })} placeholder="Select date" />
               </div>
 
               <div>

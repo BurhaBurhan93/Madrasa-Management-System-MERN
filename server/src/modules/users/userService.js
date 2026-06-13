@@ -18,11 +18,14 @@ class UserService {
 
   async createUser(userData) {
     try {
-      const existingUser = await User.findOne({ email: userData.email });
+      const { skipProfile, ...userDataForUser } = userData;
+      const existingUser = await User.findOne({ email: userDataForUser.email });
       if (existingUser) throw new Error('Email already exists');
 
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
-      const user = await User.create({ ...userData, password: hashedPassword });
+      const hashedPassword = await bcrypt.hash(userDataForUser.password, 10);
+      const user = await User.create({ ...userDataForUser, password: hashedPassword });
+
+      if (skipProfile) return user;
 
       // Create related record based on role
       if (user.role === 'student') {

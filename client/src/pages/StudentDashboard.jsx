@@ -27,11 +27,14 @@ import Card from '../components/UIHelper/Card';
 import Progress from '../components/UIHelper/Progress';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { formatDate } from '../lib/utils';
+import { useTheme } from '../contexts/ThemeContext';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
@@ -289,15 +292,15 @@ const StudentDashboard = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Overview</p>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Student Dashboard</h1>
-          <p className="text-slate-500 mt-1 font-medium">Welcome back, {user?.name || 'Student'}!</p>
+          <h1 className={`text-4xl font-black tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Student Dashboard</h1>
+          <p className={`mt-1 font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Welcome back, {user?.name || 'Student'}!</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex flex-col items-end mr-2">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Current Session</p>
-            <p className="text-sm font-black text-slate-900">2023-2024 Academic Year</p>
+            <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Current Session</p>
+            <p className={`text-sm font-black ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>2023-2024 Academic Year</p>
           </div>
-          <div className="h-12 w-12 rounded-2xl bg-white shadow-sm border border-slate-200 flex items-center justify-center text-slate-600">
+          <div className={`h-12 w-12 rounded-2xl shadow-sm border flex items-center justify-center ${isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-slate-200 text-slate-600'}`}>
             <FiCalendar className="w-6 h-6" />
           </div>
         </div>
@@ -354,13 +357,25 @@ const StudentDashboard = () => {
           <button 
             key={i} 
             onClick={() => navigate(stat.path)}
-            className="group p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:shadow-cyan-100 hover:-translate-y-1 transition-all text-left"
+            className={`group p-6 rounded-[32px] border shadow-xl transition-all text-left hover:shadow-2xl hover:-translate-y-1 ${
+              isDark 
+                ? 'bg-slate-800/60 border-slate-700 shadow-slate-900/50 hover:border-cyan-500/50 hover:shadow-cyan-900/30' 
+                : 'bg-white border-slate-100 shadow-slate-200/50 hover:border-cyan-200 hover:shadow-cyan-100'
+            }`}
           >
-            <div className={`w-14 h-14 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform`}>
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform ${
+              stat.color === 'blue' 
+                ? isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-600' 
+                : stat.color === 'emerald' 
+                ? isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-600' 
+                : stat.color === 'amber' 
+                ? isDark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-50 text-amber-600' 
+                : isDark ? 'bg-rose-500/20 text-rose-400' : 'bg-rose-50 text-rose-600'
+            }`}>
               {stat.icon}
             </div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-            <p className="text-3xl font-black text-slate-900">{stat.value}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>{stat.label}</p>
+            <p className={`text-3xl font-black ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{stat.value}</p>
           </button>
         ))}
       </div>
@@ -368,31 +383,31 @@ const StudentDashboard = () => {
       {/* Fee Summary Section */}
       {(quickStats.totalFees > 0 || quickStats.paidFees > 0 || quickStats.pendingFees > 0) && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">Fee Summary</h2>
+          <h2 className={`text-2xl font-black tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Fee Summary</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-[32px] p-6 border border-blue-200">
+            <div className={`rounded-[32px] p-6 border ${isDark ? 'bg-blue-900/20 border-blue-500/30' : 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200'}`}>
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 rounded-2xl bg-blue-500 text-white flex items-center justify-center text-2xl">
                   <FiDollarSign />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Total Fees</p>
-                  <p className="text-2xl font-black text-blue-900">${quickStats.totalFees.toLocaleString()}</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>Total Fees</p>
+                  <p className={`text-2xl font-black ${isDark ? 'text-blue-200' : 'text-blue-900'}`}>${quickStats.totalFees.toLocaleString()}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-[32px] p-6 border border-emerald-200">
+            <div className={`rounded-[32px] p-6 border ${isDark ? 'bg-emerald-900/20 border-emerald-500/30' : 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200'}`}>
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-2xl">
                   <FiCheckCircle />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Paid</p>
-                  <p className="text-2xl font-black text-emerald-900">${quickStats.paidFees.toLocaleString()}</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>Paid</p>
+                  <p className={`text-2xl font-black ${isDark ? 'text-emerald-200' : 'text-emerald-900'}`}>${quickStats.paidFees.toLocaleString()}</p>
                 </div>
               </div>
-              <div className="w-full bg-white/50 rounded-full h-2">
+              <div className={`w-full rounded-full h-2 ${isDark ? 'bg-emerald-500/20' : 'bg-white/50'}`}>
                 <div 
                   className="bg-emerald-500 h-2 rounded-full transition-all" 
                   style={{ width: `${quickStats.totalFees > 0 ? (quickStats.paidFees / quickStats.totalFees) * 100 : 0}%` }}
@@ -400,19 +415,16 @@ const StudentDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-[32px] p-6 border border-amber-200">
+            <div className={`rounded-[32px] p-6 border ${isDark ? 'bg-amber-900/20 border-amber-500/30' : 'bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200'}`}>
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-2xl">
                   <FiAlertCircle />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-amber-600 uppercase tracking-widest">Pending</p>
-                  <p className="text-2xl font-black text-amber-900">${quickStats.pendingFees.toLocaleString()}</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>Pending</p>
+                  <p className={`text-2xl font-black ${isDark ? 'text-amber-200' : 'text-amber-900'}`}>${quickStats.pendingFees.toLocaleString()}</p>
                 </div>
               </div>
-              {quickStats.pendingFees > 0 && (
-                <Badge variant="warning" className="text-xs">Payment Due</Badge>
-              )}
             </div>
           </div>
 
@@ -446,7 +458,7 @@ const StudentDashboard = () => {
                   height={250}
                 />
               ) : (
-                <div className="h-[250px] flex flex-col items-center justify-center text-slate-300">
+                <div className={`h-[250px] flex flex-col items-center justify-center ${isDark ? 'text-slate-500' : 'text-slate-300'}`}>
                   <FiActivity className="w-12 h-12 mb-4" />
                   <p className="font-bold text-sm">No attendance records yet</p>
                 </div>
@@ -462,7 +474,7 @@ const StudentDashboard = () => {
                   height={250}
                 />
               ) : (
-                <div className="h-[250px] flex flex-col items-center justify-center text-slate-300">
+                <div className={`h-[250px] flex flex-col items-center justify-center ${isDark ? 'text-slate-500' : 'text-slate-300'}`}>
                   <FiTrendingUp className="w-12 h-12 mb-4" />
                   <p className="font-bold text-sm">No performance data yet</p>
                 </div>
@@ -474,26 +486,31 @@ const StudentDashboard = () => {
             <div className="space-y-6">
               {recentActivity.length > 0 ? (
                 recentActivity.map((activity, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-cyan-200 transition-colors">
+                  <div key={i} className={`flex items-center justify-between p-4 rounded-2xl border transition-colors ${
+                    isDark 
+                      ? 'bg-slate-800/40 border-slate-700 hover:border-cyan-500/50' 
+                      : 'bg-slate-50 border-slate-100 hover:border-cyan-200'
+                  }`}>
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${
-                        activity.type === 'assignment' ? 'bg-blue-100 text-blue-600' : 
-                        activity.type === 'attendance' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600'
+                        activity.type === 'assignment' 
+                          ? isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600' 
+                          : isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-600'
                       }`}>
                         {activity.type === 'assignment' ? <FiEdit /> : <FiCheckCircle />}
                       </div>
                       <div>
-                        <p className="font-black text-slate-900">{activity.title}</p>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        <p className={`font-black ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{activity.title}</p>
+                        <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                           {activity.course || 'General'} • {formatDate(activity.date)}
                         </p>
                       </div>
                     </div>
-                    <FiArrowRight className="text-slate-300" />
+                    <FiArrowRight className={isDark ? 'text-slate-600' : 'text-slate-300'} />
                   </div>
                 ))
               ) : (
-                <p className="text-center text-slate-400 py-8 font-medium italic">No recent activity to show</p>
+                <p className={`text-center py-8 font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>No recent activity to show</p>
               )}
             </div>
           </Card>
@@ -505,22 +522,34 @@ const StudentDashboard = () => {
             <div className="space-y-6">
               {upcomingEvents.length > 0 ? (
                 upcomingEvents.map((event, i) => (
-                  <div key={i} className="group relative pl-6 border-l-2 border-slate-100 hover:border-cyan-500 transition-colors py-1">
-                    <div className="absolute left-[-5px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-200 group-hover:bg-cyan-500 transition-colors"></div>
+                  <div key={i} className={`group relative pl-6 border-l-2 transition-colors py-1 ${
+                    isDark 
+                      ? 'border-slate-700 hover:border-cyan-500' 
+                      : 'border-slate-100 hover:border-cyan-500'
+                  }`}>
+                    <div className={`absolute left-[-5px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full transition-colors ${
+                      isDark 
+                        ? 'bg-slate-600 group-hover:bg-cyan-500' 
+                        : 'bg-slate-200 group-hover:bg-cyan-500'
+                    }`}></div>
                     <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.2em] mb-1">{event.type}</p>
-                    <p className="font-black text-slate-900 leading-tight mb-1">{event.title}</p>
-                    <p className="text-xs font-bold text-slate-400">{formatDate(event.date)} • {event.time}</p>
+                    <p className={`font-black leading-tight mb-1 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{event.title}</p>
+                    <p className={`text-xs font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{formatDate(event.date)} • {event.time}</p>
                   </div>
                 ))
               ) : (
                 <div className="text-center py-12">
-                  <FiClock className="w-10 h-10 text-slate-200 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">No upcoming events</p>
+                  <FiClock className={`w-10 h-10 mx-auto mb-4 ${isDark ? 'text-slate-700' : 'text-slate-200'}`} />
+                  <p className={`font-bold text-xs uppercase tracking-widest ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>No upcoming events</p>
                 </div>
               )}
               <button 
                 onClick={() => navigate('/student/schedule')}
-                className="w-full mt-4 py-4 rounded-2xl bg-slate-900 text-white font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-800 transition-all shadow-xl shadow-slate-200"
+                className={`w-full mt-4 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl ${
+                  isDark 
+                    ? 'bg-slate-800 text-slate-200 hover:bg-slate-700 shadow-slate-900/50' 
+                    : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-200'
+                }`}
               >
                 View Full Schedule
               </button>
@@ -533,10 +562,10 @@ const StudentDashboard = () => {
                 courseDistribution.map((item, i) => (
                   <div key={i} className="space-y-2">
                     <div className="flex justify-between items-end">
-                      <p className="text-sm font-black text-slate-900">{item.name}</p>
-                      <p className="text-xs font-bold text-slate-400">{item.value} Courses</p>
+                      <p className={`text-sm font-black ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{item.name}</p>
+                      <p className={`text-xs font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{item.value} Courses</p>
                     </div>
-                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className={`h-2 w-full rounded-full overflow-hidden ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}>
                       <div 
                         className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full" 
                         style={{ width: `${(item.value / quickStats.totalCourses) * 100}%` }}
@@ -545,7 +574,7 @@ const StudentDashboard = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-center text-slate-400 py-4 font-medium italic">No course data available</p>
+                <p className={`text-center py-4 font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>No course data available</p>
               )}
             </div>
           </Card>
@@ -559,36 +588,36 @@ const StudentDashboard = () => {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Course</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Progress</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                <tr className={`border-b ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Course</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Progress</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
                 {courseDistribution.length > 0 ? (
                   courseDistribution.slice(0, 5).map((course, i) => (
-                    <tr key={i} className="hover:bg-slate-50 transition-colors">
+                    <tr key={i} className={`transition-colors ${isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50'}`}>
                       <td className="py-3 px-4">
-                        <p className="font-bold text-slate-900 text-sm">{course.name}</p>
+                        <p className={`font-bold text-sm ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{course.name}</p>
                       </td>
                       <td className="py-3 px-4">
-                        <div className="w-full bg-slate-100 rounded-full h-2">
+                        <div className={`w-full rounded-full h-2 ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}>
                           <div 
                             className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full" 
                             style={{ width: `${Math.min(course.value * 20, 100)}%` }}
                           ></div>
                         </div>
-                        <p className="text-xs font-bold text-slate-500 mt-1">{course.value} courses</p>
+                        <p className={`text-xs font-bold mt-1 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>{course.value} courses</p>
                       </td>
                       <td className="py-3 px-4">
-                        <Badge variant="success">Active</Badge>
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">Active</span>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="py-8 text-center text-slate-400 font-medium italic">
+                    <td colSpan="3" className={`py-8 text-center font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                       No courses enrolled yet
                     </td>
                   </tr>
@@ -598,7 +627,11 @@ const StudentDashboard = () => {
           </div>
           <button 
             onClick={() => navigate('/student/courses')}
-            className="w-full mt-4 py-3 rounded-2xl bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
+            className={`w-full mt-4 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${
+              isDark 
+                ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' 
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
           >
             View All Courses
           </button>
@@ -609,34 +642,38 @@ const StudentDashboard = () => {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Date</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                  <th className="text-left py-3 px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Time</th>
+                <tr className={`border-b ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Date</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Status</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Time</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
                 {attendanceData.length > 0 ? (
                   attendanceData.slice(0, 5).map((record, i) => (
-                    <tr key={i} className="hover:bg-slate-50 transition-colors">
+                    <tr key={i} className={`transition-colors ${isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50'}`}>
                       <td className="py-3 px-4">
-                        <p className="font-bold text-slate-900 text-sm">{record.month || 'N/A'}</p>
+                        <p className={`font-bold text-sm ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{record.month || 'N/A'}</p>
                       </td>
                       <td className="py-3 px-4">
-                        <Badge 
-                          variant={record.rate >= 75 ? 'success' : record.rate >= 50 ? 'warning' : 'danger'}
-                        >
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          record.rate >= 75 
+                            ? 'bg-emerald-100 text-emerald-700' 
+                            : record.rate >= 50 
+                            ? 'bg-amber-100 text-amber-700' 
+                            : 'bg-rose-100 text-rose-700'
+                        }`}>
                           {record.rate}% Present
-                        </Badge>
+                        </span>
                       </td>
                       <td className="py-3 px-4">
-                        <p className="text-sm text-slate-600 font-medium">{record.rate >= 75 ? 'On Time' : 'Late'}</p>
+                        <p className={`text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{record.rate >= 75 ? 'On Time' : 'Late'}</p>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="py-8 text-center text-slate-400 font-medium italic">
+                    <td colSpan="3" className={`py-8 text-center font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                       No attendance records yet
                     </td>
                   </tr>
@@ -646,7 +683,11 @@ const StudentDashboard = () => {
           </div>
           <button 
             onClick={() => navigate('/student/attendance')}
-            className="w-full mt-4 py-3 rounded-2xl bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
+            className={`w-full mt-4 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${
+              isDark 
+                ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' 
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
           >
             View Full Attendance
           </button>

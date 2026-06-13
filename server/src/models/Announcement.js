@@ -26,6 +26,12 @@ const announcementSchema = new mongoose.Schema({
     type: String,
     enum: ['student', 'teacher', 'staff', 'admin']
   }],
+  attachments: [{
+    fileId: String,
+    filename: String,
+    mimetype: String,
+    url: String
+  }],
   isActive: {
     type: Boolean,
     default: true

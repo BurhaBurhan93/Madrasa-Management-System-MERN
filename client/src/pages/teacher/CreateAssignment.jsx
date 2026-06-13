@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 const inputCls = 'w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100';
@@ -53,7 +54,7 @@ const CreateAssignment = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-1 block text-xs font-medium text-slate-500">Due Date <span className="text-rose-500">*</span></label>
-                <input type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} required className={inputCls} />
+                <CalendarDatePicker value={form.dueDate} onChange={(date) => setForm({ ...form, dueDate: date })} placeholder="Select date" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-slate-500">Max Points</label>

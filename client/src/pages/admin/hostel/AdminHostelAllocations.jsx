@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../lib/api';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const AdminHostelAllocations = () => {
   const [allocations, setAllocations] = useState([]);
@@ -40,8 +41,8 @@ const AdminHostelAllocations = () => {
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Student ID</label><input value={form.studentId} onChange={e => setForm({ ...form, studentId: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Room Number</label><input value={form.roomNumber} onChange={e => setForm({ ...form, roomNumber: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Block</label><input value={form.block} onChange={e => setForm({ ...form, block: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Check-in Date</label><input type="date" value={form.checkInDate} onChange={e => setForm({ ...form, checkInDate: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Check-out Date</label><input type="date" value={form.checkOutDate} onChange={e => setForm({ ...form, checkOutDate: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">Check-in Date</label><CalendarDatePicker value={form.checkInDate} onChange={(date) => setForm({ ...form, checkInDate: date })} placeholder="Select date" /></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">Check-out Date</label><CalendarDatePicker value={form.checkOutDate} onChange={(date) => setForm({ ...form, checkOutDate: date })} placeholder="Select date" /></div>
           </div>
           <button type="submit" className="mt-4 rounded-lg bg-cyan-600 px-6 py-2 text-sm font-medium text-white hover:bg-cyan-700">Allocate</button>
         </form>

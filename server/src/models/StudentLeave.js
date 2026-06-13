@@ -7,6 +7,12 @@ const StudentLeaveSchema = new Schema({
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   reason: { type: String },
+  attachments: [{
+    fileId: String,
+    filename: String,
+    mimetype: String,
+    url: String
+  }],
   requestedAt: { type: Date, default: Date.now },
   approvedBy: { type: Schema.Types.ObjectId, ref: 'Employee' },
   approvalStatus: { type: String, enum: ['pending','approved','rejected'], default: 'pending' },

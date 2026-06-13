@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import CalendarDatePicker from "../UIHelper/CalendarDatePicker";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -244,18 +245,7 @@ const Register = () => {
             <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
               Date of Birth
             </label>
-            <input
-              type="date"
-              id="dateOfBirth"
-              name="dateOfBirth"
-              value={formData.dateOfBirth}
-              onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition-colors ${
-                errors.dateOfBirth 
-                  ? 'border-red-500 focus:ring-red-200' 
-                  : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'
-              }`}
-            />
+            <CalendarDatePicker value={formData.dateOfBirth} onChange={handleChange} placeholder="Select date" />
             {errors.dateOfBirth && (
               <p className="mt-1 text-sm text-red-600">{errors.dateOfBirth}</p>
             )}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Card from '../../../components/UIHelper/Card';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 import api from '../../../lib/api';
 
 const UserEdit = () => {
@@ -159,7 +160,11 @@ const UserEdit = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                <input type="date" value={formData.dob} onChange={(e) => setFormData({ ...formData, dob: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                <CalendarDatePicker
+                  value={formData.dob}
+                  onChange={(date) => setFormData({ ...formData, dob: date })}
+                  placeholder="Select date of birth"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Blood Type</label>

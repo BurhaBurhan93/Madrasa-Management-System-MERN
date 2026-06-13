@@ -1,15 +1,19 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   FiHome, FiUsers, FiBookOpen, FiCalendar, FiDollarSign, FiUser, FiMenu, FiLogOut,
-  FiSearch, FiBell, FiChevronDown, FiChevronLeft, FiChevronRight, FiSettings, FiBarChart2, FiLayers, FiClipboard,
+  FiSearch, FiChevronDown, FiChevronLeft, FiChevronRight, FiSettings, FiBarChart2, FiLayers, FiClipboard,
   FiAward, FiPackage, FiCoffee, FiInbox, FiUserPlus, FiBook, FiFileText, FiDatabase,
   FiMonitor, FiShield, FiActivity, FiTrendingUp, FiCheckCircle, FiAlertCircle,
   FiSun, FiMoon, FiGlobe
 } from 'react-icons/fi';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { useTheme } from '../contexts/ThemeContext';
+import { CalendarProvider, useCalendar } from '../contexts/CalendarContext';
 import { clearAuth } from '../lib/auth';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
+import NotificationDropdown from '../components/UIHelper/NotificationDropdown';
+import { CALENDAR_SYSTEMS, calendarLabels, setCalendarSystem } from '../lib/dateUtils';
 
 // ── Localization strings ──
 const translations = {
@@ -306,17 +310,27 @@ const translations = {
   },
 };
 
-const AdminPanel = () => {
+const AdminPanelContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useLocalStorage('adminSidebarOpen', true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [user, setUser] = useState(null);
   const [, setLoading] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const [lang, setLang] = useLocalStorage('adminLang', 'en');
+  const { calSys, setCalSys } = useCalendar();
+  const isRTL = lang === 'dari' || lang === 'ps';
 
   const t = translations[lang] || translations.en;
+
+  // Set document direction based on language
+  useEffect(() => {
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+    document.documentElement.lang = lang;
+    return () => { document.documentElement.dir = 'ltr'; };
+  }, [lang, isRTL]);
 
   useEffect(() => {
     fetchUserData();
@@ -337,14 +351,16 @@ const AdminPanel = () => {
   };
 
   useEffect(() => {
+    let prevIsMobile = window.innerWidth < 768;
     const handleResize = () => {
-      if (window.innerWidth < 768) {
+      const nowMobile = window.innerWidth < 768;
+      setIsMobile(nowMobile);
+      // Only auto-close sidebar when crossing from desktop to mobile
+      if (!prevIsMobile && nowMobile) {
         setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
       }
+      prevIsMobile = nowMobile;
     };
-    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [setSidebarOpen]);
@@ -510,7 +526,7 @@ const AdminPanel = () => {
 
   const handleNavigation = (path) => {
     navigate(`/admin/${path}`);
-    if (window.innerWidth < 768) setSidebarOpen(false);
+    if (isMobile) setSidebarOpen(false);
   };
 
   const isActive = (path) => {
@@ -538,7 +554,7 @@ const AdminPanel = () => {
   ]), [location.pathname, lang]);
 
   return (
-    <div className={`flex h-screen overflow-hidden ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.95),_rgba(15,23,42,1)_42%,_rgba(30,41,59,1)_100%)]' : 'bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.9),_rgba(248,250,252,1)_42%,_rgba(241,245,249,1)_100%)]'}`}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} className={`flex h-screen overflow-hidden ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.95),_rgba(15,23,42,1)_42%,_rgba(30,41,59,1)_100%)]' : 'bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.9),_rgba(248,250,252,1)_42%,_rgba(241,245,249,1)_100%)]'}`}>
       <aside
         className={`fixed z-30 h-screen border-r backdrop-blur-xl transition-all duration-300 md:relative ${theme === 'dark' ? 'border-slate-700/60 bg-slate-900/95' : 'border-white/70 bg-white/90'} ${sidebarOpen ? 'w-72' : 'w-24'}`}
       >
@@ -696,7 +712,7 @@ const AdminPanel = () => {
       {sidebarOpen && <div onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-20 bg-slate-950/25 backdrop-blur-[1px] md:hidden" aria-hidden />}
 
       <main className="flex-1 min-w-0 overflow-y-auto h-screen">
-        <header className={`sticky top-0 z-20 border-b backdrop-blur-xl ${theme === 'dark' ? 'border-slate-700/60 bg-slate-900/80' : 'border-white/70 bg-white/72'}`}>
+        <header className={`sticky top-0 z-20 mx-3 mt-3 rounded-2xl border navbar-glass ${theme === 'dark' ? 'border-slate-700/60 bg-slate-900/80' : 'border-white/70 bg-white/72'}`}>
           <div className="flex items-center justify-between px-5 py-4 lg:px-8">
             <div className="flex items-center gap-4">
               <button
@@ -728,21 +744,30 @@ const AdminPanel = () => {
                   <FiGlobe size={17} />
                   <span className="text-xs font-semibold">{lang === 'en' ? 'EN' : lang === 'dari' ? 'دری' : 'پښتو'}</span>
                 </button>
-                <button className={`relative flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}>
-                  <FiBell size={19} />
-                  <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white" />
+                <button onClick={() => { const sys = [CALENDAR_SYSTEMS.GREGORIAN, CALENDAR_SYSTEMS.HIJRI, CALENDAR_SYSTEMS.JALALI]; const next = sys[(sys.indexOf(calSys) + 1) % sys.length]; setCalSys(next); setCalendarSystem('admin', next); }} title={calendarLabels[lang]?.[calSys] || calSys} className={`flex h-11 items-center gap-1 rounded-2xl border px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}>
+                  <FiCalendar size={17} />
+                  <span className="text-[10px] font-semibold">{calendarLabels[lang]?.[calSys] || calSys}</span>
                 </button>
+                <NotificationDropdown t={t} />
               </div>
             </div>
           </div>
         </header>
 
-        <div className="p-5 lg:p-8">
-          <Outlet />
-        </div>
+          <div className="p-4 lg:p-6">
+          <Suspense fallback={<PageSkeleton variant="table" />}>
+            <Outlet />
+          </Suspense>
+          </div>
       </main>
     </div>
   );
 };
+
+const AdminPanel = () => (
+  <CalendarProvider panelPrefix="admin">
+    <AdminPanelContent />
+  </CalendarProvider>
+);
 
 export default AdminPanel;

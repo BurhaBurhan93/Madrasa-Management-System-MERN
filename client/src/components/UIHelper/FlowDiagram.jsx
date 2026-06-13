@@ -236,7 +236,7 @@ export const FlowDiagram = ({
 
   return (
     <div 
-      className={`bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden ${className}`}
+      className={`bg-white/40 backdrop-blur-xl rounded-2xl shadow-md border border-white/60 overflow-hidden ${className}`}
       style={{ height, width }}
     >
       {title && (

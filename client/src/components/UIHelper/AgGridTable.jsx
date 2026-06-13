@@ -138,7 +138,7 @@ export const AgGridTable = ({
   }, []);
 
   return (
-    <div className={`bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden ${className}`}>
+    <div className={`bg-white/40 backdrop-blur-xl rounded-2xl shadow-md border border-white/60 overflow-hidden ${className}`}>
       {title && (
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-800">{title}</h3>

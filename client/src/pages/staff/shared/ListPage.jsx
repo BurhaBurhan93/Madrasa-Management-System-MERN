@@ -7,7 +7,7 @@ import StaffPageLayout from './StaffPageLayout';
 import RecordActionButtons from './RecordActionButtons';
 import StaffPagination from './StaffPagination';
 import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
-import { FiDownload } from 'react-icons/fi';
+import { FiDownload, FiPlus } from 'react-icons/fi';
 import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { getStaffToneStyles } from './staffTheme';
 
@@ -221,7 +221,7 @@ const ListPage = ({
     <div className="flex flex-wrap items-center justify-end gap-3">
       {enableExport ? <Button variant="outline" icon={FiDownload} onClick={handleExport}>Export CSV</Button> : null}
       {extraActions}
-      {createPath ? <Button variant="primary" onClick={() => (window.location.href = createPath)}>Add New</Button> : null}
+      {createPath ? <Button variant="primary" icon={FiPlus} onClick={() => (window.location.href = createPath)}>Add New</Button> : null}
     </div>
   );
 
@@ -229,12 +229,12 @@ const ListPage = ({
     <>
       {headerContent}
       <Card className="rounded-[28px] shadow-none">
-        <div className={`rounded-[24px] border p-4 lg:p-5 ${panelShellClass}`}>
-          <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className={`rounded-[24px] border p-5 lg:p-6 ${panelShellClass}`}>
+          <div className="mb-5 flex flex-wrap items-center gap-3">
             <div className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${toneStyles.soft}`}>Search And Filter</div>
             <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Quick controls for finding records faster.</div>
           </div>
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="grid w-full gap-4 lg:max-w-4xl lg:grid-cols-[minmax(300px,420px)_220px_220px]">
               <div>
                 <label className={`mb-2 block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>Search</label>

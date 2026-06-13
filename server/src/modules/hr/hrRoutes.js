@@ -40,6 +40,7 @@ router.get('/attendance/summary', hrController.getAttendanceSummary);
 router.get('/leaves', hrController.getAllLeaves);
 router.get('/leaves/:id', hrController.getLeaveById);
 router.post('/leaves', hrController.createLeave);
+router.put('/leaves/:id', hrController.updateLeave);
 router.put('/leaves/:id/approve', hrController.approveLeave);
 router.put('/leaves/:id/reject', hrController.rejectLeave);
 router.delete('/leaves/:id', hrController.deleteLeave);

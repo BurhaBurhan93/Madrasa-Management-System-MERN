@@ -66,7 +66,7 @@ const ChartContainer = ({
   className = ''
 }) => {
   return (
-    <div className={`w-full bg-white rounded-2xl shadow-md border border-gray-200 p-6 ${className}`}>
+    <div className={`w-full bg-white/40 backdrop-blur-xl rounded-2xl shadow-md border border-white/60 p-6 ${className}`}>
       {title && (
         <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
       )}

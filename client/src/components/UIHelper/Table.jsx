@@ -33,7 +33,7 @@ const Table = ({
               ))}
             </tr>
           </thead>
-          <tbody className={isDark ? 'divide-slate-800 bg-slate-950' : 'divide-slate-200 bg-white'}>
+          <tbody className={isDark ? 'divide-slate-800 bg-slate-950/60' : 'divide-slate-200 bg-white/30'}>
             {data.length > 0 ? data.map((row, rowIndex) => (
               <tr
                 key={row.id || row._id || rowIndex}
@@ -88,7 +88,7 @@ const TableHeader = ({ children }) => {
 const TableBody = ({ children }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  return <tbody className={isDark ? 'divide-slate-800 bg-slate-950' : 'divide-slate-200 bg-white'}>{children}</tbody>;
+  return <tbody className={isDark ? 'divide-slate-800 bg-slate-950/60' : 'divide-slate-200 bg-white/30'}>{children}</tbody>;
 };
 
 const TableRow = ({ children, className = '' }) => {

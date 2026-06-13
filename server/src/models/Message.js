@@ -19,6 +19,12 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  attachments: [{
+    fileId: String,
+    filename: String,
+    mimetype: String,
+    url: String
+  }],
   status: {
     type: String,
     enum: ['unread', 'read'],

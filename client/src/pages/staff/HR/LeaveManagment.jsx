@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../../lib/api';
 import StaffPageLayout from '../shared/StaffPageLayout';
 import StaffPagination from '../shared/StaffPagination';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const statusVariant = (s) => {
   if (s === 'approved') return 'bg-emerald-100 text-emerald-700';
@@ -175,8 +176,7 @@ const LeaveManagement = () => {
                 {/* Request Date */}
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Request Date</label>
-                  <input type="date" value={form.requestDate} onChange={e => set('requestDate', e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100" />
+                  <CalendarDatePicker value={form.requestDate} onChange={(date) => set('requestDate', date)} placeholder="Select date" />
                 </div>
                 {/* Reason */}
                 <div className="space-y-1.5 md:col-span-2">

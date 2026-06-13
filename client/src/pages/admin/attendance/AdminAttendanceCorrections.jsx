@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 import api from '../../../lib/api';
 
 const AdminAttendanceCorrections = () => {
@@ -40,7 +41,7 @@ const AdminAttendanceCorrections = () => {
         <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Student Name</label><input value={form.studentName} onChange={e => setForm({ ...form, studentName: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Date</label><input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">Date</label><CalendarDatePicker value={form.date} onChange={(date) => setForm({ ...form, date: date })} placeholder="Select date" /></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Corrected Status</label><select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"><option value="present">Present</option><option value="absent">Absent</option><option value="late">Late</option><option value="excused">Excused</option></select></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Reason</label><input value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Reason for correction" required /></div>
           </div>

@@ -13,6 +13,7 @@ const StudentEducation = require('../models/StudentEducation');
 const Admission = require('../models/Admission');
 
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 // Get student profile
 const getStudentProfile = async (req, res) => {
@@ -963,11 +964,13 @@ const createStudent = async (req, res) => {
   try {
     const studentData = req.body;
     
+    const hashedPassword = await bcrypt.hash(studentData.accountPassword || studentData.password || 'defaultPassword123', 10);
+    
     // Create user account first
     const user = new User({
       name: `${studentData.firstName} ${studentData.lastName || ''}`.trim(),
       email: studentData.email || `${studentData.firstName.toLowerCase()}.${Date.now()}@example.com`,
-      password: 'defaultPassword123', // Should be changed by user
+      password: hashedPassword,
       role: 'student',
       phone: studentData.phone,
       whatsapp: studentData.whatsapp,

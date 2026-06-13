@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../../lib/api';
 import Button from '../../../components/UIHelper/Button';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const statusOptions = ['present', 'absent', 'late', 'half-day', 'on-leave'];
 
@@ -92,12 +93,7 @@ const HRAttendance = () => {
           <p className="text-sm text-gray-500 mt-1">Mark daily attendance for all employees</p>
         </div>
         <div className="flex items-center gap-4">
-          <input
-            type="date"
-            value={date}
-            onChange={e => setDate(e.target.value)}
-            className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 outline-none"
-          />
+          <CalendarDatePicker value={date} onChange={(date) => setDate(date)} placeholder="Select date" />
           <Button onClick={handleSubmit} disabled={loading} className="bg-cyan-500 hover:bg-cyan-600 text-white">
             {loading ? 'Saving...' : 'Save Attendance'}
           </Button>

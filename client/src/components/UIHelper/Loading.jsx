@@ -25,7 +25,7 @@ const LoadingOverlay = ({ isLoading, children }) => {
 
   return (
     <div className="relative">
-      <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/75 backdrop-blur-sm dark:bg-slate-950/70">
+      <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/40 backdrop-blur-sm dark:bg-slate-950/70">
         <LoadingSpinner size="lg" />
       </div>
       {children}

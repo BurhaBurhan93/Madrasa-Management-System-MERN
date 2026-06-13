@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../lib/api';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const AdminHostelMeals = () => {
   const [meals, setMeals] = useState([]);
@@ -38,7 +39,7 @@ const AdminHostelMeals = () => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Meal Type</label><select value={form.mealType} onChange={e => setForm({ ...form, mealType: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"><option>breakfast</option><option>lunch</option><option>dinner</option><option>snack</option></select></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Menu</label><input value={form.menu} onChange={e => setForm({ ...form, menu: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Date</label><input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">Date</label><CalendarDatePicker value={form.date} onChange={(date) => setForm({ ...form, date: date })} placeholder="Select date" /></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Cost per Person</label><input type="number" value={form.cost} onChange={e => setForm({ ...form, cost: +e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
             <div className="md:col-span-2"><label className="mb-1 block text-sm font-medium text-slate-700">Notes</label><input value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Input from '../../components/UIHelper/Input';
 import Avatar from '../../components/UIHelper/Avatar';
 import axios from 'axios';
+import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
 
 const Panel = ({ title, subtitle, children, className = '' }) => (
   <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
@@ -171,7 +172,7 @@ const TeacherProfile = () => {
                 <Input label="Email" name="email" value={userData.email || ''} onChange={handleInputChange} disabled={!editMode} />
                 <Input label="Phone" name="phone" value={userData.phone || ''} onChange={handleInputChange} disabled={!editMode} />
                 <Input label="WhatsApp" name="whatsapp" value={userData.whatsapp || ''} onChange={handleInputChange} disabled={!editMode} />
-                <Input label="Date of Birth" type="date" name="dob" value={userData.dob || ''} onChange={handleInputChange} disabled={!editMode} />
+                <CalendarDatePicker value={userData.dob || ''} name="dob" onChange={handleInputChange} placeholder="Select date" />
                 <Input label="Blood Type" name="bloodType" value={userData.bloodType || ''} onChange={handleInputChange} disabled={!editMode} />
                 <Input label="ID Number" name="idNumber" value={userData.idNumber || ''} onChange={handleInputChange} disabled={!editMode} />
               </div>

@@ -22,6 +22,7 @@ import Modal from '../components/UIHelper/Modal';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { BarChartComponent } from '../components/UIHelper/ECharts';
 import { formatDate } from '../lib/utils';
+import CalendarDatePicker from "../components/UIHelper/CalendarDatePicker";
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -266,22 +267,8 @@ const StudentLeave = () => {
             />
             
             <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="Start Date"
-                name="startDate"
-                type="date"
-                value={formData.startDate}
-                onChange={handleInputChange}
-                required
-              />
-              <Input
-                label="End Date"
-                name="endDate"
-                type="date"
-                value={formData.endDate}
-                onChange={handleInputChange}
-                required
-              />
+              <CalendarDatePicker value={formData.startDate} name="startDate" onChange={handleInputChange} placeholder="Select date" />
+              <CalendarDatePicker value={formData.endDate} name="endDate" onChange={handleInputChange} placeholder="Select date" />
             </div>
 
             <div className="space-y-2">

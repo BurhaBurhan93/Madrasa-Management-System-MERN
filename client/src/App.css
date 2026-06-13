@@ -34,3 +34,246 @@ html.dark body {
   background: rgba(14, 165, 233, 0.25);
   color: inherit;
 }
+
+/* ── Dark-mode: fix card/container backgrounds (exclude buttons) ── */
+html.dark .bg-white:not(button):not([role="button"]):not(a) {
+  background-color: rgb(15 23 42 / 0.6) !important;
+}
+
+html.dark .bg-gray-50:not(button):not([role="button"]) {
+  background-color: rgb(15 23 42 / 0.5) !important;
+}
+
+html.dark .bg-slate-50:not(button):not([role="button"]) {
+  background-color: rgb(15 23 42 / 0.5) !important;
+}
+
+/* Keep modals and overlays readable */
+html.dark .fixed .bg-white,
+html.dark .fixed .bg-gray-50,
+html.dark [role="dialog"] .bg-white,
+html.dark [role="dialog"] .bg-gray-50 {
+  background-color: rgb(15 23 42 / 0.95) !important;
+}
+
+/* Dark-mode text color fixes for light-themed pages */
+html.dark .text-slate-900 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+html.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-gray-900 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-gray-800 {
+  color: #e2e8f0 !important;
+}
+
+html.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+/* Dark mode form elements */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  color: #e2e8f0 !important;
+  background-color: rgb(15 23 42 / 0.4) !important;
+  border-color: rgb(51 65 85 / 0.6) !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+html.dark label {
+  color: #cbd5e1 !important;
+}
+
+/* Dark mode table cell text */
+html.dark td {
+  color: #cbd5e1 !important;
+}
+
+html.dark th {
+  color: #94a3b8 !important;
+}
+
+/* Dark mode list item text */
+html.dark li {
+  color: inherit;
+}
+
+/* Dark mode paragraph and heading text */
+html.dark p {
+  color: inherit;
+}
+
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+  color: #f1f5f9 !important;
+}
+
+/* Dark mode span text override */
+html.dark span {
+  color: inherit;
+}
+
+/* Dark-mode border fixes for light-themed elements */
+html.dark .border-slate-200 {
+  border-color: rgb(51 65 85 / 0.6) !important;
+}
+
+html.dark .border-gray-200 {
+  border-color: rgb(51 65 85 / 0.6) !important;
+}
+
+html.dark .border-gray-300 {
+  border-color: rgb(71 85 105 / 0.6) !important;
+}
+
+/* Dark-mode table headers and light backgrounds */
+html.dark .bg-slate-100 {
+  background-color: rgb(30 41 59 / 0.7) !important;
+}
+
+html.dark .bg-gray-100 {
+  background-color: rgb(30 41 59 / 0.7) !important;
+}
+
+/* Dark-mode hover states */
+html.dark .hover\:bg-slate-50:hover {
+  background-color: rgb(30 41 59 / 0.5) !important;
+}
+
+html.dark .hover\:bg-gray-50:hover {
+  background-color: rgb(30 41 59 / 0.5) !important;
+}
+
+html.dark .hover\:bg-cyan-50:hover {
+  background-color: rgb(8 145 178 / 0.15) !important;
+}
+
+/* Dark-mode table row alternating backgrounds */
+html.dark .odd\:bg-white:nth-child(odd) {
+  background-color: rgb(15 23 42 / 0.4) !important;
+}
+
+html.dark .even\:bg-slate-50\/30:nth-child(even),
+html.dark .even\:bg-gray-50:nth-child(even) {
+  background-color: rgb(15 23 42 / 0.25) !important;
+}
+
+html.dark .hover\:bg-cyan-50\/40:hover {
+  background-color: rgb(8 145 178 / 0.15) !important;
+}
+
+/* Dark-mode focus states */
+html.dark .focus\:bg-white:focus {
+  background-color: rgb(15 23 42 / 0.6) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   Contextual / Semantic Colors (light + dark mode)
+   ══════════════════════════════════════════════════ */
+
+/* Status badges */
+.status-active   { color: #059669; background: #d1fae5; }
+.status-inactive { color: #dc2626; background: #fee2e2; }
+.status-pending  { color: #d97706; background: #fef3c7; }
+.status-resolved { color: #0284c7; background: #e0f2fe; }
+
+html.dark .status-active   { color: #34d399; background: rgba(5,150,105,0.15); }
+html.dark .status-inactive { color: #f87171; background: rgba(220,38,38,0.15); }
+html.dark .status-pending  { color: #fbbf24; background: rgba(217,119,6,0.15); }
+html.dark .status-resolved { color: #38bdf8; background: rgba(2,132,199,0.15); }
+
+/* Priority indicators */
+.priority-high   { color: #dc2626; background: #fee2e2; border-left: 4px solid #dc2626; }
+.priority-medium { color: #d97706; background: #fef3c7; border-left: 4px solid #d97706; }
+.priority-low    { color: #059669; background: #d1fae5; border-left: 4px solid #059669; }
+
+html.dark .priority-high   { color: #f87171; background: rgba(220,38,38,0.12); border-left-color: #f87171; }
+html.dark .priority-medium { color: #fbbf24; background: rgba(217,119,6,0.12); border-left-color: #fbbf24; }
+html.dark .priority-low    { color: #34d399; background: rgba(5,150,105,0.12); border-left-color: #34d399; }
+
+/* Approval / payment status */
+.approval-approved { color: #059669; background: #d1fae5; }
+.approval-rejected { color: #dc2626; background: #fee2e2; }
+.approval-pending  { color: #d97706; background: #fef3c7; }
+
+html.dark .approval-approved { color: #34d399; background: rgba(5,150,105,0.15); }
+html.dark .approval-rejected { color: #f87171; background: rgba(220,38,38,0.15); }
+html.dark .approval-pending  { color: #fbbf24; background: rgba(217,119,6,0.15); }
+
+/* ══════════════════════════════════════════════════
+   RTL (Right-to-Left) Layout Support
+   ══════════════════════════════════════════════════ */
+[dir="rtl"] .rtl\:right-auto { right: auto; }
+[dir="rtl"] .rtl\:left-0     { left: 0; }
+[dir="rtl"] .rtl\:ml-2       { margin-left: 0; margin-right: 0.5rem; }
+[dir="rtl"] .rtl\:mr-2       { margin-right: 0; margin-left: 0.5rem; }
+[dir="rtl"] .rtl\:pl-4       { padding-left: 0; padding-right: 1rem; }
+[dir="rtl"] .rtl\:text-left  { text-align: right; }
+[dir="rtl"] .rtl\:text-right { text-align: left; }
+[dir="rtl"] .rtl\:rotate-180 { transform: rotate(180deg); }
+[dir="rtl"] .rtl\:border-r   { border-right: none; border-left: 1px solid; }
+[dir="rtl"] .rtl\:border-l-0 { border-left: none; }
+
+/* Flip sidebar border for RTL */
+[dir="rtl"] aside.border-r {
+  border-right: none !important;
+  border-left: 1px solid;
+}
+
+/* Fix flex direction for RTL */
+[dir="rtl"] .flex-row-ltr {
+  flex-direction: row-reverse;
+}
+
+/* Notification dropdown animation */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.notification-dropdown {
+  animation: slideDown 0.2s ease-out;
+}
+
+/* Navbar glass effect */
+.navbar-glass {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}

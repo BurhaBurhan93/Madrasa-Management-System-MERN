@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../../../lib/api';
 import StaffPageLayout from '../shared/StaffPageLayout';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const RegistrarReports = () => {
   const [filters, setFilters] = useState({ status: '', startDate: '', endDate: '' });
@@ -71,13 +72,11 @@ const RegistrarReports = () => {
             </div>
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Start Date</label>
-              <input type="date" value={filters.startDate} onChange={e => set('startDate', e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100" />
+              <CalendarDatePicker value={filters.startDate} onChange={(date) => set('startDate', date)} placeholder="Select date" />
             </div>
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">End Date</label>
-              <input type="date" value={filters.endDate} onChange={e => set('endDate', e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100" />
+              <CalendarDatePicker value={filters.endDate} onChange={(date) => set('endDate', date)} placeholder="Select date" />
             </div>
           </div>
           {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}

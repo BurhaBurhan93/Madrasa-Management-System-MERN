@@ -69,36 +69,77 @@ import Communications from './components/communications/Communications';
 // Staff — all routes controlled from StaffRoutes
 import staffRoutes from './routes/StaffRoutes';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => localStorage.getItem('isAuthenticated') === 'true');
   const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole'));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = getToken(); // validates & clears if expired/fake
-    const role  = getUserRole();
-    if (token && role) {
-      setIsAuthenticated(true);
-      setUserRole(role);
+    let mounted = true;
+
+    const bootstrapAuth = async () => {
+      const token = getToken();
+      const role = getUserRole();
+
+      if (!token || !role) {
+        clearAuth();
+        if (mounted) {
+          setIsAuthenticated(false);
+          setUserRole(null);
+          setLoading(false);
+        }
+        return;
+      }
+
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      clearAuth();
-      setIsAuthenticated(false);
-    }
-    setLoading(false);
+
+      try {
+        const response = await axios.get(`${API_BASE}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const currentUser = response.data?.user || response.data?.data?.user || null;
+
+        if (!mounted) return;
+
+        if (currentUser) {
+          localStorage.setItem('user', JSON.stringify(currentUser));
+          localStorage.setItem('userRole', currentUser.role || role);
+          setUserRole(currentUser.role || role);
+        } else {
+          setUserRole(role);
+        }
+        setIsAuthenticated(true);
+      } catch (error) {
+        clearAuth();
+        if (mounted) {
+          setIsAuthenticated(false);
+          setUserRole(null);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    bootstrapAuth();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const ProtectedRoute = ({ children, allowedRoles }) => {
     const role = getUserRole();
     if (loading) return <div className="flex h-screen items-center justify-center text-slate-500">Loading...</div>;
-    if (!isTokenValid()) { clearAuth(); return <Navigate to="/login" replace />; }
+    if (!isAuthenticated || !isTokenValid()) { clearAuth(); return <Navigate to="/login" replace />; }
     if (allowedRoles && !allowedRoles.includes(role)) return <Navigate to="/" replace />;
     return children;
   };
 
   const RoleLanding = () => {
     if (loading) return <div className="flex h-screen items-center justify-center text-slate-500">Loading...</div>;
-    if (!isTokenValid()) return <Home />;
+    if (!isAuthenticated || !isTokenValid()) return <Home />;
 
     const role = getUserRole();
     const rolePaths = {
@@ -117,7 +158,7 @@ function App() {
         <Routes>
 
           {/* ── Public ── */}
-          <Route path="/" element={<RoleLanding />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
           <Route path="/register" element={<Register />} />
 

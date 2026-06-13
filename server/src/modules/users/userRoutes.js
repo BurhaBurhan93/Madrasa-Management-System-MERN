@@ -19,11 +19,12 @@ router.get('/test', (req, res) => {
   res.json({ success: true, message: 'User routes working!' });
 });
 
-// Admin-only CRUD routes
-router.use(authorizeRoles('admin'));
+// Admin and staff user management routes
+router.use(authorizeRoles('admin', 'staff'));
 router.get('/', userController.getAllUsers);
 router.get('/:id', userController.getUserById);
 router.post('/', userController.createUser);
+router.use(authorizeRoles('admin'));
 router.put('/:id', userController.updateUser);
 router.delete('/:id', userController.deleteUser);
 

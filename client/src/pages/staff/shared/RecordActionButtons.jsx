@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { FiEdit2, FiEye, FiTrash2 } from 'react-icons/fi';
 
 const RecordActionButtons = ({ onView, onEdit, onDelete, extraItems = [] }) => {
   const [open, setOpen] = useState(false);
@@ -12,37 +13,27 @@ const RecordActionButtons = ({ onView, onEdit, onDelete, extraItems = [] }) => {
 
   const items = [
     ...extraItems,
-    onView   && { label: 'View',   onClick: onView,   color: 'text-sky-700 hover:bg-sky-50' },
-    onEdit   && { label: 'Edit',   onClick: onEdit,   color: 'text-amber-700 hover:bg-amber-50' },
-    onDelete && { label: 'Delete', onClick: onDelete, color: 'text-rose-700 hover:bg-rose-50' },
+    onView   && { label: 'View',   onClick: onView,   icon: FiEye,   className: 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-300 hover:bg-sky-100' },
+    onEdit   && { label: 'Edit',   onClick: onEdit,   icon: FiEdit2,  className: 'border-amber-200 bg-amber-50 text-amber-700 hover:border-amber-300 hover:bg-amber-100' },
+    onDelete && { label: 'Delete', onClick: onDelete, icon: FiTrash2, className: 'border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100' },
   ].filter(Boolean);
 
   return (
-    <div className="relative flex justify-end" ref={ref}>
-      <button
-        type="button"
-        onClick={() => setOpen((p) => !p)}
-        className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700"
-        aria-label="Row actions"
-      >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <circle cx="8" cy="3" r="1.4"/><circle cx="8" cy="8" r="1.4"/><circle cx="8" cy="13" r="1.4"/>
-        </svg>
-      </button>
-      {open && (
-        <div className="absolute right-0 top-10 z-30 min-w-[140px] overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg">
-          {items.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => { setOpen(false); item.onClick(); }}
-              className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium transition ${item.color || 'text-slate-700 hover:bg-slate-50'}`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="flex flex-wrap justify-end gap-2" ref={ref}>
+      {items.map((item) => {
+        const Icon = item.icon;
+        return (
+          <button
+            key={item.label}
+            type="button"
+            onClick={() => item.onClick()}
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold shadow-sm transition-all duration-200 ${item.className || 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
+          >
+            <Icon size={14} />
+            {item.label}
+          </button>
+        );
+      })}
     </div>
   );
 };

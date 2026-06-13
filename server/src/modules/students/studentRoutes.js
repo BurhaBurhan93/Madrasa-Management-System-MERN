@@ -4,6 +4,35 @@ const ctrl = require('./studentController');
 const regCtrl = require('../../controllers/registrarController');
 const authenticateToken = require('../../middleware/auth');
 
+const STAFF_MANAGEMENT_PREFIXES = [
+  '/admissions',
+  '/all',
+  '/guardians',
+  '/education-history',
+  '/documents',
+  '/reports'
+];
+
+const STAFF_MANAGEMENT_METHODS = new Set(['POST', 'PUT', 'DELETE']);
+
+const isStaffManagementRoute = (reqPath, method) => {
+  if (reqPath === '/' && STAFF_MANAGEMENT_METHODS.has(method)) return true;
+  if (reqPath.startsWith('/students/')) {
+    return (
+      reqPath.includes('/transfer') ||
+      reqPath.includes('/promote') ||
+      reqPath.includes('/correct-data') ||
+      reqPath.includes('/audit-logs')
+    );
+  }
+
+  if (STAFF_MANAGEMENT_PREFIXES.some((prefix) => reqPath === prefix || reqPath.startsWith(`${prefix}/`))) {
+    return true;
+  }
+
+  return STAFF_MANAGEMENT_METHODS.has(method) && /^\/[^/]+$/.test(reqPath) && reqPath !== '/profile';
+};
+
 // Middleware to check if user is staff/admin (for registrar functions)
 const ensureStaffOrAdmin = (req, res, next) => {
   if (!['staff', 'admin'].includes(req.user.role)) {
@@ -22,17 +51,7 @@ const ensureStudent = (req, res, next) => {
 // ================= REGISTRAR/STAFF ROUTES (No student middleware) =================
 // These routes are for Registrar department use
 router.use((req, res, next) => {
-  // Check if it's a registrar route
-  if (req.path.includes('/admissions') || 
-      req.path.includes('/all') || 
-      req.path.includes('/guardians') ||
-      req.path.includes('/education-history') ||
-      req.path.includes('/documents') ||
-      req.path.includes('/transfer') ||
-      req.path.includes('/promote') ||
-      req.path.includes('/correct-data') ||
-      req.path.includes('/audit-logs') ||
-      req.path.includes('/reports')) {
+  if (isStaffManagementRoute(req.path, req.method)) {
     authenticateToken(req, res, () => {
       ensureStaffOrAdmin(req, res, next);
     });

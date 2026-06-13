@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../../components/UIHelper/Card';
+import { CreateUserModal } from '../../../components/UIHelper';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 import api from '../../../lib/api';
 
 const UserRegister = () => {
@@ -13,6 +15,7 @@ const UserRegister = () => {
     status: 'active'
   });
   const [imagePreview, setImagePreview] = useState(null);
+  const [showCreateUser, setShowCreateUser] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -43,12 +46,20 @@ const UserRegister = () => {
 
   return (
     <div className="w-full bg-gray-50 min-h-screen p-6">
-      <div className="mb-6">
-        <button onClick={() => navigate('/staff/users')} className="text-blue-600 hover:text-blue-800 mb-4">
-          ← Back to Users
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <button onClick={() => navigate('/staff/users')} className="text-blue-600 hover:text-blue-800 mb-4">
+            ← Back to Users
+          </button>
+          <h1 className="text-3xl font-bold text-gray-900"> Register New User</h1>
+          <p className="text-gray-600 mt-1">Create a new user account</p>
+        </div>
+        <button
+          onClick={() => setShowCreateUser(true)}
+          className="px-4 py-2 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 text-sm font-medium mt-8"
+        >
+          + Quick Create User
         </button>
-        <h1 className="text-3xl font-bold text-gray-900"> Register New User</h1>
-        <p className="text-gray-600 mt-1">Create a new user account</p>
       </div>
 
       <Card>
@@ -134,7 +145,11 @@ const UserRegister = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                <input type="date" value={formData.dob} onChange={(e) => setFormData({ ...formData, dob: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                <CalendarDatePicker
+                  value={formData.dob}
+                  onChange={(date) => setFormData({ ...formData, dob: date })}
+                  placeholder="Select date of birth"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Blood Type</label>
@@ -217,6 +232,11 @@ const UserRegister = () => {
           </div>
         </form>
       </Card>
+
+      <CreateUserModal
+        isOpen={showCreateUser}
+        onClose={() => setShowCreateUser(false)}
+      />
     </div>
   );
 };

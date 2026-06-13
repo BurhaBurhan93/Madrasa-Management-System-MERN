@@ -6,7 +6,7 @@ export const SkeletonCard = ({ className = '' }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   return (
-    <div className={`rounded-xl p-6 shadow-sm animate-pulse ${isDark ? 'bg-slate-900' : 'bg-white'} ${className}`}>
+    <div className={`rounded-xl p-6 shadow-sm animate-pulse ${isDark ? 'bg-slate-900' : 'bg-white/40 backdrop-blur-xl'} ${className}`}>
       <div className={`h-4 rounded w-3/4 mb-4 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
       <div className={`h-3 rounded w-1/2 mb-2 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
       <div className={`h-3 rounded w-2/3 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
@@ -18,7 +18,7 @@ export const SkeletonTable = ({ rows = 5 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   return (
-    <div className={`rounded-xl shadow-sm overflow-hidden animate-pulse ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+    <div className={`rounded-xl shadow-sm overflow-hidden animate-pulse ${isDark ? 'bg-slate-900' : 'bg-white/40 backdrop-blur-xl'}`}>
       <div className={`p-4 border-b ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
         <div className={`h-6 rounded w-1/4 mb-2 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
         <div className={`h-3 rounded w-1/3 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
@@ -43,7 +43,7 @@ export const SkeletonStats = ({ count = 4 }) => {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className={`rounded-xl p-6 shadow-sm animate-pulse ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+        <div key={i} className={`rounded-xl p-6 shadow-sm animate-pulse ${isDark ? 'bg-slate-900' : 'bg-white/40 backdrop-blur-xl'}`}>
           <div className={`h-3 rounded w-1/2 mb-3 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
           <div className={`h-8 rounded w-3/4 mb-2 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
           <div className={`h-3 rounded w-1/3 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
@@ -143,7 +143,7 @@ export const PageSkeleton = ({ variant = 'default', timeout = 10000 }) => {
 
   if (variant === 'form') {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm space-y-6 animate-pulse">
+      <div className="bg-white/40 backdrop-blur-xl rounded-xl p-6 shadow-sm space-y-6 animate-pulse">
         <div className="h-6 bg-slate-200 rounded w-1/3 mb-4"></div>
         <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (

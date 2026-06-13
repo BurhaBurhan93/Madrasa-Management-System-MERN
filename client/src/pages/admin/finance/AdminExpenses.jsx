@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../lib/api';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const AdminExpenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -42,7 +43,7 @@ const AdminExpenses = () => {
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Title</label><input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Category</label><select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"><option value="">Select</option><option>Utilities</option><option>Supplies</option><option>Maintenance</option><option>Transport</option><option>Equipment</option><option>Other</option></select></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Amount</label><input type="number" value={form.amount} onChange={e => setForm({ ...form, amount: +e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Date</label><input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">Date</label><CalendarDatePicker value={form.date} onChange={(date) => setForm({ ...form, date: date })} placeholder="Select date" /></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Vendor</label><input value={form.vendor} onChange={e => setForm({ ...form, vendor: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">Status</label><select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="paid">Paid</option></select></div>
           </div>

@@ -35,7 +35,7 @@ const DataCorrection = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/students/all', getConfig());
+      const response = await axios.get('http://localhost:5000/api/student/all', getConfig());
       setStudents(response.data.data || []);
     } catch (err) {
       setError('Failed to fetch students');
@@ -73,7 +73,7 @@ const DataCorrection = () => {
     try {
       // Call the correction endpoint
       await axios.post(
-        `http://localhost:5000/api/students/${selectedStudent._id}/correct-data`,
+        `http://localhost:5000/api/student/students/${selectedStudent._id}/correct-data`,
         {
           field: correctionData.field,
           oldValue: correctionData.oldValue,

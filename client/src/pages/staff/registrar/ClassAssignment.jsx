@@ -152,7 +152,7 @@ const ClassAssignment = () => {
     setLoading(true);
     try {
       await axios.put(
-        `http://localhost:5000/api/students/${selectedStudent._id}/transfer`,
+        `${API_BASE}/student/students/${selectedStudent._id}/transfer`,
         { newClass: newClass },
         getConfig()
       );
@@ -174,7 +174,7 @@ const ClassAssignment = () => {
     setLoading(true);
     try {
       await axios.post(
-        `http://localhost:5000/api/students/${selectedStudent._id}/promote`,
+        `${API_BASE}/student/students/${selectedStudent._id}/promote`,
         { newClass: newClass },
         getConfig()
       );

@@ -80,6 +80,6 @@ export const getStaffToneStyles = (value) => STAFF_TONES[getStaffTone(value)] ||
 
 export const getStaffShellClasses = (theme) => (
   theme === 'dark'
-    ? 'bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.95),_rgba(15,23,42,0.9)_40%,_rgba(2,6,23,1)_100%)] text-slate-100'
-    : 'bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.9),_rgba(248,250,252,1)_42%,_rgba(241,245,249,1)_100%)] text-slate-900'
+    ? 'bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.98),_rgba(15,23,42,0.92)_34%,_rgba(2,6,23,1)_100%)] text-slate-100'
+    : 'bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.95),_rgba(224,242,254,0.9)_34%,_rgba(219,234,254,0.95)_100%)] text-slate-900'
 );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import ListPage from '../shared/ListPage';
 import Card from '../../../components/UIHelper/Card';
 import { PieChartComponent } from '../../../components/UIHelper/ECharts';
@@ -51,6 +52,7 @@ export const studentsConfig = {
 };
 
 const StudentsList = () => {
+  const navigate = useNavigate();
   const [studentStats, setStudentStats] = useState({
     total: 0,
     active: 0,
@@ -162,7 +164,15 @@ const StudentsList = () => {
       </Card>
 
       {/* Students List */}
-      <ListPage {...studentsConfig} />
+      <ListPage 
+        {...studentsConfig} 
+        createPath="/staff/registrar/student-registration"
+        editPathForRow={(row) => `/staff/registrar/students?edit=${row._id}`}
+        viewPathForRow={(row) => `/staff/registrar/students?view=${row._id}`}
+        deleteEnabled={true}
+        eyebrow="Registrar"
+        enableExport={true}
+      />
     </div>
   );
 };

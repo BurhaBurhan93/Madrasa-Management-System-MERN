@@ -92,7 +92,7 @@ export const StatCard = ({ title, value, icon, trend, change, color = 'slate' })
 );
 
 export const ChartWidget = ({ title, children, actions, className = '' }) => (
-  <div className={`rounded-xl border border-slate-200 bg-white p-5 ${className}`}>
+  <div className={`rounded-xl border border-white/60 bg-white/40 backdrop-blur-xl p-5 ${className}`}>
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
       {actions && <div className="flex gap-2">{actions}</div>}
@@ -114,7 +114,7 @@ export const ProgressWidget = ({ title, value, max, color = 'blue', description 
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5">
+    <div className="rounded-xl border border-white/60 bg-white/40 backdrop-blur-xl p-5">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-medium text-slate-900">{title}</h3>
         <span className="text-sm font-medium text-slate-700">

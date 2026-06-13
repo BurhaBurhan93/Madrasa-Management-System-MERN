@@ -13,6 +13,12 @@ const ComplaintSchema = new Schema({
   submittedDate: { type: Date, default: Date.now },
   assignedTo: { type: Schema.Types.ObjectId, ref: 'User' },
   confidentialityLevel: { type: String, enum: ['low','medium','high'], default: 'low' },
+  attachments: [{
+    fileId: String,
+    filename: String,
+    mimetype: String,
+    url: String
+  }],
   closedAt: { type: Date }
 }, { timestamps: true });
 

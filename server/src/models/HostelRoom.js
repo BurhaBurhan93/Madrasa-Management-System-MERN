@@ -25,6 +25,12 @@ const HostelRoomSchema = new Schema({
   // Additional info
   description: { type: String, trim: true },
   notes: { type: String, trim: true },
+  images: [{
+    fileId: String,
+    filename: String,
+    mimetype: String,
+    url: String
+  }],
   
   // Audit fields
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' },

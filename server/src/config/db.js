@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const dns = require('dns');
+const gridfsService = require('../services/gridfsService');
 
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
@@ -31,6 +32,12 @@ const connectDB = async () => {
       maxPoolSize: 10
     });
     console.log('[DB] ✅ MongoDB Connected successfully');
+    // Initialize GridFS bucket for file uploads
+    try {
+      gridfsService.initGridFS();
+    } catch (gridErr) {
+      console.warn('[DB] ⚠️ GridFS init skipped:', gridErr.message);
+    }
     return mongoose.connection;
   } catch (err) {
     console.error('[DB] 🛑 MongoDB connection error:', err.message);

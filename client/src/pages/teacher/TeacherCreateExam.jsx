@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -74,11 +75,11 @@ const TeacherCreateExam = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-1 block text-xs font-medium text-slate-500">Start Date</label>
-                <input type="date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })} className={inputCls} />
+                <CalendarDatePicker value={form.startDate} onChange={(date) => setForm({ ...form, startDate: date })} placeholder="Select date" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-slate-500">End Date</label>
-                <input type="date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })} className={inputCls} />
+                <CalendarDatePicker value={form.endDate} onChange={(date) => setForm({ ...form, endDate: date })} placeholder="Select date" />
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-2">

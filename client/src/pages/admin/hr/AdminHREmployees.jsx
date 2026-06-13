@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../../../components/UIHelper/Card';
 import { FiUsers, FiBriefcase, FiDollarSign, FiCalendar, FiSearch, FiFilter, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const AdminHREmployees = () => {
   const [employees, setEmployees] = useState([
@@ -467,12 +468,7 @@ const AdminHREmployees = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Join Date</label>
-                <input
-                  type="date"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                  value={newEmployee.joinDate}
-                  onChange={(e) => setNewEmployee({...newEmployee, joinDate: e.target.value})}
-                />
+                <CalendarDatePicker value={newEmployee.joinDate} onChange={(date) => setNewEmployee({...newEmployee, joinDate: date })} placeholder="Select date" />
               </div>
             </div>
 

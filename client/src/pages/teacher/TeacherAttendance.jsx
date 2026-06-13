@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
+import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -130,7 +131,7 @@ const TeacherAttendance = () => {
                   <option value="">Select Class *</option>
                   {classes.map(c => <option key={c._id} value={c._id}>{c.name} {c.section}</option>)}
                 </select>
-                <input type="date" value={sessionForm.sessionDate} onChange={e => setSessionForm({ ...sessionForm, sessionDate: e.target.value })} className={inputCls} />
+                <CalendarDatePicker value={sessionForm.sessionDate} onChange={(date) => setSessionForm({ ...sessionForm, sessionDate: date })} placeholder="Select date" />
                 <select value={sessionForm.sessionType} onChange={e => setSessionForm({ ...sessionForm, sessionType: e.target.value })} className={inputCls}>
                   <option value="lecture">Lecture</option>
                   <option value="exam">Exam</option>

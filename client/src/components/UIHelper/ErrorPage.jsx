@@ -105,7 +105,7 @@ const ErrorPage = ({
     <div className={`min-h-[60vh] flex items-center justify-center p-4 bg-gradient-to-br ${config.bgGradient}`}>
       <div className="max-w-lg w-full">
         {/* Main Card */}
-        <div className="bg-white rounded-3xl shadow-xl border-2 p-8 text-center">
+        <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border-2 border-white/60 p-8 text-center">
           {/* Animated Icon Container */}
           <div className="relative mb-6">
             {/* Pulse Effect */}

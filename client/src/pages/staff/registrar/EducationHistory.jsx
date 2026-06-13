@@ -10,7 +10,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 export const educationHistoryConfig = {
   title: 'Student Education History',
   subtitle: 'Manage previous education records and academic background',
-  endpoint: '/student/education',
+  endpoint: '/student/education-history',
   columns: [
     { key: 'student', header: 'Student', render: (value, row) => row.student?.user?.name || '-' },
     { key: 'previousDegree', header: 'Previous Degree' },
@@ -65,7 +65,7 @@ const EducationHistory = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const response = await axios.get(`${API_BASE}/student/education`, config);
+      const response = await axios.get(`${API_BASE}/student/education-history`, config);
       const records = response.data || [];
       
       const total = records.length;

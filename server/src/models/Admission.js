@@ -16,6 +16,13 @@ const AdmissionSchema = new Schema({
   whatsapp: { type: String, trim: true },
   dob: { type: Date },
   bloodType: { type: String, enum: ['A+','A-','B+','B-','AB+','AB-','O+','O-'] },
+  image: { type: String },
+  documents: [{
+    fileId: String,
+    filename: String,
+    mimetype: String,
+    url: String
+  }],
   degree: { type: Schema.Types.ObjectId, ref: 'Degree' },
   previousDegree: { type: String, trim: true },
   previousInstitution: { type: String, trim: true },

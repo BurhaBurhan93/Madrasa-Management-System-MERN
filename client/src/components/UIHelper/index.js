@@ -46,6 +46,9 @@ export { default as AgGridTable } from './AgGridTable';
 export { default as Container } from './Container';
 export { default as Grid } from './Grid';
 
+// Shared Components
+export { default as CreateUserModal } from './CreateUserModal';
+
 // Dashboard Components
 export { default as DashboardWidget, StatCard, ChartWidget, ProgressWidget } from './DashboardWidget';
 

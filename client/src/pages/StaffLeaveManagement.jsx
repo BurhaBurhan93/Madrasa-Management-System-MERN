@@ -10,6 +10,7 @@ import Badge from '../components/UIHelper/Badge';
 import Modal from '../components/UIHelper/Modal';
 import { FiPlus, FiEdit2, FiTrash2, FiCheckCircle, FiXCircle, FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
+import CalendarDatePicker from "../components/UIHelper/CalendarDatePicker";
 
 const StaffLeaveManagement = () => {
   const navigate = useNavigate();
@@ -467,22 +468,8 @@ const StaffLeaveManagement = () => {
             required
           />
           <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Start Date"
-              type="date"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleInputChange}
-              required
-            />
-            <Input
-              label="End Date"
-              type="date"
-              name="endDate"
-              value={formData.endDate}
-              onChange={handleInputChange}
-              required
-            />
+            <CalendarDatePicker value={formData.startDate} name="startDate" onChange={handleInputChange} placeholder="Select date" />
+            <CalendarDatePicker value={formData.endDate} name="endDate" onChange={handleInputChange} placeholder="Select date" />
           </div>
           {formData.startDate && formData.endDate && (
             <div className="text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded">

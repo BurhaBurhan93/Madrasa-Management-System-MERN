@@ -114,7 +114,7 @@ const EnhancedTable = ({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 bg-white">
+          <tbody className="divide-y divide-slate-200 bg-white/30">
             {paginatedData.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
@@ -149,19 +149,19 @@ const EnhancedTable = ({
       </div>
 
       {pagination && totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-slate-200 bg-white px-4 py-3">
+        <div className="flex items-center justify-between border-t border-slate-200 bg-white/40 backdrop-blur-xl px-4 py-3">
           <div className="flex flex-1 justify-between sm:hidden">
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="relative inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center rounded-md border border-slate-300 bg-white/60 backdrop-blur-sm px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
             <button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="relative ml-3 inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative ml-3 inline-flex items-center rounded-md border border-slate-300 bg-white/60 backdrop-blur-sm px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -227,7 +227,7 @@ const EnhancedTable = ({
       )}
 
       {selectedRows.size > 0 && (
-        <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg border border-slate-200 p-4">
+        <div className="fixed bottom-4 right-4 bg-white/70 backdrop-blur-xl rounded-lg shadow-lg border border-slate-200 p-4">
           <div className="flex items-center gap-4">
             <span className="text-sm text-slate-700">
               {selectedRows.size} item{selectedRows.size > 1 ? 's' : ''} selected

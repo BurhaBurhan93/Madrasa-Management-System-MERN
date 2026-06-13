@@ -4,6 +4,8 @@ import { FiPackage, FiPlus, FiMinus, FiAlertTriangle, FiCheckCircle, FiSearch, F
 import Card from '../../components/UIHelper/Card';
 import { PieChartComponent, BarChartComponent } from '../../components/UIHelper/ECharts';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const StaffInventory = () => {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,12 +19,15 @@ const StaffInventory = () => {
     fetchInventory();
   }, []);
 
+  const getConfig = () => {
+    const token = localStorage.getItem('token');
+    return { headers: { Authorization: `Bearer ${token}` } };
+  };
+
   const fetchInventory = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.get('http://localhost:5000/api/staff/inventory', config);
+      const response = await axios.get(`${API_BASE}/staff/inventory`, getConfig());
       setInventory(response.data);
     } catch (error) {
       console.error('Error fetching inventory:', error);
@@ -34,32 +39,28 @@ const StaffInventory = () => {
   const handleAddStock = async () => {
     if (!selectedItem || quantity <= 0) return;
     try {
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post(`http://localhost:5000/api/staff/inventory/${selectedItem.id}/add`, { quantity }, config);
+      await axios.post(`${API_BASE}/staff/inventory/${selectedItem.id}/add`, { quantity }, getConfig());
       setShowAddModal(false);
       setSelectedItem(null);
       setQuantity(1);
       fetchInventory();
     } catch (error) {
       console.error('Error adding stock:', error);
-      alert('Failed to add stock. Please try again.');
+      alert(error.response?.data?.message || 'Failed to add stock. The add stock endpoint may not be implemented on the server yet.');
     }
   };
 
   const handleRemoveStock = async () => {
     if (!selectedItem || quantity <= 0) return;
     try {
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post(`http://localhost:5000/api/staff/inventory/${selectedItem.id}/remove`, { quantity }, config);
+      await axios.post(`${API_BASE}/staff/inventory/${selectedItem.id}/remove`, { quantity }, getConfig());
       setShowRemoveModal(false);
       setSelectedItem(null);
       setQuantity(1);
       fetchInventory();
     } catch (error) {
       console.error('Error removing stock:', error);
-      alert('Failed to remove stock. Please try again.');
+      alert(error.response?.data?.message || 'Failed to remove stock. The remove stock endpoint may not be implemented on the server yet.');
     }
   };
 

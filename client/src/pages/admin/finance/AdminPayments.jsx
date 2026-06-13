@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../../../components/UIHelper/Card';
 import { FiDollarSign, FiCheckCircle, FiClock, FiUsers, FiSearch, FiFilter, FiDownload, FiPlus } from 'react-icons/fi';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const AdminPayments = () => {
   const [payments, setPayments] = useState([
@@ -417,12 +418,7 @@ const AdminPayments = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Payment Date</label>
-                <input
-                  type="date"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                  value={newPayment.date}
-                  onChange={(e) => setNewPayment({...newPayment, date: e.target.value})}
-                />
+                <CalendarDatePicker value={newPayment.date} onChange={(date) => setNewPayment({...newPayment, date: date })} placeholder="Select date" />
               </div>
             </div>
 

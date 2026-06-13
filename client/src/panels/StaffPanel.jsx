@@ -1,16 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   FiHome, FiBookOpen, FiInbox, FiUser, FiMenu, FiLogOut,
-  FiSearch, FiBell, FiChevronDown,
+  FiSearch, FiChevronDown,
   FiUsers, FiPackage, FiDollarSign, FiUserPlus, FiCoffee, FiAward,
-  FiChevronLeft, FiChevronRight,
+  FiChevronLeft, FiChevronRight, FiCalendar,
   FiSun, FiMoon, FiGlobe
 } from 'react-icons/fi';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { useTheme } from '../contexts/ThemeContext';
+import { CalendarProvider, useCalendar } from '../contexts/CalendarContext';
 import { clearAuth } from '../lib/auth';
 import { canAccessStaffPath, filterStaffMenuItems } from '../lib/staffAccess';
+import NotificationDropdown from '../components/UIHelper/NotificationDropdown';
+import { CALENDAR_SYSTEMS, calendarLabels, setCalendarSystem } from '../lib/dateUtils';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 
 // ── Localization strings ──
 const translations = {
@@ -121,7 +125,7 @@ const translations = {
   },
 };
 
-const StaffPanel = () => {
+const StaffPanelContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useLocalStorage('staffSidebarOpen', true);
@@ -130,7 +134,15 @@ const StaffPanel = () => {
   const [, setLoading] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const [lang, setLang] = useLocalStorage('staffLang', 'en');
+  const { calSys, setCalSys } = useCalendar();
+  const isRTL = lang === 'dari' || lang === 'ps';
   const t = translations[lang] || translations.en;
+
+  useEffect(() => {
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+    document.documentElement.lang = lang;
+    return () => { document.documentElement.dir = 'ltr'; };
+  }, [lang, isRTL]);
 
   useEffect(() => {
     fetchUserData();
@@ -151,14 +163,12 @@ const StaffPanel = () => {
   };
 
   useEffect(() => {
+    let prevIsMobile = window.innerWidth < 768;
     const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
-      }
+      const nowMobile = window.innerWidth < 768;
+      if (!prevIsMobile && nowMobile) setSidebarOpen(false);
+      prevIsMobile = nowMobile;
     };
-    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [setSidebarOpen]);
@@ -313,12 +323,12 @@ const StaffPanel = () => {
   const hasRouteAccess = !user || canAccessStaffPath(location.pathname, user);
 
   return (
-    <div className={`flex h-screen overflow-hidden ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.95),_rgba(15,23,42,1)_42%,_rgba(30,41,59,1)_100%)]' : 'bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.9),_rgba(248,250,252,1)_42%,_rgba(241,245,249,1)_100%)]'}`}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} className={`flex h-screen overflow-hidden ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.98),_rgba(15,23,42,0.96)_42%,_rgba(2,6,23,1)_100%)]' : 'bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.96),_rgba(224,242,254,0.92)_42%,_rgba(219,234,254,0.96)_100%)]'}`}>
       <aside
-        className={`fixed z-30 h-screen border-r bg-white/90 backdrop-blur-xl transition-all duration-300 md:relative ${theme === 'dark' ? 'border-slate-700 bg-slate-900/90' : 'border-white/70'} ${sidebarOpen ? 'w-72' : 'w-24'}`}
+        className={`fixed z-30 h-screen border-r backdrop-blur-xl transition-all duration-300 md:relative ${theme === 'dark' ? 'border-slate-700/60 bg-slate-900/95' : 'border-cyan-100/80 bg-cyan-50/80'} ${sidebarOpen ? 'w-72' : 'w-24'}`}
       >
         <div className="flex h-full flex-col">
-          <div className={`border-b px-4 py-5 ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200/80'} ${sidebarOpen ? '' : 'flex justify-center'}`}>
+          <div className={`border-b px-4 py-5 ${theme === 'dark' ? 'border-slate-700/60' : 'border-slate-200/80'} ${sidebarOpen ? '' : 'flex justify-center'}`}>
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
                 M
@@ -431,7 +441,7 @@ const StaffPanel = () => {
             </div>
           )}
 
-          <div className={`border-t p-3 ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200/80'}`}>
+          <div className={`border-t p-3 ${theme === 'dark' ? 'border-slate-700/60' : 'border-slate-200/80'}`}>
             <div className={`rounded-3xl border bg-white/95 p-2 ${theme === 'dark' ? 'border-slate-700 bg-slate-800/95' : 'border-slate-200'} ${sidebarOpen ? '' : 'space-y-2'}`}>
               <button
                 onClick={() => handleNavigation('profile')}
@@ -471,13 +481,13 @@ const StaffPanel = () => {
       {sidebarOpen && <div onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-20 bg-slate-950/25 backdrop-blur-[1px] md:hidden" aria-hidden />}
 
       <main className="flex-1 min-w-0 overflow-y-auto h-screen">
-        <header className={`sticky top-0 z-20 border-b bg-white/72 backdrop-blur-xl ${theme === 'dark' ? 'border-slate-700 bg-slate-900/80' : 'border-white/70'}`}>
+        <header className={`sticky top-0 z-20 mx-3 mt-3 rounded-2xl border navbar-glass ${theme === 'dark' ? 'border-slate-700 bg-slate-900/80' : 'border-cyan-100/70 bg-cyan-50/70'}`}>
           <div className="flex items-center justify-between px-5 py-4 lg:px-8">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 aria-label="Toggle sidebar"
-                className={`flex h-11 w-11 items-center justify-center rounded-2xl border bg-white text-slate-500 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200'}`}
+                className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}
               >
                 <FiMenu size={20} />
               </button>
@@ -491,7 +501,7 @@ const StaffPanel = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className={`hidden items-center rounded-full border bg-white px-4 py-2.5 md:flex ${theme === 'dark' ? 'border-slate-700 bg-slate-800' : 'border-slate-200'}`}>
+              <div className={`hidden items-center rounded-full border px-4 py-2.5 md:flex ${theme === 'dark' ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-white'}`}>
                 <FiSearch className="mr-2 text-slate-400" size={18} />
                 <input type="text" placeholder={t.search} className={`w-48 bg-transparent text-sm outline-none ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`} />
               </div>
@@ -503,17 +513,24 @@ const StaffPanel = () => {
                   <FiGlobe size={17} />
                   <span className="text-xs font-semibold">{lang === 'en' ? 'EN' : lang === 'dari' ? 'دری' : 'پښتو'}</span>
                 </button>
-                <button className={`relative flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}>
-                  <FiBell size={19} />
-                  <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-500 ring-4 ring-white" />
+                <button onClick={() => { const sys = [CALENDAR_SYSTEMS.GREGORIAN, CALENDAR_SYSTEMS.HIJRI, CALENDAR_SYSTEMS.JALALI]; const next = sys[(sys.indexOf(calSys) + 1) % sys.length]; setCalSys(next); setCalendarSystem('staff', next); }} title={calendarLabels[lang]?.[calSys] || calSys} className={`flex h-11 items-center gap-1 rounded-2xl border px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}>
+                  <FiCalendar size={17} />
+                  <span className="text-[10px] font-semibold">{calendarLabels[lang]?.[calSys] || calSys}</span>
                 </button>
+                <NotificationDropdown t={t} />
               </div>
             </div>
           </div>
         </header>
 
-        <div className="p-5 lg:p-8">
-          {hasRouteAccess ? <Outlet /> : <AccessDenied t={t} />}
+        <div className="p-4 lg:p-6">
+          {hasRouteAccess ? (
+            <Suspense fallback={<PageSkeleton variant="table" />}>
+              <Outlet />
+            </Suspense>
+          ) : (
+            <AccessDenied t={t} />
+          )}
         </div>
       </main>
     </div>
@@ -525,6 +542,12 @@ const AccessDenied = ({ t }) => (
     <h2 className="text-xl font-semibold">{t?.accessDenied || 'Access restricted'}</h2>
     <p className="mt-2 text-sm">{t?.accessMsg || 'This staff account does not have permission for this module.'}</p>
   </div>
+);
+
+const StaffPanel = () => (
+  <CalendarProvider panelPrefix="staff">
+    <StaffPanelContent />
+  </CalendarProvider>
 );
 
 export default StaffPanel;

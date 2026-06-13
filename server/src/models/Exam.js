@@ -8,6 +8,7 @@ const ExamSchema = new Schema({
   class: { type: Schema.Types.ObjectId, ref: 'Class' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   academicYear: { type: String },
+  coverImage: { type: String },
   duration: { type: Number, default: 60 },
   totalMarks: { type: Number, default: 0 },
   startDate: { type: Date },

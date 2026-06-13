@@ -49,7 +49,11 @@ const modulesFromDepartment = (department) => {
 };
 
 export const getAllowedStaffModules = (user) => {
-  if (!user || user.role !== 'staff') return [];
+  if (!user) return ['dashboard', 'profile'];
+
+  if (user.role === 'admin') return MODULES_BY_EMPLOYEE_TYPE.admin;
+
+  if (user.role !== 'staff') return ['dashboard', 'profile'];
 
   const explicitModules = Array.isArray(user.staffModules) ? user.staffModules.map(normalize).filter(Boolean) : [];
   if (explicitModules.length) return [...new Set(['dashboard', 'profile', ...explicitModules])];
@@ -70,6 +74,8 @@ export const getStaffModuleFromPath = (pathname) => {
 };
 
 export const canAccessStaffPath = (pathname, user) => {
+  if (!user) return true;
+  if (user.role === 'admin') return true;
   const allowedModules = getAllowedStaffModules(user);
   const moduleName = getStaffModuleFromPath(pathname);
   return allowedModules.includes(moduleName);

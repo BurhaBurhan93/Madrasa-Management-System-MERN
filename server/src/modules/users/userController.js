@@ -21,6 +21,10 @@ exports.getUserById = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   try {
+    if (req.user.role !== 'admin' && req.body.role === 'admin') {
+      throw new Error('Staff cannot create admin accounts');
+    }
+
     console.log('Creating user with data:', req.body);
     const user = await userService.createUser(req.body);
     const userResponse = user.toObject();

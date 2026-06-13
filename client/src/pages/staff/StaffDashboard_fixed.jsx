@@ -17,7 +17,6 @@ import {
   FiUsers,
 } from 'react-icons/fi';
 
-
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const RESOURCE_DEFS = [
@@ -71,7 +70,6 @@ const safeDate = (value) => {
 
 const StatCard = ({ label, value, note, accentClass, iconText }) => (
   <div className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-transparent p-5 shadow-sm">
-
     <div className={`absolute inset-x-0 top-0 h-1 ${accentClass}`} />
     <div className="flex items-start justify-between gap-4">
       <div>
@@ -91,14 +89,10 @@ const Panel = ({ title, subtitle, children, className = '', dark = false }) => (
     {(title || subtitle) && (
       <div className="mb-5">
         {title && (
-          <h3 className={`text-lg font-semibold ${dark ? 'text-white' : 'text-slate-900'}`}>
-            {title}
-          </h3>
+          <h3 className={`text-lg font-semibold ${dark ? 'text-white' : 'text-slate-900'}`}>{title}</h3>
         )}
         {subtitle && (
-          <p className={`mt-1 text-sm ${dark ? 'text-slate-300' : 'text-slate-500'}`}>
-            {subtitle}
-          </p>
+          <p className={`mt-1 text-sm ${dark ? 'text-slate-300' : 'text-slate-500'}`}>{subtitle}</p>
         )}
       </div>
     )}
@@ -207,10 +201,13 @@ const StaffDashboard = () => {
   const totalIncome = sumBy(transactions, 'amount') + sumBy(transactions, 'credit') + sumBy(accounts, 'balance');
   const feeIncome = sumBy(feePayments, 'amount') + sumBy(feePayments, 'paidAmount');
   const totalExpenses = sumBy(expenses, 'amount') + sumBy(expenses, 'totalAmount');
-  const payrollTotal = sumBy(salaryPayments, 'amount') + sumBy(salaryPayments, 'netSalary') + sumBy(salaryAdvances, 'amount');
+  const payrollTotal =
+    sumBy(salaryPayments, 'amount') + sumBy(salaryPayments, 'netSalary') + sumBy(salaryAdvances, 'amount');
+
   const totalRevenue = totalIncome + feeIncome;
   const totalOutflow = totalExpenses + payrollTotal;
   const profitLoss = totalRevenue - totalOutflow;
+
   const financeHealthRaw = totalIncome + feeIncome > 0
     ? (((totalIncome + feeIncome) - (totalExpenses + payrollTotal)) / (totalIncome + feeIncome)) * 100
     : 0;
@@ -218,7 +215,7 @@ const StaffDashboard = () => {
 
   const metrics = {
     users: users.length,
-    students: students.length || users.filter((user) => user?.role === 'student').length,
+    students: students.length,
     books: inventory.length,
     borrowedBooks,
     complaints: complaints.length,
@@ -237,10 +234,6 @@ const StaffDashboard = () => {
     profitLoss,
     financeReports: financialReports.length,
     netFlow: profitLoss,
-    collectionRate:
-      totalIncome + feeIncome > 0
-        ? Math.min(100, Math.round((feeIncome / (totalIncome + feeIncome)) * 100))
-        : 0,
     financeHealth,
   };
 
@@ -284,80 +277,14 @@ const StaffDashboard = () => {
     { title: 'Kitchen Items', value: metrics.kitchenItems, route: '/staff/kitchen/inventory', icon: FiCoffee, tone: 'from-cyan-500 to-sky-600' },
   ];
 
-  const moduleCards = [
-    {
-      title: 'Finance',
-      value: `${transactions.length + accounts.length + feePayments.length + expenses.length} records`,
-      note: `${formatCurrency(metrics.totalIncome + metrics.feeIncome)} visible inflow`,
-      route: '/staff/finance/transactions',
-    },
-    {
-      title: 'Payroll',
-      value: `${salaryPayments.length + salaryAdvances.length} records`,
-      note: `${formatCurrency(metrics.payrollTotal)} tracked payouts`,
-      route: '/staff/payroll/salary-payments',
-    },
-    {
-      title: 'HR',
-      value: `${employees.length + leaves.length} records`,
-      note: `${metrics.pendingLeaves} pending leave requests`,
-      route: '/staff/hr/employees',
-    },
-    {
-      title: 'Kitchen',
-      value: `${kitchenInventory.length + kitchenBudgets.length} records`,
-      note: `${metrics.lowStockCount} low stock items`,
-      route: '/staff/kitchen/inventory',
-    },
-    {
-      title: 'Library',
-      value: `${inventory.length} records`,
-      note: `${metrics.borrowedBooks} borrowed items`,
-      route: '/staff/inventory',
-    },
-    {
-      title: 'Complaints',
-      value: `${complaints.length} records`,
-      note: `${metrics.pendingComplaints} still open or pending`,
-      route: '/staff/complaints',
-    },
-  ];
-
-  const financeTrendData = [
-    { month: 'Jan', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.58), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.48) },
-    { month: 'Feb', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.64), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.56) },
-    { month: 'Mar', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.71), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.63) },
-    { month: 'Apr', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.78), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.7) },
-    { month: 'May', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.88), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.82) },
-    { month: 'Jun', income: Math.round(metrics.totalIncome + metrics.feeIncome), expense: Math.round(metrics.totalExpenses + metrics.payrollTotal) },
-  ];
-
-  const profitLossTrendData = financeTrendData.map((item) => ({
-    month: item.month,
-    value: item.income - item.expense,
-  }));
-
-  const latestProfitLoss = profitLossTrendData[profitLossTrendData.length - 1]?.value || 0;
-  const previousProfitLoss = profitLossTrendData[profitLossTrendData.length - 2]?.value || 0;
-  const trendDelta = latestProfitLoss - previousProfitLoss;
-  const trendDirection = trendDelta > 0 ? 'Improving' : trendDelta < 0 ? 'Declining' : 'Stable';
-  const trendDirectionText = trendDelta > 0
-    ? 'Finance is moving in a better direction than the previous period'
-    : trendDelta < 0
-      ? 'Finance is moving in a weaker direction than the previous period'
-      : 'Finance is stable compared to the previous period';
   const profitLossStatus = metrics.profitLoss >= 0 ? 'Profit' : 'Loss';
 
-  const moduleCoverageData = [
-    { name: 'Users', value: users.length },
-    { name: 'Students', value: students.length },
-    { name: 'Library', value: inventory.length },
-    { name: 'Complaints', value: complaints.length },
-    { name: 'HR', value: employees.length + leaves.length },
-    { name: 'Finance', value: transactions.length + accounts.length + feePayments.length + expenses.length + financialReports.length },
-    { name: 'Payroll', value: salaryPayments.length + salaryAdvances.length },
-    { name: 'Kitchen', value: kitchenInventory.length + kitchenBudgets.length },
-  ];
+  const recentRows = activities.slice(0, 5).map((item, index) => ({
+    id: item?._id || index,
+    title: item?.title || item?.action || `Recent item ${index + 1}`,
+    detail: item?.detail || item?.description || 'No details available',
+    date: safeDate(item?.createdAt || item?.date || item?.updatedAt),
+  }));
 
   const tableRows = RESOURCE_DEFS.map((def) => {
     const payload = resources[def.key];
@@ -408,10 +335,10 @@ const StaffDashboard = () => {
   const performanceRadarData = [
     {
       value: [
-        Math.min(100, metrics.collectionRate || 28),
-        Math.min(100, Math.max(15, 100 - metrics.pendingComplaints * 8)),
-        Math.min(100, Math.max(20, 100 - metrics.pendingLeaves * 12)),
-        Math.min(100, Math.max(20, 100 - metrics.lowStockCount * 10)),
+        Math.min(100, 28),
+        Math.min(100, Math.max(15, 100 - pendingComplaints * 8)),
+        Math.min(100, Math.max(20, 100 - pendingLeaves * 12)),
+        Math.min(100, Math.max(20, 100 - lowStockCount * 10)),
         Math.min(100, Math.max(25, metrics.financeHealth)),
         Math.min(100, Math.max(30, metrics.financeReports * 12 || 30)),
       ],
@@ -428,12 +355,19 @@ const StaffDashboard = () => {
     { name: 'Reporting', max: 100 },
   ];
 
-  const recentRows = activities.slice(0, 5).map((item, index) => ({
-    id: item?._id || index,
-    title: item?.title || item?.action || `Recent item ${index + 1}`,
-    detail: item?.detail || item?.description || 'No details available',
-    date: safeDate(item?.createdAt || item?.date || item?.updatedAt),
-  }));
+  const moduleCoverageData = [
+    { name: 'Users', value: users.length },
+    { name: 'Students', value: students.length },
+    { name: 'Library', value: inventory.length },
+    { name: 'Complaints', value: complaints.length },
+    { name: 'HR', value: employees.length + leaves.length },
+    {
+      name: 'Finance',
+      value: transactions.length + accounts.length + feePayments.length + expenses.length + financialReports.length,
+    },
+    { name: 'Payroll', value: salaryPayments.length + salaryAdvances.length },
+    { name: 'Kitchen', value: kitchenInventory.length + kitchenBudgets.length },
+  ];
 
   if (loading) {
     return (
@@ -457,12 +391,8 @@ const StaffDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-transparent">
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-     
-
-      
-
         <section className="mt-2">
           <Panel
             title="Finance And Payroll Snapshot"
@@ -475,46 +405,80 @@ const StaffDashboard = () => {
                 <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(metrics.totalRevenue)}</p>
                 <p className="mt-3 text-sm leading-6 text-slate-600">Income plus fee collections</p>
               </div>
+
               <div className="rounded-3xl border border-orange-100 bg-transparent p-5 shadow-sm">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600">Total Outflow</p>
                 <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(metrics.totalOutflow)}</p>
                 <p className="mt-3 text-sm leading-6 text-slate-600">Expenses together with payroll</p>
               </div>
-                <div className={`rounded-3xl bg-transparent p-5 shadow-sm ${metrics.profitLoss >= 0 ? 'border border-cyan-100' : 'border border-rose-100'}`}>
-                <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${metrics.profitLoss >= 0 ? 'text-cyan-600' : 'text-rose-600'}`}>{profitLossStatus}</p>
-                <p className={`mt-3 text-3xl font-bold tracking-tight ${metrics.profitLoss >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+
+              <div
+                className={`rounded-3xl bg-transparent p-5 shadow-sm ${metrics.profitLoss >= 0 ? 'border border-cyan-100' : 'border border-rose-100'}`}
+              >
+                <p
+                  className={`text-xs font-semibold uppercase tracking-[0.18em] ${
+                    metrics.profitLoss >= 0 ? 'text-cyan-600' : 'text-rose-600'
+                  }`}
+                >
+                  {profitLossStatus}
+                </p>
+                <p
+                  className={`mt-3 text-3xl font-bold tracking-tight ${
+                    metrics.profitLoss >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                  }`}
+                >
                   {formatSignedCurrency(metrics.profitLoss)}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-slate-600">
                   {metrics.profitLoss >= 0 ? 'Revenue is higher than costs' : 'Costs are higher than revenue'}
                 </p>
               </div>
-<div className={`rounded-3xl border bg-transparent p-5 shadow-sm ${trendDelta >= 0 ? 'border-sky-100' : 'border-amber-100'}`}>
-                <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${trendDelta >= 0 ? 'text-sky-600' : 'text-amber-600'}`}>Direction</p>
-                <p className={`mt-3 text-3xl font-bold tracking-tight ${trendDelta >= 0 ? 'text-sky-600' : 'text-amber-600'}`}>
-                  {trendDirection}
+
+              <div
+                className={`rounded-3xl border bg-transparent p-5 shadow-sm ${metrics.profitLoss >= 0 ? 'border-sky-100' : 'border-amber-100'}`}
+              >
+                <p
+                  className={`text-xs font-semibold uppercase tracking-[0.18em] ${
+                    metrics.profitLoss >= 0 ? 'text-sky-600' : 'text-amber-600'
+                  }`}
+                >
+                  Direction
                 </p>
-                <p className="mt-3 text-sm leading-6 text-slate-600">{trendDirectionText}</p>
+                <p
+                  className={`mt-3 text-3xl font-bold tracking-tight ${
+                    metrics.profitLoss >= 0 ? 'text-sky-600' : 'text-amber-600'
+                  }`}
+                >
+                  {metrics.profitLoss >= 0 ? 'Improving' : 'Declining'}
+                </p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">Finance health: {metrics.financeHealth}%</p>
               </div>
             </div>
 
-<div className="mt-6 rounded-3xl border border-cyan-100 bg-transparent p-5 shadow-sm">
+            <div className="mt-6 rounded-3xl border border-cyan-100 bg-transparent p-5 shadow-sm">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-base font-semibold text-slate-900">Current Result</p>
-                <span className={`rounded-full px-3 py-1 text-xs font-medium ${
-                  metrics.profitLoss >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
-                }`}>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    metrics.profitLoss >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                  }`}
+                >
                   {profitLossStatus}
                 </span>
               </div>
               <div className="h-3 overflow-hidden rounded-full bg-slate-100">
                 <div
-                  className={`h-full rounded-full ${metrics.profitLoss >= 0 ? 'bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-500' : 'bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500'}`}
+                  className={`h-full rounded-full ${
+                    metrics.profitLoss >= 0
+                      ? 'bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-500'
+                      : 'bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500'
+                  }`}
                   style={{ width: `${Math.max(18, metrics.financeHealth)}%` }}
                 />
               </div>
               <p className="mt-4 text-sm leading-6 text-slate-600">
-                Revenue: {formatCurrency(metrics.totalRevenue)} | Outflow: {formatCurrency(metrics.totalOutflow)} | Result: {formatSignedCurrency(metrics.profitLoss)}
+                Revenue: {formatCurrency(metrics.totalRevenue)} | Outflow: {formatCurrency(metrics.totalOutflow)} | Result:{' '}
+                {formatSignedCurrency(metrics.profitLoss)}
               </p>
             </div>
           </Panel>
@@ -529,12 +493,11 @@ const StaffDashboard = () => {
         <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {overviewCards.map((card) => {
             const Icon = card.icon;
-
             return (
               <Link
                 key={card.title}
                 to={card.route}
-className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
+                className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -551,18 +514,11 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
           })}
         </section>
 
-
         <section className="mt-8 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-[28px] border border-slate-200 bg-transparent p-3 shadow-sm">
-            <DoughnutChartComponent
-              title="Money Mix"
-              data={moneyMixData}
-              height={330}
-              showLegend={false}
-            />
+          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+            <DoughnutChartComponent title="Money Mix" data={moneyMixData} height={330} showLegend={false} />
           </div>
-
-          <div className="rounded-[28px] border border-slate-200 bg-transparent p-3 shadow-sm">
+          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
             <RadarChartComponent
               title="Operations Radar"
               data={performanceRadarData}
@@ -575,30 +531,30 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
         <section className="mt-8 grid gap-6 lg:grid-cols-[0.95fr,1.05fr]">
           <Panel title="Recent Activity" subtitle="Latest updates from staff modules">
             <div className="space-y-4">
-              {recentRows.length > 0 ? recentRows.map((row) => (
-                <div
-                  key={row.id}
-                  className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-xs font-semibold text-white">
-                    <FiFileText size={16} />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="font-medium text-slate-900">{row.title}</p>
-                      <p className="text-sm text-slate-400">{row.date}</p>
+              {recentRows.length > 0 ? (
+                recentRows.map((row) => (
+                  <div key={row.id} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-xs font-semibold text-white">
+                      <FiFileText size={16} />
                     </div>
-                    <p className="mt-1 text-sm text-slate-500">{row.detail}</p>
+                    <div className="flex-1">
+                      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                        <p className="font-medium text-slate-900">{row.title}</p>
+                        <p className="text-sm text-slate-400">{row.date}</p>
+                      </div>
+                      <p className="mt-1 text-sm text-slate-500">{row.detail}</p>
+                    </div>
                   </div>
-                </div>
-              )) : (
+                ))
+              ) : (
                 <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
                   No recent activity available yet.
                 </div>
               )}
             </div>
           </Panel>
-          <div className="rounded-[28px] border border-slate-200 bg-transparent p-3 shadow-sm">
+
+          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
             <BarChartComponent
               title="Module Coverage"
               data={moduleCoverageData}
@@ -616,34 +572,27 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
               {groupedTableRows.map((group) => (
                 <div
                   key={group.title}
-                  className="overflow-hidden rounded-[28px] border border-slate-200 bg-transparent shadow-sm"
+                  className="overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,_#ffffff_0%,_#f8fafc_100%)] shadow-sm"
                 >
                   <div className={`h-1 bg-gradient-to-r ${group.accent}`} />
                   <div className="border-b border-slate-100 px-5 py-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                      {group.title}
-                    </p>
-                    <p className="mt-1 text-lg font-semibold text-slate-900">
-                      {group.items.length} connected tables
-                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{group.title}</p>
+                    <p className="mt-1 text-lg font-semibold text-slate-900">{group.items.length} connected tables</p>
                   </div>
                   <div className="divide-y divide-slate-100">
                     {group.items.map((row) => (
-                      <div
-                        key={row.table}
-                        className="flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-200 hover:bg-slate-50"
-                      >
+                      <div key={row.table} className="flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-200 hover:bg-slate-50">
                         <div>
                           <p className="font-medium text-slate-900">{row.table}</p>
                           <p className="mt-1 text-sm text-cyan-700">{row.route}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-semibold text-slate-900">{row.records} records</p>
-                          <span className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                            row.status === 'Connected'
-                              ? 'bg-emerald-100 text-emerald-700'
-                              : 'bg-amber-100 text-amber-700'
-                          }`}>
+                          <span
+                            className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                              row.status === 'Connected' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                            }`}
+                          >
                             {row.status}
                           </span>
                         </div>
@@ -661,3 +610,4 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
 };
 
 export default StaffDashboard;
+

@@ -5,6 +5,7 @@ import Input from '../UIHelper/Input';
 import Badge from '../UIHelper/Badge';
 import axios from 'axios';
 import { FiUpload, FiFile, FiCheckCircle, FiClock, FiBook } from 'react-icons/fi';
+import CalendarDatePicker from "../UIHelper/CalendarDatePicker";
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -160,15 +161,7 @@ const HomeworkSubmission = () => {
                 />
               </div>
               
-              <Input
-                label="Due Date"
-                type="date"
-                name="dueDate"
-                value={homeworkData.dueDate}
-                onChange={handleInputChange}
-                required
-                className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
-              />
+              <CalendarDatePicker value={homeworkData.dueDate} name="dueDate" onChange={handleInputChange} placeholder="Select date" />
               
               <div className="space-y-2">
                 <label className="block text-sm font-black text-slate-700 uppercase tracking-widest">

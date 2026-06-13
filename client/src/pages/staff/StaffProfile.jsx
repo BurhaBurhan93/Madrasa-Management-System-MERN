@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiEdit, FiSave, FiX } from 'react-icons/fi';
 import { Card, Button, Input, Avatar, Badge, Form } from '../../components/UIHelper';
+import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
 
 const StaffProfile = () => {
   const [isEditing, setIsEditing] = useState(false);

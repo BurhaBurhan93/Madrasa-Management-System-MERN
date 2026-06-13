@@ -3,6 +3,7 @@ import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
 import Select from '../../../components/UIHelper/Select';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 import StaffPageLayout from './StaffPageLayout';
 import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 import { useTheme } from '../../../contexts/ThemeContext.jsx';
@@ -203,6 +204,21 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
                 ? 'border-slate-700 bg-slate-900/70 text-slate-100 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20'
                 : 'border-slate-200 bg-slate-50 text-slate-700 focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100'
             }`}
+          />
+          {!fieldErrors[field.name] && helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{helperText}</p>}
+          {fieldErrors[field.name] && <p className="text-sm text-red-600">{fieldErrors[field.name]}</p>}
+        </div>
+      );
+    }
+
+    if (field.type === 'date') {
+      return (
+        <div key={field.name} className="space-y-2">
+          <label htmlFor={field.name} className={`block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{field.label}</label>
+          <CalendarDatePicker
+            value={form[field.name]}
+            onChange={(date) => setForm({ ...form, [field.name]: date })}
+            placeholder={`Select ${field.label}`}
           />
           {!fieldErrors[field.name] && helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{helperText}</p>}
           {fieldErrors[field.name] && <p className="text-sm text-red-600">{fieldErrors[field.name]}</p>}

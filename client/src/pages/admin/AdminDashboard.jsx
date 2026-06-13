@@ -121,7 +121,7 @@ const quickActionItems = [
 ];
 
 const StatCard = ({ label, value, note, accentClass, iconText }) => (
-  <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+  <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/40 backdrop-blur-xl p-5 shadow-sm">
     <div className={`absolute inset-x-0 top-0 h-1 ${accentClass}`} />
     <div className="flex items-start justify-between gap-4">
       <div>
@@ -137,7 +137,7 @@ const StatCard = ({ label, value, note, accentClass, iconText }) => (
 );
 
 const Panel = ({ title, subtitle, children, className = '', dark = false }) => (
-  <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
+  <div className={`rounded-3xl border p-6 shadow-sm ${dark ? 'border-slate-700 bg-slate-900/60 backdrop-blur-xl' : 'border-white/60 bg-white/40 backdrop-blur-xl'} ${className}`}>
     {(title || subtitle) && (
       <div className="mb-5">
         {title && (
@@ -233,7 +233,7 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef4ff_100%)]">
+    <div className="min-h-screen w-full">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <section className="overflow-hidden rounded-[32px] bg-slate-950 text-white shadow-2xl">
           <div className="grid gap-8 px-6 py-8 lg:grid-cols-[1.4fr,0.9fr] lg:px-8">
@@ -308,7 +308,7 @@ const AdminDashboard = () => {
         </section>
 
         <section className="mt-8 grid gap-6 xl:grid-cols-[1.45fr,0.95fr]">
-          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
             <AreaChartComponent
               title="Enrollment Growth"
               data={enrollmentSeedData}
@@ -355,7 +355,7 @@ const AdminDashboard = () => {
         </section>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-3">
-          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
             <DoughnutChartComponent
               title="User Distribution"
               data={userDistributionData}
@@ -364,7 +364,7 @@ const AdminDashboard = () => {
             />
           </div>
 
-          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
             <BarChartComponent
               title="Monthly Revenue"
               data={revenueSeedData}
@@ -410,7 +410,7 @@ const AdminDashboard = () => {
 
         <section className="mt-8 grid gap-6 xl:grid-cols-[1.2fr,0.8fr]">
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+            <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
               <RadarChartComponent
                 title="Performance Radar"
                 data={performanceRadarData}
@@ -419,7 +419,7 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+            <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
               <GaugeChartComponent
                 title="Capacity Usage"
                 value={occupancyRate}
@@ -433,7 +433,7 @@ const AdminDashboard = () => {
               {recentActivitySeed.map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                  className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50/50 p-4"
                 >
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-xs font-semibold text-white">
                     {activity.type}
@@ -460,7 +460,7 @@ const AdminDashboard = () => {
               {upcomingEventsSeed.map((event) => (
                 <div
                   key={event.id}
-                  className="rounded-3xl border border-slate-200 bg-[linear-gradient(180deg,_#ffffff_0%,_#f8fafc_100%)] p-5 shadow-sm"
+                  className="rounded-3xl border border-white/60 bg-white/40 backdrop-blur-xl p-5 shadow-sm"
                 >
                   <div className="flex items-center justify-between">
                     <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">

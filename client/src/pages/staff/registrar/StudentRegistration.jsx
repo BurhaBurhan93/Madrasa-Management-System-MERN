@@ -6,8 +6,9 @@ import Button from '../../../components/UIHelper/Button';
 import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
 import { PieChartComponent, BarChartComponent } from '../../../components/UIHelper/ECharts';
 import { FiUser, FiHome, FiCheckCircle, FiChevronRight, FiChevronLeft, FiUsers, FiTrendingUp, FiCalendar, FiBookOpen } from 'react-icons/fi';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
+import { CreateUserModal } from '../../../components/UIHelper';
+import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 
 const StudentRegistration = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const StudentRegistration = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [showCreateUser, setShowCreateUser] = useState(false);
   const [stats, setStats] = useState({
     totalStudents: 0,
     thisMonth: 0,
@@ -42,6 +44,7 @@ const StudentRegistration = () => {
     phone: '',
     whatsapp: '',
     email: '',
+    accountPassword: '',
     
     // Address
     permanentAddress: { province: '', district: '', village: '' },
@@ -90,8 +93,8 @@ const StudentRegistration = () => {
   const fetchRegistrationStats = async () => {
     try {
       setPageLoading(true);
-      const res = await fetch(`${API_BASE}/student`);
-      const data = await res.json();
+      const res = await apiFetch('/student/all');
+      const data = await parseJsonSafe(res);
       
       if (data.success || data.data) {
         const students = data.data || [];
@@ -167,8 +170,8 @@ const StudentRegistration = () => {
   
   const fetchAvailableRooms = async () => {
     try {
-      const res = await fetch(`${API_BASE}/hostel/rooms/available`);
-      const data = await res.json();
+      const res = await apiFetch('/hostel/rooms/available');
+      const data = await parseJsonSafe(res);
       if (data.success) {
         setAvailableRooms(data.data);
       }
@@ -179,13 +182,6 @@ const StudentRegistration = () => {
   
   const handleStudentChange = (field, value) => {
     setStudentData(prev => ({ ...prev, [field]: value }));
-  };
-  
-  const handleAddressChange = (type, field, value) => {
-    setStudentData(prev => ({
-      ...prev,
-      [type]: { ...prev[type], [field]: value }
-    }));
   };
   
   const handleHostelChange = (field, value) => {
@@ -202,6 +198,18 @@ const StudentRegistration = () => {
   const validatePhase1 = () => {
     if (!studentData.firstName || !studentData.fatherName || !studentData.phone) {
       setError('Please fill in all required fields: First Name, Father Name, and Phone');
+      return false;
+    }
+    if (!studentData.email?.trim()) {
+      setError('Student account email is required');
+      return false;
+    }
+    if (!studentData.accountPassword) {
+      setError('Student account password is required');
+      return false;
+    }
+    if (studentData.accountPassword.length < 6) {
+      setError('Student account password must be at least 6 characters');
       return false;
     }
     return true;
@@ -225,13 +233,13 @@ const StudentRegistration = () => {
     
     try {
       // Step 1: Create Student
-      const studentRes = await fetch(`${API_BASE}/student`, {
+      const studentRes = await apiFetch('/student', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(studentData)
       });
       
-      const studentResult = await studentRes.json();
+      const studentResult = await parseJsonSafe(studentRes);
       
       if (!studentRes.ok) {
         throw new Error(studentResult.message || 'Failed to create student');
@@ -241,7 +249,7 @@ const StudentRegistration = () => {
       
       // Step 2: Create Hostel Allocation if requested
       if (hostelData.wantsHostel && hostelData.room) {
-        const allocationRes = await fetch(`${API_BASE}/hostel/allocations`, {
+        const allocationRes = await apiFetch('/hostel/allocations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -257,7 +265,7 @@ const StudentRegistration = () => {
         });
         
         if (!allocationRes.ok) {
-          const allocResult = await allocationRes.json();
+          const allocResult = await parseJsonSafe(allocationRes);
           throw new Error(allocResult.message || 'Student created but hostel allocation failed');
         }
       }
@@ -302,6 +310,14 @@ const StudentRegistration = () => {
       eyebrow="Registrar / Student Affairs" 
       title="Student Registration"
       subtitle="Two-phase registration: Student Information + Optional Hostel Assignment"
+      actions={
+        <button
+          onClick={() => setShowCreateUser(true)}
+          className="px-4 py-2 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 text-sm font-medium"
+        >
+          + Create User
+        </button>
+      }
     >
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -471,11 +487,10 @@ const StudentRegistration = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-                <input
-                  type="date"
+                <CalendarDatePicker
                   value={studentData.dob}
-                  onChange={(e) => handleStudentChange('dob', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  onChange={(date) => handleStudentChange('dob', date)}
+                  placeholder="Select date"
                 />
               </div>
               
@@ -536,13 +551,37 @@ const StudentRegistration = () => {
                 />
               </div>
               
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                 <input
                   type="email"
                   value={studentData.email}
                   onChange={(e) => handleStudentChange('email', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  required
+                  placeholder="student@example.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                <input
+                  type="password"
+                  value={studentData.accountPassword}
+                  onChange={(e) => handleStudentChange('accountPassword', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  required
+                  placeholder="At least 6 characters"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Login Role</label>
+                <input
+                  type="text"
+                  value="Student"
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl bg-slate-50 text-slate-500 focus:outline-none"
                 />
               </div>
               
@@ -601,11 +640,10 @@ const StudentRegistration = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Admission Date</label>
-                <input
-                  type="date"
+                <CalendarDatePicker
                   value={studentData.admissionDate}
-                  onChange={(e) => handleStudentChange('admissionDate', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  onChange={(date) => handleStudentChange('admissionDate', date)}
+                  placeholder="Select date"
                 />
               </div>
               
@@ -682,12 +720,10 @@ const StudentRegistration = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Check-in Date *</label>
-                    <input
-                      type="date"
+                    <CalendarDatePicker
                       value={hostelData.checkInDate}
-                      onChange={(e) => handleHostelChange('checkInDate', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                      required={hostelData.wantsHostel}
+                      onChange={(date) => handleHostelChange('checkInDate', date)}
+                      placeholder="Select date"
                     />
                   </div>
                   
@@ -780,6 +816,11 @@ const StudentRegistration = () => {
           </div>
         </Card>
       )}
+      <CreateUserModal
+        isOpen={showCreateUser}
+        onClose={() => setShowCreateUser(false)}
+        onSuccess={() => fetchRegistrationStats()}
+      />
     </StaffPageLayout>
   );
 };
