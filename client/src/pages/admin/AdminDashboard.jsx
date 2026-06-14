@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../../lib/api';
 import {
   AreaChartComponent,
@@ -112,12 +113,12 @@ const upcomingEventsSeed = [
 ];
 
 const quickActionItems = [
-  { title: 'Review Admissions', note: '12 applications need approval', path: '/admin/users/register' },
-  { title: 'Check Fee Summary', note: 'Revenue is up 11% this month', path: '/admin/finance/fee-structure' },
-  { title: 'Manage Classes', note: 'Add new classes for next semester', path: '/admin/academic/classes' },
-  { title: 'Library Books', note: 'Add new books to library', path: '/admin/library/books' },
-  { title: 'System Settings', note: 'Update institution settings', path: '/admin/settings/general' },
-  { title: 'Resolve Complaints', note: '3 cases waiting for review', path: '/admin/complaints' },
+  { translationKey: 'reviewAdmissions', noteTranslationKey: 'applicationsNeedApproval', noteCount: '12', path: '/admin/users/register' },
+  { translationKey: 'checkFeeSummary', noteTranslationKey: 'revenueUp', noteCount: '11', path: '/admin/finance/fee-structure' },
+  { translationKey: 'manageClasses', noteTranslationKey: 'addNewClasses', noteCount: '', path: '/admin/academic/classes' },
+  { translationKey: 'libraryBooks', noteTranslationKey: 'addNewBooks', noteCount: '', path: '/admin/library/books' },
+  { translationKey: 'systemSettings', noteTranslationKey: 'updateInstitutionSettings', noteCount: '', path: '/admin/settings/general' },
+  { translationKey: 'resolveComplaints', noteTranslationKey: 'casesWaiting', noteCount: '3', path: '/admin/complaints' },
 ];
 
 const StatCard = ({ label, value, note, accentClass, iconText }) => (
@@ -158,6 +159,7 @@ const Panel = ({ title, subtitle, children, className = '', dark = false }) => (
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [quickStats, setQuickStats] = useState({
     totalStudents: 0,
     totalTeachers: 0,
@@ -203,30 +205,30 @@ const AdminDashboard = () => {
 
   const statCards = [
     {
-      label: 'Total Students',
+      label: t('admin.dashboard.totalStudents'),
       value: quickStats.totalStudents,
-      note: 'Active enrollments across all classes',
+      note: t('admin.dashboard.activeEnrollments'),
       accentClass: 'bg-blue-500',
       iconText: 'STD',
     },
     {
-      label: 'Teachers',
+      label: t('admin.dashboard.teachers'),
       value: quickStats.totalTeachers,
-      note: 'Faculty currently assigned',
+      note: t('admin.dashboard.facultyAssigned'),
       accentClass: 'bg-teal-500',
       iconText: 'TCH',
     },
     {
-      label: 'Support Staff',
+      label: t('admin.dashboard.supportStaff'),
       value: quickStats.totalStaff,
-      note: 'Operations and administration team',
+      note: t('admin.dashboard.operationsTeam'),
       accentClass: 'bg-orange-500',
       iconText: 'STF',
     },
     {
-      label: 'Monthly Revenue',
+      label: t('admin.dashboard.monthlyRevenue'),
       value: `$${(quickStats.monthlyRevenue / 1000).toFixed(0)}k`,
-      note: 'Collected this month',
+      note: t('admin.dashboard.collectedThisMonth'),
       accentClass: 'bg-emerald-500',
       iconText: 'REV',
     },
@@ -242,32 +244,30 @@ const AdminDashboard = () => {
               <div className="absolute left-40 top-10 h-32 w-32 rounded-full bg-blue-500/20 blur-3xl" />
               <div className="relative">
                 <div className="mb-5 inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-slate-200 backdrop-blur">
-                  Executive overview for madrasa operations
+                  {t('admin.dashboard.overview')}
                 </div>
                 <h1 className="max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
-                  Admin Dashboard
+                  {t('admin.dashboard.title')}
                 </h1>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-                  A cleaner command center for enrollment, revenue, staffing, and
-                  daily operations. The layout highlights the most important numbers
-                  first and keeps the charts easy to read.
+                  {t('admin.dashboard.subtitle')}
                 </p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-3">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Active Users</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{t('admin.dashboard.activeUsers')}</p>
                     <p className="mt-2 text-2xl font-semibold">{totalUsers}</p>
-                    <p className="mt-1 text-sm text-slate-300">Combined students, teachers, and staff</p>
+                    <p className="mt-1 text-sm text-slate-300">{t('admin.dashboard.combinedUsers')}</p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Capacity Used</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{t('admin.dashboard.capacityUsed')}</p>
                     <p className="mt-2 text-2xl font-semibold">{occupancyRate}%</p>
-                    <p className="mt-1 text-sm text-slate-300">Based on the current student target</p>
+                    <p className="mt-1 text-sm text-slate-300">{t('admin.dashboard.basedOnTarget')}</p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Session Date</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{t('admin.dashboard.sessionDate')}</p>
                     <p className="mt-2 text-2xl font-semibold">{formatDate(new Date().toISOString())}</p>
-                    <p className="mt-1 text-sm text-slate-300">Snapshot of current dashboard activity</p>
+                    <p className="mt-1 text-sm text-slate-300">{t('admin.dashboard.snapshot')}</p>
                   </div>
                 </div>
               </div>
@@ -279,8 +279,8 @@ const AdminDashboard = () => {
                   <Avatar size="xl" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-300">Administrator</p>
-                  <h2 className="text-2xl font-semibold">Super Admin</h2>
+                  <p className="text-sm text-slate-300">{t('admin.dashboard.administrator')}</p>
+                  <h2 className="text-2xl font-semibold">{t('admin.dashboard.superAdmin')}</h2>
                   <p className="text-sm text-slate-400">ADM2024001</p>
                 </div>
               </div>
@@ -288,12 +288,17 @@ const AdminDashboard = () => {
               <div className="mt-6 space-y-3">
                 {quickActionItems.map((item) => (
                   <button
-                    key={item.title}
+                    key={item.translationKey}
                     onClick={() => navigate(item.path)}
                     className="w-full text-left rounded-2xl border border-white/10 bg-slate-900/60 p-4 hover:bg-slate-800/60 transition-colors"
                   >
-                    <p className="font-medium text-white">{item.title}</p>
-                    <p className="mt-1 text-sm text-slate-400">{item.note}</p>
+                    <p className="font-medium text-white">{t(`admin.dashboard.${item.translationKey}`)}</p>
+                    <p className="mt-1 text-sm text-slate-400">
+                      {item.noteCount 
+                        ? `${item.noteCount} ${t(`admin.dashboard.${item.noteTranslationKey}`)}`
+                        : t(`admin.dashboard.${item.noteTranslationKey}`)
+                      }
+                    </p>
                   </button>
                 ))}
               </div>
@@ -310,7 +315,7 @@ const AdminDashboard = () => {
         <section className="mt-8 grid gap-6 xl:grid-cols-[1.45fr,0.95fr]">
           <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
             <AreaChartComponent
-              title="Enrollment Growth"
+              title={t('admin.dashboard.enrollmentGrowth')}
               data={enrollmentSeedData}
               dataKey="students"
               nameKey="month"
@@ -320,35 +325,35 @@ const AdminDashboard = () => {
           </div>
 
           <Panel
-            title="Operational Snapshot"
-            subtitle="A quick summary of institution health"
+            title={t('admin.dashboard.operationalSnapshot')}
+            subtitle={t('admin.dashboard.institutionHealth')}
             className="bg-slate-900 text-white"
             dark
           >
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <p className="text-sm text-slate-300">Revenue Target</p>
+                <p className="text-sm text-slate-300">{t('admin.dashboard.revenueTarget')}</p>
                 <p className="mt-2 text-3xl font-semibold">$140k</p>
-                <p className="mt-2 text-sm text-emerald-300">89 percent of target achieved</p>
+                <p className="mt-2 text-sm text-emerald-300">89 {t('admin.common.percent')} of target achieved</p>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <p className="text-sm text-slate-300">Pending Complaints</p>
+                <p className="text-sm text-slate-300">{t('admin.dashboard.pendingComplaints')}</p>
                 <p className="mt-2 text-3xl font-semibold">{quickStats.pendingComplaints}</p>
-                <p className="mt-2 text-sm text-slate-300">Service desk workload this week</p>
+                <p className="mt-2 text-sm text-slate-300">{t('admin.dashboard.serviceDeskWorkload')}</p>
               </div>
             </div>
             <div className="mt-5 rounded-3xl border border-white/10 bg-white/5 p-4">
               <div className="mb-3 flex items-center justify-between">
-                <p className="font-medium text-white">Weekly Administration Focus</p>
+                <p className="font-medium text-white">{t('admin.dashboard.weeklyFocus')}</p>
                 <span className="rounded-full bg-cyan-400/15 px-3 py-1 text-xs font-medium text-cyan-200">
-                  Healthy
+                  {t('admin.common.healthy')}
                 </span>
               </div>
               <div className="h-3 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full w-[78%] rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-blue-500" />
               </div>
               <p className="mt-3 text-sm text-slate-300">
-                Operations are stable with stronger fee collection and steady admissions.
+                {t('admin.dashboard.operationsStable')}
               </p>
             </div>
           </Panel>
@@ -357,7 +362,7 @@ const AdminDashboard = () => {
         <section className="mt-8 grid gap-6 lg:grid-cols-3">
           <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
             <DoughnutChartComponent
-              title="User Distribution"
+              title={t('admin.dashboard.userDistribution')}
               data={userDistributionData}
               height={330}
               showLegend={false}
@@ -366,7 +371,7 @@ const AdminDashboard = () => {
 
           <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
             <BarChartComponent
-              title="Monthly Revenue"
+              title={t('admin.dashboard.monthlyRevenueChart')}
               data={revenueSeedData}
               dataKey="amount"
               nameKey="month"
@@ -375,7 +380,7 @@ const AdminDashboard = () => {
             />
           </div>
 
-          <Panel title="Distribution Details" subtitle="Current user mix across the system">
+          <Panel title={t('admin.dashboard.distributionDetails')} subtitle={t('admin.dashboard.userMix')}>
             <div className="space-y-4">
               {userDistributionData.map((item) => {
                 const percent = totalUsers ? Math.round((item.value / totalUsers) * 100) : 0;
@@ -391,7 +396,7 @@ const AdminDashboard = () => {
                         <span className="font-medium text-slate-700">{item.name}</span>
                       </div>
                       <span className="text-sm text-slate-500">
-                        {item.value} users
+                        {item.value} {t('admin.common.users')}
                       </span>
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-slate-100">
@@ -400,7 +405,7 @@ const AdminDashboard = () => {
                         style={{ width: `${percent}%`, backgroundColor: item.color }}
                       />
                     </div>
-                    <p className="mt-2 text-sm text-slate-500">{percent}% of total active users</p>
+                    <p className="mt-2 text-sm text-slate-500">{percent}% {t('admin.dashboard.ofTotal')}</p>
                   </div>
                 );
               })}
@@ -412,7 +417,7 @@ const AdminDashboard = () => {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
               <RadarChartComponent
-                title="Performance Radar"
+                title={t('admin.dashboard.performanceRadar')}
                 data={performanceRadarData}
                 indicators={performanceIndicators}
                 height={330}
@@ -421,14 +426,14 @@ const AdminDashboard = () => {
 
             <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
               <GaugeChartComponent
-                title="Capacity Usage"
+                title={t('admin.dashboard.capacityUsage')}
                 value={occupancyRate}
                 height={330}
               />
             </div>
           </div>
 
-          <Panel title="Recent Activity" subtitle="Latest updates from admin operations">
+          <Panel title={t('admin.dashboard.recentActivity')} subtitle={t('admin.dashboard.adminOperations')}>
             <div className="space-y-4">
               {recentActivitySeed.map((activity) => (
                 <div
@@ -455,7 +460,7 @@ const AdminDashboard = () => {
         </section>
 
         <section className="mt-8">
-          <Panel title="Upcoming Events" subtitle="Important dates and scheduled administrative activity">
+          <Panel title={t('admin.dashboard.upcomingEvents')} subtitle={t('admin.dashboard.importantDates')}>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {upcomingEventsSeed.map((event) => (
                 <div

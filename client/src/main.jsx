@@ -1,9 +1,11 @@
 import { StrictMode, Component } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ThemeProvider } from './contexts/ThemeContext.jsx'
+import { I18nextProvider } from 'react-i18next'
 
 import App from './App.jsx'
 import Notifications from './components/UIHelper/Notifications.jsx'
+import i18n from './i18n'
 
 // Import CSS
 import './App.css'
@@ -44,10 +46,12 @@ try {
   createRoot(document.getElementById('root')).render(
     <StrictMode>
       <ErrorBoundary>
-        <ThemeProvider>
-          <App />
-          <Notifications />
-        </ThemeProvider>
+        <I18nextProvider i18n={i18n}>
+          <ThemeProvider>
+            <App />
+            <Notifications />
+          </ThemeProvider>
+        </I18nextProvider>
       </ErrorBoundary>
     </StrictMode>,
   );
