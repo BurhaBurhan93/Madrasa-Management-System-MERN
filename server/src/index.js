@@ -41,6 +41,16 @@ console.log('[Routes] ✓ examRoutes loaded');
 const communicationRoutes = require('./modules/communications/communicationRoutes');
 console.log('[Routes] ✓ communicationRoutes loaded');
 
+// Notification routes
+console.log('[Routes] Loading notificationRoutes...');
+let notificationRoutes;
+try {
+  notificationRoutes = require('./modules/notifications/notificationRoutes');
+  console.log('[Routes] ✓ notificationRoutes loaded');
+} catch (error) {
+  console.error('[Routes] ✗ Error loading notificationRoutes:', error.message);
+}
+
 // Upload routes (GridFS)
 console.log('[Routes] Loading uploadRoutes...');
 let uploadRoutes;
@@ -134,6 +144,11 @@ app.use('/api/hostel', hostelRoutes);
 console.log('[Routes] ✓ /api/hostel registered');
 app.use('/api/communications', communicationRoutes);
 console.log('[Routes] ✓ /api/communications registered');
+
+if (notificationRoutes) {
+  app.use('/api/notifications', notificationRoutes);
+  console.log('[Routes] ✓ /api/notifications registered');
+}
 
 if (uploadRoutes) {
   app.use('/api/uploads', uploadRoutes);

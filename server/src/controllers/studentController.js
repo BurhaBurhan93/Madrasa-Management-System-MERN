@@ -14,6 +14,7 @@ const Admission = require('../models/Admission');
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const notificationService = require('../modules/notifications/notificationService');
 
 // Get student profile
 const getStudentProfile = async (req, res) => {
@@ -921,14 +922,15 @@ const convertToStudent = async (req, res) => {
     }
     
     // Create user account first
-    const user = new User({
+    const userPayload = {
       name: `${admission.firstName} ${admission.lastName}`,
       email: admission.email || `${admission.firstName.toLowerCase()}@example.com`,
-      password: 'defaultPassword123', // Should be changed by user
+      password: await bcrypt.hash('defaultPassword123', 10),
       role: 'student',
       phone: admission.phone,
       status: 'active'
-    });
+    };
+    const user = new User(userPayload);
     await user.save();
     
     // Create student record
@@ -966,48 +968,56 @@ const createStudent = async (req, res) => {
     
     const hashedPassword = await bcrypt.hash(studentData.accountPassword || studentData.password || 'defaultPassword123', 10);
     
-    // Create user account first
-    const user = new User({
+    // Build user object, stripping empty enum fields to avoid Mongoose validation errors
+    const userPayload = {
       name: `${studentData.firstName} ${studentData.lastName || ''}`.trim(),
       email: studentData.email || `${studentData.firstName.toLowerCase()}.${Date.now()}@example.com`,
       password: hashedPassword,
       role: 'student',
       phone: studentData.phone,
-      whatsapp: studentData.whatsapp,
-      fatherName: studentData.fatherName,
-      grandfatherName: studentData.grandfatherName,
-      dob: studentData.dob,
-      bloodType: studentData.bloodType,
-      permanentAddress: studentData.permanentAddress,
-      currentAddress: studentData.currentAddress,
       status: 'active'
-    });
+    };
+    if (studentData.whatsapp) userPayload.whatsapp = studentData.whatsapp;
+    if (studentData.fatherName) userPayload.fatherName = studentData.fatherName;
+    if (studentData.grandfatherName) userPayload.grandfatherName = studentData.grandfatherName;
+    if (studentData.dob) userPayload.dob = studentData.dob;
+    if (studentData.bloodType) userPayload.bloodType = studentData.bloodType;
+    if (studentData.permanentAddress) userPayload.permanentAddress = studentData.permanentAddress;
+    if (studentData.currentAddress) userPayload.currentAddress = studentData.currentAddress;
+    
+    const user = new User(userPayload);
     await user.save();
     
-    // Create student record
-    const student = new Student({
+    // Build student record, only including non-empty fields
+    const studentPayload = {
       user: user._id,
       studentCode: studentData.studentCode || `STU-${Date.now()}`,
-      firstName: studentData.firstName,
-      lastName: studentData.lastName,
-      fatherName: studentData.fatherName,
-      grandfatherName: studentData.grandfatherName,
-      dob: studentData.dob,
-      phone: studentData.phone,
-      whatsapp: studentData.whatsapp,
-      email: studentData.email,
-      permanentAddress: studentData.permanentAddress,
-      currentAddress: studentData.currentAddress,
-      guardianName: studentData.guardianName,
-      guardianRelationship: studentData.guardianRelationship,
-      guardianPhone: studentData.guardianPhone,
-      guardianEmail: studentData.guardianEmail,
-      currentLevel: studentData.currentLevel,
       admissionDate: studentData.admissionDate || new Date(),
       status: studentData.status || 'active'
-    });
-    await student.save();
+    };
+    if (studentData.firstName) studentPayload.firstName = studentData.firstName;
+    if (studentData.lastName) studentPayload.lastName = studentData.lastName;
+    if (studentData.fatherName) studentPayload.fatherName = studentData.fatherName;
+    if (studentData.grandfatherName) studentPayload.grandfatherName = studentData.grandfatherName;
+    if (studentData.dob) studentPayload.dob = studentData.dob;
+    if (studentData.phone) studentPayload.phone = studentData.phone;
+    if (studentData.whatsapp) studentPayload.whatsapp = studentData.whatsapp;
+    if (studentData.email) studentPayload.email = studentData.email;
+    if (studentData.bloodType) studentPayload.bloodType = studentData.bloodType;
+    if (studentData.permanentAddress) studentPayload.permanentAddress = studentData.permanentAddress;
+    if (studentData.currentAddress) studentPayload.currentAddress = studentData.currentAddress;
+    if (studentData.guardianName) studentPayload.guardianName = studentData.guardianName;
+    if (studentData.guardianRelationship) studentPayload.guardianRelationship = studentData.guardianRelationship;
+    if (studentData.guardianPhone) studentPayload.guardianPhone = studentData.guardianPhone;
+    if (studentData.guardianEmail) studentPayload.guardianEmail = studentData.guardianEmail;
+    if (studentData.currentLevel) studentPayload.currentLevel = studentData.currentLevel;
     
+    const student = new Student(studentPayload);
+    await student.save();
+
+    // Fire notification asynchronously
+    notificationService.onStudentRegistered(student).catch(() => {});
+
     res.status(201).json({
       success: true,
       data: student

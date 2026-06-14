@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../../components/UIHelper/Card';
+import { CreateUserModal } from '../../../components/UIHelper';
 import api from '../../../lib/api';
 
 const UserIndex = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterRole, setFilterRole] = useState('');
+  const [showCreateUser, setShowCreateUser] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,10 +58,10 @@ const UserIndex = () => {
           <p className="text-gray-600 mt-1">Manage all system users</p>
         </div>
         <button
-          onClick={() => navigate('/admin/users/register')}
+          onClick={() => setShowCreateUser(true)}
           className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg"
         >
-          ➕ Add New User
+          ➕ Create User
         </button>
       </div>
 
@@ -110,6 +112,12 @@ const UserIndex = () => {
           </table>
         </div>
       </Card>
+
+      <CreateUserModal
+        isOpen={showCreateUser}
+        onClose={() => setShowCreateUser(false)}
+        onSuccess={() => fetchUsers()}
+      />
     </div>
   );
 };

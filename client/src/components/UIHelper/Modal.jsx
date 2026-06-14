@@ -18,9 +18,9 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
-      <div className={`w-full rounded-3xl border shadow-2xl ${isDark ? 'border-slate-700 bg-slate-900 text-slate-100' : 'border-slate-200 bg-white text-slate-900'} ${sizeClasses[size]}`}>
+      <div className={`w-full max-h-[90vh] overflow-y-auto rounded-3xl border shadow-2xl ${isDark ? 'border-slate-700 bg-slate-900 text-slate-100' : 'border-slate-200 bg-white text-slate-900'} ${sizeClasses[size]}`}>
         {(title || onClose) && (
-          <div className={`flex items-center justify-between border-b p-4 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+          <div className={`sticky top-0 z-10 flex items-center justify-between border-b p-4 ${isDark ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
             {title && <h3 className={`text-lg font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{title}</h3>}
             {onClose && (
               <button

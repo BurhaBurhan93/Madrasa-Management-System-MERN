@@ -19,6 +19,11 @@ class UserService {
   async createUser(userData) {
     try {
       const { skipProfile, ...userDataForUser } = userData;
+
+      // Strip empty enum fields that would cause Mongoose validation errors
+      if (!userDataForUser.bloodType) delete userDataForUser.bloodType;
+      if (!userDataForUser.idNumber) delete userDataForUser.idNumber;
+
       const existingUser = await User.findOne({ email: userDataForUser.email });
       if (existingUser) throw new Error('Email already exists');
 
@@ -32,6 +37,10 @@ class UserService {
         await Student.create({
           user: user._id,
           studentCode: userData.studentCode || `STU${Date.now()}`,
+          firstName: user.name?.split(' ')[0] || user.name,
+          lastName: user.name?.split(' ').slice(1).join(' ') || '',
+          email: user.email,
+          phone: user.phone,
           status: 'active'
         });
       } else if (user.role === 'teacher' || user.role === 'staff') {
@@ -39,7 +48,12 @@ class UserService {
           user: user._id,
           employeeCode: userData.employeeCode || `EMP${Date.now()}`,
           fullName: user.name,
+          gender: userData.gender || 'male',
+          phoneNumber: user.phone || 'N/A',
+          email: user.email,
           employeeType: user.role === 'teacher' ? 'teacher' : 'support',
+          joiningDate: userData.joiningDate || new Date(),
+          baseSalary: userData.baseSalary || 0,
           status: 'active'
         });
       }

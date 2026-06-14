@@ -1,14 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FiBell, FiCheck, FiTrash2, FiClock, FiAlertCircle, FiInfo, FiCheckCircle, FiX } from 'react-icons/fi';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { FiBell, FiCheck, FiTrash2, FiClock, FiAlertCircle, FiInfo, FiCheckCircle, FiX, FiRefreshCw } from 'react-icons/fi';
 import { useTheme } from '../../contexts/ThemeContext';
+import api from '../../lib/api';
 
-// Sample notification data (replace with API call later)
-const defaultNotifications = [
-  { id: 1, type: 'info',    title: 'System Update', message: 'New version available for deployment.', time: '5m ago', read: false },
-  { id: 2, type: 'success', title: 'Backup Complete', message: 'Database backup finished successfully.', time: '1h ago', read: false },
-  { id: 3, type: 'warning', title: 'Storage Warning', message: 'Server storage reaching 85% capacity.', time: '3h ago', read: true },
-  { id: 4, type: 'error',   title: 'Login Failed', message: '3 failed login attempts detected.', time: '5h ago', read: true },
-];
+const POLL_INTERVAL = 30000; // 30 seconds
 
 const iconMap = {
   info:    <FiInfo size={16} className="text-sky-500" />,
@@ -24,25 +19,141 @@ const bgMap = {
   error:   'bg-rose-50 dark:bg-rose-900/20',
 };
 
+/**
+ * Format a date into a human-readable relative time string
+ */
+const timeAgo = (dateStr) => {
+  if (!dateStr) return '';
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diff = now - then;
+  const seconds = Math.floor(diff / 1000);
+  if (seconds < 60) return 'Just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString();
+};
+
 const NotificationDropdown = ({ t }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState(defaultNotifications);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(false);
   const ref = useRef(null);
+  const pollRef = useRef(null);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  /** Fetch notifications from API */
+  const fetchNotifications = useCallback(async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
+      const res = await api.get('/notifications', { params: { limit: 20 } });
+      if (res.data?.success) {
+        setNotifications(res.data.data || []);
+        setUnreadCount(res.data.unreadCount || 0);
+      }
+    } catch (err) {
+      // Silently fail - don't disrupt the UI
+      console.warn('[Notifications] Fetch failed:', err?.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  /** Fetch just the unread count (lightweight) */
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const res = await api.get('/notifications/unread-count');
+      if (res.data?.success) {
+        setUnreadCount(res.data.count || 0);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  /** Initial load + polling */
   useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    fetchNotifications(true);
+
+    // Poll for unread count every 30s when dropdown is closed
+    pollRef.current = setInterval(() => {
+      if (!open) {
+        fetchUnreadCount();
+      }
+    }, POLL_INTERVAL);
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [fetchNotifications, fetchUnreadCount, open]);
+
+  /** Refresh full list when dropdown opens */
+  useEffect(() => {
+    if (open) {
+      fetchNotifications(true);
+    }
+  }, [open, fetchNotifications]);
+
+  /** Click outside to close */
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const markAllRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  const clearAll = () => setNotifications([]);
-  const markRead = (id) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-  const removeOne = (id) => setNotifications(prev => prev.filter(n => n.id !== id));
+  /** Mark one notification as read */
+  const markRead = async (id) => {
+    setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+    try {
+      await api.put(`/notifications/${id}/read`);
+    } catch {
+      // Revert on failure
+      fetchNotifications(true);
+    }
+  };
+
+  /** Mark all as read */
+  const markAllRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setUnreadCount(0);
+    try {
+      await api.put('/notifications/mark-all-read');
+    } catch {
+      fetchNotifications(true);
+    }
+  };
+
+  /** Delete one notification */
+  const removeOne = async (id) => {
+    const wasUnread = notifications.find(n => n._id === id && !n.read);
+    setNotifications(prev => prev.filter(n => n._id !== id));
+    if (wasUnread) setUnreadCount(prev => Math.max(0, prev - 1));
+    try {
+      await api.delete(`/notifications/${id}`);
+    } catch {
+      fetchNotifications(true);
+    }
+  };
+
+  /** Clear all notifications */
+  const clearAll = async () => {
+    setNotifications([]);
+    setUnreadCount(0);
+    try {
+      await api.delete('/notifications');
+    } catch {
+      fetchNotifications(true);
+    }
+  };
 
   return (
     <div className="relative" ref={ref}>
@@ -58,8 +169,8 @@ const NotificationDropdown = ({ t }) => {
       >
         <FiBell size={19} />
         {unreadCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
-            {unreadCount}
+          <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900 animate-pulse">
+            {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
@@ -70,7 +181,7 @@ const NotificationDropdown = ({ t }) => {
           className={`notification-dropdown absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-2xl border shadow-2xl ${
             isDark ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-white'
           }`}
-          style={{ minWidth: 320 }}
+          style={{ minWidth: 340 }}
         >
           {/* Header */}
           <div className={`flex items-center justify-between border-b px-4 py-3 ${isDark ? 'border-slate-700' : 'border-slate-100'}`}>
@@ -85,29 +196,44 @@ const NotificationDropdown = ({ t }) => {
                 </span>
               )}
             </div>
-            <button onClick={() => setOpen(false)} className={`rounded-lg p-1 transition ${isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-slate-100 text-slate-400'}`}>
-              <FiX size={16} />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => fetchNotifications()}
+                className={`rounded-lg p-1 transition ${isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-slate-100 text-slate-400'}`}
+                title="Refresh"
+              >
+                <FiRefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+              </button>
+              <button onClick={() => setOpen(false)} className={`rounded-lg p-1 transition ${isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-slate-100 text-slate-400'}`}>
+                <FiX size={16} />
+              </button>
+            </div>
           </div>
 
           {/* Notification list */}
-          <div className="max-h-72 overflow-y-auto">
-            {notifications.length === 0 ? (
+          <div className="max-h-80 overflow-y-auto">
+            {loading && notifications.length === 0 ? (
+              <div className={`flex flex-col items-center justify-center py-8 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                <FiRefreshCw size={24} className="mb-2 animate-spin" />
+                <p className="text-sm">Loading...</p>
+              </div>
+            ) : notifications.length === 0 ? (
               <div className={`flex flex-col items-center justify-center py-8 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                 <FiBell size={32} className="mb-2 opacity-30" />
                 <p className="text-sm">No notifications</p>
+                <p className="text-xs mt-1 opacity-60">You're all caught up!</p>
               </div>
             ) : (
               notifications.map((n) => (
                 <div
-                  key={n.id}
+                  key={n._id}
                   className={`group flex items-start gap-3 border-b px-4 py-3 transition ${
                     !n.read
                       ? isDark ? 'bg-slate-750/50' : 'bg-cyan-50/30'
                       : ''
                   } ${isDark ? 'border-slate-700/50 hover:bg-slate-700/50' : 'border-slate-50 hover:bg-slate-50'}`}
                 >
-                  <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}>
+                  <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${bgMap[n.type] || bgMap.info} ${isDark ? 'bg-slate-700' : ''}`}>
                     {iconMap[n.type] || iconMap.info}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -118,16 +244,21 @@ const NotificationDropdown = ({ t }) => {
                     <p className={`text-xs mt-0.5 line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{n.message}</p>
                     <div className={`flex items-center gap-1 mt-1 text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                       <FiClock size={10} />
-                      <span>{n.time}</span>
+                      <span>{timeAgo(n.createdAt)}</span>
+                      {n.category && (
+                        <span className={`ml-1 rounded px-1 py-0.5 text-[9px] font-medium uppercase ${isDark ? 'bg-slate-700 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+                          {n.category}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition">
                     {!n.read && (
-                      <button onClick={() => markRead(n.id)} className="rounded p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="Mark read">
+                      <button onClick={() => markRead(n._id)} className="rounded p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="Mark read">
                         <FiCheck size={12} />
                       </button>
                     )}
-                    <button onClick={() => removeOne(n.id)} className="rounded p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20" title="Remove">
+                    <button onClick={() => removeOne(n._id)} className="rounded p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20" title="Remove">
                       <FiTrash2 size={12} />
                     </button>
                   </div>

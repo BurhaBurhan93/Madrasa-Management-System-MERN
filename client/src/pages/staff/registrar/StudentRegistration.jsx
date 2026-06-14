@@ -232,11 +232,16 @@ const StudentRegistration = () => {
     setError('');
     
     try {
-      // Step 1: Create Student
+      // Step 1: Create Student - strip empty enum fields to avoid validation errors
+      const cleanData = { ...studentData };
+      if (!cleanData.bloodType) delete cleanData.bloodType;
+      if (!cleanData.dob) delete cleanData.dob;
+      if (!cleanData.studentCode) delete cleanData.studentCode;
+      
       const studentRes = await apiFetch('/student', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(studentData)
+        body: JSON.stringify(cleanData)
       });
       
       const studentResult = await parseJsonSafe(studentRes);

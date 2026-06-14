@@ -52,10 +52,17 @@ const AdminUsers = () => {
       if (editMode) {
         const updateData = { ...formData };
         if (!updateData.password) delete updateData.password;
+        if (!updateData.bloodType) delete updateData.bloodType;
+        if (!updateData.dob) delete updateData.dob;
+        if (!updateData.idNumber) delete updateData.idNumber;
         await api.put(`/users/${currentUser._id}`, updateData);
         alert('User updated successfully');
       } else {
-        await api.post('/users', formData);
+        const payload = { ...formData };
+        if (!payload.bloodType) delete payload.bloodType;
+        if (!payload.dob) delete payload.dob;
+        if (!payload.idNumber) delete payload.idNumber;
+        await api.post('/users', payload);
         alert('User created successfully');
       }
       resetForm();

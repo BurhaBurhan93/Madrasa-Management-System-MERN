@@ -5,6 +5,7 @@ const Leave = require('../../models/Leave');
 const Employee = require('../../models/Employee');
 const EmployeeAttendance = require('../../models/EmployeeAttendance');
 const User = require('../../models/User');
+const notificationService = require('../notifications/notificationService');
 
 // ==================== DEPARTMENT CONTROLLERS ====================
 
@@ -478,8 +479,17 @@ exports.createEmployee = async (req, res) => {
     if (!data.reportingManager) delete data.reportingManager;
     if (!data.dateOfBirth) delete data.dateOfBirth;
     
-    const employee = await Employee.create(data);
+    // Ensure required fields have defaults
+    if (!data.gender) data.gender = 'male';
+    if (!data.phoneNumber) data.phoneNumber = data.phone || 'N/A';
+    if (!data.joiningDate) data.joiningDate = new Date();
+    if (data.baseSalary === undefined || data.baseSalary === null || data.baseSalary === '') data.baseSalary = 0;
     
+    const employee = await Employee.create(data);
+
+    // Fire notification asynchronously
+    notificationService.onEmployeeRegistered(employee).catch(() => {});
+
     res.status(201).json({
       success: true,
       message: 'Employee created successfully',

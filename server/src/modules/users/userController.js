@@ -1,4 +1,5 @@
 const userService = require('./userService');
+const notificationService = require('../notifications/notificationService');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -29,6 +30,10 @@ exports.createUser = async (req, res) => {
     const user = await userService.createUser(req.body);
     const userResponse = user.toObject();
     delete userResponse.password;
+
+    // Fire notification asynchronously (don't block response)
+    notificationService.onUserCreated(user, req.user).catch(() => {});
+
     res.status(201).json({ success: true, data: userResponse, message: 'User created successfully' });
   } catch (error) {
     console.error('Error creating user:', error);
@@ -50,6 +55,10 @@ exports.deleteUser = async (req, res) => {
   try {
     const user = await userService.deleteUser(req.params.id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    // Fire notification asynchronously
+    notificationService.onUserDeleted(user, req.user).catch(() => {});
+
     res.json({ success: true, message: 'User deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

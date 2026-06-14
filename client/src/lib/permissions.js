@@ -164,7 +164,7 @@ const ROLE_PERMISSIONS = {
     hr: { view: true, create: true, edit: true, delete: false },
     reports: { view: true, export: false },
     settings: false,
-    users: false,
+    users: { view: true, create: true, edit: false, delete: false },
   },
 
   teacher: {

@@ -38,7 +38,7 @@ const UserRegister = () => {
       if (!payload.idNumber) delete payload.idNumber;
       await api.post('/users', payload);
       alert('User created successfully');
-      navigate('/staff/users');
+      navigate('/admin/users');
     } catch (error) {
       alert(error.response?.data?.message || 'Error creating user');
     }
@@ -48,7 +48,7 @@ const UserRegister = () => {
     <div className="w-full bg-gray-50 min-h-screen p-6">
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <button onClick={() => navigate('/staff/users')} className="text-blue-600 hover:text-blue-800 mb-4">
+          <button onClick={() => navigate('/admin/users')} className="text-blue-600 hover:text-blue-800 mb-4">
             ← Back to Users
           </button>
           <h1 className="text-3xl font-bold text-gray-900"> Register New User</h1>
@@ -226,7 +226,7 @@ const UserRegister = () => {
             <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold">
               ✅ Create User
             </button>
-            <button type="button" onClick={() => navigate('/staff/users')} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold">
+            <button type="button" onClick={() => navigate('/admin/users')} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold">
               ❌ Cancel
             </button>
           </div>
