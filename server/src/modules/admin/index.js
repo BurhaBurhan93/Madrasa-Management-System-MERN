@@ -6,6 +6,7 @@ const Student = require('../../models/Student');
 const Employee = require('../../models/Employee');
 const Class = require('../../models/Class');
 const Subject = require('../../models/Subject');
+const MadrasaInfo = require('../../models/MadrasaInfo');
 
 const ensureAdmin = (req, res, next) => {
   if (req.user.role !== 'admin') {
@@ -33,6 +34,33 @@ router.get('/dashboard', async (req, res) => {
       totalClasses,
       totalSubjects
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get Madrasa info
+router.get('/madrasa-info', async (req, res) => {
+  try {
+    const info = await MadrasaInfo.findOne().populate('updatedBy', 'name');
+    res.json(info || {});
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Save (upsert) Madrasa info
+router.put('/madrasa-info', async (req, res) => {
+  try {
+    const existing = await MadrasaInfo.findOne();
+    const data = { ...req.body, updatedBy: req.user._id || req.user.id };
+    let info;
+    if (existing) {
+      info = await MadrasaInfo.findByIdAndUpdate(existing._id, data, { new: true, runValidators: true });
+    } else {
+      info = await MadrasaInfo.create(data);
+    }
+    res.json(info);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -14,8 +14,9 @@ console.log('[Server] MONGODB_URI exists:', !!(process.env.MONGODB_URI || proces
 
 app.use(cors());
 console.log('[Server] CORS middleware applied');
-app.use(express.json());
-console.log('[Server] JSON parser middleware applied');
+app.use(express.json({ limit: '50mb' })); // Increase limit to handle base64 images
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+console.log('[Server] JSON parser middleware applied (50MB limit)');
 
 console.log('[Routes] Loading route modules...');
 const authRoutes = require('./modules/auth/authRoutes');

@@ -11,6 +11,9 @@ export const educationHistoryConfig = {
   title: 'Student Education History',
   subtitle: 'Manage previous education records and academic background',
   endpoint: '/student/education-history',
+  createPath: '/staff/registrar/education-history/create',
+  editPathForRow: (row) => `/staff/registrar/education-history/edit/${row._id}`,
+  viewPathForRow: (row) => `/staff/registrar/education-history/view/${row._id}`,
   columns: [
     { key: 'student', header: 'Student', render: (value, row) => row.student?.user?.name || '-' },
     { key: 'previousDegree', header: 'Previous Degree' },
@@ -66,7 +69,7 @@ const EducationHistory = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       const response = await axios.get(`${API_BASE}/student/education-history`, config);
-      const records = response.data || [];
+      const records = response.data?.data || response.data || [];
       
       const total = records.length;
       

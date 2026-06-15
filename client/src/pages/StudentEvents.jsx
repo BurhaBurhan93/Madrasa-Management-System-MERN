@@ -28,6 +28,9 @@ const StudentEvents = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newEvent, setNewEvent] = useState({ title: '', date: '', time: '', location: '', description: '', type: 'Personal' });
+  const [addError, setAddError] = useState('');
 
   useEffect(() => {
     fetchEventsData();
@@ -83,6 +86,29 @@ const StudentEvents = () => {
     }
   };
 
+  const handleAddEvent = (e) => {
+    e.preventDefault();
+    setAddError('');
+    if (!newEvent.title || !newEvent.date) {
+      setAddError('Title and date are required.');
+      return;
+    }
+    const custom = {
+      id: `custom-${Date.now()}`,
+      title: newEvent.title,
+      date: newEvent.date,
+      time: newEvent.time || '12:00 PM',
+      location: newEvent.location || 'N/A',
+      type: newEvent.type || 'Personal',
+      description: newEvent.description || '',
+      status: 'upcoming',
+      color: 'amber'
+    };
+    setEvents(prev => [...prev, custom].sort((a, b) => new Date(a.date) - new Date(b.date)));
+    setNewEvent({ title: '', date: '', time: '', location: '', description: '', type: 'Personal' });
+    setShowAddModal(false);
+  };
+
   const filteredEvents = events.filter(event => {
     if (filter === 'all') return true;
     return event.status === filter;
@@ -115,7 +141,7 @@ const StudentEvents = () => {
               </button>
             ))}
           </div>
-          <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2">
+          <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2" onClick={() => setShowAddModal(true)}>
             <FiPlus /> Add Event
           </Button>
         </div>
@@ -261,6 +287,52 @@ const StudentEvents = () => {
           </Card>
         </div>
       </div>
+
+      {/* Add Event Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-8">
+            <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
+              <FiPlus className="text-cyan-600" /> Add Personal Event
+            </h2>
+            <form onSubmit={handleAddEvent} className="space-y-4">
+              {addError && <p className="text-red-500 text-sm">{addError}</p>}
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Title *</label>
+                <input value={newEvent.title} onChange={e => setNewEvent(p => ({...p, title: e.target.value}))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Event title" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Date *</label>
+                  <input type="date" value={newEvent.date} onChange={e => setNewEvent(p => ({...p, date: e.target.value}))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Time</label>
+                  <input type="time" value={newEvent.time} onChange={e => setNewEvent(p => ({...p, time: e.target.value}))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Location</label>
+                <input value={newEvent.location} onChange={e => setNewEvent(p => ({...p, location: e.target.value}))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="e.g., Library, Room 12" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Type</label>
+                <select value={newEvent.type} onChange={e => setNewEvent(p => ({...p, type: e.target.value}))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                  {['Personal', 'Study Group', 'Meeting', 'Reminder', 'Other'].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Description</label>
+                <textarea value={newEvent.description} onChange={e => setNewEvent(p => ({...p, description: e.target.value}))} rows={3} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none" placeholder="Optional notes..." />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => { setShowAddModal(false); setAddError(''); }} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50">Cancel</button>
+                <button type="submit" className="flex-1 py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800">Add Event</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

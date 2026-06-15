@@ -29,7 +29,7 @@ const RecordActionButtons = ({ onView, onEdit, onDelete, extraItems = [] }) => {
             onClick={() => item.onClick()}
             className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold shadow-sm transition-all duration-200 ${item.className || 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
           >
-            <Icon size={14} />
+            {Icon ? <Icon size={14} /> : null}
             {item.label}
           </button>
         );

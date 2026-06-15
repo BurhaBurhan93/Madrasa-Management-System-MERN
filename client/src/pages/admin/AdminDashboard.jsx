@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 import api from '../../lib/api';
 import {
   AreaChartComponent,
@@ -160,6 +161,18 @@ const Panel = ({ title, subtitle, children, className = '', dark = false }) => (
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  // Sync i18n language with AdminPanel's language selection
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = localStorage.getItem('adminLang') || 'en';
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+    window.addEventListener('storage', syncLang);
+    return () => window.removeEventListener('storage', syncLang);
+  }, []);
+
   const [quickStats, setQuickStats] = useState({
     totalStudents: 0,
     totalTeachers: 0,

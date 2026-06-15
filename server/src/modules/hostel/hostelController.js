@@ -3,6 +3,7 @@ const HostelAllocation = require('../../models/HostelAllocation');
 const HostelMeal = require('../../models/HostelMeal');
 const HostelMealAttendance = require('../../models/HostelMealAttendance');
 const Student = require('../../models/Student');
+const Complaint = require('../../models/Complaint');
 
 // ==================== ROOM CONTROLLERS ====================
 
@@ -528,6 +529,91 @@ const getStudentHostelInfo = async (req, res) => {
   }
 };
 
+// ==================== HOSTEL APPLICATION CONTROLLERS ====================
+
+const submitHostelApplication = async (req, res) => {
+  try {
+    const student = await Student.findOne({ user: req.user.id });
+    if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
+
+    const { reason, roomPreference, moveInDate, notes } = req.body;
+
+    // Store as a complaint/request so registrar can see it
+    const application = await Complaint.create({
+      complaintCode: `HOSTEL-${Date.now()}`,
+      complainantType: 'student',
+      complainant: req.user.id,
+      subject: 'Hostel Application Request',
+      description: [
+        `Reason: ${reason || 'N/A'}`,
+        `Room Preference: ${roomPreference || 'Any'}`,
+        `Requested Move-in Date: ${moveInDate || 'ASAP'}`,
+        notes ? `Notes: ${notes}` : ''
+      ].filter(Boolean).join('\n'),
+      complaintCategory: 'hostel_application',
+      priorityLevel: 'medium',
+      complaintStatus: 'open',
+      meta: { studentId: student._id, type: 'hostel_application', roomPreference, moveInDate }
+    });
+
+    res.status(201).json({ success: true, message: 'Hostel application submitted. The registrar will review your request.', data: application });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getMyHostelApplication = async (req, res) => {
+  try {
+    const application = await Complaint.findOne({
+      complainant: req.user.id,
+      complaintCategory: 'hostel_application'
+    }).sort({ createdAt: -1 });
+    res.json({ success: true, data: application });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getAllHostelApplications = async (req, res) => {
+  try {
+    const applications = await Complaint.find({ complaintCategory: 'hostel_application' })
+      .populate('complainant', 'name email')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, data: applications });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const approveHostelApplication = async (req, res) => {
+  try {
+    const application = await Complaint.findByIdAndUpdate(
+      req.params.id,
+      { complaintStatus: 'closed', adminAction: 'approved', closedAt: new Date() },
+      { new: true }
+    );
+    if (!application) return res.status(404).json({ success: false, message: 'Application not found' });
+    res.json({ success: true, message: 'Application approved. Please now create a hostel allocation for this student.', data: application });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const rejectHostelApplication = async (req, res) => {
+  try {
+    const application = await Complaint.findByIdAndUpdate(
+      req.params.id,
+      { complaintStatus: 'closed', adminAction: `rejected: ${req.body.reason || 'No reason given'}`, closedAt: new Date() },
+      { new: true }
+    );
+    if (!application) return res.status(404).json({ success: false, message: 'Application not found' });
+    res.json({ success: true, message: 'Application rejected.', data: application });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
 module.exports = {
   // Rooms
   getAllRooms,
@@ -558,5 +644,12 @@ module.exports = {
   markAttendance,
   
   // Student
-  getStudentHostelInfo
+  getStudentHostelInfo,
+
+  // Hostel Applications
+  submitHostelApplication,
+  getMyHostelApplication,
+  getAllHostelApplications,
+  approveHostelApplication,
+  rejectHostelApplication
 };

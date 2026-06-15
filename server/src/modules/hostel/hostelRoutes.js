@@ -4,6 +4,11 @@ const auth = require('../../middleware/auth');
 const { authorizeRoles } = require('../../middleware/auth');
 const hostelController = require('./hostelController');
 
+// Student hostel application — students only
+router.post('/applications', auth, authorizeRoles('student'), hostelController.submitHostelApplication);
+router.get('/applications/my', auth, authorizeRoles('student'), hostelController.getMyHostelApplication);
+
+// All other routes — staff/admin only
 router.use(auth, authorizeRoles('staff', 'admin'));
 
 // ==================== ROOM ROUTES ====================
@@ -36,5 +41,10 @@ router.post('/meal-attendance', hostelController.markAttendance);
 
 // ==================== STUDENT HOSTEL ROUTES ====================
 router.get('/students/:userId/hostel', hostelController.getStudentHostelInfo);
+
+// ==================== HOSTEL APPLICATION ROUTES (staff) ====================
+router.get('/applications', hostelController.getAllHostelApplications);
+router.put('/applications/:id/approve', hostelController.approveHostelApplication);
+router.put('/applications/:id/reject', hostelController.rejectHostelApplication);
 
 module.exports = router;

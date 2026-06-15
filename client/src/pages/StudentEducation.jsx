@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiFetch, parseJsonSafe } from '../lib/apiFetch';
 import { 
   FiBook, 
   FiAward, 
@@ -21,12 +21,10 @@ import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECharts';
 import { formatDate } from '../lib/utils';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
 const StudentEducation = () => {
   const navigate = useNavigate();
   const [educationHistory, setEducationHistory] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -37,15 +35,13 @@ const StudentEducation = () => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      const response = await axios.get(`${API_BASE}/student/education`, config);
-      setEducationHistory(response.data || []);
+      const res = await apiFetch('/student/education');
+      const data = await parseJsonSafe(res);
+      setEducationHistory(Array.isArray(data) ? data : (data.data || []));
     } catch (err) {
       console.error('Error fetching education data:', err);
-      setError('Failed to fetch education records. Please try again.');
-      setEducationHistory([]); // Set empty array on error
+      setError('Failed to fetch education records.');
+      setEducationHistory([]);
     } finally {
       setLoading(false);
     }
@@ -58,9 +54,14 @@ const StudentEducation = () => {
     e.previousDegree?.toLowerCase().includes('degree')
   ).length;
 
-  if (loading && educationHistory.length === 0) {
-    return <PageSkeleton variant="table" />;
-  }
+  if (loading) return <PageSkeleton variant="table" />;
+
+  if (error) return (
+    <div className="py-20 text-center">
+      <p className="text-red-500 mb-4">{error}</p>
+      <button onClick={fetchEducationData} className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm">Retry</button>
+    </div>
+  );
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">

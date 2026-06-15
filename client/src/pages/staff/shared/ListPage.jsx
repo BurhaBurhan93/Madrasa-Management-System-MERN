@@ -10,6 +10,7 @@ import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 import { FiDownload, FiPlus } from 'react-icons/fi';
 import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { getStaffToneStyles } from './staffTheme';
+import { localizeAdminText } from '../../../lib/adminLocalization';
 
 const getCellValue = (row, key) => {
   const value = row?.[key];
@@ -55,6 +56,7 @@ const ListPage = ({
   enableExport = false,
   embedded = false
 }) => {
+  const adminLang = localStorage.getItem('adminLang') || 'en';
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -106,7 +108,7 @@ const ListPage = ({
   }, [page, limit, query, clientSidePagination]);
 
   const handleDelete = async (row) => {
-    const ok = window.confirm('Are you sure you want to delete this record?');
+    const ok = window.confirm(localizeAdminText('Are you sure you want to delete this record?', adminLang));
     if (!ok) return;
 
     setDeletingId(row?._id);
@@ -171,14 +173,14 @@ const ListPage = ({
     return [
       {
         key: '__index',
-        header: 'No.',
+        header: localizeAdminText('No.', adminLang),
         sortable: false,
         render: (_value, _row, rowIndex) => <div className="min-w-[56px] text-slate-700">{(page - 1) * limit + rowIndex + 1}</div>
       },
       ...enhancedColumns,
       {
         key: '__actions',
-        header: 'Actions',
+        header: localizeAdminText('Actions', adminLang),
         sortable: false,
         render: (_value, row) => (
           <RecordActionButtons
@@ -219,9 +221,9 @@ const ListPage = ({
 
   const pageActions = (
     <div className="flex flex-wrap items-center justify-end gap-3">
-      {enableExport ? <Button variant="outline" icon={FiDownload} onClick={handleExport}>Export CSV</Button> : null}
+      {enableExport ? <Button variant="outline" icon={FiDownload} onClick={handleExport}>{localizeAdminText('Export', adminLang)} CSV</Button> : null}
       {extraActions}
-      {createPath ? <Button variant="primary" icon={FiPlus} onClick={() => (window.location.href = createPath)}>Add New</Button> : null}
+      {createPath ? <Button variant="primary" icon={FiPlus} onClick={() => (window.location.href = createPath)}>{localizeAdminText('Add New', adminLang)}</Button> : null}
     </div>
   );
 
@@ -231,24 +233,24 @@ const ListPage = ({
       <Card className="rounded-[28px] shadow-none">
         <div className={`rounded-[24px] border p-5 lg:p-6 ${panelShellClass}`}>
           <div className="mb-5 flex flex-wrap items-center gap-3">
-            <div className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${toneStyles.soft}`}>Search And Filter</div>
-            <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Quick controls for finding records faster.</div>
+            <div className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${toneStyles.soft}`}>{localizeAdminText('Search And Filter', adminLang)}</div>
+            <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{localizeAdminText('Quick controls for finding records faster.', adminLang)}</div>
           </div>
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="grid w-full gap-4 lg:max-w-4xl lg:grid-cols-[minmax(300px,420px)_220px_220px]">
               <div>
-                <label className={`mb-2 block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>Search</label>
+                <label className={`mb-2 block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{localizeAdminText('Search', adminLang)}</label>
                 <input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${controlClass}`} placeholder={searchPlaceholder} />
               </div>
               <div>
-                <label className={`mb-2 block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>Filter By</label>
+                <label className={`mb-2 block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{localizeAdminText('Filter By', adminLang)}</label>
                 <select value={filterColumn} onChange={(e) => { setFilterColumn(e.target.value); setPage(1); }} className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${controlClass}`}>
-                  <option value="all">All Columns</option>
+                  <option value="all">{localizeAdminText('All Columns', adminLang)}</option>
                   {filterableColumns.map((column) => <option key={column.key} value={column.key}>{column.header}</option>)}
                 </select>
               </div>
               <div>
-                <label className={`mb-2 block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>Filter Value</label>
+                <label className={`mb-2 block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{localizeAdminText('Filter Value', adminLang)}</label>
                 <input value={filterValue} onChange={(e) => { setFilterValue(e.target.value); setPage(1); }} className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${controlClass}`} placeholder="Type to filter rows..." />
               </div>
             </div>
@@ -266,10 +268,10 @@ const ListPage = ({
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className={`text-sm font-semibold ${isDark ? 'text-rose-200' : 'text-rose-900'}`}>Unable to Load Data</h3>
+                <h3 className={`text-sm font-semibold ${isDark ? 'text-rose-200' : 'text-rose-900'}`}>{localizeAdminText('Unable to Load Data', adminLang)}</h3>
                 <p className={`mt-1 text-sm ${isDark ? 'text-rose-300' : 'text-rose-700'}`}>{error}</p>
                 <button onClick={fetchItems} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
-                  Retry
+                  {localizeAdminText('Retry', adminLang)}
                 </button>
               </div>
             </div>
@@ -279,17 +281,17 @@ const ListPage = ({
       <Card className="rounded-[28px] shadow-none">
         <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className={`text-xl font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Records Table</h2>
-            <p className={`mt-1 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Unified filtering, sorting, pagination, and row actions.</p>
+            <h2 className={`text-xl font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{localizeAdminText('Records Table', adminLang)}</h2>
+            <p className={`mt-1 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{localizeAdminText('Unified filtering, sorting, pagination, and row actions.', adminLang)}</p>
           </div>
           {deletingId && <div className="text-sm text-rose-500">Deleting selected record...</div>}
         </div>
         <div className={`overflow-x-auto rounded-[24px] border ${isDark ? 'border-slate-700 bg-slate-900' : 'border-slate-200 bg-white'}`}>
-          {loading ? <div className="p-6 text-sm text-slate-500">Loading data...</div> : visibleItems.length === 0 ? (
+          {loading ? <div className="p-6 text-sm text-slate-500">{localizeAdminText('Loading data...', adminLang)}</div> : visibleItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-              <div className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] ${isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-500'}`}>No Records</div>
-              <h3 className={`mt-4 text-xl font-black ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Nothing matches your current filters</h3>
-              <p className={`mt-2 max-w-xl text-sm leading-6 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Try changing the search terms, switching the filter column, or create the first record for this module.</p>
+              <div className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] ${isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-500'}`}>{localizeAdminText('No Records', adminLang)}</div>
+              <h3 className={`mt-4 text-xl font-black ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{localizeAdminText('Nothing matches your current filters', adminLang)}</h3>
+              <p className={`mt-2 max-w-xl text-sm leading-6 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{localizeAdminText('Try changing the search terms, switching the filter column, or create the first record for this module.', adminLang)}</p>
             </div>
           ) : (
             <DataTable columns={columnsWithActions.map((column) => ({ ...column, sortable: column.key !== '__actions' && column.key !== '__index' && column.sortable !== false }))} data={visibleItems} rowClassName="odd:bg-white even:bg-slate-50/30 hover:bg-cyan-50/40" cellClassName="align-middle" headerClassName="bg-slate-100 text-slate-700" sortKey={sortKey} sortDirection={sortDirection} onSort={handleSort} />

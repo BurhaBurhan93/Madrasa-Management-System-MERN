@@ -14,6 +14,20 @@ export const employeesConfig = {
   subtitle: 'Manage employee records with the same polished table and form experience.',
   endpoint: staffApi.hr.employees,
   columns: [
+    {
+      key: 'photo',
+      header: 'Photo',
+      render: (value, row) => {
+        const photo = value || row.photo;
+        return (
+          <img
+            src={photo || 'https://via.placeholder.com/40'}
+            alt="Profile"
+            className="h-10 w-10 rounded-full object-cover border border-slate-200"
+          />
+        );
+      }
+    },
     { key: 'employeeCode', header: 'Code' },
     { key: 'fullName', header: 'Full Name' },
     { key: 'department', header: 'Department', render: (value) => value?.departmentName || '-' },
@@ -24,6 +38,7 @@ export const employeesConfig = {
   ],
   formFields: [
     { name: 'user', label: 'User Account', type: 'relation', relationEndpoint: '/users', relationLabel: (row) => `${row.name || row.fullName} (${row.email || 'No Email'})` },
+    { name: 'photo', label: 'Employee Photo', type: 'file' },
     { name: 'fullName', label: 'Full Name' },
     { name: 'fullNameArabic', label: 'Full Name Arabic' },
     { name: 'fatherName', label: 'Father Name' },
@@ -70,6 +85,7 @@ export const employeesConfig = {
   ],
   initialForm: {
     user: '',
+    photo: '',
     fullName: '',
     fullNameArabic: '',
     fatherName: '',
@@ -104,6 +120,7 @@ export const employeesConfig = {
   }),
   mapRowToForm: (row) => ({
     user: row.user?._id || row.user || '',
+    photo: row.photo || '',
     fullName: row.fullName || '',
     fullNameArabic: row.fullNameArabic || '',
     fatherName: row.fatherName || '',

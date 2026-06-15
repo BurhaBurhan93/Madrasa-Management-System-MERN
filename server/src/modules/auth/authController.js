@@ -57,6 +57,8 @@ const buildAuthUser = (user, profile = {}, staffModules = []) => ({
   name: user.name,
   email: user.email,
   role: user.role,
+  image: user.image || null,
+  phone: user.phone || null,
   permissions: getPermissionNames(user),
   staffModules,
   ...profile
@@ -91,7 +93,11 @@ const getRoleProfile = async (user) => {
         employeeType: employee.employeeType,
         department: employee.department?.departmentName || employee.department,
         designation: employee.designation?.designationTitle || employee.designation,
-        joinDate: employee.joiningDate || employee.joinDate
+        joinDate: employee.joiningDate || employee.joinDate,
+        photo: employee.photo || null,
+        phoneNumber: employee.phoneNumber || null,
+        currentAddress: employee.currentAddress || null,
+        fullName: employee.fullName || null
       };
     }
   }

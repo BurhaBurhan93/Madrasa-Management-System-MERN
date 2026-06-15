@@ -11,6 +11,9 @@ export const guardianManagementConfig = {
   title: 'Guardian / Guarantor Management',
   subtitle: 'Manage student guardians and guarantors information',
   endpoint: '/student/guardians',
+  createPath: '/staff/registrar/guardians/create',
+  editPathForRow: (row) => `/staff/registrar/guardians/edit/${row._id}`,
+  viewPathForRow: (row) => `/staff/registrar/guardians/view/${row._id}`,
   columns: [
     { key: 'name', header: 'Guardian Name' },
     { key: 'relationship', header: 'Relationship' },
@@ -54,6 +57,10 @@ export const guardianManagementConfig = {
     address: row.address || '',
     idNumber: row.idNumber || '',
     isPrimary: row.isPrimary?.toString() || 'false'
+  }),
+  mapFormToPayload: (form) => ({
+    ...form,
+    isPrimary: form.isPrimary === 'true'
   })
 };
 
@@ -77,7 +84,7 @@ const GuardianManagement = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       const response = await axios.get(`${API_BASE}/student/guardians`, config);
-      const guardians = response.data || [];
+      const guardians = response.data?.data || response.data || [];
       
       const total = guardians.length;
       const primary = guardians.filter(g => g.isPrimary).length;

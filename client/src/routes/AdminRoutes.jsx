@@ -62,6 +62,7 @@ const AdminHostelMeals = lazy(() => import('../pages/admin/hostel/AdminHostelMea
 const AdminHostelAttendance = lazy(() => import('../pages/admin/hostel/AdminHostelAttendance'));
 const AdminHostelReports = lazy(() => import('../pages/admin/hostel/AdminHostelReports'));
 const AdminProfile = lazy(() => import('../pages/admin/AdminProfile'));
+const AdminMadrasaInfo = lazy(() => import('../pages/admin/AdminMadrasaInfo'));
 const Students = lazy(() => import('../pages/admin/users/Students'));
 const Teachers = lazy(() => import('../pages/admin/users/Teachers'));
 const Staff = lazy(() => import('../pages/admin/users/Staff'));
@@ -158,6 +159,7 @@ const adminRoutes = (
     <Route path="settings/api" element={<AdminAPISettings />} />
 
     <Route path="profile" element={<AdminProfile />} />
+    <Route path="madrasa-info" element={<AdminMadrasaInfo />} />
   </>
 );
 

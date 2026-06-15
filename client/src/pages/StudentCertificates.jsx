@@ -27,6 +27,27 @@ const StudentCertificates = () => {
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [shareSuccess, setShareSuccess] = useState(false);
+
+  const handleSharePortfolio = async () => {
+    const shareData = {
+      title: 'My Madrasa Portfolio',
+      text: `Check out my ${certificates.length} certificates and ${achievements.length} achievements from Madrasa Management System!`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        setShareSuccess(true);
+        setTimeout(() => setShareSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error('[Share] Error:', err);
+    }
+  };
 
   useEffect(() => {
     fetchCertificatesData();
@@ -89,8 +110,12 @@ const StudentCertificates = () => {
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Certificates & Awards</h1>
           <p className="text-slate-500 mt-1 font-medium italic">Your verified portfolio of academic excellence</p>
         </div>
-        <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2">
-          <FiShare2 /> Share Portfolio
+        <Button 
+          variant="primary" 
+          onClick={handleSharePortfolio}
+          className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2"
+        >
+          <FiShare2 /> {shareSuccess ? 'Copied to Clipboard!' : 'Share Portfolio'}
         </Button>
       </div>
 
@@ -139,10 +164,29 @@ const StudentCertificates = () => {
                       </div>
                       
                       <div className="flex gap-2 w-full md:w-auto">
-                        <button className="flex-1 md:flex-none p-4 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-cyan-600 hover:border-cyan-200 shadow-sm transition-all" title="View Online">
+                        <button 
+                          className="flex-1 md:flex-none p-4 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-cyan-600 hover:border-cyan-200 shadow-sm transition-all" 
+                          title="View Online"
+                          onClick={() => {
+                            if (cert.downloadUrl) {
+                              window.open(cert.downloadUrl, '_blank');
+                            }
+                          }}
+                        >
                           <FiEye size={20} />
                         </button>
-                        <button className="flex-1 md:flex-none p-4 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200 transition-all" title="Download PDF">
+                        <button 
+                          className="flex-1 md:flex-none p-4 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200 transition-all" 
+                          title="Download PDF"
+                          onClick={() => {
+                            if (cert.downloadUrl) {
+                              const link = document.createElement('a');
+                              link.href = cert.downloadUrl;
+                              link.download = `${cert.title}.pdf`;
+                              link.click();
+                            }
+                          }}
+                        >
                           <FiDownload size={20} />
                         </button>
                       </div>

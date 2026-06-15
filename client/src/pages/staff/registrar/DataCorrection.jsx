@@ -4,6 +4,8 @@ import Badge from '../../../components/UIHelper/Badge';
 import Button from '../../../components/UIHelper/Button';
 import axios from 'axios';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const DataCorrection = () => {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -35,7 +37,7 @@ const DataCorrection = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/student/all', getConfig());
+      const response = await axios.get(`${API_BASE}/student/all`, getConfig());
       setStudents(response.data.data || []);
     } catch (err) {
       setError('Failed to fetch students');
@@ -73,7 +75,7 @@ const DataCorrection = () => {
     try {
       // Call the correction endpoint
       await axios.post(
-        `http://localhost:5000/api/student/students/${selectedStudent._id}/correct-data`,
+        `${API_BASE}/student/students/${selectedStudent._id}/correct-data`,
         {
           field: correctionData.field,
           oldValue: correctionData.oldValue,
@@ -115,6 +117,25 @@ const DataCorrection = () => {
       status: 'select'
     };
     return types[field] || 'text';
+  };
+
+  const getCorrectionFieldKey = (label) => {
+    const map = {
+      'First Name': 'firstName',
+      'Last Name': 'lastName',
+      'Father Name': 'fatherName',
+      'Grandfather Name': 'grandfatherName',
+      'Date of Birth': 'dob',
+      'Blood Type': 'bloodType',
+      'Phone': 'phone',
+      'WhatsApp': 'whatsapp',
+      'Email': 'email',
+      'Student Code': 'studentCode',
+      'Current Class': 'currentClass',
+      'Current Level': 'currentLevel',
+      'Status': 'status'
+    };
+    return map[label] || label.toLowerCase().replace(/\s+/g, '_');
   };
 
   if (loading) {
@@ -240,7 +261,7 @@ const DataCorrection = () => {
                   <div className="flex justify-between items-start mb-2">
                     <span className="text-sm font-medium text-gray-700">{field}</span>
                     <button
-                      onClick={() => handleOpenCorrection(selectedStudent, field.toLowerCase().replace(/\s+/g, '_'), value)}
+                      onClick={() => handleOpenCorrection(selectedStudent, getCorrectionFieldKey(field), value)}
                       className="text-blue-600 hover:text-blue-800 text-sm"
                     >
                       ✏️ Correct

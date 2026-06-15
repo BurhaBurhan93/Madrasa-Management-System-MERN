@@ -1,78 +1,103 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../../components/UIHelper/Card';
-import Avatar from '../../components/UIHelper/Avatar';
-import { FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiShield, FiEdit2, FiSave, FiX } from 'react-icons/fi';
-import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
+import { FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiShield, FiEdit2, FiSave, FiX, FiBriefcase } from 'react-icons/fi';
+import { getUser } from '../../lib/auth';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
+
+const ROLE_COLORS = {
+  admin: 'bg-purple-100 text-purple-800',
+  staff: 'bg-blue-100 text-blue-800',
+  teacher: 'bg-green-100 text-green-800',
+  student: 'bg-orange-100 text-orange-800',
+};
 
 const AdminProfile = () => {
-  const [user, setUser] = useState({
-    name: 'Administrator',
-    email: 'admin@madrasa.edu',
-    phone: '+92 300 1234567',
-    role: 'Super Admin',
-    adminId: 'ADM2024001',
-    address: 'Main Campus, Islamabad',
-    dob: '1985-05-15',
-    joinDate: '2020-01-01',
-    permissions: ['all'],
-    status: 'active'
-  });
-
+  const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({ ...user });
+  const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    // Fetch admin profile data from API
-    const fetchProfile = async () => {
-      try {
-        // const res = await axios.get('/api/admin/profile');
-        // setUser(res.data);
-        // setFormData(res.data);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      }
-    };
-    fetchProfile();
-  }, []);
+  useEffect(() => { fetchProfile(); }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = async () => {
+  const fetchProfile = async () => {
+    setLoading(true);
     try {
-      // await axios.put('/api/admin/profile', formData);
-      setUser(formData);
-      setIsEditing(false);
-      alert('Profile updated successfully');
-    } catch (error) {
-      alert('Error updating profile');
+      const res = await apiFetch('/auth/me');
+      const data = await parseJsonSafe(res);
+      if (res.ok && data.user) {
+        setProfile(data.user);
+        setFormData(data.user);
+      } else {
+        const stored = getUser();
+        if (stored) { setProfile(stored); setFormData(stored); }
+      }
+    } catch {
+      const stored = getUser();
+      if (stored) { setProfile(stored); setFormData(stored); }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    setFormData(user);
-    setIsEditing(false);
+  const handleSave = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      const res = await apiFetch(`/users/${profile.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: formData.name, phone: formData.phone }),
+      });
+      const data = await parseJsonSafe(res);
+      if (res.ok) {
+        setProfile(prev => ({ ...prev, ...formData }));
+        setIsEditing(false);
+      } else {
+        setError(data.message || 'Failed to save');
+      }
+    } catch {
+      setError('Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const InfoRow = ({ icon, label, value, name, type = 'text' }) => (
-    <div className="flex items-center gap-4 py-3 border-b border-gray-100">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+  const handleCancel = () => { setFormData({ ...profile }); setIsEditing(false); setError(''); };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return <div className="p-8 text-center text-gray-500">No profile data found. Please log in again.</div>;
+  }
+
+  const avatarSrc = profile.photo || profile.image;
+  const displayName = profile.fullName || profile.name || '—';
+  const role = profile.role;
+
+  const InfoRow = ({ icon, label, value, field, type = 'text' }) => (
+    <div className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-0">
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 flex-shrink-0">
         {icon}
       </div>
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-500">{label}</p>
-        {isEditing && name ? (
+        {isEditing && field ? (
           <input
             type={type}
-            name={name}
-            value={formData[name] || ''}
-            onChange={handleInputChange}
+            value={formData[field] || ''}
+            onChange={e => setFormData(prev => ({ ...prev, [field]: e.target.value }))}
             className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 focus:border-blue-500 focus:outline-none"
           />
         ) : (
-          <p className="mt-1 font-medium text-gray-900">{value}</p>
+          <p className="mt-0.5 font-medium text-gray-900 truncate">{value || '—'}</p>
         )}
       </div>
     </div>
@@ -82,173 +107,127 @@ const AdminProfile = () => {
     <div className="w-full bg-gray-50 min-h-screen p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">👤 Admin Profile</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Admin Profile</h1>
           <p className="text-gray-600 mt-1">Manage your administrator account</p>
         </div>
         <div className="flex gap-3">
           {isEditing ? (
             <>
-              <button
-                onClick={handleSave}
-                className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-5 py-2.5 rounded-lg hover:from-green-700 hover:to-green-800 font-semibold shadow-lg"
-              >
-                <FiSave size={18} /> Save Changes
+              <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-5 py-2.5 rounded-lg hover:from-green-700 hover:to-green-800 font-semibold shadow-lg disabled:opacity-50">
+                <FiSave size={18} /> {saving ? 'Saving...' : 'Save Changes'}
               </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center gap-2 bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 font-semibold"
-              >
+              <button onClick={handleCancel} className="flex items-center gap-2 bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 font-semibold">
                 <FiX size={18} /> Cancel
               </button>
             </>
           ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg"
-            >
+            <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg">
               <FiEdit2 size={18} /> Edit Profile
             </button>
           )}
         </div>
       </div>
 
+      {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Profile Info */}
+        {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <div className="flex items-center gap-6 mb-6">
-              <Avatar size="xxl" />
+              {/* Avatar */}
+              <div className="flex-shrink-0">
+                {avatarSrc ? (
+                  <img
+                    src={avatarSrc}
+                    alt={displayName}
+                    className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
+                    onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                  />
+                ) : null}
+                <div className={`w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-2xl font-bold border-4 border-white shadow-lg ${avatarSrc ? 'hidden' : 'flex'}`}>
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+              </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
-                <p className="text-gray-600">{user.role}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
-                    {user.status}
+                <h2 className="text-2xl font-bold text-gray-900">{displayName}</h2>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <span className={`px-3 py-1 text-xs font-semibold rounded-full capitalize ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'}`}>
+                    {role}
                   </span>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
-                    ID: {user.adminId}
+                  {profile.employeeType && (
+                    <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full capitalize">
+                      {profile.employeeType}
+                    </span>
+                  )}
+                  <span className={`px-3 py-1 text-xs font-semibold rounded-full ${profile.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {profile.status || 'active'}
                   </span>
+                  {profile.employeeId && (
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                      ID: {profile.employeeId}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
-            <div className="space-y-1">
-              <InfoRow 
-                icon={<FiUser size={20} />} 
-                label="Full Name" 
-                value={user.name} 
-                name="name"
-              />
-              <InfoRow 
-                icon={<FiMail size={20} />} 
-                label="Email Address" 
-                value={user.email} 
-                name="email"
-                type="email"
-              />
-              <InfoRow 
-                icon={<FiPhone size={20} />} 
-                label="Phone Number" 
-                value={user.phone} 
-                name="phone"
-                type="tel"
-              />
-              <InfoRow 
-                icon={<FiMapPin size={20} />} 
-                label="Address" 
-                value={user.address} 
-                name="address"
-              />
-              <InfoRow 
-                icon={<FiCalendar size={20} />} 
-                label="Date of Birth" 
-                value={new Date(user.dob).toLocaleDateString()} 
-                name="dob"
-                type="date"
-              />
-              <InfoRow 
-                icon={<FiCalendar size={20} />} 
-                label="Join Date" 
-                value={new Date(user.joinDate).toLocaleDateString()} 
-              />
-            </div>
-          </Card>
-
-          {/* Security Settings */}
-          <Card title="Security Settings">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <h3 className="font-semibold text-gray-900">Two-Factor Authentication</h3>
-                  <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
-                </div>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                  Enable
-                </button>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <h3 className="font-semibold text-gray-900">Password</h3>
-                  <p className="text-sm text-gray-600">Last changed 30 days ago</p>
-                </div>
-                <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium">
-                  Change Password
-                </button>
-              </div>
+            <div className="space-y-0">
+              <InfoRow icon={<FiUser size={18} />} label="Full Name" value={displayName} field="name" />
+              <InfoRow icon={<FiMail size={18} />} label="Email Address" value={profile.email} />
+              <InfoRow icon={<FiPhone size={18} />} label="Phone Number" value={profile.phoneNumber || profile.phone} field="phone" type="tel" />
+              <InfoRow icon={<FiShield size={18} />} label="System Role" value={role?.charAt(0).toUpperCase() + role?.slice(1)} />
+              {profile.department && <InfoRow icon={<FiBriefcase size={18} />} label="Department" value={profile.department} />}
+              {profile.designation && <InfoRow icon={<FiBriefcase size={18} />} label="Designation" value={profile.designation} />}
+              {profile.joinDate && <InfoRow icon={<FiCalendar size={18} />} label="Join Date" value={new Date(profile.joinDate).toLocaleDateString()} />}
+              {profile.currentAddress && <InfoRow icon={<FiMapPin size={18} />} label="Address" value={profile.currentAddress} />}
             </div>
           </Card>
         </div>
 
-        {/* Right Column - Permissions & Activity */}
+        {/* Right Column */}
         <div className="space-y-6">
-          <Card title="Permissions">
-            <div className="space-y-3">
-              {user.permissions.map((perm, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <FiShield className="text-green-600" size={18} />
-                  <span className="font-medium text-gray-900 capitalize">{perm.replace('_', ' ')}</span>
+          <Card>
+            <h3 className="text-base font-semibold text-gray-900 mb-4">Account Info</h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Role</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'}`}>{role}</span>
+              </div>
+              {profile.employeeType && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Type</span>
+                  <span className="font-medium capitalize">{profile.employeeType}</span>
                 </div>
-              ))}
-            </div>
-            <p className="mt-4 text-sm text-gray-600">
-              As a Super Admin, you have full access to all system modules and settings.
-            </p>
-          </Card>
-
-          <Card title="Recent Activity">
-            <div className="space-y-4">
-              {[
-                { action: 'Updated user permissions', time: '2 hours ago' },
-                { action: 'Approved new student admission', time: '1 day ago' },
-                { action: 'Generated financial report', time: '2 days ago' },
-                { action: 'Updated system settings', time: '3 days ago' },
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                    <p className="text-xs text-gray-500">{activity.time}</p>
+              )}
+              {profile.employeeId && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Employee ID</span>
+                  <span className="font-medium">{profile.employeeId}</span>
+                </div>
+              )}
+              {profile.department && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Department</span>
+                  <span className="font-medium">{profile.department}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Status</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${profile.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {profile.status || 'active'}
+                </span>
+              </div>
+              {profile.staffModules?.length > 0 && (
+                <div className="pt-3 border-t border-gray-100">
+                  <p className="text-gray-500 mb-2">Access Modules</p>
+                  <div className="flex flex-wrap gap-1">
+                    {profile.staffModules.map(m => (
+                      <span key={m} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs capitalize">{m}</span>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card title="System Status">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700">Database</span>
-                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Online</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700">API Services</span>
-                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Running</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700">Backup Status</span>
-                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">Last: 24h ago</span>
-              </div>
+              )}
             </div>
           </Card>
         </div>

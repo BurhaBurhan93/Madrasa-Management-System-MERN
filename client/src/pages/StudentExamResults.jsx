@@ -6,10 +6,7 @@ import Badge from '../components/UIHelper/Badge';
 import Button from '../components/UIHelper/Button';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { formatDate } from '../lib/utils';
-import axios from 'axios';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
+import { apiFetch, parseJsonSafe } from '../lib/apiFetch';
 const StudentExamResults = () => {
   const navigate = useNavigate();
   const [results, setResults] = useState([]);
@@ -22,13 +19,8 @@ const StudentExamResults = () => {
     passRate: 0
   });
 
-  // Get API config with auth token
-  const getConfig = () => {
-    const token = localStorage.getItem('token');
-    return {
-      headers: { Authorization: `Bearer ${token}` }
-    };
-  };
+  // Get API config with auth token — kept for reference but replaced by apiFetch
+  const getConfig = () => ({});
 
   useEffect(() => {
     fetchExamResults();
@@ -38,11 +30,10 @@ const StudentExamResults = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const config = getConfig();
-      const response = await axios.get(`${API_BASE}/student/exam-results`, config);
-      
-      const examResults = response.data || [];
+
+      const res = await apiFetch('/student/results');
+      const data = await parseJsonSafe(res);
+      const examResults = Array.isArray(data) ? data : (data.data || []);
       setResults(examResults);
 
       // Calculate statistics

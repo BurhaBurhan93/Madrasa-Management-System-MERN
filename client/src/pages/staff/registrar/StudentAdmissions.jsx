@@ -12,6 +12,9 @@ export const studentAdmissionsConfig = {
   title: 'Student Admissions',
   subtitle: 'Manage new student admissions - Complete registration with all required information',
   endpoint: '/student/admissions',
+  createPath: '/staff/registrar/admissions/create',
+  editPathForRow: (row) => `/staff/registrar/admissions/edit/${row._id}`,
+  viewPathForRow: (row) => `/staff/registrar/admissions/view/${row._id}`,
   columns: [
     { key: 'studentCode', header: 'Student Code' },
     { key: 'name', header: 'Student Name', render: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || '-' },
@@ -195,7 +198,7 @@ const StudentAdmissions = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       const response = await axios.get(`${API_BASE}/student/admissions`, config);
-      const admissions = response.data || [];
+      const admissions = response.data?.data || response.data || [];
       
       // Calculate statistics
       const total = admissions.length;

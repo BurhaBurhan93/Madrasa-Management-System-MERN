@@ -1,9 +1,11 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext.jsx';
+import { localizeAdminText } from '../../lib/adminLocalization';
 
 const Card = ({ children, className = '', title, subtitle }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const adminLang = localStorage.getItem('adminLang') || 'en';
 
   const surfaceClasses = isDark
     ? 'border-slate-700 bg-slate-900/60 text-slate-100 shadow-[0_20px_45px_-22px_rgba(0,0,0,0.55)] backdrop-blur-xl'
@@ -13,8 +15,8 @@ const Card = ({ children, className = '', title, subtitle }) => {
     <div className={`overflow-hidden rounded-2xl border ${surfaceClasses} ${className}`}>
       {(title || subtitle) && (
         <div className={`border-b p-6 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
-          {title && <h3 className={`text-lg font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{title}</h3>}
-          {subtitle && <p className={`mt-1 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{subtitle}</p>}
+          {title && <h3 className={`text-lg font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{localizeAdminText(title, adminLang)}</h3>}
+          {subtitle && <p className={`mt-1 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{localizeAdminText(subtitle, adminLang)}</p>}
         </div>
       )}
       <div className={title || subtitle ? 'p-6' : 'p-6'}>

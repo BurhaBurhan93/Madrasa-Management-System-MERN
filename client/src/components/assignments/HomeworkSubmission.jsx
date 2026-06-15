@@ -3,11 +3,9 @@ import Card from '../UIHelper/Card';
 import Button from '../UIHelper/Button';
 import Input from '../UIHelper/Input';
 import Badge from '../UIHelper/Badge';
-import axios from 'axios';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { FiUpload, FiFile, FiCheckCircle, FiClock, FiBook } from 'react-icons/fi';
 import CalendarDatePicker from "../UIHelper/CalendarDatePicker";
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const HomeworkSubmission = () => {
   const [homeworkData, setHomeworkData] = useState({
@@ -20,11 +18,8 @@ const HomeworkSubmission = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
-  const getConfig = () => {
-    const token = localStorage.getItem('token');
-    return { headers: { Authorization: `Bearer ${token}` } };
-  };
+  const [submitError, setSubmitError] = useState('');
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   useEffect(() => {
     fetchAssignments();
@@ -33,11 +28,10 @@ const HomeworkSubmission = () => {
   const fetchAssignments = async () => {
     try {
       setLoading(true);
-      const config = getConfig();
-      const response = await axios.get(`${API_BASE}/student/assignments`, config);
-      // Filter pending assignments
-      const pending = (response.data || []).filter(a => a.status !== 'submitted');
-      setAssignments(pending);
+      const res = await apiFetch('/student/assignments');
+      const data = await parseJsonSafe(res);
+      const list = Array.isArray(data) ? data : (data.data || []);
+      setAssignments(list.filter(a => a.status !== 'submitted'));
     } catch (err) {
       console.error('[HomeworkSubmission] Error fetching assignments:', err);
     } finally {
@@ -62,51 +56,38 @@ const HomeworkSubmission = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setSubmitError('');
+    setSubmitSuccess(false);
+
     if (!homeworkData.title || !homeworkData.course) {
-      alert('Please fill in all required fields');
+      setSubmitError('Please fill in the required fields: Title and Course.');
       return;
     }
 
     try {
       setSubmitting(true);
-      const config = getConfig();
-      
-      // Create form data for file upload
-      const formData = new FormData();
-      formData.append('title', homeworkData.title);
-      formData.append('description', homeworkData.description);
-      formData.append('course', homeworkData.course);
-      formData.append('dueDate', homeworkData.dueDate);
-      if (homeworkData.file) {
-        formData.append('file', homeworkData.file);
-      }
-
-      // Submit to assignments API (creating a new assignment submission)
-      await axios.post(`${API_BASE}/student/assignments`, {
-        title: homeworkData.title,
-        description: homeworkData.description,
-        course: homeworkData.course,
-        dueDate: homeworkData.dueDate,
-        status: 'submitted'
-      }, config);
-      
-      alert('Homework submitted successfully!');
-      
-      // Reset form
-      setHomeworkData({
-        title: '',
-        description: '',
-        course: '',
-        dueDate: '',
-        file: null
+      const res = await apiFetch('/student/assignments/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: homeworkData.title,
+          description: homeworkData.description,
+          course: homeworkData.course,
+          dueDate: homeworkData.dueDate,
+          status: 'submitted'
+        })
       });
-      
-      // Refresh assignments list
+      const data = await parseJsonSafe(res);
+      if (!res.ok) {
+        setSubmitError(data.message || 'Failed to submit homework.');
+        return;
+      }
+      setSubmitSuccess(true);
+      setHomeworkData({ title: '', description: '', course: '', dueDate: '', file: null });
       fetchAssignments();
     } catch (err) {
       console.error('[HomeworkSubmission] Error submitting:', err);
-      alert('Failed to submit homework. Please try again.');
+      setSubmitError('Failed to submit homework. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -131,6 +112,17 @@ const HomeworkSubmission = () => {
           <p className="text-slate-500 mt-1 font-medium italic">Upload your coursework and assignments</p>
         </div>
       </div>
+
+      {submitSuccess && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-700 font-medium">
+          <FiCheckCircle size={18} /> Homework submitted successfully!
+        </div>
+      )}
+      {submitError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 font-medium">
+          {submitError}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Submission Form */}
@@ -161,7 +153,11 @@ const HomeworkSubmission = () => {
                 />
               </div>
               
-              <CalendarDatePicker value={homeworkData.dueDate} name="dueDate" onChange={handleInputChange} placeholder="Select date" />
+              <CalendarDatePicker
+                value={homeworkData.dueDate}
+                onChange={(date) => setHomeworkData(prev => ({ ...prev, dueDate: date }))}
+                placeholder="Select due date"
+              />
               
               <div className="space-y-2">
                 <label className="block text-sm font-black text-slate-700 uppercase tracking-widest">

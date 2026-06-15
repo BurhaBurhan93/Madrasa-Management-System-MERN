@@ -13,8 +13,30 @@ export const studentsConfig = {
   subtitle: 'Manage enrolled students and their information',
   endpoint: '/student/all',
   columns: [
+    { 
+      key: 'image', 
+      header: 'Photo', 
+      render: (value, row) => {
+        const img = row.image || row.user?.image;
+        return (
+          <div className="flex items-center justify-center">
+            {img ? (
+              <img 
+                src={img} 
+                alt="Student" 
+                className="h-10 w-10 rounded-full object-cover border border-slate-200" 
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                👤
+              </div>
+            )}
+          </div>
+        )
+      }
+    },
     { key: 'studentCode', header: 'Student Code' },
-    { key: 'name', header: 'Student Name', render: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || '-' },
+    { key: 'name', header: 'Student Name', render: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.user?.name || '-' },
     { key: 'fatherName', header: 'Father Name' },
     { key: 'phone', header: 'Phone' },
     { key: 'currentClass', header: 'Class', render: (value) => value?.className || '-' },
@@ -167,8 +189,8 @@ const StudentsList = () => {
       <ListPage 
         {...studentsConfig} 
         createPath="/staff/registrar/student-registration"
-        editPathForRow={(row) => `/staff/registrar/students?edit=${row._id}`}
-        viewPathForRow={(row) => `/staff/registrar/students?view=${row._id}`}
+        editPathForRow={(row) => `/staff/registrar/students/edit/${row._id}`}
+        viewPathForRow={(row) => `/staff/registrar/students/view/${row._id}`}
         deleteEnabled={true}
         eyebrow="Registrar"
         enableExport={true}

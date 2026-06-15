@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiHome, FiUsers, FiBookOpen, FiCalendar, FiDollarSign, FiMenu, FiX, FiSun, FiMoon, FiLogIn } from 'react-icons/fi';
 import { useTheme } from '../contexts/ThemeContext';
+import useMadrasaInfo from '../hooks/useMadrasaInfo';
+import { getMadrasaDisplayName, getMadrasaLogo } from '../lib/madrasaInfo';
 
 const Home = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [madrasaInfo] = useMadrasaInfo();
+  const madrasaName = getMadrasaDisplayName(madrasaInfo);
+  const madrasaLogo = getMadrasaLogo(madrasaInfo);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,11 +63,15 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
-                M
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
+                {madrasaLogo ? (
+                  <img src={madrasaLogo} alt={`${madrasaName} logo`} className="h-full w-full object-cover" />
+                ) : (
+                  <span>{madrasaName[0]?.toUpperCase() || 'M'}</span>
+                )}
               </div>
               <div>
-                <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">Madrasa EMIS</div>
+                <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">{madrasaName}</div>
               </div>
             </div>
 
@@ -205,10 +214,14 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div className="col-span-1 md:col-span-1">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white">
-                  M
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white">
+                  {madrasaLogo ? (
+                    <img src={madrasaLogo} alt={`${madrasaName} logo`} className="h-full w-full object-cover" />
+                  ) : (
+                    <span>{madrasaName[0]?.toUpperCase() || 'M'}</span>
+                  )}
                 </div>
-                <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">Madrasa EMIS</div>
+                <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">{madrasaName}</div>
               </div>
               <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
                 Comprehensive Educational Management Information System

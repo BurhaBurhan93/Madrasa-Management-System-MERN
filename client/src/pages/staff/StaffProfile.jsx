@@ -1,267 +1,301 @@
 import React, { useState, useEffect } from 'react';
-import { FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiEdit, FiSave, FiX } from 'react-icons/fi';
-import { Card, Button, Input, Avatar, Badge, Form } from '../../components/UIHelper';
-import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
+import { FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiEdit, FiSave, FiX, FiBriefcase, FiShield } from 'react-icons/fi';
+import { Card, Button, Input, Badge } from '../../components/UIHelper';
+import { getUser } from '../../lib/auth';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
+
+const ROLE_COLORS = {
+  admin: 'purple',
+  staff: 'blue',
+  teacher: 'green',
+  student: 'orange',
+};
+
+const ROLE_LABELS = {
+  admin: 'Administrator',
+  staff: 'Staff Member',
+  teacher: 'Teacher',
+  student: 'Student',
+};
 
 const StaffProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
-    name: 'Ahmed Khan',
-    email: 'ahmed.khan@madrasa.edu',
-    phone: '0300-1234567',
-    designation: 'Registrar',
-    department: 'Administration',
-    employeeId: 'S001',
-    joinDate: '2021-02-10',
-    address: '123 Main Street, City, Country',
-    status: 'Active',
-  });
-
-  const [editData, setEditData] = useState({ ...profile });
+  const [profile, setProfile] = useState(null);
+  const [editData, setEditData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // In real app, fetch profile data from API
-    setEditData({ ...profile });
-  }, [profile]);
+    fetchProfile();
+  }, []);
 
-  const handleSave = () => {
-    setProfile({ ...editData });
-    setIsEditing(false);
+  const fetchProfile = async () => {
+    setLoading(true);
+    try {
+      const res = await apiFetch('/auth/me');
+      const data = await parseJsonSafe(res);
+      if (res.ok && data.user) {
+        setProfile(data.user);
+        setEditData(data.user);
+      } else {
+        // fallback to localStorage
+        const stored = getUser();
+        if (stored) {
+          setProfile(stored);
+          setEditData(stored);
+        }
+      }
+    } catch {
+      const stored = getUser();
+      if (stored) {
+        setProfile(stored);
+        setEditData(stored);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      const res = await apiFetch(`/users/${profile.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editData.name,
+          phone: editData.phone,
+          currentAddress: editData.currentAddress,
+        }),
+      });
+      const data = await parseJsonSafe(res);
+      if (res.ok) {
+        setProfile(prev => ({ ...prev, ...editData }));
+        setIsEditing(false);
+      } else {
+        setError(data.message || 'Failed to save changes');
+      }
+    } catch {
+      setError('Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
     setEditData({ ...profile });
     setIsEditing(false);
+    setError('');
   };
 
-  const handleChange = (field, value) => {
-    setEditData(prev => ({ ...prev, [field]: value }));
-  };
+  const avatarSrc = profile?.photo || profile?.image;
+  const displayName = profile?.fullName || profile?.name || '—';
+  const role = profile?.role;
+  const employeeType = profile?.employeeType;
 
-  const InfoField = ({ label, value, icon, field, type = 'text' }) => (
-    <div className="space-y-1">
-      <div className="flex items-center text-sm text-slate-500">
-        {icon && <span className="mr-2">{icon}</span>}
-        {label}
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-600" />
       </div>
-      {isEditing ? (
-        <Input
-          value={editData[field]}
-          onChange={(e) => handleChange(field, e.target.value)}
-          type={type}
-          className="w-full"
-        />
-      ) : (
-        <div className="text-slate-900 font-medium">{value}</div>
-      )}
-    </div>
-  );
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="p-8 text-center text-slate-500">No profile data found. Please log in again.</div>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Staff Profile</h1>
-          <p className="text-slate-600">Manage your personal information and account settings</p>
+          <h1 className="text-2xl font-bold text-slate-900">My Profile</h1>
+          <p className="text-slate-500 text-sm mt-0.5">View and manage your account information</p>
         </div>
         <div className="flex gap-2">
           {isEditing ? (
             <>
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                icon={<FiX size={16} />}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSave}
-                icon={<FiSave size={16} />}
-              >
-                Save Changes
+              <Button variant="outline" onClick={handleCancel} icon={<FiX size={15} />}>Cancel</Button>
+              <Button onClick={handleSave} disabled={saving} icon={<FiSave size={15} />}>
+                {saving ? 'Saving...' : 'Save'}
               </Button>
             </>
           ) : (
-            <Button
-              onClick={() => setIsEditing(true)}
-              icon={<FiEdit size={16} />}
-            >
-              Edit Profile
-            </Button>
+            <Button onClick={() => setIsEditing(true)} icon={<FiEdit size={15} />}>Edit Profile</Button>
           )}
         </div>
       </div>
 
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Profile Info */}
+        {/* Left — Main Info */}
         <div className="lg:col-span-2 space-y-6">
           <Card className="p-6">
-            <div className="flex items-start gap-6 mb-6">
-              <Avatar
-                size="xl"
-                name={profile.name}
-                className="border-4 border-white shadow-lg"
-              />
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-xl font-bold text-slate-900">{profile.name}</h2>
-                  <Badge color="green" variant="subtle">
-                    {profile.status}
-                  </Badge>
-                </div>
-                <p className="text-slate-600 mb-4">{profile.designation} • {profile.department}</p>
-                <div className="flex items-center gap-4 text-sm text-slate-500">
-                  <div className="flex items-center">
-                    <FiMail className="mr-2" size={14} />
-                    {profile.email}
-                  </div>
-                  <div className="flex items-center">
-                    <FiPhone className="mr-2" size={14} />
-                    {profile.phone}
-                  </div>
+            {/* Avatar + name header */}
+            <div className="flex items-start gap-5 mb-6 pb-6 border-b border-slate-100">
+              <div className="relative flex-shrink-0">
+                {avatarSrc ? (
+                  <img
+                    src={avatarSrc}
+                    alt={displayName}
+                    className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
+                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                  />
+                ) : null}
+                <div
+                  className={`w-20 h-20 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-700 text-2xl font-bold border-4 border-white shadow-md ${avatarSrc ? 'hidden' : 'flex'}`}
+                >
+                  {displayName.charAt(0).toUpperCase()}
                 </div>
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InfoField
-                label="Full Name"
-                value={profile.name}
-                icon={<FiUser size={14} />}
-                field="name"
-              />
-              <InfoField
-                label="Email Address"
-                value={profile.email}
-                icon={<FiMail size={14} />}
-                field="email"
-                type="email"
-              />
-              <InfoField
-                label="Phone Number"
-                value={profile.phone}
-                icon={<FiPhone size={14} />}
-                field="phone"
-                type="tel"
-              />
-              <InfoField
-                label="Designation"
-                value={profile.designation}
-                field="designation"
-              />
-              <InfoField
-                label="Department"
-                value={profile.department}
-                field="department"
-              />
-              <InfoField
-                label="Employee ID"
-                value={profile.employeeId}
-                field="employeeId"
-              />
-              <InfoField
-                label="Join Date"
-                value={profile.joinDate}
-                icon={<FiCalendar size={14} />}
-                field="joinDate"
-                type="date"
-              />
-              <InfoField
-                label="Address"
-                value={profile.address}
-                icon={<FiMapPin size={14} />}
-                field="address"
-              />
-            </div>
-          </Card>
-
-          {/* Additional Information */}
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Additional Information</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Bio/Description
-                </label>
-                {isEditing ? (
-                  <textarea
-                    value={editData.bio || ''}
-                    onChange={(e) => handleChange('bio', e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
-                    rows={4}
-                    placeholder="Write a brief description about yourself..."
-                  />
-                ) : (
-                  <p className="text-slate-700">
-                    {profile.bio || 'No bio provided. Add a brief description about yourself.'}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <h2 className="text-xl font-bold text-slate-900">{displayName}</h2>
+                  <Badge color={ROLE_COLORS[role] || 'gray'} variant="subtle">
+                    {ROLE_LABELS[role] || role}
+                  </Badge>
+                  {profile.status && (
+                    <Badge color={profile.status === 'active' ? 'green' : 'red'} variant="subtle">
+                      {profile.status}
+                    </Badge>
+                  )}
+                </div>
+                {(profile.designation || employeeType) && (
+                  <p className="text-slate-500 text-sm">
+                    {profile.designation || ''}
+                    {profile.designation && employeeType ? ' · ' : ''}
+                    {employeeType ? `${employeeType.charAt(0).toUpperCase() + employeeType.slice(1)} Department` : ''}
                   </p>
                 )}
+                <div className="flex flex-wrap gap-4 mt-2 text-sm text-slate-500">
+                  <span className="flex items-center gap-1"><FiMail size={13} />{profile.email}</span>
+                  {(profile.phoneNumber || profile.phone) && (
+                    <span className="flex items-center gap-1"><FiPhone size={13} />{profile.phoneNumber || profile.phone}</span>
+                  )}
+                </div>
               </div>
+            </div>
+
+            {/* Fields grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Name */}
+              <Field label="Full Name" icon={<FiUser size={13} />}>
+                {isEditing
+                  ? <Input value={editData.name || ''} onChange={e => setEditData(p => ({ ...p, name: e.target.value }))} className="w-full" />
+                  : <span>{displayName}</span>}
+              </Field>
+
+              {/* Email — read only */}
+              <Field label="Email Address" icon={<FiMail size={13} />}>
+                <span>{profile.email}</span>
+              </Field>
+
+              {/* Role */}
+              <Field label="System Role" icon={<FiShield size={13} />}>
+                <div className="flex items-center gap-2">
+                  <Badge color={ROLE_COLORS[role] || 'gray'} variant="subtle">{ROLE_LABELS[role] || role}</Badge>
+                </div>
+              </Field>
+
+              {/* Employee Type (staff/teacher only) */}
+              {employeeType && (
+                <Field label="Position / Type" icon={<FiBriefcase size={13} />}>
+                  <span className="capitalize">{employeeType}</span>
+                </Field>
+              )}
+
+              {/* Department */}
+              {profile.department && (
+                <Field label="Department">
+                  <span>{profile.department}</span>
+                </Field>
+              )}
+
+              {/* Designation */}
+              {profile.designation && (
+                <Field label="Designation">
+                  <span>{profile.designation}</span>
+                </Field>
+              )}
+
+              {/* Employee ID */}
+              {profile.employeeId && (
+                <Field label="Employee ID">
+                  <span>{profile.employeeId}</span>
+                </Field>
+              )}
+
+              {/* Student ID */}
+              {profile.studentId && (
+                <Field label="Student ID">
+                  <span>{profile.studentId}</span>
+                </Field>
+              )}
+
+              {/* Phone */}
+              <Field label="Phone" icon={<FiPhone size={13} />}>
+                {isEditing
+                  ? <Input value={editData.phone || editData.phoneNumber || ''} onChange={e => setEditData(p => ({ ...p, phone: e.target.value }))} className="w-full" type="tel" />
+                  : <span>{profile.phoneNumber || profile.phone || '—'}</span>}
+              </Field>
+
+              {/* Join Date */}
+              {(profile.joinDate || profile.enrollmentDate) && (
+                <Field label="Join Date" icon={<FiCalendar size={13} />}>
+                  <span>{new Date(profile.joinDate || profile.enrollmentDate).toLocaleDateString()}</span>
+                </Field>
+              )}
+
+              {/* Address */}
+              <Field label="Address" icon={<FiMapPin size={13} />} className="md:col-span-2">
+                {isEditing
+                  ? <Input value={editData.currentAddress || ''} onChange={e => setEditData(p => ({ ...p, currentAddress: e.target.value }))} className="w-full" />
+                  : <span>{profile.currentAddress || '—'}</span>}
+              </Field>
             </div>
           </Card>
         </div>
 
-        {/* Right Column - Stats & Actions */}
+        {/* Right — Account Info */}
         <div className="space-y-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Stats</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600">Years of Service</span>
-                <span className="font-bold text-slate-900">3</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600">Students Managed</span>
-                <span className="font-bold text-slate-900">245</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600">Tasks Completed</span>
-                <span className="font-bold text-slate-900">1,234</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600">Attendance Rate</span>
-                <span className="font-bold text-green-600">98%</span>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">
-                Change Password
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                Update Profile Picture
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                Download Profile
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                View Activity Log
-              </Button>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Account Status</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-slate-600">Last Login</span>
-                <span className="font-medium">Today, 10:30 AM</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">Account Created</span>
-                <span className="font-medium">Feb 10, 2021</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">Email Verified</span>
-                <Badge color="green" variant="subtle">Verified</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">2FA Enabled</span>
-                <Badge color="red" variant="subtle">Disabled</Badge>
-              </div>
+            <h3 className="text-base font-semibold text-slate-900 mb-4">Account Details</h3>
+            <div className="space-y-3 text-sm">
+              <Row label="Role">
+                <Badge color={ROLE_COLORS[role] || 'gray'} variant="subtle">{ROLE_LABELS[role] || role}</Badge>
+              </Row>
+              {employeeType && (
+                <Row label="Type"><span className="capitalize font-medium">{employeeType}</span></Row>
+              )}
+              {profile.employeeId && (
+                <Row label="Employee ID"><span className="font-medium">{profile.employeeId}</span></Row>
+              )}
+              {profile.department && (
+                <Row label="Department"><span className="font-medium">{profile.department}</span></Row>
+              )}
+              <Row label="Status">
+                <Badge color={profile.status === 'active' ? 'green' : 'red'} variant="subtle">
+                  {profile.status || 'Active'}
+                </Badge>
+              </Row>
+              {profile.staffModules?.length > 0 && (
+                <div className="pt-2 border-t border-slate-100">
+                  <p className="text-slate-500 mb-2">Access Modules</p>
+                  <div className="flex flex-wrap gap-1">
+                    {profile.staffModules.map(m => (
+                      <span key={m} className="px-2 py-0.5 bg-cyan-50 text-cyan-700 rounded-full text-xs capitalize">{m}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
         </div>
@@ -269,5 +303,21 @@ const StaffProfile = () => {
     </div>
   );
 };
+
+const Field = ({ label, icon, children, className = '' }) => (
+  <div className={`space-y-1 ${className}`}>
+    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium uppercase tracking-wide">
+      {icon}{label}
+    </div>
+    <div className="text-slate-800 font-medium text-sm">{children}</div>
+  </div>
+);
+
+const Row = ({ label, children }) => (
+  <div className="flex justify-between items-center">
+    <span className="text-slate-500">{label}</span>
+    {children}
+  </div>
+);
 
 export default StaffProfile;

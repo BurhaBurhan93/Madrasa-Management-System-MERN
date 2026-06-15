@@ -8,6 +8,7 @@ import StaffPageLayout from './StaffPageLayout';
 import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { getStaffToneStyles } from './staffTheme';
+import { localizeAdminText } from '../../../lib/adminLocalization';
 
 const formatFieldLabel = (label = '') => label.toLowerCase().replace(/\s+/g, ' ');
 
@@ -96,6 +97,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
   const [currentStep, setCurrentStep] = useState(0);
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const adminLang = localStorage.getItem('adminLang') || 'en';
   const toneStyles = getStaffToneStyles(endpoint || titleCreate || titleEdit);
 
   const stepCount = formFields.length > 16 ? 5 : 4;
@@ -138,7 +140,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       });
       if (Object.keys(newFieldErrors).length > 0) {
         setFieldErrors(newFieldErrors);
-        throw new Error('Please correct the highlighted fields.');
+        throw new Error(localizeAdminText('Please correct the highlighted fields.', adminLang));
       }
 
       const payload = mapFormToPayload ? mapFormToPayload(form) : form;
@@ -151,7 +153,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       if (!res.ok || !data.success) throw new Error(data.message || 'Save failed');
       if (onSavedPath) window.location.href = onSavedPath;
     } catch (err) {
-      setError(err.message || 'Save error');
+      setError(err.message || localizeAdminText('Save error', adminLang));
     } finally {
       setSaving(false);
     }
@@ -226,6 +228,78 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       );
     }
 
+    if (field.type === 'file') {
+      const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          // Check file size (max 5MB)
+          if (file.size > 5 * 1024 * 1024) {
+            alert('Image size must be less than 5MB');
+            return;
+          }
+
+          // Compress image before upload
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let { width, height } = img;
+
+              // Resize if too large
+              const maxDim = 800;
+              if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                  height = Math.round((height / width) * maxDim);
+                  width = maxDim;
+                } else {
+                  width = Math.round((width / height) * maxDim);
+                  height = maxDim;
+                }
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              const compressedDataUrl = canvas.toDataURL(file.type, 0.7); // 70% quality
+              setForm({ ...form, [field.name]: compressedDataUrl });
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      return (
+        <div key={field.name} className="space-y-2">
+          <label htmlFor={field.name} className={`block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{field.label}</label>
+          <div className="flex items-center gap-4">
+            {form[field.name] && (
+              <img
+                src={form[field.name]}
+                alt="Preview"
+                className="h-20 w-20 rounded-lg object-cover border border-slate-200"
+              />
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              id={field.name}
+              onChange={handleImageChange}
+              className={`flex-1 rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${
+                isDark
+                  ? 'border-slate-700 bg-slate-900/70 text-slate-100 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20'
+                  : 'border-slate-200 bg-slate-50 text-slate-700 focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100'
+              }`}
+            />
+          </div>
+          {!fieldErrors[field.name] && helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{helperText}</p>}
+          {fieldErrors[field.name] && <p className="text-sm text-red-600">{fieldErrors[field.name]}</p>}
+        </div>
+      );
+    }
+
     return (
       <Input
         key={field.name}
@@ -251,21 +325,21 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       title={mode === 'edit' ? titleEdit : titleCreate}
       subtitle="A phased entry flow keeps create and edit tasks easier to complete without overwhelming the form."
       tone={endpoint || titleCreate || titleEdit}
-      actions={<Button variant="outline" onClick={() => window.history.back()}>Back</Button>}
+      actions={<Button variant="outline" onClick={() => window.history.back()}>{localizeAdminText('Back', adminLang)}</Button>}
     >
       <Card className="rounded-[28px] shadow-sm">
         {loading ? (
-          <div className={`p-6 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Loading data...</div>
+          <div className={`p-6 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{localizeAdminText('Loading data...', adminLang)}</div>
         ) : (
           <div className="space-y-6">
             <div className={`rounded-[24px] border p-5 ${isDark ? 'border-slate-700 bg-slate-950/50' : 'border-slate-200 bg-slate-50'}`}>
               <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className={`text-xs font-bold uppercase tracking-[0.24em] ${toneStyles.badge.split(' ')[1] || 'text-cyan-700'}`}>
-                    Step {activeStep + 1} of {steps.length}
+                    {`${localizeAdminText('Step', adminLang)} ${activeStep + 1} of ${steps.length}`}
                   </p>
                   <h3 className={`mt-2 text-lg font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-                    {stepLabels[activeStep] || `Step ${activeStep + 1}`}
+                    {localizeAdminText(stepLabels[activeStep] || `Step ${activeStep + 1}`, adminLang)}
                   </h3>
                 </div>
                 <div className={`h-2 w-full max-w-xs overflow-hidden rounded-full ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
@@ -304,13 +378,13 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <h3 className={`text-sm font-semibold ${isDark ? 'text-rose-200' : 'text-rose-900'}`}>Form Error</h3>
+                    <h3 className={`text-sm font-semibold ${isDark ? 'text-rose-200' : 'text-rose-900'}`}>{localizeAdminText('Form Error', adminLang)}</h3>
                     <p className={`mt-1 text-sm ${isDark ? 'text-rose-300' : 'text-rose-700'}`}>{error}</p>
                     <button
                       onClick={() => window.location.reload()}
                       className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700"
                     >
-                      Reload Page
+                      {localizeAdminText('Retry', adminLang)}
                     </button>
                   </div>
                 </div>
@@ -319,14 +393,14 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
 
             <div className={`flex flex-col gap-3 border-t pt-5 sm:flex-row sm:justify-between ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => window.history.back()}>Cancel</Button>
+                <Button variant="outline" onClick={() => window.history.back()}>{localizeAdminText('Cancel', adminLang)}</Button>
               </div>
               <div className="flex gap-3">
-                {canGoBack && <Button variant="outline" onClick={goBack}>Back</Button>}
+                {canGoBack && <Button variant="outline" onClick={goBack}>{localizeAdminText('Back', adminLang)}</Button>}
                 {canGoNext ? (
-                  <Button variant="primary" onClick={goNext}>Next Step</Button>
+                  <Button variant="primary" onClick={goNext}>{localizeAdminText('Next Step', adminLang)}</Button>
                 ) : (
-                  <Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Record'}</Button>
+                  <Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? localizeAdminText('Loading...', adminLang) : localizeAdminText('Save Record', adminLang)}</Button>
                 )}
               </div>
             </div>

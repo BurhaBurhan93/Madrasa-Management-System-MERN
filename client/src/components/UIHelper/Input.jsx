@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext.jsx';
+import { localizeAdminText } from '../../lib/adminLocalization';
 
 const Input = ({
   label,
@@ -17,12 +18,13 @@ const Input = ({
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const adminLang = localStorage.getItem('adminLang') || 'en';
 
   return (
     <div className="space-y-2">
       {label && (
         <label htmlFor={id} className={`block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
-          {label} {required && <span className="text-red-500">*</span>}
+          {localizeAdminText(label, adminLang)} {required && <span className="text-red-500">*</span>}
         </label>
       )}
       <div className="relative">
@@ -34,7 +36,7 @@ const Input = ({
         <input
           id={id}
           type={type}
-          placeholder={placeholder}
+          placeholder={localizeAdminText(placeholder, adminLang)}
           value={value}
           onChange={onChange}
           required={required}
@@ -46,7 +48,7 @@ const Input = ({
           {...props}
         />
       </div>
-      {!error && helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{helperText}</p>}
+      {!error && helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{localizeAdminText(helperText, adminLang)}</p>}
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );

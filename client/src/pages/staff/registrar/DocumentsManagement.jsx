@@ -11,6 +11,9 @@ export const documentsManagementConfig = {
   title: 'Student Documents Management',
   subtitle: 'Upload, manage, and track student documents and certificates',
   endpoint: '/student/documents',
+  createPath: '/staff/registrar/documents/create',
+  editPathForRow: (row) => `/staff/registrar/documents/edit/${row._id}`,
+  viewPathForRow: (row) => `/staff/registrar/documents/view/${row._id}`,
   columns: [
     { key: 'student', header: 'Student', render: (value, row) => row.student?.user?.name || '-' },
     { key: 'type', header: 'Document Type' },
@@ -90,7 +93,7 @@ const DocumentsManagement = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       const response = await axios.get(`${API_BASE}/student/documents`, config);
-      const documents = response.data || [];
+      const documents = response.data?.data || response.data || [];
       
       const total = documents.length;
       const active = documents.filter(d => d.status === 'active').length;

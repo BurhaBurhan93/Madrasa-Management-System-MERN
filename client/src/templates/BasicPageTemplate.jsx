@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiPlus, FiSearch, FiFilter, FiDownload, FiEdit, FiEye, FiTrash2 } from 'react-icons/fi';
 import { Table, Button, Card, Input, Select, Badge, Modal, Loading } from '../components/UIHelper';
+import { localizeAdminText } from '../lib/adminLocalization';
 
 const BasicPageTemplate = ({
   title,
@@ -20,6 +21,7 @@ const BasicPageTemplate = ({
   onRowClick,
   emptyMessage = 'No records found',
 }) => {
+  const adminLang = localStorage.getItem('adminLang') || 'en';
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -55,7 +57,7 @@ const BasicPageTemplate = ({
     ...columns,
     {
       key: 'actions',
-      label: 'Actions',
+      label: localizeAdminText('Actions', adminLang),
       render: (_, row) => (
         <div className="flex gap-2">
           {onView && (
@@ -65,7 +67,7 @@ const BasicPageTemplate = ({
               onClick={() => onView(row)}
               icon={<FiEye size={14} />}
             >
-              View
+              {localizeAdminText('View Details', adminLang)}
             </Button>
           )}
           {onEdit && (
@@ -75,7 +77,7 @@ const BasicPageTemplate = ({
               onClick={() => onEdit(row)}
               icon={<FiEdit size={14} />}
             >
-              Edit
+              {localizeAdminText('Edit', adminLang)}
             </Button>
           )}
           {onDelete && (
@@ -86,7 +88,7 @@ const BasicPageTemplate = ({
               onClick={() => handleDelete(row)}
               icon={<FiTrash2 size={14} />}
             >
-              Delete
+              {localizeAdminText('Delete', adminLang)}
             </Button>
           )}
         </div>
@@ -100,15 +102,15 @@ const BasicPageTemplate = ({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
-          <p className="text-slate-600">{description}</p>
+          <h1 className="text-2xl font-bold text-slate-900">{localizeAdminText(title, adminLang)}</h1>
+          <p className="text-slate-600">{localizeAdminText(description, adminLang)}</p>
         </div>
         {onCreate && (
           <Button
             onClick={onCreate}
             icon={<FiPlus size={18} />}
           >
-            Add New
+            {localizeAdminText('Add New', adminLang)}
           </Button>
         )}
       </div>
@@ -117,7 +119,7 @@ const BasicPageTemplate = ({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className={filters.length > 0 ? "md:col-span-2" : "md:col-span-4"}>
             <Input
-              placeholder={`Search ${title.toLowerCase()}...`}
+              placeholder={localizeAdminText(`Search ${String(title).toLowerCase()}...`, adminLang)}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               icon={<FiSearch />}
@@ -130,7 +132,7 @@ const BasicPageTemplate = ({
               value={activeFilters[filter.key] || ''}
               onChange={(e) => setActiveFilters(prev => ({ ...prev, [filter.key]: e.target.value }))}
               options={[
-                { value: '', label: `All ${filter.label}` },
+                { value: '', label: localizeAdminText(`All ${filter.label}`, adminLang) },
                 ...filter.options
               ]}
             />
@@ -144,12 +146,12 @@ const BasicPageTemplate = ({
           <div className="flex gap-2">
             {filters.length > 0 && (
               <Button variant="outline" icon={<FiFilter size={16} />}>
-                More Filters
+                {localizeAdminText('Filter By', adminLang)}
               </Button>
             )}
             {exportData && (
               <Button variant="outline" icon={<FiDownload size={16} />}>
-                Export
+                {localizeAdminText('Export', adminLang)}
               </Button>
             )}
           </div>
@@ -166,15 +168,15 @@ const BasicPageTemplate = ({
         ) : (
           <div className="text-center py-12">
             <div className="text-4xl mb-4">📭</div>
-            <h3 className="text-lg font-semibold text-slate-700 mb-2">{emptyMessage}</h3>
-            <p className="text-slate-500">Try adjusting your search or filters</p>
+            <h3 className="text-lg font-semibold text-slate-700 mb-2">{localizeAdminText(emptyMessage, adminLang)}</h3>
+            <p className="text-slate-500">{localizeAdminText('Try changing the search terms, switching the filter column, or create the first record for this module.', adminLang)}</p>
             {onCreate && (
               <Button
                 onClick={onCreate}
                 className="mt-4"
                 icon={<FiPlus size={18} />}
               >
-                Create First Record
+                {localizeAdminText('Create Record', adminLang)}
               </Button>
             )}
           </div>
@@ -184,19 +186,19 @@ const BasicPageTemplate = ({
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title="Confirm Delete"
+        title={localizeAdminText('Confirm Delete', adminLang)}
         size="sm"
       >
         <div className="space-y-4">
           <p className="text-slate-700">
-            Are you sure you want to delete this record? This action cannot be undone.
+            {localizeAdminText('Are you sure you want to delete this record?', adminLang)} This action cannot be undone.
           </p>
           <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
-              Cancel
+              {localizeAdminText('Cancel', adminLang)}
             </Button>
             <Button color="red" onClick={confirmDelete}>
-              Delete
+              {localizeAdminText('Delete', adminLang)}
             </Button>
           </div>
         </div>

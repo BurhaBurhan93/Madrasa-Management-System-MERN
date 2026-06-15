@@ -19,23 +19,41 @@ const notificationService = require('../modules/notifications/notificationServic
 // Get student profile
 const getStudentProfile = async (req, res) => {
   try {
-    const student = await Student.findOne({ user: req.user.id }).populate('user');
+    const student = await Student.findOne({ user: req.user.id })
+      .populate('user', '-password')
+      .populate('currentClass', 'className');
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
     }
-    
+
+    const u = student.user || {};
     res.json({
       id: student._id,
-      name: student.user?.name || student.firstName + ' ' + student.lastName,
-      email: student.user?.email || student.email,
-      studentId: student.studentCode,
-      phone: student.phone,
-      dateOfBirth: student.dob,
-      address: student.permanentAddress,
-      enrollmentDate: student.admissionDate,
+      userId: u._id,
+      role: u.role || 'student',
+      name: u.name || `${student.firstName || ''} ${student.lastName || ''}`.trim(),
+      email: u.email || student.email,
+      phone: student.phone || u.phone,
+      whatsapp: student.whatsapp || u.whatsapp,
+      image: u.image || student.image || null,
+      studentCode: student.studentCode,
+      firstName: student.firstName,
+      lastName: student.lastName,
+      fatherName: student.fatherName || u.fatherName,
+      grandfatherName: student.grandfatherName || u.grandfatherName,
+      dob: student.dob || u.dob,
+      bloodType: student.bloodType || u.bloodType,
+      gender: student.gender,
+      currentClass: student.currentClass?.className || student.currentClass,
+      currentLevel: student.currentLevel,
+      admissionDate: student.admissionDate,
       status: student.status,
-      class: student.currentClass,
-      courseId: student.currentClass
+      guardianName: student.guardianName,
+      guardianRelationship: student.guardianRelationship,
+      guardianPhone: student.guardianPhone,
+      guardianEmail: student.guardianEmail,
+      permanentAddress: student.permanentAddress || u.permanentAddress,
+      currentAddress: student.currentAddress || u.currentAddress,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -82,7 +100,7 @@ const getStudentCourses = async (req, res) => {
     }
     
     // Use currentClass to find subjects/courses for the student's class
-    const courses = await Course.find({ classId: student.currentClass }).populate('teacher', 'name');
+    const courses = await Course.find({ classId: student.currentClass }, null, { strictPopulate: false });
     
     res.json(courses);
   } catch (error) {
@@ -101,7 +119,7 @@ const getAttendanceRecords = async (req, res) => {
     
     const records = await AttendanceRecord.find({ 
       student: student._id 
-    }).populate('session').populate('course');
+    }, null, { strictPopulate: false });
     
     res.json(records);
   } catch (error) {
@@ -121,7 +139,7 @@ const getAssignments = async (req, res) => {
     // Get assignments for the student's class
     const assignments = await Assignment.find({
       classId: student.currentClass
-    }).populate('courseId').populate('subject');
+    }, null, { strictPopulate: false });
     
     res.json(assignments);
   } catch (error) {
@@ -769,11 +787,46 @@ const getStudentFinalResults = async (req, res) => {
   }
 };
 
-// Get all students (for Registrar/Staff)
+// Submit homework/assignment by student
+const submitAssignment = async (req, res) => {
+  try {
+    const student = await Student.findOne({ user: req.user.id });
+    if (!student) return res.status(404).json({ message: 'Student not found' });
+
+    const { title, description, course, dueDate, assignmentId } = req.body;
+    if (!title || !course) return res.status(400).json({ message: 'Title and course are required' });
+
+    // If an assignmentId was provided, mark it submitted
+    if (assignmentId) {
+      const updated = await Assignment.findByIdAndUpdate(
+        assignmentId,
+        { $addToSet: { submissions: { student: student._id, submittedAt: new Date(), note: description } } },
+        { new: true }
+      );
+      if (!updated) return res.status(404).json({ message: 'Assignment not found' });
+      return res.json({ success: true, message: 'Assignment submitted successfully' });
+    }
+
+    // Otherwise create a submission record directly
+    const submission = await Assignment.create({
+      title,
+      description: description || '',
+      courseId: course,
+      dueDate: dueDate || new Date(),
+      status: 'submitted',
+      createdBy: req.user.id
+    });
+
+    res.status(201).json({ success: true, message: 'Homework submitted successfully', data: submission });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getAllStudents = async (req, res) => {
   try {
     const students = await Student.find({ deletedAt: null })
-      .populate('user', 'name email phone')
+      .populate('user', 'name email phone image')
       .populate('currentClass', 'className')
       .lean();
     
@@ -984,6 +1037,7 @@ const createStudent = async (req, res) => {
     if (studentData.bloodType) userPayload.bloodType = studentData.bloodType;
     if (studentData.permanentAddress) userPayload.permanentAddress = studentData.permanentAddress;
     if (studentData.currentAddress) userPayload.currentAddress = studentData.currentAddress;
+    if (studentData.image) userPayload.image = studentData.image;
     
     const user = new User(userPayload);
     await user.save();
@@ -1011,6 +1065,7 @@ const createStudent = async (req, res) => {
     if (studentData.guardianPhone) studentPayload.guardianPhone = studentData.guardianPhone;
     if (studentData.guardianEmail) studentPayload.guardianEmail = studentData.guardianEmail;
     if (studentData.currentLevel) studentPayload.currentLevel = studentData.currentLevel;
+    if (studentData.image) studentPayload.image = studentData.image;
     
     const student = new Student(studentPayload);
     await student.save();
@@ -1035,22 +1090,50 @@ const updateStudent = async (req, res) => {
   try {
     const studentData = req.body;
     
-    const student = await Student.findByIdAndUpdate(
-      req.params.id,
-      studentData,
-      { new: true, runValidators: true }
-    );
-    
+    const student = await Student.findById(req.params.id);
     if (!student) {
       return res.status(404).json({
         success: false,
         message: 'Student not found'
       });
     }
+
+    // Update user fields if provided
+    const userUpdateData = {};
+    // Handle name from firstName + lastName if available
+    if (studentData.firstName || studentData.lastName) {
+      const fullName = `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim();
+      if (fullName) userUpdateData.name = fullName;
+    } else if (studentData.name) {
+      userUpdateData.name = studentData.name;
+    }
+    if (studentData.email) userUpdateData.email = studentData.email;
+    if (studentData.phone) userUpdateData.phone = studentData.phone;
+    if (studentData.image) userUpdateData.image = studentData.image;
+    if (studentData.fatherName) userUpdateData.fatherName = studentData.fatherName;
+    if (studentData.grandfatherName) userUpdateData.grandfatherName = studentData.grandfatherName;
+    if (studentData.dob) userUpdateData.dob = studentData.dob;
+    if (studentData.bloodType) userUpdateData.bloodType = studentData.bloodType;
+
+    if (Object.keys(userUpdateData).length > 0) {
+      await User.findByIdAndUpdate(student.user, userUpdateData, { new: true, runValidators: true });
+    }
+
+    // Filter out fields with empty string values to avoid cast errors
+    const filteredUpdateData = Object.fromEntries(
+      Object.entries(studentData).filter(([_, value]) => value !== '')
+    );
+
+    // Update student record
+    const updatedStudent = await Student.findByIdAndUpdate(
+      req.params.id,
+      filteredUpdateData,
+      { new: true, runValidators: true }
+    );
     
     res.json({
       success: true,
-      data: student
+      data: updatedStudent
     });
   } catch (error) {
     res.status(400).json({ 
@@ -1118,6 +1201,7 @@ module.exports = {
   getStudentDocuments,
   getStudentFinalResults,
   
+  submitAssignment,
   // Registrar/Staff routes
   getAllStudents,
   createStudent,

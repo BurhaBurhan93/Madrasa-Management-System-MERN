@@ -132,12 +132,26 @@ import StaffProfile from '../pages/staff/StaffProfile';
 import StudentRegistration from '../pages/staff/registrar/StudentRegistration';
 import StudentsList from '../pages/staff/registrar/StudentsList';
 import StudentAdmissions from '../pages/staff/registrar/StudentAdmissions';
+import StudentAdmissionsCreate from '../pages/staff/registrar/StudentAdmissionsCreate';
+import StudentAdmissionsEdit from '../pages/staff/registrar/StudentAdmissionsEdit';
+import StudentAdmissionsView from '../pages/staff/registrar/StudentAdmissionsView';
 import StudentProfiles from '../pages/staff/registrar/StudentProfiles';
+import StudentEdit from '../pages/staff/registrar/StudentEdit';
+import StudentView from '../pages/staff/registrar/StudentView';
 import ClassAssignment from '../pages/staff/registrar/ClassAssignment';
 import DataCorrection from '../pages/staff/registrar/DataCorrection';
 import GuardianManagement from '../pages/staff/registrar/GuardianManagement';
+import GuardianCreate from '../pages/staff/registrar/GuardianCreate';
+import GuardianEdit from '../pages/staff/registrar/GuardianEdit';
+import GuardianView from '../pages/staff/registrar/GuardianView';
 import EducationHistory from '../pages/staff/registrar/EducationHistory';
+import EducationHistoryCreate from '../pages/staff/registrar/EducationHistoryCreate';
+import EducationHistoryEdit from '../pages/staff/registrar/EducationHistoryEdit';
+import EducationHistoryView from '../pages/staff/registrar/EducationHistoryView';
 import DocumentsManagement from '../pages/staff/registrar/DocumentsManagement';
+import DocumentsCreate from '../pages/staff/registrar/DocumentsCreate';
+import DocumentsEdit from '../pages/staff/registrar/DocumentsEdit';
+import DocumentsView from '../pages/staff/registrar/DocumentsView';
 import RegistrarReports from '../pages/staff/registrar/RegistrarReports';
 import HostelRooms from '../pages/staff/hostel/HostelRooms';
 import HostelAllocations from '../pages/staff/hostel/HostelAllocations';
@@ -295,13 +309,27 @@ const staffRoutes = (
     <Route path="registrar/hostel-meals" element={<HostelMeals />} />
     <Route path="registrar/student-registration" element={<StudentRegistration />} />
     <Route path="registrar/students" element={<StudentsList />} />
+    <Route path="registrar/students/edit/:id" element={<StudentEdit />} />
+    <Route path="registrar/students/view/:id" element={<StudentView />} />
     <Route path="registrar/admissions" element={<StudentAdmissions />} />
+    <Route path="registrar/admissions/create" element={<StudentAdmissionsCreate />} />
+    <Route path="registrar/admissions/edit/:id" element={<StudentAdmissionsEdit />} />
+    <Route path="registrar/admissions/view/:id" element={<StudentAdmissionsView />} />
     <Route path="registrar/profiles" element={<StudentProfiles />} />
     <Route path="registrar/class-assignment" element={<ClassAssignment />} />
     <Route path="registrar/data-correction" element={<DataCorrection />} />
     <Route path="registrar/guardians" element={<GuardianManagement />} />
+    <Route path="registrar/guardians/create" element={<GuardianCreate />} />
+    <Route path="registrar/guardians/edit/:id" element={<GuardianEdit />} />
+    <Route path="registrar/guardians/view/:id" element={<GuardianView />} />
     <Route path="registrar/education-history" element={<EducationHistory />} />
+    <Route path="registrar/education-history/create" element={<EducationHistoryCreate />} />
+    <Route path="registrar/education-history/edit/:id" element={<EducationHistoryEdit />} />
+    <Route path="registrar/education-history/view/:id" element={<EducationHistoryView />} />
     <Route path="registrar/documents" element={<DocumentsManagement />} />
+    <Route path="registrar/documents/create" element={<DocumentsCreate />} />
+    <Route path="registrar/documents/edit/:id" element={<DocumentsEdit />} />
+    <Route path="registrar/documents/view/:id" element={<DocumentsView />} />
     <Route path="registrar/reports" element={<RegistrarReports />} />
 
     <Route path="leave" element={<StaffLeaveManagement />} />

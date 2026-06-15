@@ -18,23 +18,7 @@ export const classAssignmentConfig = {
     { key: 'name', header: 'Student Name', render: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.user?.name || '-' },
     { key: 'currentClass', header: 'Current Class', render: (value) => value?.className || 'Not Assigned' },
     { key: 'currentLevel', header: 'Level' },
-    { key: 'status', header: 'Status' },
-    { key: 'actions', header: 'Actions', render: (value, row, actions) => (
-      <div className="flex gap-2">
-        <button 
-          onClick={() => actions.onTransfer(row)}
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-        >
-          Transfer
-        </button>
-        <button 
-          onClick={() => actions.onPromote(row)}
-          className="text-green-600 hover:text-green-800 text-sm font-medium"
-        >
-          Promote
-        </button>
-      </div>
-    )}
+    { key: 'status', header: 'Status' }
   ],
   formFields: [
     { name: 'studentCode', label: 'Student Code', required: true },
@@ -286,10 +270,19 @@ const ClassAssignment = () => {
       <ListPage 
         embedded={true}
         {...classAssignmentConfig} 
-        customActions={{
-          onTransfer: openTransferModal,
-          onPromote: openPromoteModal
-        }}
+        deleteEnabled={false}
+        extraActionItemsForRow={(row) => ([
+          {
+            label: 'Transfer',
+            className: 'border-blue-200 bg-blue-50 text-blue-700 hover:border-blue-300 hover:bg-blue-100',
+            onClick: () => openTransferModal(row)
+          },
+          {
+            label: 'Promote',
+            className: 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-300 hover:bg-emerald-100',
+            onClick: () => openPromoteModal(row)
+          }
+        ])}
       />
 
       {/* Transfer Modal */}

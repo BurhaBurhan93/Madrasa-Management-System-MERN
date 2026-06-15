@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext.jsx';
+import { localizeAdminText } from '../../lib/adminLocalization';
 
 const Select = ({ 
   label, 
@@ -16,12 +17,13 @@ const Select = ({
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const adminLang = localStorage.getItem('adminLang') || 'en';
 
   return (
     <div className="w-full">
       {label && (
         <label htmlFor={id} className={`block text-sm font-medium mb-1 ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
-          {label} {required && <span className="text-red-500">*</span>}
+          {localizeAdminText(label, adminLang)} {required && <span className="text-red-500">*</span>}
         </label>
       )}
       <select
@@ -36,14 +38,14 @@ const Select = ({
         } ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''} ${className}`}
         {...props}
       >
-        {placeholder && <option value="">{placeholder}</option>}
+        {placeholder && <option value="">{localizeAdminText(placeholder, adminLang)}</option>}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {localizeAdminText(option.label, adminLang)}
           </option>
         ))}
       </select>
-      {!error && helperText && <p className={`mt-1 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{helperText}</p>}
+      {!error && helperText && <p className={`mt-1 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{localizeAdminText(helperText, adminLang)}</p>}
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );

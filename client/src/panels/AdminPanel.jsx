@@ -1,19 +1,23 @@
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   FiHome, FiUsers, FiBookOpen, FiCalendar, FiDollarSign, FiUser, FiMenu, FiLogOut,
   FiSearch, FiChevronDown, FiChevronLeft, FiChevronRight, FiSettings, FiBarChart2, FiLayers, FiClipboard,
   FiAward, FiPackage, FiCoffee, FiInbox, FiUserPlus, FiBook, FiFileText, FiDatabase,
   FiMonitor, FiShield, FiActivity, FiTrendingUp, FiCheckCircle, FiAlertCircle,
-  FiSun, FiMoon, FiGlobe
+  FiSun, FiMoon, FiGlobe, FiInfo
 } from 'react-icons/fi';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { useTheme } from '../contexts/ThemeContext';
+import i18n from '../i18n';
 import { CalendarProvider, useCalendar } from '../contexts/CalendarContext';
 import { clearAuth } from '../lib/auth';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import NotificationDropdown from '../components/UIHelper/NotificationDropdown';
 import { CALENDAR_SYSTEMS, calendarLabels, setCalendarSystem } from '../lib/dateUtils';
+import useMadrasaInfo from '../hooks/useMadrasaInfo';
+import { getMadrasaDisplayName, getMadrasaLogo } from '../lib/madrasaInfo';
+import { translateAdminTree } from '../lib/adminLocalization';
 
 // ── Localization strings ──
 const translations = {
@@ -113,6 +117,7 @@ const translations = {
     language: 'Language',
     collapseSidebar: 'Collapse sidebar',
     expandSidebar: 'Expand sidebar',
+    madrasaInfo: 'Madrasa Info',
   },
   dari: {
     console: 'کنسول مدیریتی',
@@ -210,6 +215,7 @@ const translations = {
     language: 'زبان',
     collapseSidebar: 'جمع کردن نوار کناری',
     expandSidebar: 'باز کردن نوار کناری',
+    madrasaInfo: 'معلومات مدرسه',
   },
   ps: {
     console: 'د ادارې کنسول',
@@ -307,6 +313,7 @@ const translations = {
     language: 'ژبه',
     collapseSidebar: 'د اړخ پټۍ ټولول',
     expandSidebar: 'د اړخ پټۍ خلاصول',
+    madrasaInfo: 'د مدرسې معلومات',
   },
 };
 
@@ -319,9 +326,12 @@ const AdminPanelContent = () => {
   const [user, setUser] = useState(null);
   const [, setLoading] = useState(true);
   const { theme, toggleTheme } = useTheme();
-  const [lang, setLang] = useLocalStorage('adminLang', 'en');
+  const [lang, setLangRaw] = useLocalStorage('adminLang', 'en');
+  const setLang = (l) => { setLangRaw(l); i18n.changeLanguage(l); };
   const { calSys, setCalSys } = useCalendar();
+  const [madrasaInfo] = useMadrasaInfo({ fetchRemote: true });
   const isRTL = lang === 'dari' || lang === 'ps';
+  const panelRef = useRef(null);
 
   const t = translations[lang] || translations.en;
 
@@ -331,6 +341,20 @@ const AdminPanelContent = () => {
     document.documentElement.lang = lang;
     return () => { document.documentElement.dir = 'ltr'; };
   }, [lang, isRTL]);
+
+  useEffect(() => {
+    const root = panelRef.current;
+    if (!root) return undefined;
+
+    translateAdminTree(root, lang);
+
+    const observer = new MutationObserver(() => {
+      translateAdminTree(root, lang);
+    });
+
+    observer.observe(root, { subtree: true, childList: true, characterData: true });
+    return () => observer.disconnect();
+  }, [lang]);
 
   useEffect(() => {
     fetchUserData();
@@ -367,6 +391,7 @@ const AdminPanelContent = () => {
 
   const menuItems = [
     { id: 'dashboard', icon: <FiHome size={19} />, path: 'dashboard', label: t.dashboard, type: 'link' },
+    { id: 'madrasa-info', icon: <FiInfo size={19} />, path: 'madrasa-info', label: t.madrasaInfo, type: 'link' },
     {
       id: 'users',
       icon: <FiUsers size={19} />,
@@ -548,25 +573,29 @@ const AdminPanelContent = () => {
     navigate('/');
   };
   const groupedMenu = useMemo(() => ([
-    { title: t.overview, items: menuItems.slice(0, 3) },
-    { title: t.operations, items: menuItems.slice(3, 8) },
-    { title: t.management, items: menuItems.slice(8) }
+    { title: t.overview, items: menuItems.slice(0, 4) },
+    { title: t.operations, items: menuItems.slice(4, 9) },
+    { title: t.management, items: menuItems.slice(9) }
   ]), [location.pathname, lang]);
 
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className={`flex h-screen overflow-hidden ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.95),_rgba(15,23,42,1)_42%,_rgba(30,41,59,1)_100%)]' : 'bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.9),_rgba(248,250,252,1)_42%,_rgba(241,245,249,1)_100%)]'}`}>
+    <div ref={panelRef} data-admin-panel-root dir={isRTL ? 'rtl' : 'ltr'} className={`flex h-screen overflow-hidden ${theme === 'dark' ? 'bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.95),_rgba(15,23,42,1)_42%,_rgba(30,41,59,1)_100%)]' : 'bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.9),_rgba(248,250,252,1)_42%,_rgba(241,245,249,1)_100%)]'}`}>
       <aside
         className={`fixed z-30 h-screen border-r backdrop-blur-xl transition-all duration-300 md:relative ${theme === 'dark' ? 'border-slate-700/60 bg-slate-900/95' : 'border-white/70 bg-white/90'} ${sidebarOpen ? 'w-72' : 'w-24'}`}
       >
         <div className="flex h-full flex-col">
           <div className={`border-b px-4 py-5 ${theme === 'dark' ? 'border-slate-700/60' : 'border-slate-200/80'} ${sidebarOpen ? '' : 'flex justify-center'}`}>
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
-                M
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
+                {getMadrasaLogo(madrasaInfo) ? (
+                  <img src={getMadrasaLogo(madrasaInfo)} alt="Madrasa logo" className="h-full w-full object-cover" />
+                ) : (
+                  <span>{getMadrasaDisplayName(madrasaInfo)[0]?.toUpperCase() || 'M'}</span>
+                )}
               </div>
               {sidebarOpen && (
                 <div>
-                  <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">Madrasa EMIS</div>
+                  <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">{getMadrasaDisplayName(madrasaInfo)}</div>
                   <div className={`mt-1 text-lg font-semibold ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>{t.workspace}</div>
                 </div>
               )}

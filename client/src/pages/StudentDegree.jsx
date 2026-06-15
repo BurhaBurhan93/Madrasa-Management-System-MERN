@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiFetch, parseJsonSafe } from '../lib/apiFetch';
 import { 
   FiAward, 
   FiCalendar, 
@@ -21,11 +21,9 @@ import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { PieChartComponent } from '../components/UIHelper/ECharts';
 import { formatDate } from '../lib/utils';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
 const StudentDegree = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [enrolledDegrees, setEnrolledDegrees] = useState([]);
   const [stats, setStats] = useState({
@@ -43,11 +41,9 @@ const StudentDegree = () => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      const response = await axios.get(`${API_BASE}/student/degrees`, config);
-      const enrolled = response.data || [];
+      const res = await apiFetch('/student/degrees');
+      const data = await parseJsonSafe(res);
+      const enrolled = Array.isArray(data) ? data : (data.data || []);
       setEnrolledDegrees(enrolled);
       
       setStats({
@@ -58,8 +54,8 @@ const StudentDegree = () => {
       });
     } catch (err) {
       console.error('Error fetching degree data:', err);
-      setError('Failed to fetch degree data. Please try again.');
-      setEnrolledDegrees([]); // Set empty array on error
+      setError('Failed to fetch degree data.');
+      setEnrolledDegrees([]);
     } finally {
       setLoading(false);
     }
@@ -80,9 +76,14 @@ const StudentDegree = () => {
     { name: 'Inactive', value: stats.totalEnrolled - stats.activeDegrees - stats.completedDegrees, color: '#EF4444' }
   ].filter(d => d.value > 0);
 
-  if (loading && enrolledDegrees.length === 0) {
-    return <PageSkeleton variant="table" />;
-  }
+  if (loading) return <PageSkeleton variant="table" />;
+
+  if (error) return (
+    <div className="py-20 text-center">
+      <p className="text-red-500 mb-4">{error}</p>
+      <button onClick={fetchDegreeData} className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm">Retry</button>
+    </div>
+  );
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">

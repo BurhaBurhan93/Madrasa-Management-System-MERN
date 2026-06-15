@@ -3,30 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import StaffPageLayout from '../shared/StaffPageLayout';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
-import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
-import { PieChartComponent, BarChartComponent } from '../../../components/UIHelper/ECharts';
-import { FiUser, FiHome, FiCheckCircle, FiChevronRight, FiChevronLeft, FiUsers, FiTrendingUp, FiCalendar, FiBookOpen } from 'react-icons/fi';
+import { FiUser, FiHome, FiCheckCircle, FiChevronRight, FiChevronLeft } from 'react-icons/fi';
 import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
-import { CreateUserModal } from '../../../components/UIHelper';
 import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 
 const StudentRegistration = () => {
   const navigate = useNavigate();
   const [currentPhase, setCurrentPhase] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [showCreateUser, setShowCreateUser] = useState(false);
-  const [stats, setStats] = useState({
-    totalStudents: 0,
-    thisMonth: 0,
-    hostelAssigned: 0,
-    activeStudents: 0,
-    byDegree: [],
-    byMonth: [],
-    byGender: []
-  });
   
   // Phase 1: Student Information
   const [studentData, setStudentData] = useState({
@@ -39,6 +25,7 @@ const StudentRegistration = () => {
     dob: '',
     gender: 'male',
     bloodType: '',
+    image: '',
     
     // Contact Info
     phone: '',
@@ -64,6 +51,52 @@ const StudentRegistration = () => {
     // Status
     status: 'active'
   });
+  const [imagePreview, setImagePreview] = useState(null);
+
+  // Handle image change with compression
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must be less than 5MB');
+        return;
+      }
+      
+      // Compress image before upload
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          
+          // Resize if too large
+          const maxDim = 800;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height / width) * maxDim);
+              width = maxDim;
+            } else {
+              width = Math.round((width / height) * maxDim);
+              height = maxDim;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL(file.type, 0.7); // 70% quality
+          
+          setStudentData(prev => ({ ...prev, image: compressedDataUrl }));
+          setImagePreview(compressedDataUrl);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   
   // Phase 2: Hostel Assignment
   const [hostelData, setHostelData] = useState({
@@ -84,90 +117,11 @@ const StudentRegistration = () => {
   const [availableRooms, setAvailableRooms] = useState([]);
   
   useEffect(() => {
-    fetchRegistrationStats();
     if (hostelData.wantsHostel) {
       fetchAvailableRooms();
     }
   }, [hostelData.wantsHostel]);
-  
-  const fetchRegistrationStats = async () => {
-    try {
-      setPageLoading(true);
-      const res = await apiFetch('/student/all');
-      const data = await parseJsonSafe(res);
-      
-      if (data.success || data.data) {
-        const students = data.data || [];
-        
-        // Calculate statistics
-        const totalStudents = students.length;
-        const thisMonth = students.filter(s => {
-          const admissionDate = new Date(s.admissionDate);
-          const now = new Date();
-          return admissionDate.getMonth() === now.getMonth() && 
-                 admissionDate.getFullYear() === now.getFullYear();
-        }).length;
-        
-        const hostelAssigned = students.filter(s => s.hostelStatus === 'allocated' || s.hostelRoom).length;
-        const activeStudents = students.filter(s => s.status === 'active').length;
-        
-        // By Degree
-        const degreeMap = {};
-        students.forEach(s => {
-          const degree = s.degree || s.currentClass || 'Unclassified';
-          degreeMap[degree] = (degreeMap[degree] || 0) + 1;
-        });
-        const byDegree = Object.entries(degreeMap).map(([name, value]) => ({ name, value })).slice(0, 6);
-        
-        // By Month (last 6 months)
-        const monthMap = {};
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        students.forEach(s => {
-          if (s.admissionDate) {
-            const date = new Date(s.admissionDate);
-            const key = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-            monthMap[key] = (monthMap[key] || 0) + 1;
-          }
-        });
-        const byMonth = Object.entries(monthMap)
-          .sort((a, b) => new Date(a[0]) - new Date(b[0]))
-          .slice(-6)
-          .map(([name, value]) => ({ name, value }));
-        
-        // By Gender
-        const genderMap = {};
-        students.forEach(s => {
-          const gender = s.gender || 'unspecified';
-          genderMap[gender] = (genderMap[gender] || 0) + 1;
-        });
-        const byGender = Object.entries(genderMap).map(([name, value]) => ({ name, value }));
-        
-        setStats({
-          totalStudents,
-          thisMonth,
-          hostelAssigned,
-          activeStudents,
-          byDegree,
-          byMonth,
-          byGender
-        });
-      }
-    } catch (err) {
-      console.error('Error fetching stats:', err);
-      setStats({
-        totalStudents: 0,
-        thisMonth: 0,
-        hostelAssigned: 0,
-        activeStudents: 0,
-        byDegree: [],
-        byMonth: [],
-        byGender: []
-      });
-    } finally {
-      setPageLoading(false);
-    }
-  };
-  
+
   const fetchAvailableRooms = async () => {
     try {
       const res = await apiFetch('/hostel/rooms/available');
@@ -287,14 +241,6 @@ const StudentRegistration = () => {
     }
   };
   
-  if (pageLoading) {
-    return (
-      <StaffPageLayout eyebrow="Registrar" title="Student Registration">
-        <PageSkeleton type="dashboard" />
-      </StaffPageLayout>
-    );
-  }
-  
   if (success) {
     return (
       <StaffPageLayout eyebrow="Registrar" title="Student Registration Complete">
@@ -315,96 +261,7 @@ const StudentRegistration = () => {
       eyebrow="Registrar / Student Affairs" 
       title="Student Registration"
       subtitle="Two-phase registration: Student Information + Optional Hostel Assignment"
-      actions={
-        <button
-          onClick={() => setShowCreateUser(true)}
-          className="px-4 py-2 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 text-sm font-medium"
-        >
-          + Create User
-        </button>
-      }
     >
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-cyan-50 to-blue-50 p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Total Students</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.totalStudents}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-cyan-100 flex items-center justify-center">
-              <FiUsers className="w-6 h-6 text-cyan-600" />
-            </div>
-          </div>
-        </Card>
-        
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">This Month</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.thisMonth}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-              <FiTrendingUp className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </Card>
-        
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-violet-50 p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Hostel Assigned</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.hostelAssigned}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-              <FiHome className="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
-        </Card>
-        
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-orange-50 to-amber-50 p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Active Students</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.activeStudents}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
-              <FiCalendar className="w-6 h-6 text-orange-600" />
-            </div>
-          </div>
-        </Card>
-      </div>
-      
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Registrations by Degree</h3>
-          {stats.byDegree.length > 0 ? (
-            <PieChartComponent data={stats.byDegree} height={250} />
-          ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
-          )}
-        </Card>
-        
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Monthly Registration Trend</h3>
-          {stats.byMonth.length > 0 ? (
-            <BarChartComponent data={stats.byMonth} dataKey="value" nameKey="name" height={250} />
-          ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
-          )}
-        </Card>
-        
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Gender Distribution</h3>
-          {stats.byGender.length > 0 ? (
-            <PieChartComponent data={stats.byGender} height={250} />
-          ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
-          )}
-        </Card>
-      </div>
-      
       {/* Progress Steps */}
       <div className="mb-6">
         <div className="flex items-center gap-4">
@@ -437,6 +294,31 @@ const StudentRegistration = () => {
                 <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">Basic Information</h4>
               </div>
               
+              {/* Profile Image */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Profile Photo</label>
+                <div className="flex items-center gap-6">
+                  <div className="flex-shrink-0">
+                    {imagePreview ? (
+                      <img src={imagePreview} alt="Preview" className="h-24 w-24 rounded-full object-cover border-4 border-cyan-200 shadow" />
+                    ) : (
+                      <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-3xl">
+                        👤
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:bg-cyan-50 file:text-cyan-700 file:font-medium file:text-sm"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">JPG, PNG or GIF. Max 5MB recommended.</p>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Student Code *</label>
                 <input
@@ -821,11 +703,6 @@ const StudentRegistration = () => {
           </div>
         </Card>
       )}
-      <CreateUserModal
-        isOpen={showCreateUser}
-        onClose={() => setShowCreateUser(false)}
-        onSuccess={() => fetchRegistrationStats()}
-      />
     </StaffPageLayout>
   );
 };

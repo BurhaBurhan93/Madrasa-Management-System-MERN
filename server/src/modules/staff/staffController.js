@@ -71,7 +71,7 @@ const getStudentDetails = async (req, res) => {
     const borrowedBooks = await BorrowedBook.find({ 
       borrower: student._id,
       status: 'borrowed'
-    }).populate('bookId');
+    }).populate('book', 'title');
 
     res.json({
       student: {
@@ -83,9 +83,9 @@ const getStudentDetails = async (req, res) => {
       },
       borrowedBooks: borrowedBooks.map(bb => ({
         id: bb._id,
-        bookTitle: bb.bookId.title,
-        borrowDate: bb.borrowDate,
-        dueDate: bb.dueDate
+        bookTitle: bb.book?.title || 'Unknown',
+        borrowDate: bb.borrowedAt,
+        dueDate: bb.returnDate
       }))
     });
   } catch (error) {
@@ -121,12 +121,13 @@ const getRecentActivities = async (req, res) => {
     const recentBorrows = await BorrowedBook.find()
       .sort({ createdAt: -1 })
       .limit(5)
-      .populate('bookId studentId');
+      .populate('book', 'title')
+      .populate({ path: 'borrower', populate: { path: 'user', select: 'name email' } });
 
     const activities = recentBorrows.map(borrow => ({
       id: borrow._id,
       action: borrow.status === 'borrowed' ? 'Book borrowed' : 'Book returned',
-      detail: `${borrow.bookId?.title} - by ${borrow.studentId?.name || 'Unknown'}`,
+      detail: `${borrow.book?.title || 'Unknown'} - by ${borrow.borrower?.user?.name || borrow.borrower?.firstName || 'Unknown'}`,
       time: borrow.createdAt,
       type: borrow.status === 'borrowed' ? 'borrow' : 'return'
     }));

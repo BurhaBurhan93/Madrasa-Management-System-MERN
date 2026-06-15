@@ -9,13 +9,36 @@ const STAFF_MANAGEMENT_PREFIXES = [
   '/all',
   '/guardians',
   '/education-history',
-  '/documents',
   '/reports'
+];
+
+const STUDENT_SPECIFIC_PATHS = [
+  '/profile',
+  '/courses',
+  '/exams',
+  '/attendance',
+  '/assignments',
+  '/results',
+  '/fees',
+  '/complaints',
+  '/leaves',
+  '/education',
+  '/degrees',
+  '/books',
+  '/borrowed-books',
+  '/final-results',
+  '/documents'
 ];
 
 const STAFF_MANAGEMENT_METHODS = new Set(['POST', 'PUT', 'DELETE']);
 
 const isStaffManagementRoute = (reqPath, method) => {
+  // Explicitly check if it's a student-specific path (regardless of method)
+  const isStudentPath = STUDENT_SPECIFIC_PATHS.some(prefix => 
+    reqPath === prefix || reqPath.startsWith(`${prefix}/`)
+  );
+  if (isStudentPath) return false;
+
   if (reqPath === '/' && STAFF_MANAGEMENT_METHODS.has(method)) return true;
   if (reqPath.startsWith('/students/')) {
     return (
@@ -51,16 +74,30 @@ const ensureStudent = (req, res, next) => {
 // ================= REGISTRAR/STAFF ROUTES (No student middleware) =================
 // These routes are for Registrar department use
 router.use((req, res, next) => {
-  if (isStaffManagementRoute(req.path, req.method)) {
-    authenticateToken(req, res, () => {
-      ensureStaffOrAdmin(req, res, next);
-    });
-  } else {
-    // Student routes
-    authenticateToken(req, res, () => {
+  // First authenticate the token
+  authenticateToken(req, res, () => {
+    const isStaffRoute = isStaffManagementRoute(req.path, req.method);
+    // Special case: if it's a staff route but the user is a student, check if it's a student-specific path first
+    const isStudentPath = STUDENT_SPECIFIC_PATHS.some(prefix => 
+      req.path === prefix || req.path.startsWith(`${prefix}/`)
+    );
+    
+    if (isStudentPath) {
+      // Student route - ensure student
       ensureStudent(req, res, next);
-    });
-  }
+    } else if (isStaffRoute) {
+      // Staff route - ensure staff/admin
+      ensureStaffOrAdmin(req, res, next);
+    } else {
+      // If it's not a staff route and not a student path, let's check the user's role
+      // If user is student, apply student middleware; if staff/admin, apply staff middleware
+      if (req.user.role === 'student') {
+        ensureStudent(req, res, next);
+      } else {
+        ensureStaffOrAdmin(req, res, next);
+      }
+    }
+  });
 });
 
 // Registrar routes - Admissions Management
@@ -72,9 +109,26 @@ router.post('/admissions/:id/convert', ctrl.convertToStudent); // Convert to stu
 
 // Registrar routes - All Students Management
 router.get('/all', ctrl.getAllStudents); // Get all students
+router.get('/all/:id', async (req, res) => { // Get single student by ID
+  try {
+    const Student = require('../../models/Student');
+    const student = await Student.findById(req.params.id)
+      .populate('user', 'name email phone image')
+      .populate('currentClass', 'className')
+      .lean();
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+    res.json({ success: true, data: student });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 router.post('/', ctrl.createStudent); // Create new student (for registrar)
 router.put('/:id', ctrl.updateStudent); // Update student
+router.put('/all/:id', ctrl.updateStudent); // Update student via all endpoint
 router.delete('/:id', ctrl.deleteStudent); // Delete student
+router.delete('/all/:id', ctrl.deleteStudent); // Delete student via all endpoint
 
 // ================= REGISTRAR DEPARTMENT ROUTES =================
 
@@ -119,6 +173,7 @@ router.get('/exams/:id/my-submission', ctrl.getExamSubmission);
 router.post('/exams/:id/submit', ctrl.submitExam);
 router.get('/attendance', ctrl.getAttendanceRecords);
 router.get('/assignments', ctrl.getAssignments);
+router.post('/assignments/submit', ctrl.submitAssignment);
 router.get('/results', ctrl.getExamResults);
 
 router.get('/fees', ctrl.getFeePayments);
@@ -149,5 +204,80 @@ router.post('/books/:id/renew', ctrl.renewBook);
 // Documents and Results routes
 router.get('/documents', ctrl.getStudentDocuments);
 router.get('/final-results', ctrl.getStudentFinalResults);
+
+// Student Hostel Routes
+router.get('/hostel', async (req, res) => {
+  try {
+    const Student = require('../../models/Student');
+    const HostelAllocation = require('../../models/HostelAllocation');
+    const student = await Student.findOne({ user: req.user.id }).populate('user', 'name email phone image');
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+
+    const allocation = await HostelAllocation.findOne({
+      student: student._id,
+      status: 'active',
+      deletedAt: null
+    }).populate('room');
+
+    const isResident = Boolean(allocation);
+    res.json({
+      success: true,
+      data: {
+        isResident,
+        student: {
+          firstName: student.firstName,
+          lastName: student.lastName,
+          studentCode: student.studentCode
+        },
+        room: allocation?.room || null,
+        allocation: allocation || null
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+router.post('/hostel/application', async (req, res) => {
+  try {
+    const Complaint = require('../../models/Complaint');
+    const Student = require('../../models/Student');
+    const student = await Student.findOne({ user: req.user.id });
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+    const application = await Complaint.create({
+      complaintCode: `HOSTEL-${Date.now()}`,
+      complainantType: 'student',
+      complainant: req.user.id,
+      subject: 'Hostel Application Request',
+      description: [
+        `Reason: ${req.body.reason || 'N/A'}`,
+        `Room Preference: ${req.body.roomPreference || 'Any'}`,
+        `Requested Move-in Date: ${req.body.moveInDate || 'ASAP'}`,
+        req.body.notes ? `Notes: ${req.body.notes}` : ''
+      ].filter(Boolean).join('\n'),
+      complaintCategory: 'hostel_application',
+      priorityLevel: 'medium',
+      complaintStatus: 'open'
+    });
+    res.status(201).json({ success: true, message: 'Hostel application submitted', data: application });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+router.get('/hostel/application', async (req, res) => {
+  try {
+    const Complaint = require('../../models/Complaint');
+    const application = await Complaint.findOne({
+      complainant: req.user.id,
+      complaintCategory: 'hostel_application'
+    }).sort({ createdAt: -1 });
+    res.json({ success: true, data: application });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
 module.exports = router;

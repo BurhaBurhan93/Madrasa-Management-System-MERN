@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext.jsx';
+import { localizeAdminText } from '../../lib/adminLocalization';
 
 /**
  * Button Component
@@ -24,6 +25,7 @@ const Button = ({
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const adminLang = localStorage.getItem('adminLang') || 'en';
 
   // Base button classes
   const baseClasses = `
@@ -223,7 +225,7 @@ const Button = ({
           : <Icon size={iconSizes[size] || 18} className="mr-2" />
       )}
       
-      {children}
+      {typeof children === 'string' ? localizeAdminText(children, adminLang) : children}
       
       {!loading && Icon && iconPosition === 'right' && (
         React.isValidElement(Icon)

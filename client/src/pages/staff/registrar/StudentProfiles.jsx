@@ -11,7 +11,32 @@ export const studentProfilesConfig = {
   title: 'Student Profile Management',
   subtitle: 'Manage complete student profiles, personal information, and academic records',
   endpoint: '/student/all',
+  createPath: '/staff/registrar/student-registration',
+  editPathForRow: (row) => `/staff/registrar/students/edit/${row._id}`,
+  viewPathForRow: (row) => `/staff/registrar/students/view/${row._id}`,
   columns: [
+    { 
+      key: 'image', 
+      header: 'Photo', 
+      render: (value, row) => {
+        const img = row.image || row.user?.image;
+        return (
+          <div className="flex items-center justify-center">
+            {img ? (
+              <img 
+                src={img} 
+                alt="Student" 
+                className="h-10 w-10 rounded-full object-cover border border-slate-200" 
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                👤
+              </div>
+            )}
+          </div>
+        )
+      }
+    },
     { key: 'studentCode', header: 'Student Code' },
     { key: 'name', header: 'Student Name', render: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.user?.name || '-' },
     { key: 'fatherName', header: 'Father Name' },
@@ -24,12 +49,13 @@ export const studentProfilesConfig = {
       }`}>
         {value || 'N/A'}
       </span>
-    )},
+    ) },
     { key: 'admissionDate', header: 'Admission Date', render: (value) => value ? new Date(value).toLocaleDateString() : '-' }
   ],
   formFields: [
     // Basic Information
     { name: 'user', label: 'User Account', type: 'relation', relationEndpoint: '/users/students', relationLabel: (row) => `${row.name || row.email}`, required: true, group: 'Basic Information' },
+    { name: 'image', label: 'Profile Photo', type: 'file', group: 'Basic Information' },
     { name: 'studentCode', label: 'Student Code', required: true, group: 'Basic Information' },
     { name: 'firstName', label: 'First Name', required: true, group: 'Basic Information' },
     { name: 'lastName', label: 'Last Name', group: 'Basic Information' },
@@ -79,6 +105,7 @@ export const studentProfilesConfig = {
   initialForm: {
     // Basic
     user: '',
+    image: '',
     studentCode: '',
     firstName: '',
     lastName: '',
@@ -115,6 +142,7 @@ export const studentProfilesConfig = {
   mapRowToForm: (row) => ({
     // Basic
     user: row.user?._id || row.user || '',
+    image: row.image || row.user?.image || '',
     studentCode: row.studentCode || '',
     firstName: row.firstName || row.user?.name?.split(' ')[0] || '',
     lastName: row.lastName || row.user?.name?.split(' ')[1] || '',
@@ -147,7 +175,40 @@ export const studentProfilesConfig = {
     guardianRelationship: row.guardianRelationship || '',
     guardianPhone: row.guardianPhone || '',
     guardianEmail: row.guardianEmail || ''
-  })
+  }),
+  mapFormToPayload: (form) => {
+    const payload = {
+      ...form,
+      // Combine address fields into objects for the server
+      permanentAddress: {
+        province: form.permanentAddress_province,
+        district: form.permanentAddress_district,
+        village: form.permanentAddress_village
+      },
+      currentAddress: {
+        province: form.currentAddress_province,
+        district: form.currentAddress_district,
+        village: form.currentAddress_village
+      }
+    };
+    
+    // Clean up empty ObjectId fields to avoid cast errors
+    ['currentClass', 'user', 'designation', 'department'].forEach(field => {
+      if (payload[field] === '') {
+        payload[field] = undefined;
+      }
+    });
+    
+    // Remove empty address objects if needed
+    if (!payload.permanentAddress?.province && !payload.permanentAddress?.district && !payload.permanentAddress?.village) {
+      payload.permanentAddress = undefined;
+    }
+    if (!payload.currentAddress?.province && !payload.currentAddress?.district && !payload.currentAddress?.village) {
+      payload.currentAddress = undefined;
+    }
+    
+    return payload;
+  }
 };
 
 const StudentProfiles = () => {
@@ -171,7 +232,7 @@ const StudentProfiles = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
       const response = await axios.get(`${API_BASE}/student/all`, config);
-      const students = response.data || [];
+      const students = response.data?.data || response.data || [];
       
       // Calculate statistics
       const total = students.length;

@@ -40,6 +40,7 @@ const EmployeeRegistration = () => {
 
   const [form, setForm] = useState({
     user: '',
+    photo: '',
     fullName: '',
     fullNameArabic: '',
     fatherName: '',
@@ -79,6 +80,48 @@ const EmployeeRegistration = () => {
     accountTitle: '',
     status: 'active'
   });
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must be less than 5MB');
+        return;
+      }
+
+      // Compress image before upload
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+
+          // Resize if too large
+          const maxDim = 800;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height / width) * maxDim);
+              width = maxDim;
+            } else {
+              width = Math.round((width / height) * maxDim);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL(file.type, 0.7); // 70% quality
+          setForm(prev => ({ ...prev, photo: compressedDataUrl }));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -327,12 +370,6 @@ const EmployeeRegistration = () => {
           <h1 className="text-2xl font-bold text-slate-900">Employee Registration</h1>
           <p className="text-slate-600">Register new employee with complete information and position assignments</p>
         </div>
-        <button
-          onClick={() => setShowCreateUser(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 text-sm font-medium"
-        >
-          <FiPlus size={16} /> Create User
-        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -456,6 +493,30 @@ const EmployeeRegistration = () => {
             </div>
           </div>
           <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="lg:col-span-1">
+                <label className="block text-sm font-medium text-slate-700 mb-1">Employee Photo</label>
+                <div className="flex items-center gap-3">
+                  {form.photo ? (
+                    <img
+                      src={form.photo}
+                      alt="Profile Preview"
+                      className="h-24 w-24 rounded-lg object-cover border border-slate-200"
+                    />
+                  ) : (
+                    <div className="h-24 w-24 rounded-lg border border-dashed border-slate-300 flex items-center justify-center text-slate-400">
+                      No Photo
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="flex-1 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {renderField('Employee Code *', 'employeeCode', 'text', null, { required: true, placeholder: 'e.g., EMP-2024-001' })}
               {renderField('Full Name *', 'fullName', 'text', null, { required: true })}

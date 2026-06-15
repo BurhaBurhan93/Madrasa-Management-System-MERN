@@ -1,11 +1,13 @@
 import React from 'react';
 import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { getStaffShellClasses, getStaffToneStyles } from './staffTheme';
+import { localizeAdminText } from '../../../lib/adminLocalization';
 
 const StaffPageLayout = ({ eyebrow, title, subtitle, actions, children, tone }) => {
   const { theme } = useTheme();
   const toneStyles = getStaffToneStyles(tone || eyebrow || title);
   const isDark = theme === 'dark';
+  const adminLang = localStorage.getItem('adminLang') || 'en';
 
   return (
     <div className={`min-h-screen w-full transition-colors duration-200 ${getStaffShellClasses(theme)}`}>
@@ -17,17 +19,17 @@ const StaffPageLayout = ({ eyebrow, title, subtitle, actions, children, tone }) 
               <div className="space-y-2">
                 {eyebrow && (
                   <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] ring-1 ${toneStyles.badge}`}>
-                    {eyebrow}
+                    {localizeAdminText(eyebrow, adminLang)}
                   </span>
                 )}
                 {title && (
                   <h1 className={`text-2xl font-black tracking-tight sm:text-3xl ${isDark ? 'text-white' : 'text-slate-950'}`}>
-                    {title}
+                    {localizeAdminText(title, adminLang)}
                   </h1>
                 )}
                 {subtitle && (
                   <p className={`max-w-3xl text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>
-                    {subtitle}
+                    {localizeAdminText(subtitle, adminLang)}
                   </p>
                 )}
               </div>

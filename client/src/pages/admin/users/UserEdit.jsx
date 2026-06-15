@@ -8,6 +8,7 @@ const UserEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '', fatherName: '', grandfatherName: '', email: '', password: '', role: 'student',
     phone: '', whatsapp: '', dob: '', bloodType: '', idNumber: '', image: '',
@@ -17,13 +18,47 @@ const UserEdit = () => {
   });
   const [imagePreview, setImagePreview] = useState(null);
 
+  const totalSteps = 4;
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must be less than 5MB');
+        return;
+      }
+      
+      // Compress image before upload
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, image: reader.result });
-        setImagePreview(reader.result);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          
+          // Resize if too large
+          const maxDim = 800;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height / width) * maxDim);
+              width = maxDim;
+            } else {
+              width = Math.round((width / height) * maxDim);
+              height = maxDim;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL(file.type, 0.7); // 70% quality
+          
+          setFormData({ ...formData, image: compressedDataUrl });
+          setImagePreview(compressedDataUrl);
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
@@ -59,29 +94,27 @@ const UserEdit = () => {
       if (!updateData.password) delete updateData.password;
       await api.put(`/users/${id}`, updateData);
       alert('User updated successfully');
-      navigate('/staff/users');
+      navigate('/admin/users');
     } catch (error) {
       alert(error.response?.data?.message || 'Error updating user');
     }
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  const nextStep = () => {
+    setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+  };
 
-  return (
-    <div className="w-full bg-gray-50 min-h-screen p-6">
-      <div className="mb-6">
-        <button onClick={() => navigate('/staff/users')} className="text-blue-600 hover:text-blue-800 mb-4">
-          ← Back to Users
-        </button>
-        <h1 className="text-3xl font-bold text-gray-900">✏️ Edit User</h1>
-        <p className="text-gray-600 mt-1">Update user information</p>
-      </div>
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
 
-      <Card>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">👤 Basic Information</h3>
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Step 1: Basic & Account Information</h3>
+            {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Name *</label>
@@ -96,32 +129,8 @@ const UserEdit = () => {
                 <input type="text" value={formData.grandfatherName || ''} onChange={(e) => setFormData({ ...formData, grandfatherName: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
-          </div>
 
-          {/* Profile Image */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📷 Profile Image</h3>
-            <div className="flex items-center gap-6">
-              <div className="flex-shrink-0">
-                {imagePreview ? (
-                  <img src={imagePreview} alt="Preview" className="h-24 w-24 rounded-full object-cover border-4 border-blue-200 shadow" />
-                ) : (
-                  <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-3xl">
-                    👤
-                  </div>
-                )}
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
-                <input type="file" accept="image/*" onChange={handleImageChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700 file:font-medium file:text-sm" />
-                <p className="text-xs text-gray-500 mt-1">JPG, PNG or GIF. Max 2MB recommended.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Account Information */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">🔐 Account Information</h3>
+            {/* Account Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
@@ -149,10 +158,11 @@ const UserEdit = () => {
               </div>
             </div>
           </div>
-
-          {/* Personal Information */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📋 Personal Information</h3>
+        );
+      case 2:
+        return (
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Step 2: Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">ID Number</label>
@@ -181,11 +191,30 @@ const UserEdit = () => {
                 </select>
               </div>
             </div>
-          </div>
 
-          {/* Contact Information */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📞 Contact Information</h3>
+            {/* Profile Image */}
+            <div className="flex items-center gap-6">
+              <div className="flex-shrink-0">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Preview" className="h-24 w-24 rounded-full object-cover border-4 border-blue-200 shadow" />
+                ) : (
+                  <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-3xl">
+                    👤
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
+                <input type="file" accept="image/*" onChange={handleImageChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700 file:font-medium file:text-sm" />
+                <p className="text-xs text-gray-500 mt-1">JPG, PNG or GIF. Max 2MB recommended.</p>
+              </div>
+            </div>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Step 3: Contact Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
@@ -197,53 +226,126 @@ const UserEdit = () => {
               </div>
             </div>
           </div>
+        );
+      case 4:
+        return (
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Step 4: Address Information</h3>
+            {/* Permanent Address */}
+            <div>
+              <h4 className="text-md font-semibold text-gray-700 mb-3">🏠 Permanent Address</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                  <input type="text" value={formData.permanentAddress.province} onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, province: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+                  <input type="text" value={formData.permanentAddress.district} onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, district: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+                  <input type="text" value={formData.permanentAddress.village} onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, village: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                </div>
+              </div>
+            </div>
 
-          {/* Permanent Address */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">🏠 Permanent Address</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
-                <input type="text" value={formData.permanentAddress.province} onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, province: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
-                <input type="text" value={formData.permanentAddress.district} onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, district: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
-                <input type="text" value={formData.permanentAddress.village} onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, village: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+            {/* Current Address */}
+            <div>
+              <h4 className="text-md font-semibold text-gray-700 mb-3">📍 Current Address</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                  <input type="text" value={formData.currentAddress.province} onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, province: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+                  <input type="text" value={formData.currentAddress.district} onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, district: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+                  <input type="text" value={formData.currentAddress.village} onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, village: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+                </div>
               </div>
             </div>
           </div>
+        );
+      default:
+        return null;
+    }
+  };
 
-          {/* Current Address */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📍 Current Address</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
-                <input type="text" value={formData.currentAddress.province} onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, province: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+  if (loading) return <div className="p-6">Loading...</div>;
+
+  return (
+    <div className="w-full bg-gray-50 min-h-screen p-6">
+      <div className="mb-6">
+        <button onClick={() => navigate('/admin/users')} className="text-blue-600 hover:text-blue-800 mb-4">
+          ← Back to Users
+        </button>
+        <h1 className="text-3xl font-bold text-gray-900">✏️ Edit User</h1>
+        <p className="text-gray-600 mt-1">Update user information in 4 simple steps</p>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          {[1, 2, 3, 4].map((step) => (
+            <div key={step} className="flex flex-col items-center">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
+                  currentStep >= step ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'
+                }`}
+              >
+                {step}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
-                <input type="text" value={formData.currentAddress.district} onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, district: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
-                <input type="text" value={formData.currentAddress.village} onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, village: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
-              </div>
+              <p className={`text-xs mt-2 ${currentStep >= step ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+                {step === 1 ? 'Basic Info' : step === 2 ? 'Personal Info' : step === 3 ? 'Contact' : 'Address'}
+              </p>
             </div>
-          </div>
+          ))}
+        </div>
+        <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
+          />
+        </div>
+      </div>
 
-          {/* Buttons */}
+      <Card>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {renderStepContent()}
+
+          {/* Navigation Buttons */}
           <div className="flex gap-3 pt-4 border-t">
-            <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold">
-              💾 Update User
-            </button>
-            <button type="button" onClick={() => navigate('/staff/users')} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold">
-              ❌ Cancel
-            </button>
+            {currentStep > 1 && (
+              <button
+                type="button"
+                onClick={prevStep}
+                className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold"
+              >
+                ← Previous
+              </button>
+            )}
+            {currentStep < totalSteps ? (
+              <button
+                type="button"
+                onClick={nextStep}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold"
+              >
+                Next →
+              </button>
+            ) : (
+              <>
+                <button type="submit" className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 font-semibold">
+                  💾 Update User
+                </button>
+                <button type="button" onClick={() => navigate('/admin/users')} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold">
+                  ❌ Cancel
+                </button>
+              </>
+            )}
           </div>
         </form>
       </Card>
