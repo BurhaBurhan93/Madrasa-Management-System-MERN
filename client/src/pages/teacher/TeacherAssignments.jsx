@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -11,6 +12,7 @@ const statusColors = {
 };
 
 const TeacherAssignments = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [assignments, setAssignments] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -36,18 +38,18 @@ const TeacherAssignments = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this assignment?')) return;
+   if (!window.confirm(t('teacher.assignments.deleteConfirm'))) return;
     try {
       await axios.delete(`http://localhost:5000/api/teacher/assignments/${id}`, api());
       fetchAssignments();
-    } catch (e) { alert('Failed to delete'); }
+    } catch (e) { alert(t('teacher.assignments.deleteFailed')); }
   };
 
   const handleStatusChange = async (id, status) => {
     try {
       await axios.put(`http://localhost:5000/api/teacher/assignments/${id}`, { status }, api());
       fetchAssignments();
-    } catch (e) { alert('Failed to update'); }
+    } catch (e) { alert(t('teacher.assignments.updateFailed')); }
   };
 
   const filtered = assignments.filter(a => {
@@ -64,11 +66,27 @@ const TeacherAssignments = () => {
   };
 
   const statCards = [
-    { label: 'Total', value: stats.total, accent: 'bg-cyan-500' },
-    { label: 'Active', value: stats.active, accent: 'bg-emerald-500' },
-    { label: 'Completed', value: stats.completed, accent: 'bg-violet-500' },
-    { label: 'Overdue', value: stats.overdue, accent: 'bg-rose-500' },
-  ];
+  {
+    label: t('teacher.assignments.total'),
+    value: stats.total,
+    accent: 'bg-cyan-500'
+  },
+  {
+    label: t('teacher.assignments.active'),
+    value: stats.active,
+    accent: 'bg-emerald-500'
+  },
+  {
+    label: t('teacher.assignments.completed'),
+    value: stats.completed,
+    accent: 'bg-violet-500'
+  },
+  {
+    label: t('teacher.assignments.overdue'),
+    value: stats.overdue,
+    accent: 'bg-rose-500'
+  }
+];
 
   return (
     <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
@@ -76,11 +94,11 @@ const TeacherAssignments = () => {
 
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Assignments</h1>
-            <p className="mt-1 text-sm text-slate-500">Manage and track student assignments</p>
+            <h1 className="text-2xl font-bold text-slate-900">{t('teacher.assignments.title')}</h1>
+            <p className="mt-1 text-sm text-slate-500">{t('teacher.assignments.subtitle')}</p>
           </div>
           <button onClick={() => navigate('/teacher/create-assignments')} className="rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-md">
-            + Create Assignment
+            + {t('teacher.assignments.createAssignment')}
           </button>
         </div>
 
@@ -99,13 +117,23 @@ const TeacherAssignments = () => {
         <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-wrap gap-3">
             <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
+              <option value="all">
+  {t('teacher.assignments.allStatus')}
+</option>
+              <option value="active">
+  {t('teacher.common.active')}
+</option>
+              <option value="completed">
+  {t('teacher.common.completed')}
+</option>
+              <option value="cancelled">
+  {t('teacher.assignments.cancelled')}
+</option>
             </select>
             <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
-              <option value="all">All Subjects</option>
+              <option value="all">
+  {t('teacher.assignments.allSubjects')}
+</option>
               {subjects.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
             </select>
           </div>
@@ -113,12 +141,12 @@ const TeacherAssignments = () => {
 
         {/* Cards */}
         {loading ? (
-          <div className="flex h-32 items-center justify-center text-slate-500">Loading...</div>
+          <div className="flex h-32 items-center justify-center text-slate-500">{t('teacher.assignments.loading')}</div>
         ) : (
           <section className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {filtered.length === 0 ? (
               <div className="col-span-3 rounded-2xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500">
-                No assignments found
+                {t('teacher.assignments.noAssignmentsFound')}
               </div>
             ) : filtered.map(a => {
               const isOverdue = new Date(a.dueDate) < new Date() && a.status === 'active';
@@ -127,28 +155,42 @@ const TeacherAssignments = () => {
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="font-semibold text-slate-900">{a.title}</h3>
-                      <p className="mt-1 text-sm text-slate-500">{a.courseId?.name || 'No Subject'}</p>
+                      <p className="mt-1 text-sm text-slate-500">{a.courseId?.name || t('teacher.assignments.noSubject')}</p>
                     </div>
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[a.status] || 'bg-slate-100 text-slate-600'}`}>{a.status}</span>
+                    <span
+  className={`rounded-full px-3 py-1 text-xs font-medium ${
+    statusColors[a.status] || 'bg-slate-100 text-slate-600'
+  }`}
+>
+  {a.status === 'active'
+    ? t('teacher.common.active')
+    : a.status === 'completed'
+    ? t('teacher.common.completed')
+    : a.status === 'cancelled'
+    ? t('teacher.assignments.cancelled')
+    : a.status}
+</span>
                   </div>
 
                   <p className="mt-3 text-sm text-slate-600 line-clamp-2">{a.description}</p>
 
                   <div className="mt-3 space-y-1 text-sm">
                     <p className={`font-medium ${isOverdue ? 'text-rose-600' : 'text-slate-600'}`}>
-                      Due: {new Date(a.dueDate).toLocaleDateString()} {isOverdue && '⚠️ Overdue'}
+                      {t('teacher.assignments.due')}: {new Date(a.dueDate).toLocaleDateString()} {isOverdue && (
+  <> ⚠️ {t('teacher.assignments.overdueLabel')}</>
+)}
                     </p>
-                    <p className="text-slate-500">Max Points: {a.maxPoints}</p>
+                    <p className="text-slate-500">{t('teacher.assignments.maxPoints')}: {a.maxPoints}</p>
                   </div>
 
                   <div className="mt-4 flex gap-2">
                     {a.status === 'active' && (
                       <button onClick={() => handleStatusChange(a._id, 'completed')} className="rounded-2xl border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-700 transition-all duration-200 hover:bg-sky-100">
-                        Mark Complete
+                        {t('teacher.assignments.markComplete')}
                       </button>
                     )}
                     <button onClick={() => handleDelete(a._id)} className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-700 transition-all duration-200 hover:bg-rose-100">
-                      Delete
+                      {t('teacher.assignments.delete')}
                     </button>
                   </div>
                 </div>

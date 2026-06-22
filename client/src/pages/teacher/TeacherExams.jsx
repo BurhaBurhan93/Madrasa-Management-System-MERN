@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import Card from '../../components/UIHelper/Card';
 import Button from '../../components/UIHelper/Button';
@@ -7,6 +8,7 @@ import DataTable from '../../components/UIHelper/DataTable';
 import Badge from '../../components/UIHelper/Badge';
 
 const TeacherExams = () => {
+  const { t } = useTranslation();
   const [academicYear, setAcademicYear] = useState('2024-2025');
   const navigate = useNavigate();
 
@@ -47,36 +49,40 @@ const TeacherExams = () => {
   const columns = [
     {
       key: 'title',
-      header: 'Exam Title'
+      header: t('teacher.examsList.title')
     },
     {
       key: 'subject',
-      header: 'Subject'
+      header: t('teacher.examsList.subject')
     },
     {
       key: 'degree',
-      header: 'Class'
+      header: t('teacher.examsList.class')
     },
     {
       key: 'date',
-      header: 'Exam Date'
+      header: t('teacher.examsList.examDate')
     },
     {
       key: 'totalMarks',
-      header: 'Total Marks'
+      header: t('teacher.examsList.totalMarks')
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('teacher.examsList.status'),
       render: (value) => (
         <Badge variant={getStatusVariant(value)}>
-          {value}
+          {value === 'Published'
+    ? t('teacher.examsList.published')
+    : value === 'Draft'
+    ? t('teacher.examsList.draft')
+    : t('teacher.examsList.completed')}
         </Badge>
       )
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('teacher.examsList.actions'),
       render: (_, row) => (
         <div className="flex gap-2">
           <Button
@@ -86,14 +92,14 @@ const TeacherExams = () => {
               navigate(`/teacher/exams/${row.id}`);
             }}
           >
-            Manage Questions
+            {t('teacher.examsList.manageQuestions')}
           </Button>
 
           <Button
             size="sm"
             variant="secondary"
           >
-            View Submissions
+            {t('teacher.examsList.viewSubmissions')}
           </Button>
         </div>
       )
@@ -107,14 +113,13 @@ const TeacherExams = () => {
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
-
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">
-          Exams Management
+          {t('teacher.examsList.title')}
         </h1>
         <p className="text-gray-600">
-          Create and manage your exams.
+          {t('teacher.examsList.subtitle')}
         </p>
       </div>
 
@@ -122,7 +127,7 @@ const TeacherExams = () => {
       <Card className="mb-6">
         <div>
           <label className="text-sm text-gray-600">
-            Academic Year
+            {t('teacher.examsList.academicYear')}
           </label>
           <select
             value={academicYear}
@@ -139,7 +144,7 @@ const TeacherExams = () => {
       <Card>
         {exams.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
-            No exams created yet.
+            {t('teacher.examsList.noExams')}
           </div>
         ) : (
           <DataTable

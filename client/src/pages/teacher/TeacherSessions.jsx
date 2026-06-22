@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Card from '../../components/UIHelper/Card';
 import Button from '../../components/UIHelper/Button';
 import Badge from '../../components/UIHelper/Badge';
 
 const TeacherSessions = () => {
+  const { t } = useTranslation();
 
   /* ================= STATIC SESSIONS ================= */
   const [sessions] = useState([
@@ -46,14 +48,14 @@ const TeacherSessions = () => {
   ]);
 
   const weekDays = [
-    { key: '2026-01-12', label: 'Mon 12' },
-    { key: '2026-01-13', label: 'Tue 13' },
-    { key: '2026-01-14', label: 'Wed 14' },
-    { key: '2026-01-15', label: 'Thu 15' },
-    { key: '2026-01-16', label: 'Fri 16' },
-    { key: '2026-01-17', label: 'Sat 17' },
-    { key: '2026-01-18', label: 'Sun 18' },
-  ];
+  { key: '2026-01-12', label: t('teacherSessions.days.mon') },
+  { key: '2026-01-13', label: t('teacherSessions.days.tue') },
+  { key: '2026-01-14', label: t('teacherSessions.days.wed') },
+  { key: '2026-01-15', label: t('teacherSessions.days.thu') },
+  { key: '2026-01-16', label: t('teacherSessions.days.fri') },
+  { key: '2026-01-17', label: t('teacherSessions.days.sat') },
+  { key: '2026-01-18', label: t('teacherSessions.days.sun') },
+];
 
   /* ================= STATS ================= */
   const totalSessions = sessions.length;
@@ -79,9 +81,9 @@ const TeacherSessions = () => {
 
       {/* HEADER */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Class Sessions</h1>
+        <h1 className="text-3xl font-bold">{t('teacherSessions.title')}</h1>
         <p className="text-gray-600">
-          Weekly calendar view of your teaching sessions
+          {t('teacherSessions.subtitle')}
         </p>
       </div>
 
@@ -91,36 +93,36 @@ const TeacherSessions = () => {
           <div className="text-3xl font-bold text-blue-600">
             {totalSessions}
           </div>
-          <div className="text-sm text-gray-600">Total Sessions</div>
+          <div className="text-sm text-gray-600"> {t('teacherSessions.totalSessions')}</div>
         </Card>
 
         <Card className="text-center">
           <div className="text-3xl font-bold text-green-600">
             {completedSessions}
           </div>
-          <div className="text-sm text-gray-600">Completed</div>
+          <div className="text-sm text-gray-600">{t('teacherSessions.completed')}</div>
         </Card>
 
         <Card className="text-center">
           <div className="text-3xl font-bold text-purple-600">
             {upcomingSessions}
           </div>
-          <div className="text-sm text-gray-600">Upcoming</div>
+          <div className="text-sm text-gray-600">{t('teacherSessions.upcoming')}</div>
         </Card>
 
         <Card className="text-center">
           <div className="text-3xl font-bold text-red-600">
             {cancelledSessions}
           </div>
-          <div className="text-sm text-gray-600">Cancelled</div>
+          <div className="text-sm text-gray-600">{t('teacherSessions.cancelled')}</div>
         </Card>
       </div>
 
       {/* WEEK NAVIGATION */}
       <div className="flex justify-between items-center mb-6">
-        <Button variant="outline">← Previous Week</Button>
-        <h2 className="text-lg font-semibold">January 12 - January 18, 2026</h2>
-        <Button variant="outline">Next Week →</Button>
+        <Button variant="outline">← {t('teacherSessions.previousWeek')}</Button>
+        <h2 className="text-lg font-semibold">{t('teacherSessions.weekRange')}</h2>
+        <Button variant="outline">{t('teacherSessions.nextWeek')} →</Button>
       </div>
 
       {/* CALENDAR GRID */}
@@ -156,7 +158,7 @@ const TeacherSessions = () => {
 
                       <div className="mt-2">
                         <Badge variant={getStatusVariant(session.status)}>
-                          {session.status}
+                          {t(`teacherSessions.status.${session.status}`)}
                         </Badge>
                       </div>
 

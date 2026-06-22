@@ -4,7 +4,7 @@ import enTranslations from './locales/en.json';
 import dariTranslations from './locales/dari.json';
 import psTranslations from './locales/ps.json';
 
-const savedLang = localStorage.getItem('adminLang') || 'en';
+const savedLang = localStorage.getItem('teacherLang') || localStorage.getItem('adminLang') || 'en';
 
 i18n
   .use(initReactI18next)

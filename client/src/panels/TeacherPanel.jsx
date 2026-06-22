@@ -6,6 +6,7 @@ import {
   FiSearch, FiChevronDown, FiChevronLeft, FiChevronRight, FiUsers, FiEdit,
   FiSun, FiMoon, FiGlobe
 } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { useTheme } from '../contexts/ThemeContext';
 import { CalendarProvider, useCalendar } from '../contexts/CalendarContext';
@@ -78,6 +79,7 @@ const TeacherPanelContent = () => {
   const [, setLoading] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const [lang, setLang] = useLocalStorage('teacherLang', 'en');
+  const { i18n } = useTranslation();
   const { calSys, setCalSys } = useCalendar();
   const isRTL = lang === 'dari' || lang === 'ps';
   const t = translations[lang] || translations.en;
@@ -85,8 +87,10 @@ const TeacherPanelContent = () => {
   useEffect(() => {
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
+    i18n.changeLanguage(lang);
+    localStorage.setItem('adminLang', lang);
     return () => { document.documentElement.dir = 'ltr'; };
-  }, [lang, isRTL]);
+  }, [lang, isRTL, i18n]);
 
   useEffect(() => { fetchUserData(); }, []);
 
@@ -386,7 +390,13 @@ const TeacherPanelContent = () => {
                 <button onClick={toggleTheme} title={t.theme} className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}>
                   {theme === 'dark' ? <FiSun size={19} /> : <FiMoon size={19} />}
                 </button>
-                <button onClick={() => { const langs = ['en', 'dari', 'ps']; setLang(langs[(langs.indexOf(lang) + 1) % langs.length]); }} title={t.language} className={`flex h-11 items-center gap-1 rounded-2xl border px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}>
+                <button onClick={() => { 
+                  const langs = ['en', 'dari', 'ps'];
+                  const newLang = langs[(langs.indexOf(lang) + 1) % langs.length];
+                  setLang(newLang);
+                  i18n.changeLanguage(newLang);
+                  localStorage.setItem('adminLang', newLang);
+                }} title={t.language} className={`flex h-11 items-center gap-1 rounded-2xl border px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}>
                   <FiGlobe size={17} />
                   <span className="text-xs font-semibold">{lang === 'en' ? 'EN' : lang === 'dari' ? 'دری' : 'پښتو'}</span>
                 </button>

@@ -3,6 +3,7 @@ import { FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiShield, FiEdit, FiSave
 import Input from '../../components/UIHelper/Input';
 import { getUser } from '../../lib/auth';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
+import { useTranslation } from 'react-i18next';
 
 const Panel = ({ title, children, className = '' }) => (
   <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
@@ -19,6 +20,7 @@ const ROLE_COLORS = {
 };
 
 const TeacherProfile = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(null);
@@ -62,10 +64,10 @@ const TeacherProfile = () => {
         setProfile(prev => ({ ...prev, ...editData }));
         setEditMode(false);
       } else {
-        setError(data.message || 'Failed to save');
+        setError(data.message || t('teacher.teacherProfile.messages.saveFailed'));
       }
     } catch {
-      setError('Failed to save changes');
+      setError(t('teacher.teacherProfile.messages.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -82,35 +84,39 @@ const TeacherProfile = () => {
   }
 
   if (!profile) {
-    return <div className="p-8 text-center text-slate-500">No profile data found. Please log in again.</div>;
+    return <div className="p-8 text-center text-slate-500">{t('teacher.teacherProfile.messages.noProfile')}</div>;
   }
 
   const avatarSrc = profile.photo || profile.image;
   const displayName = profile.fullName || profile.name || '—';
   const role = profile.role;
-  const addrStr = (addr) => addr ? [addr.province, addr.district, addr.village].filter(Boolean).join(', ') || '—' : '—';
-
+const addrStr = (addr) =>
+  addr
+    ? [addr.province, addr.district, addr.village]
+        .filter(Boolean)
+        .join(', ') || t('common.notAvailable')
+    : t('common.notAvailable');
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-slate-50 to-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Teacher Profile</h1>
-            <p className="mt-1 text-sm text-slate-500">Manage your professional and personal information</p>
+            <h1 className="text-2xl font-bold text-slate-900">{t('teacher.teacherProfile.title')}</h1>
+            <p className="mt-1 text-sm text-slate-500">{t('teacher.teacherProfile.subtitle')}</p>
           </div>
           <div className="flex gap-2">
             {editMode ? (
               <>
                 <button onClick={handleCancel} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">
-                  <FiX className="inline mr-1" size={14} /> Cancel
+                  <FiX className="inline mr-1" size={14} /> {t('teacher.teacherProfile.buttons.cancel')}
                 </button>
                 <button onClick={handleSave} disabled={saving} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-700 disabled:opacity-50">
-                  <FiSave className="inline mr-1" size={14} /> {saving ? 'Saving...' : 'Save Changes'}
+                  <FiSave className="inline mr-1" size={14} /> {saving ? t('teacher.teacherProfile.buttons.saving') : t('teacher.teacherProfile.buttons.saveChanges')}
                 </button>
               </>
             ) : (
               <button onClick={() => setEditMode(true)} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700">
-                <FiEdit className="inline mr-1" size={14} /> Edit Profile
+                <FiEdit className="inline mr-1" size={14} /> {t('teacher.teacherProfile.buttons.editProfile')}
               </button>
             )}
           </div>
@@ -151,38 +157,38 @@ const TeacherProfile = () => {
 
                 <div className="mt-5 space-y-3 text-sm text-left border-t border-slate-100 pt-4">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Status</span>
+                    <span className="text-slate-400">{t('teacher.teacherProfile.status.title')}</span>
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${profile.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                      {(profile.status || 'active').charAt(0).toUpperCase() + (profile.status || 'active').slice(1)}
+                      {t(`teacher.teacherProfile.status.${profile.status || 'active'}`)}
                     </span>
                   </div>
                   {profile.employeeId && (
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Employee ID</span>
+                      <span className="text-slate-400">{t('teacher.teacherProfile.employeeId')}</span>
                       <span className="font-medium text-slate-700">{profile.employeeId}</span>
                     </div>
                   )}
                   {profile.department && (
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Department</span>
+                      <span className="text-slate-400">{t('teacher.teacherProfile.department')}</span>
                       <span className="font-medium text-slate-700 text-right">{profile.department}</span>
                     </div>
                   )}
                   {profile.designation && (
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Designation</span>
+                      <span className="text-slate-400">{t('teacher.teacherProfile.designation')}</span>
                       <span className="font-medium text-slate-700 text-right">{profile.designation}</span>
                     </div>
                   )}
                   {profile.joinDate && (
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Joined</span>
+                      <span className="text-slate-400">{t('teacher.teacherProfile.joined')}</span>
                       <span className="font-medium text-slate-700">{new Date(profile.joinDate).toLocaleDateString()}</span>
                     </div>
                   )}
                   {profile.staffModules?.length > 0 && (
                     <div className="pt-2 border-t border-slate-100">
-                      <p className="text-slate-400 mb-1.5">Modules</p>
+                      <p className="text-slate-400 mb-1.5">{t('teacher.teacherProfile.modules')}</p>
                       <div className="flex flex-wrap gap-1">
                         {profile.staffModules.map(m => (
                           <span key={m} className="px-2 py-0.5 bg-cyan-50 text-cyan-700 rounded-full text-xs capitalize">{m}</span>
@@ -197,40 +203,40 @@ const TeacherProfile = () => {
 
           {/* Info Panels */}
           <div className="w-full space-y-6 md:w-2/3">
-            <Panel title="Personal Information">
+            <Panel title={t('teacher.teacherProfile.sections.personalInformation')}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Input label="Name" value={editMode ? editData.name || '' : displayName} onChange={e => setEditData(p => ({ ...p, name: e.target.value }))} disabled={!editMode} />
-                <Input label="Email" value={profile.email || ''} disabled />
+                <Input label={t('teacher.teacherProfile.fields.name')} value={editMode ? editData.name || '' : displayName} onChange={e => setEditData(p => ({ ...p, name: e.target.value }))} disabled={!editMode} />
+                <Input label={t('teacher.teacherProfile.fields.email')} value={profile.email || ''} disabled />
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">{t('teacher.teacherProfile.fields.role')}</label>
                   <div className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50">
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'}`}>{role}</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'}`}>{t(`roles.${role}`)}</span>
                     {profile.employeeType && <span className="ml-2 text-sm text-slate-500 capitalize">· {profile.employeeType}</span>}
                   </div>
                 </div>
-                <Input label="Phone" value={editMode ? editData.phone || editData.phoneNumber || '' : profile.phone || profile.phoneNumber || ''} onChange={e => setEditData(p => ({ ...p, phone: e.target.value }))} disabled={!editMode} />
-                <Input label="Father Name" value={profile.fatherName || ''} disabled />
-                <Input label="Grandfather Name" value={profile.grandfatherName || ''} disabled />
-                <Input label="Blood Type" value={profile.bloodType || ''} disabled />
-                <Input label="ID Number" value={profile.idNumber || ''} disabled />
+                <Input label={t('teacher.teacherProfile.fields.phone')} value={editMode ? editData.phone || editData.phoneNumber || '' : profile.phone || profile.phoneNumber || ''} onChange={e => setEditData(p => ({ ...p, phone: e.target.value }))} disabled={!editMode} />
+                <Input label={t('teacher.teacherProfile.fields.fatherName')} value={profile.fatherName || ''} disabled />
+                <Input label={t('teacher.teacherProfile.fields.grandfatherName')} value={profile.grandfatherName || ''} disabled />
+                <Input label={t('teacher.teacherProfile.fields.bloodType')} value={profile.bloodType || ''} disabled />
+                <Input label={t('teacher.teacherProfile.fields.idNumber')} value={profile.idNumber || ''} disabled />
               </div>
             </Panel>
 
-            <Panel title="Address Information">
+            <Panel title={t('teacher.teacherProfile.sections.addressInformation')}>
               <div className="mb-5">
-                <p className="mb-3 text-sm font-medium text-slate-700">Permanent Address</p>
+                <p className="mb-3 text-sm font-medium text-slate-700">{t('teacher.teacherProfile.sections.permanentAddress')}</p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <Input label="Province" value={profile.permanentAddress?.province || ''} disabled />
-                  <Input label="District" value={profile.permanentAddress?.district || ''} disabled />
-                  <Input label="Village" value={profile.permanentAddress?.village || ''} disabled />
+                  <Input label={t('teacher.teacherProfile.fields.province')} value={profile.permanentAddress?.province || ''} disabled />
+                  <Input label={t('teacher.teacherProfile.fields.district')} value={profile.permanentAddress?.district || ''} disabled />
+                  <Input label={t('teacher.teacherProfile.fields.village')} value={profile.permanentAddress?.village || ''} disabled />
                 </div>
               </div>
               <div>
-                <p className="mb-3 text-sm font-medium text-slate-700">Current Address</p>
+                <p className="mb-3 text-sm font-medium text-slate-700">{t('teacher.teacherProfile.sections.currentAddress')}</p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <Input label="Province" value={profile.currentAddress?.province || ''} disabled />
-                  <Input label="District" value={profile.currentAddress?.district || ''} disabled />
-                  <Input label="Village" value={profile.currentAddress?.village || ''} disabled />
+                  <Input label={t('teacher.teacherProfile.fields.province')} value={profile.currentAddress?.province || ''} disabled />
+                  <Input label={t('teacher.teacherProfile.fields.district')} value={profile.currentAddress?.district || ''} disabled />
+                  <Input label={t('teacher.teacherProfile.fields.village')} value={profile.currentAddress?.village || ''} disabled />
                 </div>
               </div>
             </Panel>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../../lib/api';
 import { BarChartComponent, LineChartComponent } from '../../components/UIHelper/ECharts';
 import { formatDate } from '../../lib/utils';
@@ -33,6 +34,7 @@ const Panel = ({ title, subtitle, children, className = '' }) => (
 );
 
 const TeacherDashboard = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [quickStats, setQuickStats] = useState({ totalSubjects: 0, totalStudents: 0, pendingAssignments: 0, totalClasses: 0 });
@@ -66,8 +68,8 @@ const TeacherDashboard = () => {
       const exams = examsRes.data.data || [];
 
       const activities = [
-        ...assignments.slice(0, 2).map(a => ({ id: a._id, title: 'Assignment: ' + a.title, course: a.courseId?.name, date: a.dueDate })),
-        ...exams.slice(0, 1).map(e => ({ id: e._id, title: 'Exam: ' + e.title, course: e.examType?.name, date: e.startDate }))
+        ...assignments.slice(0, 2).map(a => ({ id: a._id, title: t('teacher.common.assignments') + ': ' + a.title, course: a.courseId?.name, date: a.dueDate })),
+        ...exams.slice(0, 1).map(e => ({ id: e._id, title: t('teacher.common.exams') + ': ' + e.title, course: e.examType?.name, date: e.startDate }))
       ];
       setRecentActivity(activities);
 
@@ -89,10 +91,10 @@ const TeacherDashboard = () => {
   }
 
   const statCards = [
-    { label: 'Total Subjects', value: quickStats.totalSubjects, note: 'Assigned to you', accentClass: 'bg-cyan-500', icon: FiBookOpen },
-    { label: 'Total Students', value: quickStats.totalStudents, note: 'Across all classes', accentClass: 'bg-sky-500', icon: FiUsers },
-    { label: 'Pending Assignments', value: quickStats.pendingAssignments, note: 'Awaiting review', accentClass: 'bg-amber-500', icon: FiClipboard },
-    { label: 'Total Classes', value: quickStats.totalClasses, note: 'Active this term', accentClass: 'bg-violet-500', icon: FiGrid },
+    { label: t('teacher.dashboard.totalStudents'), value: quickStats.totalStudents, note: t('teacher.dashboard.acrossAllClasses'), accentClass: 'bg-sky-500', icon: FiUsers },
+    { label: t('teacher.dashboard.totalSubjects'), value: quickStats.totalSubjects, note: t('teacher.dashboard.assignedToYou'), accentClass: 'bg-cyan-500', icon: FiBookOpen },
+    { label: t('teacher.dashboard.pendingAssignments'), value: quickStats.pendingAssignments, note: t('teacher.dashboard.awaitingReview'), accentClass: 'bg-amber-500', icon: FiClipboard },
+    { label: t('teacher.common.subjects'), value: quickStats.totalClasses, note: t('teacher.dashboard.activeThisTerm'), accentClass: 'bg-violet-500', icon: FiGrid },
   ];
 
   return (
@@ -132,16 +134,16 @@ const TeacherDashboard = () => {
         {/* Charts */}
         <section className="mt-8 grid gap-6 lg:grid-cols-2">
           <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
-            <BarChartComponent data={classAttendanceData} dataKey="rate" nameKey="month" title="Class Attendance Overview" height={300} color="#0EA5E9" />
+            <BarChartComponent data={classAttendanceData} dataKey="rate" nameKey="month" title={t('teacher.dashboard.classAttendanceOverview')} height={300} color="#0EA5E9" />
           </div>
           <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
-            <LineChartComponent data={classPerformanceData} dataKey="score" nameKey="subject" title="Average Student Performance" height={300} />
+            <LineChartComponent data={classPerformanceData} dataKey="score" nameKey="subject" title={t('teacher.dashboard.averageStudentPerformance')} height={300} />
           </div>
         </section>
 
         {/* Activity + Upcoming */}
         <section className="mt-8 grid gap-6 lg:grid-cols-2">
-          <Panel title="Recent Class Activity" subtitle="Latest assignments and exams">
+          <Panel title={t('teacher.dashboard.recentActivity')} subtitle={t('teacher.dashboard.latestAssignmentsExams')}>
             <div className="space-y-3">
               {recentActivity.length > 0 ? recentActivity.map(a => (
                 <div key={a.id} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -158,13 +160,13 @@ const TeacherDashboard = () => {
                 </div>
               )) : (
                 <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
-                  No recent activity available yet.
+                  {t('teacher.dashboard.noRecentActivity')}
                 </div>
               )}
             </div>
           </Panel>
 
-          <Panel title="Upcoming Classes" subtitle="Scheduled exams and sessions">
+          <Panel title={t('teacher.dashboard.upcomingClasses')} subtitle={t('teacher.dashboard.scheduledExamsSessions')}>
             <div className="space-y-3">
               {upcomingClasses.length > 0 ? upcomingClasses.map(c => (
                 <div key={c.id} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -178,7 +180,7 @@ const TeacherDashboard = () => {
                 </div>
               )) : (
                 <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
-                  No upcoming classes scheduled.
+                  {t('teacher.dashboard.noUpcomingClasses')}
                 </div>
               )}
             </div>

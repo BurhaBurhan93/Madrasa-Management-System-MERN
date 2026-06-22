@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Progress from '../../components/UIHelper/Progress';
@@ -24,6 +25,7 @@ const statusVariants = {
 };
 
 const TeacherSubjects = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState([]);
@@ -74,10 +76,10 @@ const TeacherSubjects = () => {
   }
 
   const statCards = [
-    { label: 'Total Subjects', value: subjects.length, accent: 'bg-cyan-500' },
-    { label: 'Active Classes', value: subjects.filter(s => (s.status || s.isActive) === 'active' || s.isActive === true).length, accent: 'bg-emerald-500' },
-    { label: 'Total Students', value: totalStudents, accent: 'bg-violet-500' },
-    { label: 'Weekly Hours', value: totalHours, accent: 'bg-amber-500' },
+    { label: t('teacher.dashboard.totalSubjects'), value: subjects.length, accent: 'bg-cyan-500' },
+    { label: t('teacher.dashboard.activeClasses'), value: subjects.filter(s => (s.status || s.isActive) === 'active' || s.isActive === true).length, accent: 'bg-emerald-500' },
+    { label: t('teacher.dashboard.totalStudents'), value: totalStudents, accent: 'bg-violet-500' },
+    { label: t('teacher.common.weeklyHours'), value: totalHours, accent: 'bg-amber-500' },
   ];
 
   return (
@@ -86,8 +88,8 @@ const TeacherSubjects = () => {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">My Subjects</h1>
-          <p className="mt-1 text-sm text-slate-500">Manage your teaching subjects and workload</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('teacher.common.subjects')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('teacher.common.manageSubjectsWorkload')}</p>
         </div>
 
         {/* Stats */}
@@ -111,18 +113,18 @@ const TeacherSubjects = () => {
                   onClick={() => setFilter(status)}
                   className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200 ${filter === status ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                 >
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                  {t(`teacher.common.${status}`)}
                 </button>
               ))}
             </div>
             <div className="flex gap-3">
               <select value={fieldFilter} onChange={e => setFieldFilter(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
-                {uniqueFields.map(f => <option key={f} value={f}>{f === 'all' ? 'All Fields' : f}</option>)}
+                {uniqueFields.map(f => <option key={f} value={f}>{f === 'all' ? t('teacher.common.allFields') : f}</option>)}
               </select>
               <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
-                <option value="name">Sort by Name</option>
-                <option value="students">Sort by Students</option>
-                <option value="progress">Sort by Progress</option>
+                <option value="name">{t('teacher.common.sortByName')}</option>
+                <option value="students">{t('teacher.common.sortByStudents')}</option>
+                <option value="progress">{t('teacher.common.sortByProgress')}</option>
               </select>
             </div>
           </div>
@@ -137,28 +139,28 @@ const TeacherSubjects = () => {
               <div key={subject.id || subject._id} className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-900">{subject.name || 'Unnamed Subject'}</h3>
-                    <p className="mt-1 text-sm text-slate-500">{subject.code || 'N/A'}</p>
+                    <h3 className="font-semibold text-slate-900">{subject.name || t('teacher.common.unnamedSubject')}</h3>
+                    <p className="mt-1 text-sm text-slate-500">{subject.code || t('teacher.common.na')}</p>
                   </div>
                   <span className={`rounded-full px-3 py-1 text-xs font-medium ${badgeClass}`}>
-                    {subject.status || (subject.isActive ? 'active' : 'inactive')}
+                    {subject.status ? t(`teacher.common.${subject.status}`) : (subject.isActive ? t('teacher.common.active') : t('teacher.common.inactive'))}
                   </span>
                 </div>
 
                 <div className="mt-4 space-y-1 text-sm text-slate-600">
-                  <p><span className="text-slate-400">Credits:</span> {subject.credits || 'N/A'}</p>
-                  <p><span className="text-slate-400">Description:</span> {subject.description || 'No description'}</p>
+                  <p><span className="text-slate-400">{t('teacher.common.credits')}:</span> {subject.credits || t('teacher.common.na')}</p>
+                  <p><span className="text-slate-400">{t('teacher.common.description')}:</span> {subject.description || t('teacher.common.noDescription')}</p>
                 </div>
 
                 <div className="mt-4">
-                  <Progress value={subject.progress || 50} max={100} label="Syllabus Progress" />
+                  <Progress value={subject.progress || 50} max={100} label={t('teacher.common.syllabusProgress')} />
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-2">
                   {[
-                    { label: 'Students', path: `/teacher/students?subjectId=${subject._id}` },
-                    { label: 'Attendance', path: `/teacher/attendance?subjectId=${subject._id}` },
-                    { label: 'Exams', path: `/teacher/exams?subjectId=${subject._id}` },
+                    { label: t('teacher.common.students'), path: `/teacher/students?subjectId=${subject._id}` },
+                    { label: t('teacher.common.attendance'), path: `/teacher/attendance?subjectId=${subject._id}` },
+                    { label: t('teacher.common.exams'), path: `/teacher/exams?subjectId=${subject._id}` },
                   ].map(btn => (
                     <button
                       key={btn.label}
@@ -173,7 +175,7 @@ const TeacherSubjects = () => {
             );
           }) : (
             <div className="col-span-3 rounded-2xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500">
-              No subjects found
+              {t('teacher.common.noSubjectsFound')}
             </div>
           )}
         </section>
