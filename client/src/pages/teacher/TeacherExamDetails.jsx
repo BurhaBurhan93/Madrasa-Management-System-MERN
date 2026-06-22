@@ -67,18 +67,18 @@ const TeacherExamDetails = () => {
           <div className="flex flex-wrap gap-2">
             {exam.status === 'draft' && (
               <>
-                <button onClick={() => navigate(`/teacher/exams/${examId}/add-question`)} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-700">+ {t('examDetails.addQuestion')}</button>
-                <button onClick={handlePublish} className="rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-700">{t('examDetails.publish')}</button>
+                <button onClick={() => navigate(`/teacher/exams/${examId}/add-question`)} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-700">+ {t('teacher.examDetails.addQuestion')}</button>
+                <button onClick={handlePublish} className="rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-700">{t('teacher.examDetails.publish')}</button>
               </>
             )}
             {exam.status === 'published' && (
               <>
-                <button onClick={() => navigate(`/teacher/exams/${examId}/submissions`)} className="rounded-2xl bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-violet-700">{t('examDetails.viewSubmissions')}</button>
-                <button onClick={handleClose} className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700 transition-all duration-200 hover:bg-rose-100">{t('examDetails.closeExam')}</button>
+                <button onClick={() => navigate(`/teacher/exams/${examId}/submissions`)} className="rounded-2xl bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-violet-700">{t('teacher.examDetails.viewSubmissions')}</button>
+                <button onClick={handleClose} className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700 transition-all duration-200 hover:bg-rose-100">{t('teacher.examDetails.closeExam')}</button>
               </>
             )}
             {exam.status === 'finished' && (
-              <button onClick={() => navigate(`/teacher/exams/${examId}/submissions`)} className="rounded-2xl bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-violet-700">{t('examDetails.viewSubmissions')}</button>
+              <button onClick={() => navigate(`/teacher/exams/${examId}/submissions`)} className="rounded-2xl bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-violet-700">{t('teacher.examDetails.viewSubmissions')}</button>
             )}
           </div>
         </div>
@@ -86,10 +86,10 @@ const TeacherExamDetails = () => {
         {/* Info Cards */}
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
           {[
-            { label: t('examDetails.status'), value: <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[exam.status]}`}>{t(`examDetails.${exam.status}`)}</span>, accent: 'bg-cyan-500' },
-            { label: t('examDetails.duration'), value: `${exam.duration} ${t('examDetails.minutes')}`, accent: 'bg-sky-500' },
-            { label: t('examDetails.totalMarks'), value: exam.totalMarks, accent: 'bg-violet-500' },
-            { label: t('examDetails.questionsCount'), value: questions.length, accent: 'bg-amber-500' },
+            { label: t('teacher.examDetails.status'), value: <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[exam.status]}`}>{t(`teacher.examDetails.${exam.status}`)}</span>, accent: 'bg-cyan-500' },
+            { label: t('teacher.examDetails.duration'), value: `${exam.duration} ${t('teacher.examDetails.minutes')}`, accent: 'bg-sky-500' },
+            { label: t('teacher.examDetails.totalMarks'), value: exam.totalMarks, accent: 'bg-violet-500' },
+            { label: t('teacher.examDetails.questionsCount'), value: questions.length, accent: 'bg-amber-500' },
           ].map(c => (
             <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
@@ -101,10 +101,10 @@ const TeacherExamDetails = () => {
 
         {/* Questions */}
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 text-lg font-semibold text-slate-900">{t('examDetails.questions')}</h2>
+          <h2 className="mb-5 text-lg font-semibold text-slate-900">{t('teacher.examDetails.questions')}</h2>
           {questions.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500">
-              {t('examDetails.noQuestions')} {exam.status === 'draft' && ` ${t('examDetails.clickAddQuestion')}`}
+              {t('teacher.examDetails.noQuestions')} {exam.status === 'draft' && ` ${t('teacher.examDetails.clickAddQuestion')}`}
             </div>
           ) : (
             <div className="space-y-4">
@@ -115,13 +115,13 @@ const TeacherExamDetails = () => {
                       <p className="font-medium text-slate-900">{i + 1}. {q.question}</p>
                       <div className="mt-2 flex gap-2">
                         <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-medium text-sky-700">{q.questionType}</span>
-                        <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600">{q.marks} {t('examDetails.marks')}</span>
+                        <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600">{q.marks} {t('teacher.examDetails.marks')}</span>
                       </div>
                     </div>
                     {exam.status === 'draft' && (
                       <div className="ml-4 flex gap-2">
-                        <button onClick={() => navigate(`/teacher/exams/${examId}/edit-question/${q._id}`)} className="rounded-xl border border-sky-200 bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700 hover:bg-sky-100">{t('examDetails.edit')}</button>
-                        <button onClick={() => handleDeleteQuestion(q._id)} className="rounded-xl border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">{t('examDetails.delete')}</button>
+                        <button onClick={() => navigate(`/teacher/exams/${examId}/edit-question/${q._id}`)} className="rounded-xl border border-sky-200 bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-700 hover:bg-sky-100">{t('teacher.examDetails.edit')}</button>
+                        <button onClick={() => handleDeleteQuestion(q._id)} className="rounded-xl border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">{t('teacher.examDetails.delete')}</button>
                       </div>
                     )}
                   </div>
@@ -135,7 +135,7 @@ const TeacherExamDetails = () => {
                     </ul>
                   )}
                   {q.questionType === 'truefalse' && (
-                    <p className="mt-2 text-sm font-medium text-emerald-600">{t('examDetails.correct')}: {q.correctAnswer}</p>
+                    <p className="mt-2 text-sm font-medium text-emerald-600">{t('teacher.examDetails.correct')}: {q.correctAnswer}</p>
                   )}
                 </div>
               ))}

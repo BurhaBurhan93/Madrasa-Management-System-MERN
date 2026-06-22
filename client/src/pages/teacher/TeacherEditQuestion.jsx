@@ -41,21 +41,21 @@ const TeacherEditQuestion = () => {
     <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
       <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">{t('editQuestion.title')}</h1>
+          <h1 className="text-2xl font-bold text-slate-900">{t('teacher.editQuestion.title')}</h1>
         </div>
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">{t('editQuestion.questionText')}</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.editQuestion.questionText')}</label>
               <textarea value={form.question} onChange={e => setForm({ ...form, question: e.target.value })} required rows="3" className={inputCls} />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">{t('editQuestion.marks')}</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.editQuestion.marks')}</label>
               <input type="number" value={form.marks} onChange={e => setForm({ ...form, marks: e.target.value })} min="1" className={inputCls} />
             </div>
             {form.questionType === 'mcq' && (
               <div className="space-y-2">
-                <label className="block text-xs font-medium text-slate-500">{t('editQuestion.options')}</label>
+                <label className="block text-xs font-medium text-slate-500">{t('teacher.editQuestion.options')}</label>
                 {form.options.map((opt, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <span className="w-6 text-sm font-medium text-slate-500">{String.fromCharCode(65 + i)}.</span>
@@ -63,9 +63,9 @@ const TeacherEditQuestion = () => {
                   </div>
                 ))}
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-500">{t('editQuestion.correctAnswer')}</label>
+                  <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.editQuestion.correctAnswer')}</label>
                   <select value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })} className={inputCls}>
-                    <option value="">{t('editQuestion.selectCorrectOption')}</option>
+                    <option value="">{t('teacher.editQuestion.selectCorrectOption')}</option>
                     {form.options.filter(o => o.trim()).map((opt, i) => <option key={i} value={opt}>{String.fromCharCode(65 + i)}. {opt}</option>)}
                   </select>
                 </div>
@@ -73,19 +73,19 @@ const TeacherEditQuestion = () => {
             )}
             {form.questionType === 'truefalse' && (
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500">{t('editQuestion.correctAnswer')}</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.editQuestion.correctAnswer')}</label>
                 <select value={form.correctAnswer} onChange={e => setForm({ ...form, correctAnswer: e.target.value })} className={inputCls}>
-                  <option value="True">{t('editQuestion.true')}</option>
-                  <option value="False">{t('editQuestion.false')}</option>
+                  <option value="True">{t('teacher.editQuestion.true')}</option>
+                  <option value="False">{t('teacher.editQuestion.false')}</option>
                 </select>
               </div>
             )}
             <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => navigate(`/teacher/exams/${examId}`)} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100">{t('editQuestion.cancel')}</button>
+              <button type="button" onClick={() => navigate(`/teacher/exams/${examId}`)} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100">{t('teacher.editQuestion.cancel')}</button>
               <button type="submit" disabled={loading} className="rounded-2xl bg-cyan-600 px-5 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700 disabled:opacity-60">
                 {loading
-  ? t('editQuestion.saving')
-  : t('editQuestion.updateQuestion')}
+  ? t('teacher.editQuestion.saving')
+  : t('teacher.editQuestion.updateQuestion')}
               </button>
             </div>
           </form>

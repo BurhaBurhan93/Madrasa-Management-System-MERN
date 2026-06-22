@@ -9,22 +9,22 @@ const TeacherResults = () => {
 
   const cards = [
     {
-      title: t('teacherResults.enterMarksTitle'),
-      description: t('teacherResults.enterMarksDescription'),
+      title: t('teacher.teacherResults.enterMarksTitle'),
+      description: t('teacher.teacherResults.enterMarksDescription'),
       icon: FiEdit,
       accent: 'bg-cyan-500',
       tone: 'from-cyan-500 to-sky-600',
       action: () => navigate('enter-marks'),
-      label: t('teacherResults.enterMarksButton')
+      label: t('teacher.teacherResults.enterMarksButton')
     },
     {
-      title: t('teacherResults.viewResultsTitle'),
-      description: t('teacherResults.viewResultsDescription'),
+      title: t('teacher.teacherResults.viewResultsTitle'),
+      description: t('teacher.teacherResults.viewResultsDescription'),
       icon: FiBarChart2,
       accent: 'bg-violet-500',
       tone: 'from-violet-500 to-purple-600',
       action: () => navigate('view-results'),
-      label: t('teacherResults.viewResultsButton'),
+      label: t('teacher.teacherResults.viewResultsButton'),
     },
   ];
 
@@ -33,8 +33,8 @@ const TeacherResults = () => {
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">{t('teacherResults.title')}</h1>
-          <p className="mt-1 text-sm text-slate-500">{t('teacherResults.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('teacher.teacherResults.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('teacher.teacherResults.subtitle')}</p>
         </div>
 
         <section className="grid grid-cols-1 gap-5 md:grid-cols-2">
