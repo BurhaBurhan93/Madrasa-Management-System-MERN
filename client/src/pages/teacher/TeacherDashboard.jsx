@@ -4,6 +4,7 @@ import api from '../../lib/api';
 import { BarChartComponent, LineChartComponent } from '../../components/UIHelper/ECharts';
 import { formatDate } from '../../lib/utils';
 import { FiBookOpen, FiUsers, FiClipboard, FiGrid } from 'react-icons/fi';
+import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
 const StatCard = ({ label, value, note, accentClass, icon: Icon }) => (
   <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -98,7 +99,7 @@ const TeacherDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+    <div className={PANEL_PAGE_BG}>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
         {/* Profile Banner */}

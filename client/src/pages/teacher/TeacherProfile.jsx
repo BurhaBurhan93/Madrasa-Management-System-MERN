@@ -4,6 +4,7 @@ import Input from '../../components/UIHelper/Input';
 import { getUser } from '../../lib/auth';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { useTranslation } from 'react-i18next';
+import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
 const Panel = ({ title, children, className = '' }) => (
   <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
@@ -97,7 +98,7 @@ const addrStr = (addr) =>
         .join(', ') || t('common.notAvailable')
     : t('common.notAvailable');
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-slate-50 to-slate-100">
+    <div className={PANEL_PAGE_BG}>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8 flex justify-between items-start">
           <div>

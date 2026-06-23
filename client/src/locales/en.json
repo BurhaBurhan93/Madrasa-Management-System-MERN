@@ -70,7 +70,8 @@
       "classAttendanceOverview": "Class Attendance Overview",
       "averageStudentPerformance": "Average Student Performance",
       "noRecentActivity": "No recent activity available yet.",
-      "noUpcomingClasses": "No upcoming classes scheduled."
+      "noUpcomingClasses": "No upcoming classes scheduled.",
+      "totalSubjects": "Total Subjects"
     },
     "common": {
       "assignments": "Assignments",

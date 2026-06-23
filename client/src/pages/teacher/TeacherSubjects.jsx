@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Progress from '../../components/UIHelper/Progress';
+import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
 const Panel = ({ title, subtitle, children, className = '' }) => (
   <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
@@ -83,7 +84,7 @@ const TeacherSubjects = () => {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+    <div className={PANEL_PAGE_BG}>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
         {/* Header */}
