@@ -149,5 +149,32 @@
       "update": "Update",
       "remove": "Remove"
     }
+  },
+  "print": {
+    "title": "Print Preview",
+    "printButton": "🖨️ Print",
+    "closeButton": "Close",
+    "typeFeeReceipt": "Fee Receipt",
+    "typeAttendanceReport": "Attendance Report",
+    "typeCertificate": "Certificate",
+    "typeExamResult": "Exam Result",
+    "date": "Date",
+    "studentName": "Student Name",
+    "class": "Class",
+    "rollNumber": "Roll Number",
+    "feeAmount": "Fee Amount",
+    "paidDate": "Paid Date",
+    "status": "Status",
+    "attendanceDate": "Attendance Date",
+    "present": "Present",
+    "absent": "Absent",
+    "certificateOf": "Certificate of",
+    "issuedBy": "Issued By",
+    "issuedDate": "Issued Date",
+    "examName": "Exam Name",
+    "subject": "Subject",
+    "marks": "Marks",
+    "grade": "Grade",
+    "totalMarks": "Total Marks"
   }
 }

@@ -1,5 +1,6 @@
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import PrintPage from '../components/PrintPage';
 
 // Lazy load all admin page components for code-splitting and skeleton loading
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
@@ -160,6 +161,7 @@ const adminRoutes = (
 
     <Route path="profile" element={<AdminProfile />} />
     <Route path="madrasa-info" element={<AdminMadrasaInfo />} />
+    <Route path="print/:type/:id?" element={<PrintPage />} />
   </>
 );
 

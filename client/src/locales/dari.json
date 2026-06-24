@@ -150,5 +150,32 @@
       "update": "به‌روزرسانی",
       "remove": "برداشتن"
     }
+  },
+  "print": {
+    "title": "پیش‌نمایش چاپ",
+    "printButton": "🖨️ چاپ",
+    "closeButton": "بستن",
+    "typeFeeReceipt": "رسید فیس",
+    "typeAttendanceReport": "گزارش حضور",
+    "typeCertificate": "گواهی‌نامه",
+    "typeExamResult": "نتیجه امتحان",
+    "date": "تاریخ",
+    "studentName": "نام شاگرد",
+    "class": "صنف",
+    "rollNumber": "شماره رول",
+    "feeAmount": "میزان فیس",
+    "paidDate": "تاریخ پرداخت",
+    "status": "وضعیت",
+    "attendanceDate": "تاریخ حضور",
+    "present": "حاضر",
+    "absent": "غایب",
+    "certificateOf": "گواهی‌نامه",
+    "issuedBy": "صادر شده توسط",
+    "issuedDate": "تاریخ صدور",
+    "examName": "نام امتحان",
+    "subject": "موضوع",
+    "marks": "نمرات",
+    "grade": "نمره",
+    "totalMarks": "کل نمرات"
   }
 }

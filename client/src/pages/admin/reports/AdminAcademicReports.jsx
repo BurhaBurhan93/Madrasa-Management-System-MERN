@@ -1,43 +1,258 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../../lib/api';
+import React, { useEffect, useMemo, useState } from "react";
+import api from "../../../lib/api";
+import {
+  getDefaultPeriodFilters,
+  isDateWithinRange,
+} from "../../../utils/reportPeriods";
 
 const AdminAcademicReports = () => {
-  const [data, setData] = useState([]);
+  const [filters, setFilters] = useState(getDefaultPeriodFilters());
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState('monthly');
+  const [classes, setClasses] = useState([]);
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    activeStudents: 0,
+    totalExams: 0,
+    totalClasses: 0,
+  });
+  const [exams, setExams] = useState([]);
+
+  async function fetchData() {
+    setLoading(true);
+    try {
+      const [classRes, examRes, studentRes] = await Promise.all([
+        api.get("/academic/classes"),
+        api.get("/academic/exams"),
+        api.get("/students/reports"),
+      ]);
+
+      const allClasses = Array.isArray(classRes.data?.data)
+        ? classRes.data.data
+        : Array.isArray(classRes.data)
+          ? classRes.data
+          : [];
+      const allExams = Array.isArray(examRes.data?.data)
+        ? examRes.data.data
+        : Array.isArray(examRes.data)
+          ? examRes.data
+          : [];
+      const studentData = studentRes.data?.data || {};
+
+      const filteredExams = allExams.filter((e) =>
+        isDateWithinRange(e.startDate || e.createdAt, filters),
+      );
+
+      setClasses(allClasses);
+      setExams(filteredExams);
+      setStats({
+        totalClasses: allClasses.length,
+        totalStudents: studentData.stats?.totalStudents || 0,
+        activeStudents: studentData.stats?.activeStudents || 0,
+        totalExams: filteredExams.length,
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    const fetch = async () => {
-      try { const { data: res } = await api.get(`/academic/classes`); setData(Array.isArray(res) ? res : res.data || []); }
-      catch { setData([]); } finally { setLoading(false); }
-    };
-    fetch();
-  }, [period]);
+    fetchData();
+  }, [filters.period, filters.date, filters.week, filters.month]);
+
+  const periodLabel = useMemo(() => {
+    if (filters.period === "daily") return "today";
+    if (filters.period === "weekly") return "this week";
+    if (filters.period === "yearly") return "this year";
+    if (filters.period === "term") return "this term";
+    return "this month";
+  }, [filters.period]);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-slate-900">Academic Reports</h1><p className="mt-1 text-sm text-slate-500">Academic performance analysis and insights</p></div>
-        <select value={period} onChange={e => setPeriod(e.target.value)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm"><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="term">Term</option><option value="yearly">Yearly</option></select>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">
+            Academic Reports
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Academic performance analysis and insights
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <select
+            value={filters.period}
+            onChange={(e) =>
+              setFilters((c) => ({ ...c, period: e.target.value }))
+            }
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm"
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="term">Term</option>
+            <option value="yearly">Yearly</option>
+          </select>
+          {filters.period === "daily" && (
+            <input
+              type="date"
+              value={filters.date}
+              onChange={(e) =>
+                setFilters((c) => ({ ...c, date: e.target.value }))
+              }
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            />
+          )}
+          {filters.period === "weekly" && (
+            <input
+              type="week"
+              value={filters.week}
+              onChange={(e) =>
+                setFilters((c) => ({ ...c, week: e.target.value }))
+              }
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            />
+          )}
+          {filters.period === "monthly" && (
+            <input
+              type="month"
+              value={filters.month}
+              onChange={(e) =>
+                setFilters((c) => ({ ...c, month: e.target.value }))
+              }
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            />
+          )}
+        </div>
       </div>
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5"><p className="text-xs font-medium text-cyan-600">Total Students</p><p className="mt-1 text-2xl font-bold text-cyan-700">—</p></div>
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5"><p className="text-xs font-medium text-emerald-600">Avg. Score</p><p className="mt-1 text-2xl font-bold text-emerald-700">—</p></div>
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5"><p className="text-xs font-medium text-amber-600">Pass Rate</p><p className="mt-1 text-2xl font-bold text-amber-700">—</p></div>
-        <div className="rounded-2xl border border-violet-200 bg-violet-50 p-5"><p className="text-xs font-medium text-violet-600">Top Performers</p><p className="mt-1 text-2xl font-bold text-violet-700">—</p></div>
+        <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
+          <p className="text-xs font-medium text-cyan-600">Total Students</p>
+          <p className="mt-1 text-2xl font-bold text-cyan-700">
+            {loading ? "…" : stats.totalStudents}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+          <p className="text-xs font-medium text-emerald-600">
+            Active Students
+          </p>
+          <p className="mt-1 text-2xl font-bold text-emerald-700">
+            {loading ? "…" : stats.activeStudents}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <p className="text-xs font-medium text-amber-600">
+            Exams ({periodLabel})
+          </p>
+          <p className="mt-1 text-2xl font-bold text-amber-700">
+            {loading ? "…" : stats.totalExams}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-violet-200 bg-violet-50 p-5">
+          <p className="text-xs font-medium text-violet-600">Total Classes</p>
+          <p className="mt-1 text-2xl font-bold text-violet-700">
+            {loading ? "…" : stats.totalClasses}
+          </p>
+        </div>
       </div>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-800">Class-wise Performance</h2>
-          {loading ? <p className="text-slate-400">Loading...</p> : (
-            <table className="w-full text-left text-sm"><thead className="border-b border-slate-200 bg-slate-50"><tr><th className="px-4 py-3 font-semibold text-slate-600">Class</th><th className="px-4 py-3 font-semibold text-slate-600">Students</th><th className="px-4 py-3 font-semibold text-slate-600">Avg Score</th><th className="px-4 py-3 font-semibold text-slate-600">Pass %</th></tr></thead>
-              <tbody>{data.map((c, i) => (<tr key={c._id || i} className="border-b border-slate-100"><td className="px-4 py-3 font-medium text-slate-800">{c.name}</td><td className="px-4 py-3 text-slate-600">{c.studentCount || '-'}</td><td className="px-4 py-3 text-slate-600">—</td><td className="px-4 py-3 text-slate-600">—</td></tr>))}</tbody>
+          <h2 className="mb-4 text-lg font-semibold text-slate-800">Classes</h2>
+          {loading ? (
+            <p className="text-slate-400">Loading…</p>
+          ) : classes.length === 0 ? (
+            <p className="text-slate-400">No classes found.</p>
+          ) : (
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50">
+                <tr>
+                  <th className="px-4 py-3 font-semibold text-slate-600">
+                    Class
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-slate-600">
+                    Section
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-slate-600">
+                    Level
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {classes.map((c, i) => (
+                  <tr
+                    key={c._id || i}
+                    className="border-b border-slate-100 hover:bg-slate-50"
+                  >
+                    <td className="px-4 py-3 font-medium text-slate-800">
+                      {c.name || c.className || "—"}
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {c.section || "—"}
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {c.level || c.grade || "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           )}
         </div>
+
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-800">Subject Analysis</h2>
-          <p className="text-slate-400">Subject-wise breakdown will appear here when data is available.</p>
+          <h2 className="mb-4 text-lg font-semibold text-slate-800">
+            Exams — {periodLabel}
+          </h2>
+          {loading ? (
+            <p className="text-slate-400">Loading…</p>
+          ) : exams.length === 0 ? (
+            <p className="text-slate-400">
+              No exams scheduled for this period.
+            </p>
+          ) : (
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-slate-200 bg-slate-50">
+                <tr>
+                  <th className="px-4 py-3 font-semibold text-slate-600">
+                    Title
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-slate-600">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-slate-600">
+                    Start
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {exams.map((e, i) => (
+                  <tr
+                    key={e._id || i}
+                    className="border-b border-slate-100 hover:bg-slate-50"
+                  >
+                    <td className="px-4 py-3 font-medium text-slate-800">
+                      {e.title || "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${e.status === "active" ? "bg-emerald-100 text-emerald-700" : e.status === "completed" ? "bg-slate-100 text-slate-600" : "bg-amber-100 text-amber-700"}`}
+                      >
+                        {e.status || "—"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {e.startDate
+                        ? new Date(e.startDate).toLocaleDateString()
+                        : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

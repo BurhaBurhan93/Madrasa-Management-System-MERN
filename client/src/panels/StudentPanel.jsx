@@ -14,6 +14,10 @@ import axios from 'axios';
 import NotificationDropdown from '../components/UIHelper/NotificationDropdown';
 import { CALENDAR_SYSTEMS, calendarLabels, setCalendarSystem } from '../lib/dateUtils';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
+import useMadrasaInfo from '../hooks/useMadrasaInfo';
+import { getMadrasaDisplayName, getMadrasaLogo } from '../lib/madrasaInfo';
+import i18n from '../i18n';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -95,12 +99,16 @@ const StudentPanelContent = () => {
   const { theme, toggleTheme } = useTheme();
   const [lang, setLang] = useLocalStorage('studentLang', 'en');
   const { calSys, setCalSys } = useCalendar();
+  const [madrasaInfo] = useMadrasaInfo({ fetchRemote: true });
   const isRTL = lang === 'dari' || lang === 'ps';
   const t = translations[lang] || translations.en;
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
+    localStorage.setItem('lang', lang);
+    i18n.changeLanguage(lang);
     return () => { document.documentElement.dir = 'ltr'; };
   }, [lang, isRTL]);
 
@@ -267,7 +275,16 @@ const StudentPanelContent = () => {
     }
   }, [location.pathname]);
 
+  // Save last visited path to localStorage
+  useEffect(() => {
+    localStorage.setItem('lastPath', location.pathname);
+  }, [location.pathname]);
+
   const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+  
+  const confirmLogout = () => {
     clearAuth();
     navigate('/');
   };
@@ -286,12 +303,16 @@ const StudentPanelContent = () => {
         <div className="flex h-full flex-col">
           <div className={`border-b px-4 py-5 ${theme === 'dark' ? 'border-slate-700/60' : 'border-slate-200/80'} ${sidebarOpen ? '' : 'flex justify-center'}`}>
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
-                M
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
+                {getMadrasaLogo(madrasaInfo) ? (
+                  <img src={getMadrasaLogo(madrasaInfo)} alt={`${getMadrasaDisplayName(madrasaInfo)} logo`} className="h-full w-full object-cover" />
+                ) : (
+                  <span>{getMadrasaDisplayName(madrasaInfo)[0]?.toUpperCase() || 'M'}</span>
+                )}
               </div>
               {sidebarOpen && (
                 <div>
-                  <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">Madrasa EMIS</div>
+                  <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-600">{getMadrasaDisplayName(madrasaInfo)}</div>
                   <div className={`mt-1 text-lg font-semibold ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>{t.workspace}</div>
                 </div>
               )}
@@ -485,6 +506,16 @@ const StudentPanelContent = () => {
           </Suspense>
         </div>
       </main>
+      
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={confirmLogout}
+        title="Logout"
+        message="Are you sure you want to logout?"
+        confirmText="Logout"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

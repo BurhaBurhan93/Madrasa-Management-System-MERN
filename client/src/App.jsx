@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ExamProvider } from './contexts/ExamContext';
@@ -16,6 +16,7 @@ import AdminPanel from './panels/AdminPanel';
 import StudentPanel from './panels/StudentPanel';
 import TeacherPanel from './panels/TeacherPanel';
 import StaffPanel from './panels/StaffPanel';
+import PrintPage from './components/PrintPage';
 
 import AdminRoutes from './routes/AdminRoutes';
 
@@ -44,32 +45,62 @@ import StudentDashboard from './pages/StudentDashboard';
 import StudentProfile from './pages/StudentProfileReadonly';
 import StudentCourses from './pages/StudentCourses';
 import StudentAttendance from './pages/StudentAttendance';
-import StudentAssignments from './pages/StudentAssignments';
 import StudentResults from './pages/StudentResults';
-import StudentSchedule from './pages/StudentSchedule';
-import StudentExams from './pages/StudentExams';
-import StudentFees from './pages/StudentFees';
-import StudentLibrary from './pages/StudentLibrary';
-import StudentComplaints from './pages/StudentComplaints';
-import StudentExamAttempt from './pages/StudentExamAttempt';
-import StudentCertificates from './pages/StudentCertificates';
-import StudentEvents from './pages/StudentEvents';
-import StudentSettings from './pages/StudentSettings';
 import StudentExamResults from './pages/StudentExamResults';
 import StudentTimetable from './pages/StudentTimetable';
+import StudentSchedule from './pages/StudentSchedule';
+import StudentExams from './pages/StudentExams';
+import StudentExamAttempt from './pages/StudentExamAttempt';
+import StudentFees from './pages/StudentFees';
+import StudentLibrary from './pages/StudentLibrary';
+import StudentCertificates from './pages/StudentCertificates';
+import StudentEvents from './pages/StudentEvents';
 import StudentHostel from './pages/StudentHostel';
 import StudentLeave from './pages/StudentLeave';
+import StudentSettings from './pages/StudentSettings';
 import LearningResources from './components/library/LearningResources';
 import BorrowedBooks from './components/library/BorrowedBooks';
 import PurchaseHistory from './components/library/PurchaseHistory';
 import TransactionHistory from './components/finance/TransactionHistory';
-import HomeworkSubmission from './components/assignments/HomeworkSubmission';
+import StudentComplaints from './pages/StudentComplaints';
 import Communications from './components/communications/Communications';
+import HomeworkSubmission from './components/assignments/HomeworkSubmission';
 
 // Staff — all routes controlled from StaffRoutes
 import staffRoutes from './routes/StaffRoutes';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+const HomeWithRedirect = ({ isAuthenticated, loading }) => {
+  const navigate = useNavigate();
+  const [redirecting, setRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      const lastPath = localStorage.getItem('lastPath');
+      if (lastPath) {
+        navigate(lastPath, { replace: true });
+      } else {
+        const role = getUserRole();
+        const defaultPaths = {
+          admin: '/admin/dashboard',
+          teacher: '/teacher/dashboard',
+          staff: '/staff/dashboard',
+          student: '/student/dashboard'
+        };
+        if (defaultPaths[role]) {
+          navigate(defaultPaths[role], { replace: true });
+        }
+      }
+      setRedirecting(true);
+    }
+  }, [navigate, isAuthenticated, loading]);
+
+  if (loading || redirecting) {
+    return <div className="flex h-screen items-center justify-center text-slate-500">Loading...</div>;
+  }
+  return <Home />;
+};
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => localStorage.getItem('isAuthenticated') === 'true');
@@ -137,96 +168,103 @@ function App() {
     return children;
   };
 
-  const RoleLanding = () => {
-    if (loading) return <div className="flex h-screen items-center justify-center text-slate-500">Loading...</div>;
-    if (!isAuthenticated || !isTokenValid()) return <Home />;
-
-    const role = getUserRole();
-    const rolePaths = {
-      admin: '/admin/dashboard',
-      staff: '/staff/dashboard',
-      teacher: '/teacher',
-      student: '/student/dashboard',
-    };
-
-    return <Navigate to={rolePaths[role] || '/login'} replace />;
-  };
+  const adminRoles = ['admin'];
+  const teacherRoles = ['teacher'];
+  const staffRoles = ['staff'];
+  const studentRoles = ['student'];
 
   return (
     <ExamProvider>
       <Router>
         <Routes>
-
           {/* ── Public ── */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomeWithRedirect isAuthenticated={isAuthenticated} loading={loading} />} />
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
           <Route path="/register" element={<Register />} />
 
           {/* ── Admin ── */}
-          <Route path="/admin/*" element={<ProtectedRoute allowedRoles={['admin']}><AdminPanel /></ProtectedRoute>}>
+          <Route path="/admin/*" element={
+            <ProtectedRoute allowedRoles={adminRoles}>
+              <AdminPanel />
+            </ProtectedRoute>
+          }>
             {AdminRoutes}
           </Route>
 
           {/* ── Teacher ── */}
-          <Route path="/teacher/*" element={<ProtectedRoute allowedRoles={['teacher']}><TeacherPanel /></ProtectedRoute>}>
-            <Route index element={<TeacherDashboard />} />
-            <Route path="subjects"            element={<TeacherSubjects />} />
-            <Route path="profile"             element={<TeacherProfile />} />
-            <Route path="students"            element={<TeacherStudents />} />
-            <Route path="assignments"         element={<TeacherAssignments />} />
-            <Route path="create-assignments"  element={<CreateAssignment />} />
-            <Route path="attendance"          element={<TeacherAttendance />} />
-            <Route path="attendance-reports"  element={<TeacherAttendanceReports />} />
-            <Route path="exams"               element={<TeacherExamsList />} />
-            <Route path="exams/create"        element={<TeacherCreateExam />} />
-            <Route path="exams/:examId"       element={<TeacherExamDetails />} />
-            <Route path="exams/:examId/add-question"                    element={<TeacherAddQuestion />} />
-            <Route path="exams/:examId/edit-question/:questionId"       element={<TeacherEditQuestion />} />
-            <Route path="exams/:examId/submissions"                     element={<TeacherExamSubmissions />} />
-            <Route path="results"             element={<TeacherResults />} />
+          <Route path="/teacher/*" element={
+            <ProtectedRoute allowedRoles={teacherRoles}>
+              <TeacherPanel />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<TeacherDashboard />} />
+            <Route path="subjects" element={<TeacherSubjects />} />
+            <Route path="profile" element={<TeacherProfile />} />
+            <Route path="students" element={<TeacherStudents />} />
+            <Route path="assignments" element={<TeacherAssignments />} />
+            <Route path="create-assignments" element={<CreateAssignment />} />
+            <Route path="attendance" element={<TeacherAttendance />} />
+            <Route path="attendance-reports" element={<TeacherAttendanceReports />} />
+            <Route path="exams" element={<TeacherExamsList />} />
+            <Route path="exams/create" element={<TeacherCreateExam />} />
+            <Route path="exams/:examId" element={<TeacherExamDetails />} />
+            <Route path="exams/:examId/add-question" element={<TeacherAddQuestion />} />
+            <Route path="exams/:examId/edit-question/:questionId" element={<TeacherEditQuestion />} />
+            <Route path="exams/:examId/submissions" element={<TeacherExamSubmissions />} />
+            <Route path="results" element={<TeacherResults />} />
             <Route path="results/enter-marks" element={<TeacherEnterMarks />} />
             <Route path="results/view-results" element={<TeacherViewResults />} />
-            <Route path="complaints"          element={<AssignedComplaints />} />
+            <Route path="complaints" element={<AssignedComplaints />} />
+            <Route path="print/:type/:id?" element={<PrintPage />} />
           </Route>
 
-          {/* ── Staff — fully controlled by StaffRoutes ── */}
-          <Route path="/staff/*" element={<ProtectedRoute allowedRoles={['staff']}><StaffPanel /></ProtectedRoute>}>
+          {/* ── Staff ── */}
+          <Route path="/staff/*" element={
+            <ProtectedRoute allowedRoles={staffRoles}>
+              <StaffPanel />
+            </ProtectedRoute>
+          }>
             {staffRoutes}
           </Route>
 
           {/* ── Student ── */}
-          <Route path="/student/*" element={<ProtectedRoute allowedRoles={['student']}><StudentPanel /></ProtectedRoute>}>
-            <Route index element={<StudentDashboard />} />
-            <Route path="dashboard"           element={<StudentDashboard />} />
-            <Route path="profile"             element={<StudentProfile />} />
-            <Route path="courses"             element={<StudentCourses />} />
-            <Route path="attendance"          element={<StudentAttendance />} />
-            <Route path="assignments"         element={<StudentAssignments />} />
+          <Route path="/student/*" element={
+            <ProtectedRoute allowedRoles={studentRoles}>
+              <StudentPanel />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<StudentDashboard />} />
+            <Route path="profile" element={<StudentProfile />} />
+            <Route path="courses" element={<StudentCourses />} />
+            <Route path="attendance" element={<StudentAttendance />} />
+            <Route path="assignments" element={<TeacherAssignments />} />
             <Route path="homework-submission" element={<HomeworkSubmission />} />
-            <Route path="results"             element={<StudentResults />} />
-            <Route path="exam-results"        element={<StudentExamResults />} />
-            <Route path="timetable"           element={<StudentTimetable />} />
-            <Route path="schedule"            element={<StudentSchedule />} />
-            <Route path="exams"               element={<StudentExams />} />
+            <Route path="results" element={<StudentResults />} />
+            <Route path="exam-results" element={<StudentExamResults />} />
+            <Route path="timetable" element={<StudentTimetable />} />
+            <Route path="schedule" element={<StudentSchedule />} />
+            <Route path="exams" element={<StudentExams />} />
             <Route path="exams/:examId/attempt" element={<StudentExamAttempt />} />
-            <Route path="fees"                element={<StudentFees />} />
-            <Route path="library"             element={<StudentLibrary />} />
-            <Route path="resources"           element={<LearningResources />} />
-            <Route path="borrowed"            element={<BorrowedBooks />} />
-            <Route path="purchase"            element={<PurchaseHistory />} />
-            <Route path="transactions"        element={<TransactionHistory />} />
-            <Route path="complaints"          element={<StudentComplaints />} />
-            <Route path="communications"      element={<Communications />} />
-            <Route path="certificates"        element={<StudentCertificates />} />
-            <Route path="events"              element={<StudentEvents />} />
-            <Route path="hostel"              element={<StudentHostel />} />
-            <Route path="leave"               element={<StudentLeave />} />
-            <Route path="settings"            element={<StudentSettings />} />
+            <Route path="fees" element={<StudentFees />} />
+            <Route path="library" element={<StudentLibrary />} />
+            <Route path="resources" element={<LearningResources />} />
+            <Route path="borrowed" element={<BorrowedBooks />} />
+            <Route path="purchase" element={<PurchaseHistory />} />
+            <Route path="transactions" element={<TransactionHistory />} />
+            <Route path="complaints" element={<StudentComplaints />} />
+            <Route path="communications" element={<Communications />} />
+            <Route path="certificates" element={<StudentCertificates />} />
+            <Route path="events" element={<StudentEvents />} />
+            <Route path="hostel" element={<StudentHostel />} />
+            <Route path="leave" element={<StudentLeave />} />
+            <Route path="settings" element={<StudentSettings />} />
+            <Route path="print/:type/:id?" element={<PrintPage />} />
           </Route>
 
           {/* ── Fallback ── */}
           <Route path="*" element={<Navigate to="/" replace />} />
-
         </Routes>
       </Router>
     </ExamProvider>

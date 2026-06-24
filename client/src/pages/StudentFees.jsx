@@ -85,8 +85,16 @@ const StudentFees = () => {
     }
   };
 
-  const handleDownloadReceipt = (paymentId) => {
-    // Download receipt for payment
+  const handlePrintReceipt = (payment) => {
+    const data = encodeURIComponent(JSON.stringify({
+      studentName: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : 'Student',
+      className: 'Class 1', // Could be dynamic from student data
+      rollNumber: '123',
+      feeAmount: payment.amount,
+      paidDate: payment.createdAt || payment.paymentDate,
+      status: payment.status,
+    }));
+    navigate(`/student/print/fee-receipt/${payment._id}?data=${data}`);
   };
 
   const paymentStatusColors = {
@@ -118,7 +126,17 @@ const StudentFees = () => {
           <Button
             variant="outline"
             className="flex items-center gap-2"
-            onClick={() => window.print()}
+            onClick={() => {
+              const data = encodeURIComponent(JSON.stringify({
+                studentName: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : 'Student',
+                className: 'Class 1',
+                rollNumber: '123',
+                feeAmount: feeSummary.totalFees,
+                paidDate: feeSummary.lastPaymentDate,
+                status: feeSummary.pendingAmount === 0 ? 'Paid' : 'Partial',
+              }));
+              navigate(`/student/print/fee-receipt/statement?data=${data}`);
+            }}
           >
             <FiPrinter className="w-4 h-4" />
             Print Statement
@@ -279,9 +297,9 @@ const StudentFees = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDownloadReceipt(payment._id)}
+                    onClick={() => handlePrintReceipt(payment)}
                   >
-                    <FiDownload className="w-4 h-4" />
+                    <FiPrinter className="w-4 h-4" />
                   </Button>
                 )}
               </div>

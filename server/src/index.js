@@ -2,6 +2,12 @@
 console.log('[Server] Initializing server...');
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
+const session = require('express-session');
+const MongoStore = require('connect-mongo').default;
 const connectDB = require('./config/db');
 const seedDatabase = require('./seedDatabase');
 const app = express();
@@ -12,11 +18,36 @@ require('dotenv').config();
 console.log('[Server] .env loaded, PORT:', process.env.PORT || '5000 (default)');
 console.log('[Server] MONGODB_URI exists:', !!(process.env.MONGODB_URI || process.env.MONGO_URI));
 
+// Apply security headers with Helmet
+app.use(helmet());
+console.log('[Server] Helmet security middleware applied');
+
+// Compress all responses
+app.use(compression());
+console.log('[Server] Compression middleware applied');
+
+// Parse cookies
+app.use(cookieParser());
+console.log('[Server] Cookie-parser middleware applied');
+
+// CORS setup
 app.use(cors());
 console.log('[Server] CORS middleware applied');
+
+// Body parsers
 app.use(express.json({ limit: '50mb' })); // Increase limit to handle base64 images
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 console.log('[Server] JSON parser middleware applied (50MB limit)');
+
+// Rate limiting for login and register endpoints
+const loginLimiter = rateLimit({
+  windowMs: 15 * 1000, // 15 seconds
+  max: 5, // Limit each IP to 5 login attempts per window
+  message: { success: false, message: 'Too many login attempts. Please try again after 15 seconds.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+console.log('[Server] Login rate limiter created');
 
 console.log('[Routes] Loading route modules...');
 const authRoutes = require('./modules/auth/authRoutes');
@@ -125,8 +156,8 @@ try {
 
 // Use routes
 console.log('[Routes] Registering routes...');
-app.use('/api/auth', authRoutes);
-console.log('[Routes] ✓ /api/auth registered');
+app.use('/api/auth', loginLimiter, authRoutes);
+console.log('[Routes] ✓ /api/auth registered (with rate limiter)');
 app.use('/api/student', studentRoutes);
 console.log('[Routes] ✓ /api/student registered');
 app.use('/api/staff', staffRoutes);
@@ -271,8 +302,31 @@ console.log('[Server] Starting server initialization...');
 const startServer = async () => {
   try {
     console.log('[Server] Calling connectDB()...');
-    await connectDB();
+    const dbConnection = await connectDB();
     console.log('[Server] Database connection complete');
+    
+    // Set up session store with MongoDB
+    const sessionStore = new MongoStore({
+      mongoUrl: process.env.MONGODB_URI || process.env.MONGO_URI,
+      collectionName: 'sessions',
+      ttl: 24 * 60 * 60, // 1 day
+      autoRemove: 'native',
+    });
+
+    // Session middleware
+    app.use(session({
+      secret: process.env.SESSION_SECRET || 'madrasa-session-secret-key',
+      resave: false,
+      saveUninitialized: false,
+      store: sessionStore,
+      cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        sameSite: 'strict',
+      },
+    }));
+    console.log('[Server] Session middleware with connect-mongo applied');
     
     app.listen(PORT, () => {
       console.log('[Server] ✅ Server running on port ' + PORT);

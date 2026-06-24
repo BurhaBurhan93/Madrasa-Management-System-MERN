@@ -1,37 +1,38 @@
-const Student = require('../models/Student');
-const User = require('../models/User');
-const Course = require('../models/Subject'); // Assuming subjects are courses for students
-const AttendanceRecord = require('../models/AttendanceRecord');
-const Exam = require('../models/Exam');
-const ExamQuestion = require('../models/ExamQuestion');
-const ExamAnswer = require('../models/ExamAnswer');
-const FeePayment = require('../models/FeePayment');
-const Complaint = require('../models/Complaint');
-const Assignment = require('../models/Assignment');
-const StudentLeave = require('../models/StudentLeave');
-const StudentEducation = require('../models/StudentEducation');
-const Admission = require('../models/Admission');
+const Student = require("../models/Student");
+const User = require("../models/User");
+const Course = require("../models/Subject"); // Assuming subjects are courses for students
+const AttendanceRecord = require("../models/AttendanceRecord");
+const Exam = require("../models/Exam");
+const ExamQuestion = require("../models/ExamQuestion");
+const ExamAnswer = require("../models/ExamAnswer");
+const FeePayment = require("../models/FeePayment");
+const Complaint = require("../models/Complaint");
+const Assignment = require("../models/Assignment");
+const StudentLeave = require("../models/StudentLeave");
+const StudentEducation = require("../models/StudentEducation");
+const Admission = require("../models/Admission");
 
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const notificationService = require('../modules/notifications/notificationService');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const notificationService = require("../modules/notifications/notificationService");
 
 // Get student profile
 const getStudentProfile = async (req, res) => {
   try {
     const student = await Student.findOne({ user: req.user.id })
-      .populate('user', '-password')
-      .populate('currentClass', 'className');
+      .populate("user", "-password")
+      .populate("currentClass", "className");
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
 
     const u = student.user || {};
     res.json({
       id: student._id,
       userId: u._id,
-      role: u.role || 'student',
-      name: u.name || `${student.firstName || ''} ${student.lastName || ''}`.trim(),
+      role: u.role || "student",
+      name:
+        u.name || `${student.firstName || ""} ${student.lastName || ""}`.trim(),
       email: u.email || student.email,
       phone: student.phone || u.phone,
       whatsapp: student.whatsapp || u.whatsapp,
@@ -64,27 +65,27 @@ const getStudentProfile = async (req, res) => {
 const updateStudentProfile = async (req, res) => {
   try {
     const { phone, address, dateOfBirth } = req.body;
-    
+
     const student = await Student.findOneAndUpdate(
       { user: req.user.id },
       { phone, permanentAddress: address, dob: dateOfBirth },
-      { new: true }
-    ).populate('user');
-    
+      { new: true },
+    ).populate("user");
+
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
-    
+
     res.json({
       id: student._id,
-      name: student.user?.name || student.firstName + ' ' + student.lastName,
+      name: student.user?.name || student.firstName + " " + student.lastName,
       email: student.user?.email || student.email,
       studentId: student.studentCode,
       phone: student.phone,
       dateOfBirth: student.dob,
       address: student.permanentAddress,
       enrollmentDate: student.admissionDate,
-      status: student.status
+      status: student.status,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -94,14 +95,18 @@ const updateStudentProfile = async (req, res) => {
 // Get student courses
 const getStudentCourses = async (req, res) => {
   try {
-    const student = await Student.findOne({ user: req.user.id }).populate('currentClass');
+    const student = await Student.findOne({ user: req.user.id }).populate(
+      "currentClass",
+    );
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
-    
+
     // Use currentClass to find subjects/courses for the student's class
-    const courses = await Course.find({ classId: student.currentClass }, null, { strictPopulate: false });
-    
+    const courses = await Course.find({ classId: student.currentClass }, null, {
+      strictPopulate: false,
+    });
+
     res.json(courses);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -114,13 +119,17 @@ const getAttendanceRecords = async (req, res) => {
     // Find student record first
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
-    
-    const records = await AttendanceRecord.find({ 
-      student: student._id 
-    }, null, { strictPopulate: false });
-    
+
+    const records = await AttendanceRecord.find(
+      {
+        student: student._id,
+      },
+      null,
+      { strictPopulate: false },
+    );
+
     res.json(records);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -133,14 +142,18 @@ const getAssignments = async (req, res) => {
     // Find student to get their enrolled courses
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
-    
+
     // Get assignments for the student's class
-    const assignments = await Assignment.find({
-      classId: student.currentClass
-    }, null, { strictPopulate: false });
-    
+    const assignments = await Assignment.find(
+      {
+        classId: student.currentClass,
+      },
+      null,
+      { strictPopulate: false },
+    );
+
     res.json(assignments);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -152,25 +165,27 @@ const getExams = async (req, res) => {
   try {
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
 
     // Find exams for the student's class
     const exams = await Exam.find({
-      status: 'published',
-      class: student.currentClass
-    }).populate('subject', 'name');
+      status: "published",
+      class: student.currentClass,
+    }).populate("subject", "name");
 
-    res.json(exams.map(exam => ({
-      id: exam._id,
-      title: exam.title,
-      course: exam.subject?.name,
-      duration: exam.duration,
-      totalMarks: exam.totalMarks,
-      publishDate: exam.startDate,
-      status: exam.status,
-      description: exam.description
-    })));
+    res.json(
+      exams.map((exam) => ({
+        id: exam._id,
+        title: exam.title,
+        course: exam.subject?.name,
+        duration: exam.duration,
+        totalMarks: exam.totalMarks,
+        publishDate: exam.startDate,
+        status: exam.status,
+        description: exam.description,
+      })),
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -179,13 +194,15 @@ const getExams = async (req, res) => {
 // Get exam details with questions
 const getExamDetails = async (req, res) => {
   try {
-    const exam = await Exam.findById(req.params.id).populate('subject', 'name');
+    const exam = await Exam.findById(req.params.id).populate("subject", "name");
     if (!exam) {
-      return res.status(404).json({ message: 'Exam not found' });
+      return res.status(404).json({ message: "Exam not found" });
     }
 
     // Get questions for this exam
-    const questions = await ExamQuestion.find({ exam: exam._id }).select('-correctAnswer');
+    const questions = await ExamQuestion.find({ exam: exam._id }).select(
+      "-correctAnswer",
+    );
 
     res.json({
       id: exam._id,
@@ -194,13 +211,13 @@ const getExamDetails = async (req, res) => {
       duration: exam.duration,
       totalMarks: exam.totalMarks,
       description: exam.description,
-      questions: questions.map(q => ({
+      questions: questions.map((q) => ({
         id: q._id,
         question: q.question,
         type: q.questionType,
         options: q.options,
-        marks: q.marks
-      }))
+        marks: q.marks,
+      })),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -213,7 +230,7 @@ const getExamSubmission = async (req, res) => {
     const student = await Student.findOne({ user: req.user.id });
     const submission = await ExamAnswer.findOne({
       exam: req.params.id,
-      student: student?._id
+      student: student?._id,
     });
 
     res.json(submission);
@@ -230,17 +247,17 @@ const submitExam = async (req, res) => {
     const student = await Student.findOne({ user: req.user.id });
 
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
 
     // Check if already submitted
     const existingSubmission = await ExamAnswer.findOne({
       exam: examId,
-      student: student._id
+      student: student._id,
     });
 
     if (existingSubmission) {
-      return res.status(400).json({ message: 'Exam already submitted' });
+      return res.status(400).json({ message: "Exam already submitted" });
     }
 
     // Calculate score
@@ -248,7 +265,7 @@ const submitExam = async (req, res) => {
     let score = 0;
     let totalMarks = 0;
 
-    questions.forEach(q => {
+    questions.forEach((q) => {
       totalMarks += q.marks;
       if (answers[q._id] === q.correctAnswer) {
         score += q.marks;
@@ -261,7 +278,7 @@ const submitExam = async (req, res) => {
       answers,
       score,
       totalMarks,
-      submittedAt: new Date()
+      submittedAt: new Date(),
     });
 
     await submission.save();
@@ -278,22 +295,22 @@ const getExamResults = async (req, res) => {
     // Find student record first
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
-    
-    const results = await ExamAnswer.find({ 
-      student: student._id 
+
+    const results = await ExamAnswer.find({
+      student: student._id,
     })
-      .populate('exam', 'title subject totalMarks')
+      .populate("exam", "title subject totalMarks")
       .populate({
-        path: 'exam',
+        path: "exam",
         populate: {
-          path: 'subject',
-          select: 'name'
-        }
+          path: "subject",
+          select: "name",
+        },
       })
       .sort({ createdAt: -1 });
-    
+
     res.json(results);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -306,19 +323,21 @@ const getFeePayments = async (req, res) => {
     // Find student record first
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
-    
+
     // Find StudentFee records for this student
-    const StudentFee = require('../models/StudentFee');
+    const StudentFee = require("../models/StudentFee");
     const studentFees = await StudentFee.find({ student: student._id });
-    
+
     // Get payments for these student fees
-    const studentFeeIds = studentFees.map(sf => sf._id);
-    const payments = await FeePayment.find({ 
-      studentFee: { $in: studentFeeIds }
-    }).populate('studentFee').sort({ createdAt: -1 });
-    
+    const studentFeeIds = studentFees.map((sf) => sf._id);
+    const payments = await FeePayment.find({
+      studentFee: { $in: studentFeeIds },
+    })
+      .populate("studentFee")
+      .sort({ createdAt: -1 });
+
     res.json(payments);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -331,13 +350,13 @@ const submitComplaint = async (req, res) => {
     const { title, description, category, priority } = req.body;
     const complaint = new Complaint({
       complaintCode: `CMP-${Date.now()}`,
-      complainantType: 'student',
+      complainantType: "student",
       complainant: req.user.id,
       subject: title,
       description,
       complaintCategory: category,
-      priorityLevel: priority || 'medium',
-      complaintStatus: 'open'
+      priorityLevel: priority || "medium",
+      complaintStatus: "open",
     });
 
     await complaint.save();
@@ -353,7 +372,7 @@ const getStudentComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find({
       complainant: req.user.id,
-      complainantType: 'student'
+      complainantType: "student",
     }).sort({ createdAt: -1 });
 
     res.json(complaints);
@@ -368,16 +387,16 @@ const getStudentLeaves = async (req, res) => {
     // Find student record first
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
+      return res.status(404).json({ message: "Student not found" });
     }
-    
+
     const leaves = await StudentLeave.find({ student: student._id })
-      .populate('approvedBy', 'name')
-      .populate('leaveType')
+      .populate("approvedBy", "name")
+      .populate("leaveType")
       .sort({ createdAt: -1 });
     res.json(leaves);
   } catch (error) {
-    console.error('[StudentController] Error fetching leaves:', error);
+    console.error("[StudentController] Error fetching leaves:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -388,25 +407,25 @@ const createStudentLeave = async (req, res) => {
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
+
     const { leaveType, startDate, endDate, reason } = req.body;
-    
+
     const leave = new StudentLeave({
       student: student._id,
       leaveType,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
       reason,
-      approvalStatus: 'pending'
+      approvalStatus: "pending",
     });
-    
+
     await leave.save();
-    console.log('[StudentController] Leave created:', leave._id);
+    console.log("[StudentController] Leave created:", leave._id);
     res.status(201).json(leave);
   } catch (error) {
-    console.error('[StudentController] Error creating leave:', error);
+    console.error("[StudentController] Error creating leave:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -417,14 +436,15 @@ const getStudentEducation = async (req, res) => {
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
-    const education = await StudentEducation.find({ student: student._id })
-      .sort({ createdAt: -1 });
+
+    const education = await StudentEducation.find({
+      student: student._id,
+    }).sort({ createdAt: -1 });
     res.json(education);
   } catch (error) {
-    console.error('[StudentController] Error fetching education:', error);
+    console.error("[StudentController] Error fetching education:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -435,23 +455,23 @@ const createStudentEducation = async (req, res) => {
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
+
     const { previousDegree, previousInstitution, location } = req.body;
-    
+
     const education = new StudentEducation({
       student: student._id,
       previousDegree,
       previousInstitution,
-      location
+      location,
     });
-    
+
     await education.save();
-    console.log('[StudentController] Education record created:', education._id);
+    console.log("[StudentController] Education record created:", education._id);
     res.status(201).json(education);
   } catch (error) {
-    console.error('[StudentController] Error creating education:', error);
+    console.error("[StudentController] Error creating education:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -462,25 +482,25 @@ const updateStudentEducation = async (req, res) => {
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
+
     const { previousDegree, previousInstitution, location } = req.body;
-    
+
     const education = await StudentEducation.findOneAndUpdate(
       { _id: req.params.id, student: student._id },
       { previousDegree, previousInstitution, location },
-      { new: true }
+      { new: true },
     );
-    
+
     if (!education) {
-      return res.status(404).json({ message: 'Education record not found' });
+      return res.status(404).json({ message: "Education record not found" });
     }
-    
-    console.log('[StudentController] Education record updated:', education._id);
+
+    console.log("[StudentController] Education record updated:", education._id);
     res.json(education);
   } catch (error) {
-    console.error('[StudentController] Error updating education:', error);
+    console.error("[StudentController] Error updating education:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -491,22 +511,22 @@ const deleteStudentEducation = async (req, res) => {
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
+
     const education = await StudentEducation.findOneAndDelete({
       _id: req.params.id,
-      student: student._id
+      student: student._id,
     });
-    
+
     if (!education) {
-      return res.status(404).json({ message: 'Education record not found' });
+      return res.status(404).json({ message: "Education record not found" });
     }
-    
-    console.log('[StudentController] Education record deleted:', req.params.id);
-    res.json({ message: 'Education record deleted successfully' });
+
+    console.log("[StudentController] Education record deleted:", req.params.id);
+    res.json({ message: "Education record deleted successfully" });
   } catch (error) {
-    console.error('[StudentController] Error deleting education:', error);
+    console.error("[StudentController] Error deleting education:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -514,23 +534,23 @@ const deleteStudentEducation = async (req, res) => {
 // Get student degree records
 const getStudentDegrees = async (req, res) => {
   try {
-    const StudentDegree = require('../models/StudentDegree');
-    const Student = require('../models/Student');
-    
+    const StudentDegree = require("../models/StudentDegree");
+    const Student = require("../models/Student");
+
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
+
     const degrees = await StudentDegree.find({ student: student._id })
-      .populate('degree')
+      .populate("degree")
       .sort({ createdAt: -1 });
-    
-    console.log('[StudentController] Degrees fetched:', degrees.length);
+
+    console.log("[StudentController] Degrees fetched:", degrees.length);
     res.json(degrees);
   } catch (error) {
-    console.error('[StudentController] Error fetching degrees:', error);
+    console.error("[StudentController] Error fetching degrees:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -538,26 +558,28 @@ const getStudentDegrees = async (req, res) => {
 // Get all books for library
 const getBooks = async (req, res) => {
   try {
-    const Book = require('../models/Book');
+    const Book = require("../models/Book");
     const books = await Book.find({ deletedAt: null })
-      .populate('category', 'name')
+      .populate("category", "name")
       .sort({ title: 1 });
-    
-    console.log('[StudentController] Books fetched:', books.length);
+
+    console.log("[StudentController] Books fetched:", books.length);
     res.json(
       books.map((book) => ({
         _id: book._id,
         title: book.title,
-        author: book.author || 'Unknown',
-        isbn: book.isbn || '',
-        category: book.category?.name || 'Uncategorized',
-        status: book.stock > 0 ? 'available' : 'borrowed',
+        author: book.author || "Unknown",
+        isbn: book.isbn || "",
+        category: book.category?.name || "Uncategorized",
+        status: book.stock > 0 ? "available" : "borrowed",
         stock: book.stock || 0,
-        image: book.coverImage || 'https://via.placeholder.com/120x160/e5e7eb/6b7280?text=BOOK'
-      }))
+        image:
+          book.coverImage ||
+          "https://via.placeholder.com/120x160/e5e7eb/6b7280?text=BOOK",
+      })),
     );
   } catch (error) {
-    console.error('[StudentController] Error fetching books:', error);
+    console.error("[StudentController] Error fetching books:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -565,40 +587,48 @@ const getBooks = async (req, res) => {
 // Get student's borrowed books
 const getBorrowedBooks = async (req, res) => {
   try {
-    const BorrowedBook = require('../models/BorrowedBook');
-    const Student = require('../models/Student');
-    
+    const BorrowedBook = require("../models/BorrowedBook");
+    const Student = require("../models/Student");
+
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
-    const borrowedBooks = await BorrowedBook.find({ 
+
+    const borrowedBooks = await BorrowedBook.find({
       borrower: student._id,
-      status: 'borrowed'
+      status: "borrowed",
     })
-      .populate('book')
+      .populate("book")
       .sort({ borrowedAt: -1 });
-    
-    console.log('[StudentController] Borrowed books fetched:', borrowedBooks.length);
+
+    console.log(
+      "[StudentController] Borrowed books fetched:",
+      borrowedBooks.length,
+    );
     res.json(
       borrowedBooks.map((record) => ({
         _id: record._id,
         id: record.book?._id || record._id,
-        title: record.book?.title || 'Unknown book',
-        author: record.book?.author || 'Unknown',
-        isbn: record.book?.isbn || '',
-        category: record.book?.category?.name || 'Uncategorized',
+        title: record.book?.title || "Unknown book",
+        author: record.book?.author || "Unknown",
+        isbn: record.book?.isbn || "",
+        category: record.book?.category?.name || "Uncategorized",
         borrowDate: record.borrowedAt,
         dueDate: record.returnDate,
         renewals: 0,
-        status: record.returnDate && new Date(record.returnDate) < new Date() ? 'overdue' : 'borrowed',
-        image: record.book?.coverImage || 'https://via.placeholder.com/120x160/e5e7eb/6b7280?text=BOOK'
-      }))
+        status:
+          record.returnDate && new Date(record.returnDate) < new Date()
+            ? "overdue"
+            : "borrowed",
+        image:
+          record.book?.coverImage ||
+          "https://via.placeholder.com/120x160/e5e7eb/6b7280?text=BOOK",
+      })),
     );
   } catch (error) {
-    console.error('[StudentController] Error fetching borrowed books:', error);
+    console.error("[StudentController] Error fetching borrowed books:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -606,57 +636,59 @@ const getBorrowedBooks = async (req, res) => {
 // Borrow a book
 const borrowBook = async (req, res) => {
   try {
-    const BorrowedBook = require('../models/BorrowedBook');
-    const Book = require('../models/Book');
-    const Student = require('../models/Student');
-    
+    const BorrowedBook = require("../models/BorrowedBook");
+    const Book = require("../models/Book");
+    const Student = require("../models/Student");
+
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
+
     const bookId = req.params.id;
     const book = await Book.findById(bookId);
-    
+
     if (!book) {
-      return res.status(404).json({ message: 'Book not found' });
+      return res.status(404).json({ message: "Book not found" });
     }
-    
+
     if (book.stock <= 0) {
-      return res.status(400).json({ message: 'Book is not available' });
+      return res.status(400).json({ message: "Book is not available" });
     }
-    
+
     // Check if already borrowed
     const existingBorrow = await BorrowedBook.findOne({
       book: bookId,
       borrower: student._id,
-      status: 'borrowed'
+      status: "borrowed",
     });
-    
+
     if (existingBorrow) {
-      return res.status(400).json({ message: 'You have already borrowed this book' });
+      return res
+        .status(400)
+        .json({ message: "You have already borrowed this book" });
     }
-    
+
     // Create borrow record
     const borrowedBook = new BorrowedBook({
       book: bookId,
       borrower: student._id,
       borrowedAt: new Date(),
       returnDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days
-      status: 'borrowed'
+      status: "borrowed",
     });
-    
+
     await borrowedBook.save();
-    
+
     // Update book stock
     book.stock -= 1;
     await book.save();
-    
-    console.log('[StudentController] Book borrowed:', bookId);
-    res.json({ message: 'Book borrowed successfully', borrowedBook });
+
+    console.log("[StudentController] Book borrowed:", bookId);
+    res.json({ message: "Book borrowed successfully", borrowedBook });
   } catch (error) {
-    console.error('[StudentController] Error borrowing book:', error);
+    console.error("[StudentController] Error borrowing book:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -664,45 +696,45 @@ const borrowBook = async (req, res) => {
 // Return a book
 const returnBook = async (req, res) => {
   try {
-    const BorrowedBook = require('../models/BorrowedBook');
-    const Book = require('../models/Book');
-    const Student = require('../models/Student');
-    
+    const BorrowedBook = require("../models/BorrowedBook");
+    const Book = require("../models/Book");
+    const Student = require("../models/Student");
+
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
+
     const bookId = req.params.id;
-    
+
     // Find the borrow record
     const borrowedBook = await BorrowedBook.findOne({
       book: bookId,
       borrower: student._id,
-      status: 'borrowed'
+      status: "borrowed",
     });
-    
+
     if (!borrowedBook) {
-      return res.status(404).json({ message: 'Borrow record not found' });
+      return res.status(404).json({ message: "Borrow record not found" });
     }
-    
+
     // Update borrow record
-    borrowedBook.status = 'returned';
+    borrowedBook.status = "returned";
     borrowedBook.returnDate = new Date();
     await borrowedBook.save();
-    
+
     // Update book stock
     const book = await Book.findById(bookId);
     if (book) {
       book.stock += 1;
       await book.save();
     }
-    
-    console.log('[StudentController] Book returned:', bookId);
-    res.json({ message: 'Book returned successfully' });
+
+    console.log("[StudentController] Book returned:", bookId);
+    res.json({ message: "Book returned successfully" });
   } catch (error) {
-    console.error('[StudentController] Error returning book:', error);
+    console.error("[StudentController] Error returning book:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -710,37 +742,42 @@ const returnBook = async (req, res) => {
 // Renew a book
 const renewBook = async (req, res) => {
   try {
-    const BorrowedBook = require('../models/BorrowedBook');
-    const Student = require('../models/Student');
-    
+    const BorrowedBook = require("../models/BorrowedBook");
+    const Student = require("../models/Student");
+
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
+
     const bookId = req.params.id;
-    
+
     // Find the borrow record
     const borrowedBook = await BorrowedBook.findOne({
       book: bookId,
       borrower: student._id,
-      status: 'borrowed'
+      status: "borrowed",
     });
-    
+
     if (!borrowedBook) {
-      return res.status(404).json({ message: 'Borrow record not found' });
+      return res.status(404).json({ message: "Borrow record not found" });
     }
-    
+
     // Extend return date by 7 days
     const currentReturnDate = new Date(borrowedBook.returnDate);
-    borrowedBook.returnDate = new Date(currentReturnDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    borrowedBook.returnDate = new Date(
+      currentReturnDate.getTime() + 7 * 24 * 60 * 60 * 1000,
+    );
     await borrowedBook.save();
-    
-    console.log('[StudentController] Book renewed:', bookId);
-    res.json({ message: 'Book renewed successfully', returnDate: borrowedBook.returnDate });
+
+    console.log("[StudentController] Book renewed:", bookId);
+    res.json({
+      message: "Book renewed successfully",
+      returnDate: borrowedBook.returnDate,
+    });
   } catch (error) {
-    console.error('[StudentController] Error renewing book:', error);
+    console.error("[StudentController] Error renewing book:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -748,15 +785,16 @@ const renewBook = async (req, res) => {
 // Get student documents
 const getStudentDocuments = async (req, res) => {
   try {
-    const UserDocument = require('../models/UserDocument');
-    
-    const documents = await UserDocument.find({ user: req.user.id })
-      .sort({ createdAt: -1 });
-    
-    console.log('[StudentController] Documents fetched:', documents.length);
+    const UserDocument = require("../models/UserDocument");
+
+    const documents = await UserDocument.find({ user: req.user.id }).sort({
+      createdAt: -1,
+    });
+
+    console.log("[StudentController] Documents fetched:", documents.length);
     res.json(documents);
   } catch (error) {
-    console.error('[StudentController] Error fetching documents:', error);
+    console.error("[StudentController] Error fetching documents:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -764,25 +802,25 @@ const getStudentDocuments = async (req, res) => {
 // Get student final results
 const getStudentFinalResults = async (req, res) => {
   try {
-    const FinalResult = require('../models/FinalResult');
-    const Student = require('../models/Student');
-    
+    const FinalResult = require("../models/FinalResult");
+    const Student = require("../models/Student");
+
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: 'Student record not found' });
+      return res.status(404).json({ message: "Student record not found" });
     }
-    
+
     const results = await FinalResult.find({ student: student._id })
-      .populate('exam')
-      .populate('class')
-      .populate('course')
+      .populate("exam")
+      .populate("class")
+      .populate("course")
       .sort({ createdAt: -1 });
-    
-    console.log('[StudentController] Final results fetched:', results.length);
+
+    console.log("[StudentController] Final results fetched:", results.length);
     res.json(results);
   } catch (error) {
-    console.error('[StudentController] Error fetching final results:', error);
+    console.error("[StudentController] Error fetching final results:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -791,33 +829,52 @@ const getStudentFinalResults = async (req, res) => {
 const submitAssignment = async (req, res) => {
   try {
     const student = await Student.findOne({ user: req.user.id });
-    if (!student) return res.status(404).json({ message: 'Student not found' });
+    if (!student) return res.status(404).json({ message: "Student not found" });
 
     const { title, description, course, dueDate, assignmentId } = req.body;
-    if (!title || !course) return res.status(400).json({ message: 'Title and course are required' });
+    if (!title || !course)
+      return res.status(400).json({ message: "Title and course are required" });
 
     // If an assignmentId was provided, mark it submitted
     if (assignmentId) {
       const updated = await Assignment.findByIdAndUpdate(
         assignmentId,
-        { $addToSet: { submissions: { student: student._id, submittedAt: new Date(), note: description } } },
-        { new: true }
+        {
+          $addToSet: {
+            submissions: {
+              student: student._id,
+              submittedAt: new Date(),
+              note: description,
+            },
+          },
+        },
+        { new: true },
       );
-      if (!updated) return res.status(404).json({ message: 'Assignment not found' });
-      return res.json({ success: true, message: 'Assignment submitted successfully' });
+      if (!updated)
+        return res.status(404).json({ message: "Assignment not found" });
+      return res.json({
+        success: true,
+        message: "Assignment submitted successfully",
+      });
     }
 
     // Otherwise create a submission record directly
     const submission = await Assignment.create({
       title,
-      description: description || '',
+      description: description || "",
       courseId: course,
       dueDate: dueDate || new Date(),
-      status: 'submitted',
-      createdBy: req.user.id
+      status: "submitted",
+      createdBy: req.user.id,
     });
 
-    res.status(201).json({ success: true, message: 'Homework submitted successfully', data: submission });
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: "Homework submitted successfully",
+        data: submission,
+      });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -826,28 +883,28 @@ const submitAssignment = async (req, res) => {
 const getAllStudents = async (req, res) => {
   try {
     const students = await Student.find({ deletedAt: null })
-      .populate('user', 'name email phone image')
-      .populate('currentClass', 'className')
+      .populate("user", "name email phone image")
+      .populate("currentClass", "className")
       .lean();
-    
+
     // Merge student data with user data
-    const enrichedStudents = students.map(student => ({
+    const enrichedStudents = students.map((student) => ({
       ...student,
-      firstName: student.user?.name?.split(' ')[0],
-      lastName: student.user?.name?.split(' ')[1] || '',
+      firstName: student.user?.name?.split(" ")[0],
+      lastName: student.user?.name?.split(" ")[1] || "",
       name: student.user?.name,
       email: student.user?.email,
-      phone: student.user?.phone
+      phone: student.user?.phone,
     }));
-    
+
     res.json({
       success: true,
-      data: enrichedStudents
+      data: enrichedStudents,
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: error.message 
+      message: error.message,
     });
   }
 };
@@ -856,17 +913,17 @@ const getAllStudents = async (req, res) => {
 const getAllAdmissions = async (req, res) => {
   try {
     const admissions = await Admission.find({ deletedAt: null })
-      .populate('degree', 'degreeName name')
+      .populate("degree", "degreeName name")
       .lean();
-    
+
     res.json({
       success: true,
-      data: admissions
+      data: admissions,
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: error.message 
+      message: error.message,
     });
   }
 };
@@ -875,32 +932,32 @@ const getAllAdmissions = async (req, res) => {
 const createAdmission = async (req, res) => {
   try {
     const admissionData = req.body;
-    
+
     // Handle nested address objects
     const admission = new Admission({
       ...admissionData,
       permanentAddress: {
         province: admissionData.permanentAddress_province,
         district: admissionData.permanentAddress_district,
-        village: admissionData.permanentAddress_village
+        village: admissionData.permanentAddress_village,
       },
       currentAddress: {
         province: admissionData.currentAddress_province,
         district: admissionData.currentAddress_district,
-        village: admissionData.currentAddress_village
-      }
+        village: admissionData.currentAddress_village,
+      },
     });
-    
+
     await admission.save();
-    
+
     res.status(201).json({
       success: true,
-      data: admission
+      data: admission,
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      message: error.message 
+      message: error.message,
     });
   }
 };
@@ -909,28 +966,28 @@ const createAdmission = async (req, res) => {
 const updateAdmission = async (req, res) => {
   try {
     const admissionData = req.body;
-    
+
     const admission = await Admission.findByIdAndUpdate(
       req.params.id,
       admissionData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
-    
+
     if (!admission) {
       return res.status(404).json({
         success: false,
-        message: 'Admission not found'
+        message: "Admission not found",
       });
     }
-    
+
     res.json({
       success: true,
-      data: admission
+      data: admission,
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      message: error.message 
+      message: error.message,
     });
   }
 };
@@ -941,24 +998,24 @@ const deleteAdmission = async (req, res) => {
     const admission = await Admission.findByIdAndUpdate(
       req.params.id,
       { deletedAt: new Date() },
-      { new: true }
+      { new: true },
     );
-    
+
     if (!admission) {
       return res.status(404).json({
         success: false,
-        message: 'Admission not found'
+        message: "Admission not found",
       });
     }
-    
+
     res.json({
       success: true,
-      message: 'Admission deleted successfully'
+      message: "Admission deleted successfully",
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: error.message 
+      message: error.message,
     });
   }
 };
@@ -966,50 +1023,52 @@ const deleteAdmission = async (req, res) => {
 // Convert admission to student
 const convertToStudent = async (req, res) => {
   try {
-    const admission = await Admission.findById(req.params.id).populate('degree');
+    const admission = await Admission.findById(req.params.id).populate(
+      "degree",
+    );
     if (!admission) {
       return res.status(404).json({
         success: false,
-        message: 'Admission not found'
+        message: "Admission not found",
       });
     }
-    
+
     // Create user account first
     const userPayload = {
       name: `${admission.firstName} ${admission.lastName}`,
-      email: admission.email || `${admission.firstName.toLowerCase()}@example.com`,
-      password: await bcrypt.hash('defaultPassword123', 10),
-      role: 'student',
+      email:
+        admission.email || `${admission.firstName.toLowerCase()}@example.com`,
+      password: await bcrypt.hash("defaultPassword123", 10),
+      role: "student",
       phone: admission.phone,
-      status: 'active'
+      status: "active",
     };
     const user = new User(userPayload);
     await user.save();
-    
+
     // Create student record
     const student = new Student({
       user: user._id,
       studentCode: `STU-${Date.now()}`,
-      currentClass: admission.degree?._id,
-      currentLevel: admission.degree?.degreeName || 'Level 1',
+      currentLevel: admission.degree?.degreeName || "Level 1",
       admissionDate: new Date(),
-      status: 'active'
+      status: "active",
     });
     await student.save();
-    
+
     // Update admission status
-    admission.status = 'accepted';
+    admission.status = "accepted";
     await admission.save();
-    
+
     res.json({
       success: true,
-      message: 'Admission converted to student successfully',
-      data: { user, student }
+      message: "Admission converted to student successfully",
+      data: { user, student },
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: error.message 
+      message: error.message,
     });
   }
 };
@@ -1018,55 +1077,76 @@ const convertToStudent = async (req, res) => {
 const createStudent = async (req, res) => {
   try {
     const studentData = req.body;
-    
-    const hashedPassword = await bcrypt.hash(studentData.accountPassword || studentData.password || 'defaultPassword123', 10);
-    
+
+    const hashedPassword = await bcrypt.hash(
+      studentData.accountPassword ||
+        studentData.password ||
+        "defaultPassword123",
+      10,
+    );
+
     // Build user object, stripping empty enum fields to avoid Mongoose validation errors
     const userPayload = {
-      name: `${studentData.firstName} ${studentData.lastName || ''}`.trim(),
-      email: studentData.email || `${studentData.firstName.toLowerCase()}.${Date.now()}@example.com`,
+      name: `${studentData.firstName} ${studentData.lastName || ""}`.trim(),
+      email:
+        studentData.email ||
+        `${studentData.firstName.toLowerCase()}.${Date.now()}@example.com`,
       password: hashedPassword,
-      role: 'student',
+      role: "student",
       phone: studentData.phone,
-      status: 'active'
+      status: "active",
     };
     if (studentData.whatsapp) userPayload.whatsapp = studentData.whatsapp;
     if (studentData.fatherName) userPayload.fatherName = studentData.fatherName;
-    if (studentData.grandfatherName) userPayload.grandfatherName = studentData.grandfatherName;
+    if (studentData.grandfatherName)
+      userPayload.grandfatherName = studentData.grandfatherName;
     if (studentData.dob) userPayload.dob = studentData.dob;
     if (studentData.bloodType) userPayload.bloodType = studentData.bloodType;
-    if (studentData.permanentAddress) userPayload.permanentAddress = studentData.permanentAddress;
-    if (studentData.currentAddress) userPayload.currentAddress = studentData.currentAddress;
+    if (studentData.permanentAddress)
+      userPayload.permanentAddress = studentData.permanentAddress;
+    if (studentData.currentAddress)
+      userPayload.currentAddress = studentData.currentAddress;
     if (studentData.image) userPayload.image = studentData.image;
-    
+
     const user = new User(userPayload);
     await user.save();
-    
+
     // Build student record, only including non-empty fields
     const studentPayload = {
       user: user._id,
       studentCode: studentData.studentCode || `STU-${Date.now()}`,
       admissionDate: studentData.admissionDate || new Date(),
-      status: studentData.status || 'active'
+      status: studentData.status || "active",
     };
     if (studentData.firstName) studentPayload.firstName = studentData.firstName;
     if (studentData.lastName) studentPayload.lastName = studentData.lastName;
-    if (studentData.fatherName) studentPayload.fatherName = studentData.fatherName;
-    if (studentData.grandfatherName) studentPayload.grandfatherName = studentData.grandfatherName;
+    if (studentData.fatherName)
+      studentPayload.fatherName = studentData.fatherName;
+    if (studentData.grandfatherName)
+      studentPayload.grandfatherName = studentData.grandfatherName;
     if (studentData.dob) studentPayload.dob = studentData.dob;
     if (studentData.phone) studentPayload.phone = studentData.phone;
     if (studentData.whatsapp) studentPayload.whatsapp = studentData.whatsapp;
     if (studentData.email) studentPayload.email = studentData.email;
     if (studentData.bloodType) studentPayload.bloodType = studentData.bloodType;
-    if (studentData.permanentAddress) studentPayload.permanentAddress = studentData.permanentAddress;
-    if (studentData.currentAddress) studentPayload.currentAddress = studentData.currentAddress;
-    if (studentData.guardianName) studentPayload.guardianName = studentData.guardianName;
-    if (studentData.guardianRelationship) studentPayload.guardianRelationship = studentData.guardianRelationship;
-    if (studentData.guardianPhone) studentPayload.guardianPhone = studentData.guardianPhone;
-    if (studentData.guardianEmail) studentPayload.guardianEmail = studentData.guardianEmail;
-    if (studentData.currentLevel) studentPayload.currentLevel = studentData.currentLevel;
+    if (studentData.permanentAddress)
+      studentPayload.permanentAddress = studentData.permanentAddress;
+    if (studentData.currentAddress)
+      studentPayload.currentAddress = studentData.currentAddress;
+    if (studentData.guardianName)
+      studentPayload.guardianName = studentData.guardianName;
+    if (studentData.guardianRelationship)
+      studentPayload.guardianRelationship = studentData.guardianRelationship;
+    if (studentData.guardianPhone)
+      studentPayload.guardianPhone = studentData.guardianPhone;
+    if (studentData.guardianEmail)
+      studentPayload.guardianEmail = studentData.guardianEmail;
+    if (studentData.currentLevel)
+      studentPayload.currentLevel = studentData.currentLevel;
+    if (studentData.currentClass)
+      studentPayload.currentClass = studentData.currentClass;
     if (studentData.image) studentPayload.image = studentData.image;
-    
+
     const student = new Student(studentPayload);
     await student.save();
 
@@ -1075,12 +1155,12 @@ const createStudent = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      data: student
+      data: student,
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      message: error.message 
+      message: error.message,
     });
   }
 };
@@ -1089,12 +1169,12 @@ const createStudent = async (req, res) => {
 const updateStudent = async (req, res) => {
   try {
     const studentData = req.body;
-    
+
     const student = await Student.findById(req.params.id);
     if (!student) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found'
+        message: "Student not found",
       });
     }
 
@@ -1102,7 +1182,8 @@ const updateStudent = async (req, res) => {
     const userUpdateData = {};
     // Handle name from firstName + lastName if available
     if (studentData.firstName || studentData.lastName) {
-      const fullName = `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim();
+      const fullName =
+        `${studentData.firstName || ""} ${studentData.lastName || ""}`.trim();
       if (fullName) userUpdateData.name = fullName;
     } else if (studentData.name) {
       userUpdateData.name = studentData.name;
@@ -1110,35 +1191,40 @@ const updateStudent = async (req, res) => {
     if (studentData.email) userUpdateData.email = studentData.email;
     if (studentData.phone) userUpdateData.phone = studentData.phone;
     if (studentData.image) userUpdateData.image = studentData.image;
-    if (studentData.fatherName) userUpdateData.fatherName = studentData.fatherName;
-    if (studentData.grandfatherName) userUpdateData.grandfatherName = studentData.grandfatherName;
+    if (studentData.fatherName)
+      userUpdateData.fatherName = studentData.fatherName;
+    if (studentData.grandfatherName)
+      userUpdateData.grandfatherName = studentData.grandfatherName;
     if (studentData.dob) userUpdateData.dob = studentData.dob;
     if (studentData.bloodType) userUpdateData.bloodType = studentData.bloodType;
 
     if (Object.keys(userUpdateData).length > 0) {
-      await User.findByIdAndUpdate(student.user, userUpdateData, { new: true, runValidators: true });
+      await User.findByIdAndUpdate(student.user, userUpdateData, {
+        new: true,
+        runValidators: true,
+      });
     }
 
     // Filter out fields with empty string values to avoid cast errors
     const filteredUpdateData = Object.fromEntries(
-      Object.entries(studentData).filter(([_, value]) => value !== '')
+      Object.entries(studentData).filter(([_, value]) => value !== ""),
     );
 
     // Update student record
     const updatedStudent = await Student.findByIdAndUpdate(
       req.params.id,
       filteredUpdateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
-    
+
     res.json({
       success: true,
-      data: updatedStudent
+      data: updatedStudent,
     });
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       success: false,
-      message: error.message 
+      message: error.message,
     });
   }
 };
@@ -1149,24 +1235,24 @@ const deleteStudent = async (req, res) => {
     const student = await Student.findByIdAndUpdate(
       req.params.id,
       { deletedAt: new Date() },
-      { new: true }
+      { new: true },
     );
-    
+
     if (!student) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found'
+        message: "Student not found",
       });
     }
-    
+
     res.json({
       success: true,
-      message: 'Student deleted successfully'
+      message: "Student deleted successfully",
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: error.message 
+      message: error.message,
     });
   }
 };
@@ -1200,7 +1286,7 @@ module.exports = {
   renewBook,
   getStudentDocuments,
   getStudentFinalResults,
-  
+
   submitAssignment,
   // Registrar/Staff routes
   getAllStudents,
@@ -1211,5 +1297,5 @@ module.exports = {
   createAdmission,
   updateAdmission,
   deleteAdmission,
-  convertToStudent
+  convertToStudent,
 };

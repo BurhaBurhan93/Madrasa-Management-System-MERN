@@ -1,6 +1,6 @@
-import React from 'react';
-import FormPage from '../shared/FormPage';
-import { financialReportsConfig } from './FinancialReports';
+import React from "react";
+import FormPage from "../shared/FormPage";
+import financialReportsConfig from "./financialReportsConfig";
 
 const FinancialReportsCreate = () => (
   <FormPage

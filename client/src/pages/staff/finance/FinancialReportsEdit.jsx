@@ -1,7 +1,7 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import FormPage from '../shared/FormPage';
-import { financialReportsConfig } from './FinancialReports';
+import React from "react";
+import { useParams } from "react-router-dom";
+import FormPage from "../shared/FormPage";
+import financialReportsConfig from "./financialReportsConfig";
 
 const FinancialReportsEdit = () => {
   const { id } = useParams();

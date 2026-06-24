@@ -3,6 +3,7 @@ const Student = require('../../models/Student');
 const Employee = require('../../models/Employee');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const validator = require('validator');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'madrasa-dev-secret';
 const DEMO_ACCOUNTS = {
@@ -110,39 +111,51 @@ const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
 
+    // Sanitize inputs using validator
+    const sanitizedEmail = validator.normalizeEmail(email);
+    const sanitizedRole = validator.trim(role);
+
     // Find user by email
-    const user = await User.findOne({ email }).populate({
+    const user = await User.findOne({ email: sanitizedEmail }).populate({
       path: 'roles',
       populate: { path: 'permissions', select: 'name description' }
     });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Verify role matches
-    if (user.role !== role) {
-      return res.status(403).json({ message: `Access denied. You are not registered as ${role}.` });
+    if (user.role !== sanitizedRole) {
+      return res.status(403).json({ success: false, message: `Access denied. You are not registered as ${sanitizedRole}.` });
     }
 
     // Generate JWT token
     const token = createToken(user);
 
-    const { profile, employee } = await getRoleProfile(user);
+    // Set HTTP-only cookie
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: 'strict',
+    });
 
+    const { profile, employee } = await getRoleProfile(user);
     const staffModules = getStaffModules(user, employee);
 
     res.json({
+      success: true,
       token,
       user: buildAuthUser(user, profile, staffModules)
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -175,12 +188,22 @@ const demoLogin = async (req, res) => {
       });
     }
 
+    const token = createToken(user);
+
+    // Set HTTP-only cookie for demo login too
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: 'strict',
+    });
+
     const { profile, employee } = await getRoleProfile(user);
     const staffModules = getStaffModules(user, employee);
 
     res.json({
       success: true,
-      token: createToken(user),
+      token,
       user: buildAuthUser(user, profile, staffModules)
     });
   } catch (error) {
@@ -188,15 +211,26 @@ const demoLogin = async (req, res) => {
   }
 };
 
+// Logout user
+const logout = (req, res) => {
+  res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+  res.json({ success: true, message: 'Logged out successfully' });
+};
+
 // Register user (for testing purposes)
 const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
+    // Sanitize inputs
+    const sanitizedName = validator.trim(name);
+    const sanitizedEmail = validator.normalizeEmail(email);
+    const sanitizedRole = validator.trim(role);
+
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: sanitizedEmail });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ success: false, message: 'User already exists' });
     }
 
     // Hash password
@@ -204,44 +238,44 @@ const register = async (req, res) => {
 
     // Create user
     const user = new User({
-      name,
-      email,
+      name: sanitizedName,
+      email: sanitizedEmail,
       password: hashedPassword,
-      role
+      role: sanitizedRole
     });
 
     await user.save();
 
     // Create role-specific profile
-    if (role === 'student') {
+    if (sanitizedRole === 'student') {
       const studentCount = await Student.countDocuments();
       await Student.create({
         user: user._id,
-        firstName: name,
-        email,
+        firstName: sanitizedName,
+        email: sanitizedEmail,
         studentCode: `STU${2024000 + studentCount + 1}`,
         admissionDate: new Date(),
         status: 'active'
       });
-    } else if (role === 'teacher' || role === 'staff') {
+    } else if (sanitizedRole === 'teacher' || sanitizedRole === 'staff') {
       const empCount = await Employee.countDocuments();
       await Employee.create({
         user: user._id,
         employeeCode: `EMP${2024000 + empCount + 1}`,
-        fullName: name,
+        fullName: sanitizedName,
         gender: 'male',
         phoneNumber: 'N/A',
-        email,
-        employeeType: role === 'teacher' ? 'teacher' : 'support',
+        email: sanitizedEmail,
+        employeeType: sanitizedRole === 'teacher' ? 'teacher' : 'support',
         joiningDate: new Date(),
         baseSalary: 0,
         status: 'active'
       });
     }
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ success: true, message: 'User registered successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -270,5 +304,6 @@ module.exports = {
   demoLogin,
   login,
   register,
+  logout,
   getMe
 };
