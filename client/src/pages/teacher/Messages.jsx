@@ -5,26 +5,59 @@ import Button from "../../components/UIHelper/Button";
 import Input from "../../components/UIHelper/Input";
 import Search from "../../components/UIHelper/Search";
 import Badge from "../../components/UIHelper/Badge";
+import { useTranslation } from 'react-i18next';
 
 const contacts = [
-  { id: 1, name: "Admin Office", unread: 2 },
-  { id: 2, name: "Teacher Ahmad", unread: 0 },
-  { id: 3, name: "Finance Department", unread: 5 },
+  {
+    id: 1,
+    name: t('messagesPage.contacts.adminOffice'),
+    unread: 2
+  },
+  {
+    id: 2,
+    name: t('messagesPage.contacts.teacherAhmad'),
+    unread: 0
+  },
+  {
+    id: 3,
+    name: t('messagesPage.contacts.financeDepartment'),
+    unread: 5
+  }
 ];
 
 const initialMessages = [
-  { sender: "Admin Office", text: "Please check complaint CMP-001.", time: "10:20 AM" },
-  { sender: "You", text: "I will review it today.", time: "10:25 AM" },
-  { sender: "Admin Office", text: "Thank you.", time: "10:27 AM" },
+  {
+    sender: t('messagesPage.contacts.adminOffice'),
+    text: t('messagesPage.defaultMessages.checkComplaint'),
+    time: "10:20 AM"
+  },
+  {
+    sender: t('messagesPage.labels.you'),
+    text: t('messagesPage.defaultMessages.reviewToday'),
+    time: "10:25 AM"
+  },
+  {
+    sender: t('messagesPage.contacts.adminOffice'),
+    text: t('messagesPage.defaultMessages.thankYou'),
+    time: "10:27 AM"
+  }
 ];
 
 const Messages = () => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState(initialMessages);
   const [newMessage, setNewMessage] = useState("");
 
   const sendMessage = () => {
     if (!newMessage) return;
-    setMessages([...messages, { sender: "You", text: newMessage, time: "Now" }]);
+   setMessages([
+  ...messages,
+  {
+    sender: t('messagesPage.labels.you'),
+    text: newMessage,
+    time: t('messagesPage.labels.now')
+  }
+]);
     setNewMessage("");
   };
 
@@ -35,7 +68,7 @@ const Messages = () => {
 
           {/* Contacts */}
           <div className="w-1/3 border-r p-4 space-y-4">
-            <Search placeholder="Search contacts..." />
+            <Search placeholder={t('messagesPage.searchPlaceholder')} />
             {contacts.map((contact) => (
               <div key={contact.id} className="flex justify-between items-center p-3 hover:bg-gray-100 rounded cursor-pointer">
                 <div className="flex items-center gap-2">
@@ -57,7 +90,7 @@ const Messages = () => {
                 <div
                   key={index}
                   className={`max-w-md p-3 rounded-lg ${
-                    msg.sender === "You"
+                    msg.sender === t('messagesPage.labels.you')
                       ? "bg-blue-500 text-white ml-auto"
                       : "bg-gray-200"
                   }`}
@@ -73,9 +106,9 @@ const Messages = () => {
               <Input
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message..."
+                placeholder={t('messagesPage.typeMessage')}
               />
-              <Button onClick={sendMessage}>Send</Button>
+              <Button onClick={sendMessage}>{t('messagesPage.send')}</Button>
             </div>
 
           </div>

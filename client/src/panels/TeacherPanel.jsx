@@ -26,16 +26,11 @@ import { useTheme } from "../contexts/ThemeContext";
 import { CalendarProvider, useCalendar } from "../contexts/CalendarContext";
 import { clearAuth } from "../lib/auth";
 import NotificationDropdown from "../components/UIHelper/NotificationDropdown";
-import {
-  CALENDAR_SYSTEMS,
-  calendarLabels,
-  setCalendarSystem,
-} from "../lib/dateUtils";
-import { PageSkeleton } from "../components/UIHelper/SkeletonLoader";
-import useMadrasaInfo from "../hooks/useMadrasaInfo";
-import { getMadrasaDisplayName, getMadrasaLogo } from "../lib/madrasaInfo";
-import i18n from "../i18n";
-import ConfirmDialog from "../components/ConfirmDialog";
+import { CALENDAR_SYSTEMS, calendarLabels, setCalendarSystem } from '../lib/dateUtils';
+import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
+import { getMadrasaLogo, getMadrasaDisplayName } from '../lib/madrasaInfo';
+import useMadrasaInfo from '../hooks/useMadrasaInfo';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // ── Localization strings ──
 const translations = {
@@ -157,7 +152,7 @@ const TeacherPanelContent = () => {
   const [user, setUser] = useState(null);
   const [, setLoading] = useState(true);
   const { theme, toggleTheme } = useTheme();
-  const [lang, setLang] = useLocalStorage("teacherLang", "en");
+  const [lang, setLang] = useLocalStorage('teacherLang', 'en');
   const { calSys, setCalSys } = useCalendar();
   const [madrasaInfo] = useMadrasaInfo({ fetchRemote: true });
   const isRTL = lang === "dari" || lang === "ps";
@@ -167,11 +162,7 @@ const TeacherPanelContent = () => {
   useEffect(() => {
     document.documentElement.dir = isRTL ? "rtl" : "ltr";
     document.documentElement.lang = lang;
-    localStorage.setItem("lang", lang);
-    i18n.changeLanguage(lang);
-    return () => {
-      document.documentElement.dir = "ltr";
-    };
+    return () => { document.documentElement.dir = 'ltr'; };
   }, [lang, isRTL]);
 
   useEffect(() => {
@@ -691,14 +682,7 @@ const TeacherPanelContent = () => {
                     <FiMoon size={19} />
                   )}
                 </button>
-                <button
-                  onClick={() => {
-                    const langs = ["en", "dari", "ps"];
-                    setLang(langs[(langs.indexOf(lang) + 1) % langs.length]);
-                  }}
-                  title={t.language}
-                  className={`flex h-11 items-center gap-1 rounded-2xl border px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
-                >
+                <button onClick={() => { const langs = ['en', 'dari', 'ps']; setLang(langs[(langs.indexOf(lang) + 1) % langs.length]); }} title={t.language} className={`flex h-11 items-center gap-1 rounded-2xl border px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}>
                   <FiGlobe size={17} />
                   <span className="text-xs font-semibold">
                     {lang === "en" ? "EN" : lang === "dari" ? "دری" : "پښتو"}

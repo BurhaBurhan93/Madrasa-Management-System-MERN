@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
+import { useTranslation } from 'react-i18next';
+import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -12,6 +14,7 @@ const statusColors = {
 };
 
 const TeacherAttendance = () => {
+  const { t } = useTranslation();
   const [sessions, setSessions] = useState([]);
   const [classes, setClasses] = useState([]);
   const [students, setStudents] = useState([]);
@@ -75,7 +78,10 @@ const TeacherAttendance = () => {
         setShowCreateSession(false);
         setSessionForm({ class: '', sessionDate: new Date().toISOString().split('T')[0], sessionType: 'lecture', location: '' });
       }
-    } catch (e) { alert(e.response?.data?.message || 'Failed to create session'); }
+    } catch (e) { alert(
+  e.response?.data?.message ||
+  t('teacher.attendance.failedCreateSession')
+); }
   };
 
   const saveAttendance = async () => {
@@ -84,8 +90,8 @@ const TeacherAttendance = () => {
     try {
       const records = students.map(s => ({ student: s._id, status: attendance[s._id] || 'present' }));
       const res = await axios.post('http://localhost:5000/api/teacher/attendance', { sessionId: selectedSession._id, records }, api());
-      if (res.data.success) alert('Attendance saved successfully!');
-    } catch (e) { alert('Failed to save attendance'); } finally { setSaving(false); }
+      if (res.data.success) alert(t('teacher.attendance.attendanceSaved'));
+    } catch (e) { alert(t('teacher.attendance.failedSaveAttendance')); } finally { setSaving(false); }
   };
 
   const markAll = (status) => {
@@ -108,16 +114,16 @@ const TeacherAttendance = () => {
   const inputCls = 'w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100';
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)] pb-24">
+    <div className={PANEL_PAGE_BG}>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Attendance</h1>
-            <p className="mt-1 text-sm text-slate-500">Select a session to mark attendance</p>
+            <h1 className="text-2xl font-bold text-slate-900">{t('teacher.attendance.title')}</h1>
+            <p className="mt-1 text-sm text-slate-500">{t('teacher.attendance.subtitle')}</p>
           </div>
           <button onClick={() => setShowCreateSession(true)} className="rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-md">
-            + New Session
+            + {t('teacher.attendance.newSession')}
           </button>
         </div>
 
@@ -125,23 +131,23 @@ const TeacherAttendance = () => {
         {showCreateSession && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm">
             <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl">
-              <h2 className="mb-5 text-lg font-semibold text-slate-900">Create Session</h2>
+              <h2 className="mb-5 text-lg font-semibold text-slate-900">{t('teacher.attendance.createSession')}</h2>
               <div className="space-y-3">
                 <select value={sessionForm.class} onChange={e => setSessionForm({ ...sessionForm, class: e.target.value })} className={inputCls}>
-                  <option value="">Select Class *</option>
+                  <option value="">{t('teacher.attendance.selectClass')} *</option>
                   {classes.map(c => <option key={c._id} value={c._id}>{c.name} {c.section}</option>)}
                 </select>
-                <CalendarDatePicker value={sessionForm.sessionDate} onChange={(date) => setSessionForm({ ...sessionForm, sessionDate: date })} placeholder="Select date" />
+                <CalendarDatePicker value={sessionForm.sessionDate} onChange={(date) => setSessionForm({ ...sessionForm, sessionDate: date })} placeholder={t('teacher.attendance.selectDate')} />
                 <select value={sessionForm.sessionType} onChange={e => setSessionForm({ ...sessionForm, sessionType: e.target.value })} className={inputCls}>
-                  <option value="lecture">Lecture</option>
-                  <option value="exam">Exam</option>
-                  <option value="other">Other</option>
+                  <option value="lecture">{t('teacher.attendance.lecture')}</option>
+                  <option value="exam">{t('teacher.attendance.exam')}</option>
+                  <option value="other">{t('teacher.attendance.other')}</option>
                 </select>
-                <input type="text" placeholder="Location (optional)" value={sessionForm.location} onChange={e => setSessionForm({ ...sessionForm, location: e.target.value })} className={inputCls} />
+                <input type="text" placeholder={t('teacher.attendance.locationOptional')} value={sessionForm.location} onChange={e => setSessionForm({ ...sessionForm, location: e.target.value })} className={inputCls} />
               </div>
               <div className="mt-5 flex justify-end gap-3">
-                <button onClick={() => setShowCreateSession(false)} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">Cancel</button>
-                <button onClick={createSession} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-700">Create</button>
+                <button onClick={() => setShowCreateSession(false)} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">{t('teacher.attendance.cancel')}</button>
+                <button onClick={createSession} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-700">{t('teacher.attendance.create')}</button>
               </div>
             </div>
           </div>
@@ -150,9 +156,9 @@ const TeacherAttendance = () => {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Sessions List */}
           <div className="space-y-3">
-            <p className="px-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Sessions</p>
+            <p className="px-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t('teacher.attendance.sessions')}</p>
             {sessions.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-500">No sessions yet</div>
+              <div className="rounded-3xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-500">{t('teacher.attendance.noSessions')}</div>
             ) : sessions.map(s => (
               <div
                 key={s._id}
@@ -170,19 +176,39 @@ const TeacherAttendance = () => {
           <div className="lg:col-span-2">
             {!selectedSession ? (
               <div className="rounded-3xl border border-dashed border-slate-200 bg-white p-12 text-center text-sm text-slate-500">
-                Select a session from the left to mark attendance
+                {t('teacher.attendance.selectSession')}
               </div>
             ) : (
               <div className="space-y-5">
                 {/* Summary */}
                 <div className="grid grid-cols-5 gap-3">
                   {[
-                    { label: 'Total', value: summary.total, accent: 'bg-slate-500' },
-                    { label: 'Present', value: summary.present, accent: 'bg-emerald-500' },
-                    { label: 'Absent', value: summary.absent, accent: 'bg-rose-500' },
-                    { label: 'Late', value: summary.late, accent: 'bg-amber-500' },
-                    { label: 'Rate', value: `${summary.rate}%`, accent: 'bg-violet-500' },
-                  ].map(c => (
+  {
+    label: t('teacher.attendance.total'),
+    value: summary.total,
+    accent: 'bg-slate-500'
+  },
+  {
+    label: t('teacher.attendance.present'),
+    value: summary.present,
+    accent: 'bg-emerald-500'
+  },
+  {
+    label: t('teacher.attendance.absent'),
+    value: summary.absent,
+    accent: 'bg-rose-500'
+  },
+  {
+    label: t('teacher.attendance.late'),
+    value: summary.late,
+    accent: 'bg-amber-500'
+  },
+  {
+    label: t('teacher.attendance.rate'),
+    value: `${summary.rate}%`,
+    accent: 'bg-violet-500'
+  }
+].map(c => (
                     <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-3 text-center shadow-sm">
                       <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
                       <p className="mt-1 text-lg font-bold text-slate-900">{c.value}</p>
@@ -195,7 +221,15 @@ const TeacherAttendance = () => {
                 <div className="flex flex-wrap gap-2">
                   {['present', 'absent', 'late', 'excused'].map(s => (
                     <button key={s} onClick={() => markAll(s)} className="rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 capitalize transition-all duration-200 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700">
-                      All {s}
+                      {
+  s === 'present'
+    ? t('teacher.attendance.allPresent')
+    : s === 'absent'
+    ? t('teacher.attendance.allAbsent')
+    : s === 'late'
+    ? t('teacher.attendance.allLate')
+    : t('teacher.attendance.allExcused')
+}
                     </button>
                   ))}
                 </div>
@@ -203,19 +237,19 @@ const TeacherAttendance = () => {
                 {/* Table */}
                 <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                   {loading ? (
-                    <div className="flex h-32 items-center justify-center text-slate-500">Loading students...</div>
+                    <div className="flex h-32 items-center justify-center text-slate-500">{t('teacher.attendance.loadingStudents')}</div>
                   ) : (
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-slate-100 bg-slate-50">
-                          <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Student</th>
-                          <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Code</th>
-                          <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Status</th>
+                          <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t('teacher.attendance.student')}</th>
+                          <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t('teacher.attendance.code')}</th>
+                          <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t('teacher.attendance.status')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {students.length === 0 ? (
-                          <tr><td colSpan="3" className="p-8 text-center text-slate-500">No students in this class</td></tr>
+                          <tr><td colSpan="3" className="p-8 text-center text-slate-500">{t('teacher.attendance.noStudents')}</td></tr>
                         ) : students.map(student => (
                           <tr key={student._id} className="transition-colors duration-150 hover:bg-slate-50">
                             <td className="p-4 font-medium text-slate-900">{student.user?.name}</td>
@@ -228,7 +262,15 @@ const TeacherAttendance = () => {
                                     onClick={() => setAttendance(prev => ({ ...prev, [student._id]: status }))}
                                     className={`rounded-xl px-2.5 py-1 text-xs font-medium capitalize transition-all duration-150 ${attendance[student._id] === status ? statusColors[status] : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                                   >
-                                    {status}
+                                    {
+  status === 'present'
+    ? t('teacher.attendance.present')
+    : status === 'absent'
+    ? t('teacher.attendance.absent')
+    : status === 'late'
+    ? t('teacher.attendance.late')
+    : t('teacher.attendance.excused')
+}
                                   </button>
                                 ))}
                               </div>
@@ -252,7 +294,7 @@ const TeacherAttendance = () => {
           <div className="mx-auto flex max-w-7xl items-center justify-between">
             <p className="text-sm text-slate-600">{summary.present} Present • {summary.absent} Absent • {summary.late} Late</p>
             <button onClick={saveAttendance} disabled={saving} className="rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700 disabled:opacity-60">
-              {saving ? 'Saving...' : 'Save Attendance'}
+              {saving ? t('teacher.attendance.saving') : t('teacher.attendance.saveAttendance')}
             </button>
           </div>
         </div>

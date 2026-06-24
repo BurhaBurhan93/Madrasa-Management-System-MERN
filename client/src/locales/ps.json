@@ -1,4 +1,692 @@
 {
+  "teacher": {
+    "dashboard": {
+      "title": "د ښوونځي ډشبورډ",
+      "totalSubjects": "ټول مضامین",
+      "welcome": "ستاسو د ښوونځي پورتل ته ښه راغلاست",
+      "quickStats": "چټکې احصائیه",
+      "upcomingClasses": "راتلونکې ټولګي",
+      "pendingAssignments": "پاتې دندې",
+      "studentAttendance": "د زدهکوونکو ګډون",
+      "totalStudents": "ټول زدهکوونکي",
+      "activeClasses": "فعال ټولګي",
+      "averageAttendance": "منځنی ګډون",
+      "recentActivity": "وروستنۍ فعالیت",
+      "assignedToYou": "ستاسو ته ټاکل شوي",
+      "acrossAllClasses": "ټولو ټولګیو کې",
+      "awaitingReview": "د بیاکتنې په انتظار کې",
+      "activeThisTerm": "په دې ترم کې فعال",
+      "latestAssignmentsExams": "وروستنۍ دندې او امتحانات",
+      "scheduledExamsSessions": "پلان شوي امتحانات او غونډې",
+      "classAttendanceOverview": "د ټولګیو د ګډون لنډیز",
+      "averageStudentPerformance": "د زدهکوونکو منځنی فعالیت",
+      "noRecentActivity": "تر اوسه هېڅ وروستنۍ فعالیت نشته.",
+      "noUpcomingClasses": "هېڅ راتلونکې ټولګي پلان شوي نه دي."
+    },
+    "common": {
+      "assignments": "دندې",
+      "manageSubjectsWorkload": "خپل تدریسي مضامین او کار بار اداره کړئ",
+      "weeklyHours": "اونیزې ساعتونه",
+      "all": "ټول",
+      "active": "فعال",
+      "completed": "پای ته رسیدلی",
+      "upcoming": "راتلونکی",
+      "inactive": "غیرفعال",
+      "allFields": "ټولې ساحې",
+      "sortByName": "د نوم له مخې ترتیب کړئ",
+      "sortByStudents": "د زدهکوونکو له مخې ترتیب کړئ",
+      "sortByProgress": "د پرمختګ له مخې ترتیب کړئ",
+      "credits": "ګڼونې",
+      "description": "تشریح",
+      "syllabusProgress": "د نصاب پرمختګ",
+      "students": "زدهکوونکي",
+      "attendance": "حاضری",
+      "exams": "امتحانات",
+      "unnamedSubject": "بې نومه مضمون",
+      "noDescription": "هیڅ تشریح نشته",
+      "noSubjectsFound": "هیڅ مضمون ونه موندل شو",
+      "na": "شته نه دی",
+      "students": "زدهکوونکي",
+      "attendance": "ګډون",
+      "exams": "امتحانات",
+      "results": "نتایج",
+      "profile": "پروفایل",
+      "subjects": "مضامین",
+      "sessions": "غونډې",
+      "grades": "درجې",
+      "messages": "پیغامونه",
+      "compose": "جوړول",
+      "inbox": "انباکس",
+      "sent": "لېږل شوي",
+      "drafts": "مسودې",
+      "logout": "وتل",
+      "viewAll": "ټول وګورئ",
+      "addNew": "نوی اضافه کړئ",
+      "edit": "سمول",
+      "delete": "ړنګول",
+      "save": "خوندي کړئ",
+      "cancel": "لغول",
+      "search": "لټون",
+      "filter": "فلټر",
+      "loading": "بارول کیږي...",
+      "noData": "هېڅ معلومات نشته"
+    },"students": {
+  "title": "زما زده کوونکي",
+  "subtitle": "هغه زده کوونکي چې ستاسو په ټولګیو کې شامل دي",
+  "totalStudents": "ټول زده کوونکي",
+  "activeStudents": "فعال",
+  "inactiveStudents": "غیرفعال",
+  "mySubjects": "زما مضامین",
+  "searchPlaceholder": "د نوم یا کوډ له مخې لټون...",
+  "allStatus": "ټول حالتونه",
+  "allSubjects": "ټول مضامین",
+  "noStudentsFound": "هیڅ زده کوونکی ونه موندل شو",
+  "registerStudentsMessage": "زده کوونکي د کارکوونکو پینل ← د کاروونکو مدیریت له لارې ثبت کړئ",
+  "unknown": "نامعلوم",
+  "notAssigned": "نه دی ټاکل شوی",
+  "class": "ټولګی",
+  "level": "کچه",
+  "email": "برېښنالیک",
+  "admission": "د شمولیت نېټه",
+  "markAttendance": "حاضري ثبت کړئ",
+  "enterMarks": "نمرې ثبت کړئ"
+},"assignments": {
+  "title": "دندې",
+  "subtitle": "د زده کوونکو دندو مدیریت او تعقیب",
+  "createAssignment": "نوې دنده جوړه کړئ",
+  "total": "ټول",
+  "active": "فعال",
+  "completed": "بشپړ شوي",
+  "overdue": "ځنډېدلي",
+  "allStatus": "ټول حالتونه",
+  "allSubjects": "ټول مضامین",
+  "loading": "بارول کیږي...",
+  "noAssignmentsFound": "هیڅ دنده ونه موندل شوه",
+  "noSubject": "بې مضمون",
+  "due": "وروستۍ نېټه",
+  "overdueLabel": "ځنډېدلی",
+  "maxPoints": "اعظمي نمرې",
+  "markComplete": "بشپړ یې کړئ",
+  "delete": "ړنګول",
+  "deleteConfirm": "ایا غواړئ دا دنده حذف کړئ؟",
+  "deleteFailed": "د حذف کولو هڅه ناکامه شوه",
+  "updateFailed": "تازه کول ناکام شول",
+  "cancelled": "لغوه شوی"
+},"attendance": {
+  "title": "حاضري",
+  "subtitle": "د حاضري ثبت لپاره یوه غونډه وټاکئ",
+  "newSession": "نوې غونډه",
+  "createSession": "غونډه جوړول",
+  "selectClass": "ټولګی وټاکئ",
+  "selectDate": "نېټه وټاکئ",
+  "lecture": "درس",
+  "exam": "ازموینه",
+  "other": "نور",
+  "locationOptional": "ځای (اختیاري)",
+  "cancel": "لغوه",
+  "create": "جوړول",
+  "sessions": "غونډې",
+  "noSessions": "تر اوسه کومه غونډه نشته",
+  "selectSession": "د حاضري لپاره له چپ لوري یوه غونډه وټاکئ",
+  "total": "ټول",
+  "present": "حاضر",
+  "absent": "غایب",
+  "late": "ناوخته",
+  "rate": "کچه",
+  "allPresent": "ټول حاضر",
+  "allAbsent": "ټول غایب",
+  "allLate": "ټول ناوخته",
+  "allExcused": "ټول رخصت",
+  "loadingStudents": "زده کوونکي بارېږي...",
+  "student": "زده کوونکی",
+  "code": "کوډ",
+  "status": "حالت",
+  "noStudents": "په دې ټولګي کې زده کوونکي نشته",
+  "excused": "رخصت",
+  "saveAttendance": "حاضري خوندي کړئ",
+  "saving": "خوندي کېږي...",
+  "attendanceSaved": "حاضري په بریالیتوب سره خوندي شوه!",
+  "failedSaveAttendance": "د حاضري خوندي کول ناکام شول",
+  "failedCreateSession": "د غونډې جوړول ناکام شول"
+},"createAssignment": {
+  "title": "دنده جوړه کړئ",
+  "subtitle": "د خپلو زده کوونکو لپاره نوې دنده جوړه کړئ",
+  "assignmentTitle": "عنوان",
+  "subject": "مضمون",
+  "selectSubject": "مضمون وټاکئ",
+  "dueDate": "د سپارلو نېټه",
+  "maxPoints": "اعظمي نمرې",
+  "description": "تشریح",
+  "status": "حالت",
+  "assignmentTitlePlaceholder": "د دندې عنوان",
+  "descriptionPlaceholder": "د دندې لارښوونې او تشریح...",
+  "selectDate": "نېټه وټاکئ",
+  "requiredFields": "مهرباني وکړئ ټول ضروري معلومات ډک کړئ",
+  "createdSuccess": "دنده په بریالیتوب سره جوړه شوه",
+  "createFailed": "دنده جوړه نه شوه",
+  "creating": "جوړیږي...",
+  "create": "دنده جوړه کړئ"
+},"addQuestion": {
+  "title": "پوښتنه اضافه کول",
+  "subtitle": "دې ازموینې ته نوې پوښتنه اضافه کړئ",
+
+  "questionType": "د پوښتنې ډول",
+  "questionText": "د پوښتنې متن",
+  "marks": "نمرې",
+
+  "multipleChoice": "څو انتخابي (MCQ)",
+  "trueFalse": "سم / ناسم",
+  "shortAnswer": "لنډ ځواب",
+  "essay": "تشریحي",
+
+  "enterQuestion": "خپله پوښتنه ولیکئ...",
+
+  "options": "اختیارونه",
+  "option": "اختیار",
+
+  "correctAnswer": "سم ځواب",
+  "selectCorrectOption": "سم اختیار وټاکئ",
+  "select": "وټاکئ",
+
+  "true": "سم",
+  "false": "ناسم",
+
+  "cancel": "لغوه",
+  "saveQuestion": "پوښتنه ذخیره کړئ",
+  "saving": "د ذخیره کولو په حال کې...",
+
+  "failedToAddQuestion": "د پوښتنې اضافه کول ناکام شول"
+},"createExam": {
+  "title": "نوې ازموینه جوړول",
+  "subtitle": "جزئیات بشپړ کړئ او بیا پوښتنې اضافه کړئ",
+
+  "examTitle": "د ازموینې عنوان",
+  "subject": "مضمون",
+  "class": "ټولګی",
+
+  "selectSubject": "مضمون وټاکئ",
+  "selectClass": "ټولګی وټاکئ",
+
+  "duration": "وخت (دقیقې)",
+  "academicYear": "تعلیمي کال",
+
+  "startDate": "د پیل نېټه",
+  "endDate": "د پای نېټه",
+
+  "selectDate": "نېټه وټاکئ",
+
+  "cancel": "لغوه",
+
+  "creating": "د جوړېدو په حال کې...",
+  "createAndAddQuestions": "جوړول او پوښتنې اضافه کول",
+
+  "failedToCreateExam": "د ازموینې جوړول ناکام شول",
+
+  "examTitlePlaceholder": "بېلګه: د منځنۍ دورې ازموینه"
+},"editQuestion": {
+  "title": "د پوښتنې سمول",
+
+  "questionText": "د پوښتنې متن",
+  "marks": "نمرې",
+
+  "options": "اختیارونه",
+
+  "correctAnswer": "سم ځواب",
+  "selectCorrectOption": "سم اختیار وټاکئ",
+
+  "true": "سم",
+  "false": "ناسم",
+
+  "cancel": "لغوه",
+
+  "saving": "خوندي کېږي...",
+  "updateQuestion": "پوښتنه تازه کول",
+
+  "failedToUpdateQuestion": "د پوښتنې تازه کول ناکام شول"
+},"teacherExams": {
+  "title": "د ازموینو مدیریت",
+  "subtitle": "خپلې ازموینې جوړې او اداره کړئ",
+  "academicYear": "تعلیمي کال",
+
+  "examTitle": "د ازموینې عنوان",
+  "subject": "مضمون",
+  "class": "صنف",
+  "examDate": "د ازموینې نېټه",
+  "totalMarks": "ټولې نمرې",
+  "status": "حالت",
+  "actions": "عملیات",
+
+  "manageQuestions": "د پوښتنو مدیریت",
+  "viewSubmissions": "سپارل شوي کارونه وګورئ",
+
+  "published": "خپور شوی",
+  "draft": "مسوده",
+  "completed": "بشپړ شوی",
+
+  "noExams": "تر اوسه هېڅ ازموینه نه ده جوړه شوې"
+},"enterMarks": {
+  "title": "د نمرو ثبتول",
+  "subtitle": "لومړی ازموینه، مضمون او صنف وټاکئ، بیا زده کوونکي پورته کړئ",
+
+  "exam": "ازموینه",
+  "subject": "مضمون",
+  "class": "صنف",
+
+  "selectExam": "ازموینه وټاکئ",
+  "selectSubject": "مضمون وټاکئ",
+  "selectClass": "صنف وټاکئ",
+
+  "totalMarks": "ټولې نمرې",
+
+  "loadStudents": "زده کوونکي پورته کړئ",
+  "loading": "د بارولو په حال کې...",
+
+  "classAverage": "د ټولګي اوسط",
+  "pass": "بریالی",
+  "fail": "ناکام",
+
+  "student": "زده کوونکی",
+  "code": "کوډ",
+  "total": "ټول",
+  "obtained": "ترلاسه شوې نمرې",
+  "grade": "درجه",
+  "status": "حالت",
+
+  "saveMarks": "نمرې خوندي کړئ",
+  "saving": "د خوندي کولو په حال کې...",
+
+  "pleaseSelectClass": "مهرباني وکړئ یو صنف وټاکئ",
+  "pleaseSelectExamSubjectClass": "مهرباني وکړئ ازموینه، مضمون او صنف وټاکئ",
+
+  "marksSavedSuccessfully": "نمرې په بریالیتوب سره خوندي شوې",
+  "failedToSaveMarks": "د نمرو خوندي کول ناکام شول"
+},"examDetails": {
+  "examPublished": "ازموینه خپره شوه",
+  "failedToPublish": "د ازموینې خپرول ناکام شول",
+  "failedToClose": "د ازموینې تړل ناکام شول",
+  "deleteQuestionConfirm": "ایا غواړئ دا پوښتنه حذف کړئ؟",
+  "failedToDeleteQuestion": "د پوښتنې حذف کول ناکام شول",
+  "examNotFound": "ازموینه ونه موندل شوه",
+
+  "addQuestion": "پوښتنه اضافه کړئ",
+  "publish": "خپرول",
+  "viewSubmissions": "سپارنې وګورئ",
+  "closeExam": "ازموینه وتړئ",
+
+  "status": "حالت",
+  "duration": "وخت",
+  "minutes": "دقیقې",
+  "totalMarks": "ټولې نمرې",
+  "questionsCount": "د پوښتنو شمېر",
+
+  "questions": "پوښتنې",
+  "noQuestions": "تر اوسه هېڅ پوښتنه نشته",
+  "clickAddQuestion": "د پیل لپاره «پوښتنه اضافه کړئ» کلیک کړئ",
+
+  "marks": "نمرې",
+  "edit": "سمول",
+  "delete": "حذف",
+
+  "correct": "سم ځواب",
+
+  "draft": "مسوده",
+  "published": "خپور شوی",
+  "finished": "پای ته رسېدلی",
+  "mcq": "څلور انتخابي",
+"truefalse": "سم / ناسم",
+"shortanswer": "لنډ ځواب",
+"essay": "تشریحي"
+},"examsList": {
+  "title": "زما ازموینې",
+  "subtitle": "خپلې ازموینې اداره او څارنه وکړئ",
+  "createExam": "ازموینه جوړه کړئ",
+
+  "total": "ټول",
+  "draft": "مسوده",
+  "published": "خپره شوې",
+  "finished": "پای ته رسېدلې",
+  "cancelled": "لغوه شوې",
+
+  "searchExam": "ازموینه ولټوئ...",
+  "allStatus": "ټول حالتونه",
+
+  "titleColumn": "عنوان",
+  "subject": "مضمون",
+  "class": "صنف",
+  "duration": "موده",
+  "minutes": "دقیقې",
+  "totalMarks": "ټولې نمرې",
+  "status": "حالت",
+  "actions": "عملیات",
+
+  "view": "لیدل",
+  "publish": "خپرول",
+  "close": "تړل",
+  "submissions": "سپارنې",
+  "delete": "ړنګول",
+
+  "loading": "د معلوماتو ترلاسه کول...",
+  "noExamsFound": "هیڅ ازموینه ونه موندل شوه",
+
+  "deleteExamConfirm": "ایا ډاډه یاست چې دا ازموینه ړنګه کړئ؟",
+  "failedToDelete": "د ازموینې ړنګول ناکام شول",
+
+  "examPublished": "ازموینه په بریالیتوب سره خپره شوه",
+  "failedToPublish": "د ازموینې خپرول ناکام شول",
+
+  "examClosed": "ازموینه په بریالیتوب سره وتړل شوه",
+  "failedToClose": "د ازموینې تړل ناکام شول"
+},"examSubmissions": {
+    "title": "سپارنې",
+    "totalSubmissions": "ټولې سپارنې",
+    "submitted": "سپارل شوي",
+    "passed": "بریالي",
+    "failed": "ناکام",
+    "average": "اوسط",
+    "loading": "د بارېدو په حال کې...",
+    "noSubmissions": "تر اوسه هېڅ سپارنه نه ده ثبت شوې",
+    "student": "زده کوونکی",
+    "score": "نمره",
+    "total": "ټول",
+    "percentage": "سلنه",
+    "status": "حالت",
+    "submittedAt": "د سپارلو وخت",
+    "pass": "بریالی",
+    "fail": "ناکام",
+    "unknown": "نامعلوم"
+  },
+  "teacherResults": {
+    "title": "پایلې",
+    "subtitle": "د زده کوونکو د ازموینو پایلې مدیریت او مشاهده کړئ",
+
+    "enterMarksTitle": "د نمرو ثبت",
+    "enterMarksDescription": "د خپلو زده کوونکو د ازموینو نمرې ثبت او خوندي کړئ.",
+    "enterMarksButton": "د نمرو ثبت ته لاړ شئ",
+
+    "viewResultsTitle": "د پایلو لیدل",
+    "viewResultsDescription": "د خپلو ټولګیو او مضمونونو وروستۍ پایلې وګورئ.",
+    "viewResultsButton": "د پایلو لیدلو ته لاړ شئ"
+  },"viewResults": {
+    "title": "د پایلو لیدل",
+    "subtitle": "د زده کوونکو د ازموینو پایلې فلټر او وګورئ",
+
+    "exam": "ازموینه",
+    "subject": "مضمون",
+    "class": "ټولګی",
+
+    "allExams": "ټولې ازموینې",
+    "allSubjects": "ټول مضمونونه",
+    "allClasses": "ټول ټولګي",
+
+    "search": "پلټنه",
+
+    "total": "ټول",
+    "passed": "بریالي",
+    "failed": "ناکام",
+    "average": "اوسط",
+
+    "loading": "د بارېدو په حال کې...",
+
+    "student": "زده کوونکی",
+    "score": "نمره",
+    "grade": "درجه",
+    "status": "حالت",
+
+    "noResults": "هیڅ پایله ونه موندل شوه. د لټون لپاره پورته فلټرونه وکاروئ.",
+
+    "pass": "بریالی",
+    "fail": "ناکام",
+    "examColumn": "ازموینه",
+"subjectColumn": "مضمون"
+  },
+  "teacherSessions": {
+    "title": "د ټولګیو ناستې",
+    "subtitle": "ستاسو د تدریسي ناستو اوونیز لید",
+    "totalSessions": "ټولې ناستې",
+    "completed": "بشپړې شوې",
+    "upcoming": "راتلونکې",
+    "cancelled": "لغوه شوې",
+    "previousWeek": "تېره اوونۍ",
+    "nextWeek": "راتلونکې اوونۍ",
+    "weekRange": "۱۲ جنوري - ۱۸ جنوري ۲۰۲۶",
+    "noSessions": "هیڅ ناسته نشته",
+    "takeAttendance": "حاضري ثبت کړئ",
+    "viewDetails": "جزئیات وګورئ",
+    "statusUpcoming": "راتلونکې",
+    "statusCompleted": "بشپړې شوې",
+    "statusCancelled": "لغوه شوې",
+    "monday": "دوشنبه ۱۲",
+    "tuesday": "سه شنبه ۱۳",
+    "wednesday": "چهارشنبه ۱۴",
+    "thursday": "پنجشنبه ۱۵",
+    "friday": "جمعه ۱۶",
+    "saturday": "شنبه ۱۷",
+    "sunday": "یکشنبه ۱۸"
+  },"assignedComplaints": {
+    "title": "سپارل شوي شکایتونه",
+    "subtitle": "هغه شکایتونه چې د حل لپاره تاسو ته سپارل شوي",
+
+    "stats": {
+      "total": "ټول",
+      "open": "خلاص",
+      "inProgress": "د ارزونې په حال کې",
+      "closed": "تړل شوي"
+    },
+
+    "searchPlaceholder": "شکایتونه ولټوئ...",
+    "allStatus": "ټول حالتونه",
+
+    "status": {
+      "open": "خلاص",
+      "in_progress": "د ارزونې په حال کې",
+      "closed": "تړل شوي"
+    },
+
+    "priority": {
+      "high": "لوړ",
+      "medium": "منځنی",
+      "low": "ټیټ"
+    },
+
+    "table": {
+      "code": "کوډ",
+      "subject": "موضوع",
+      "priority": "لومړیتوب",
+      "status": "حالت",
+      "date": "نېټه",
+      "actions": "عملیات"
+    },
+
+    "empty": "تاسو ته هېڅ شکایت نه دی سپارل شوی",
+
+    "loading": "د معلوماتو د ترلاسه کولو په حال کې...",
+    "updateFailed": "د شکایت تازه کول بریالي نه شول",
+
+    "modal": {
+      "code": "کوډ",
+      "category": "کټګوري",
+      "priority": "لومړیتوب",
+      "status": "حالت",
+      "description": "تشریح",
+      "noDescription": "تشریح نشته"
+    },
+
+    "buttons": {
+      "markInProgress": "د ارزونې په حال کې نښه کول",
+      "markResolved": "حل شوی نښه کول"
+    }
+  },"teacherProfile": {
+    "title": "د استاد پروفایل",
+    "subtitle": "خپل شخصي او مسلکي معلومات اداره کړئ",
+
+    "buttons": {
+      "editProfile": "پروفایل سمول",
+      "cancel": "لغوه",
+      "saveChanges": "بدلونونه خوندي کول",
+      "saving": "خوندي کېږي..."
+    },
+
+    "messages": {
+      "saveFailed": "بدلونونه خوندي نه شول",
+      "saveChangesFailed": "بدلونونه خوندي نه شول",
+      "noProfile": "د پروفایل معلومات ونه موندل شول. مهرباني وکړئ بیا ننوتل وکړئ."
+    },
+
+    "status": {
+      "title": "حالت",
+      "active": "فعال",
+      "inactive": "غیرفعال"
+    },
+
+    "employeeId": "د کارکوونکي پېژندپاڼه",
+    "department": "څانګه",
+    "designation": "دنده",
+    "joined": "د استخدام نېټه",
+    "modules": "ماډلونه",
+
+    "sections": {
+      "personalInformation": "شخصي معلومات",
+      "addressInformation": "د پته معلومات",
+      "permanentAddress": "دایمي پته",
+      "currentAddress": "اوسنۍ پته"
+    },
+
+    "fields": {
+      "name": "نوم",
+      "email": "برېښنالیک",
+      "role": "رول",
+      "phone": "د اړیکې شمېره",
+      "fatherName": "د پلار نوم",
+      "grandfatherName": "د نیکه نوم",
+      "bloodType": "د وینې ګروپ",
+      "idNumber": "د تذکرې شمېره",
+      "province": "ولایت",
+      "district": "ولسوالي",
+      "village": "کلی"
+    }
+  },
+  "title": "د حاضرۍ راپورونه",
+  "subtitle": "ستاسو د ټولګیو د حاضرۍ میاشتنی تحلیل",
+
+  "filters": {
+    "class": "ټولګی",
+    "allClasses": "ټول ټولګي",
+    "month": "میاشت",
+    "year": "کال"
+  },
+
+  "months": {
+    "jan": "جنوري",
+    "feb": "فبروري",
+    "mar": "مارچ",
+    "apr": "اپریل",
+    "may": "می",
+    "jun": "جون",
+    "jul": "جولای",
+    "aug": "اګست",
+    "sep": "سپتمبر",
+    "oct": "اکتوبر",
+    "nov": "نومبر",
+    "dec": "دسمبر"
+  },
+
+  "stats": {
+    "totalSessions": "ټولې غونډې",
+    "present": "حاضر",
+    "absent": "غایب",
+    "attendanceRate": "د حاضرۍ کچه"
+  },
+
+  "chartTitle": "د زده کوونکو د حاضرۍ عمومي کتنه",
+
+  "table": {
+    "student": "زده کوونکی",
+    "code": "کوډ",
+    "present": "حاضر",
+    "absent": "غایب",
+    "late": "ناوخته",
+    "excused": "اجازه",
+    "rate": "کچه"
+  },
+
+  "messages": {
+    "loading": "بارېږي...",
+    "noData": "د دې مودې لپاره د حاضرۍ معلومات نشته",
+    "na": "نامعلوم"
+  
+},"messagesPage": {
+    "searchPlaceholder": "د اړیکو لټون...",
+    "typeMessage": "خپل پیغام ولیکئ...",
+    "send": "لېږل",
+
+    "contacts": {
+      "adminOffice": "اداري دفتر",
+      "teacherAhmad": "استاد احمد",
+      "financeDepartment": "مالي څانګه"
+    },
+
+    "defaultMessages": {
+      "checkComplaint": "مهرباني وکړئ CMP-001 شکایت وڅېړئ.",
+      "reviewToday": "نن به یې وڅېړم.",
+      "thankYou": "مننه."
+    },
+
+    "labels": {
+      "you": "تاسو",
+      "now": "اوس"
+    }
+  },"teacherAttendanceReports": {
+    "title": "د حاضرۍ راپورونه",
+    "subtitle": "ستاسو د ټولګیو د حاضرۍ میاشتنی تحلیل",
+
+    "filters": {
+      "class": "ټولګی",
+      "allClasses": "ټول ټولګي",
+      "month": "میاشت",
+      "year": "کال"
+    },
+
+    "stats": {
+      "totalSessions": "ټولې ناستې",
+      "present": "حاضر",
+      "absent": "غایب",
+      "attendanceRate": "د حاضرۍ کچه"
+    },
+
+    "chartTitle": "د زده کوونکو د حاضرۍ عمومي کتنه",
+
+    "table": {
+      "student": "زده کوونکی",
+      "code": "کوډ",
+      "present": "حاضر",
+      "absent": "غایب",
+      "late": "ناوخته",
+      "excused": "اجازه لرونکی",
+      "rate": "د حاضرۍ کچه",
+      "noData": "د دې مودې لپاره د حاضرۍ معلومات نشته"
+    },
+
+    "messages": {
+      "loading": "بارېږي...",
+      "na": "نامعلوم"
+    },
+
+    "months": {
+      "jan": "جنوري",
+      "feb": "فبروري",
+      "mar": "مارچ",
+      "apr": "اپرېل",
+      "may": "مې",
+      "jun": "جون",
+      "jul": "جولای",
+      "aug": "اګست",
+      "sep": "سپتمبر",
+      "oct": "اکتوبر",
+      "nov": "نومبر",
+      "dec": "دسمبر"
+    }
+  }  
+  },
   "admin": {
     "dashboard": {
       "title": "د اداری ډشبورډ",

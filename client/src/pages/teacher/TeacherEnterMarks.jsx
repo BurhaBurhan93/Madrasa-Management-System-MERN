@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -10,6 +12,7 @@ const calcGrade = (score, total) => {
 };
 
 const TeacherEnterMarks = () => {
+  const { t } = useTranslation();
   const [exams, setExams] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
@@ -33,7 +36,7 @@ const TeacherEnterMarks = () => {
   }, []);
 
   const loadStudents = async () => {
-    if (!filters.classId) { alert('Please select a class'); return; }
+    if (!filters.classId) { alert(t('teacher.enterMarks.selectClassAlert')); return; }
     setLoading(true);
     try {
       const res = await axios.get(`http://localhost:5000/api/teacher/students?classId=${filters.classId}`, api());
@@ -56,15 +59,15 @@ const TeacherEnterMarks = () => {
   };
 
   const saveMarks = async () => {
-    if (!filters.examId || !filters.subjectId || !filters.classId) { alert('Please select exam, subject and class'); return; }
+    if (!filters.examId || !filters.subjectId || !filters.classId) { alert(t('enterMarks.selectFiltersAlert')); return; }
     setSaving(true);
     try {
       const marksArr = students.map(s => ({ student: s._id, totalScore: Number(marks[s._id] || 0), totalMarks }));
       const res = await axios.post('http://localhost:5000/api/teacher/results/save-marks', {
         examId: filters.examId, subjectId: filters.subjectId, classId: filters.classId, marks: marksArr
       }, api());
-      if (res.data.success) alert('Marks saved successfully!');
-    } catch (e) { alert('Failed to save marks'); } finally { setSaving(false); }
+      if (res.data.success) alert(t('enterMarks.saveSuccess'));
+    } catch (e) { alert(t('enterMarks.saveFailed')); } finally { setSaving(false); }
   };
 
   const summary = useMemo(() => {
@@ -77,44 +80,44 @@ const TeacherEnterMarks = () => {
   const selectCls = 'w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100';
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+    <div className={PANEL_PAGE_BG}>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Enter Marks</h1>
-          <p className="mt-1 text-sm text-slate-500">Select exam, subject and class then load students</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('teacher.enterMarks.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('teacher.enterMarks.subtitle')}</p>
         </div>
 
         {/* Filters */}
         <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-5 items-end">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">Exam</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.enterMarks.exam')}</label>
               <select value={filters.examId} onChange={e => setFilters({ ...filters, examId: e.target.value })} className={selectCls}>
-                <option value="">Select Exam</option>
+                <option value="">{t('teacher.enterMarks.selectExam')}</option>
                 {exams.map(e => <option key={e._id} value={e._id}>{e.title}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">Subject</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.enterMarks.subject')}</label>
               <select value={filters.subjectId} onChange={e => setFilters({ ...filters, subjectId: e.target.value })} className={selectCls}>
-                <option value="">Select Subject</option>
+                <option value="">{t('teacher.enterMarks.selectSubject')}</option>
                 {subjects.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">Class</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.enterMarks.class')}</label>
               <select value={filters.classId} onChange={e => setFilters({ ...filters, classId: e.target.value })} className={selectCls}>
-                <option value="">Select Class</option>
+                <option value="">{t('teacher.enterMarks.selectClass')}</option>
                 {classes.map(c => <option key={c._id} value={c._id}>{c.name} {c.section}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">Total Marks</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.enterMarks.totalMarks')}</label>
               <input type="number" value={totalMarks} onChange={e => setTotalMarks(Number(e.target.value))} className={selectCls} />
             </div>
             <button onClick={loadStudents} disabled={loading} className="rounded-2xl bg-cyan-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700 disabled:opacity-60">
-              {loading ? 'Loading...' : 'Load Students'}
+              {loading ? t('teacher.enterMarks.loading') : t('teacher.enterMarks.loadStudents')}
             </button>
           </div>
         </div>
@@ -123,9 +126,9 @@ const TeacherEnterMarks = () => {
         {students.length > 0 && (
           <section className="grid grid-cols-3 gap-4 mb-6">
             {[
-              { label: 'Class Average', value: summary.avg, accent: 'bg-cyan-500' },
-              { label: 'Pass', value: summary.pass, accent: 'bg-emerald-500' },
-              { label: 'Fail', value: summary.fail, accent: 'bg-rose-500' },
+              { label: t('enterMarks.classAverage'), value: summary.avg, accent: 'bg-cyan-500' },
+              { label: t('enterMarks.pass'), value: summary.pass, accent: 'bg-emerald-500' },
+              { label: t('enterMarks.fail'), value: summary.fail, accent: 'bg-rose-500' },
             ].map(c => (
               <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 text-center shadow-sm">
                 <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
@@ -142,7 +145,7 @@ const TeacherEnterMarks = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
-                  {['#', 'Student', 'Code', 'Total', 'Obtained', 'Grade', 'Status'].map(h => (
+                  {['#', t('enterMarks.student'), t('enterMarks.code'), t('enterMarks.total'), t('enterMarks.obtained'), t('enterMarks.grade'), t('enterMarks.status')].map(h => (
                     <th key={h} className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{h}</th>
                   ))}
                 </tr>
@@ -180,7 +183,7 @@ const TeacherEnterMarks = () => {
             </table>
             <div className="flex justify-end border-t border-slate-100 p-4">
               <button onClick={saveMarks} disabled={saving} className="rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700 disabled:opacity-60">
-                {saving ? 'Saving...' : 'Save Marks'}
+                {saving ? t('enterMarks.saving') : t('enterMarks.saveMarks')}
               </button>
             </div>
           </div>

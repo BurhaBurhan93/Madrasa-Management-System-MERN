@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiEye, FiCheck } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
+import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
 const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -16,6 +18,7 @@ const priorityColors = {
 };
 
 const AssignedComplaints = () => {
+  const { t } = useTranslation();
   const [complaints, setComplaints] = useState([]);
   const [selected, setSelected] = useState(null);
   const [filterStatus, setFilterStatus] = useState('');
@@ -36,7 +39,7 @@ const AssignedComplaints = () => {
     try {
       const res = await axios.put(`http://localhost:5000/api/teacher/complaints/${id}/status`, { status }, api());
       if (res.data.success) { fetchComplaints(); setSelected(null); }
-    } catch (e) { alert('Failed to update complaint'); }
+    } catch (e) { alert(t('teacher.assignedComplaints.updateFailed')); }
   };
 
   const filtered = complaints.filter(c => {
@@ -53,21 +56,21 @@ const AssignedComplaints = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+    <div className={PANEL_PAGE_BG}>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Assigned Complaints</h1>
-          <p className="mt-1 text-sm text-slate-500">Complaints assigned to you for resolution</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('teacher.assignedComplaints.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('teacher.assignedComplaints.subtitle')}</p>
         </div>
 
         {/* Stats */}
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
           {[
-            { label: 'Total', value: stats.total, accent: 'bg-cyan-500' },
-            { label: 'Open', value: stats.open, accent: 'bg-rose-500' },
-            { label: 'In Progress', value: stats.inProgress, accent: 'bg-amber-500' },
-            { label: 'Closed', value: stats.closed, accent: 'bg-emerald-500' },
+            { label: t('teacher.assignedComplaints.stats.total'),value: stats.total, accent: 'bg-cyan-500' },
+            { label: t('teacher.assignedComplaints.stats.open'), value: stats.open, accent: 'bg-rose-500' },
+            { label: t('teacher.assignedComplaints.stats.inProgress'), value: stats.inProgress, accent: 'bg-amber-500' },
+            { label: t('teacher.assignedComplaints.stats.closed'), value: stats.closed, accent: 'bg-emerald-500' },
           ].map(c => (
             <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
@@ -80,12 +83,12 @@ const AssignedComplaints = () => {
         {/* Filters */}
         <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-wrap gap-3">
-            <input type="text" placeholder="Search complaints..." value={search} onChange={e => setSearch(e.target.value)} className="flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100" />
+            <input type="text" placeholder={t('teacher.assignedComplaints.searchPlaceholder')} value={search} onChange={e => setSearch(e.target.value)} className="flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100" />
             <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
-              <option value="">All Status</option>
-              <option value="open">Open</option>
-              <option value="in_progress">In Progress</option>
-              <option value="closed">Closed</option>
+              <option value="">{t('teacher.assignedComplaints.allStatus')}</option>
+              <option value="open"> {t('teacher.assignedComplaints.status.open')}</option>
+              <option value="in_progress"> {t('teacher.assignedComplaints.status.in_progress')}</option>
+              <option value="closed">{t('teacher.assignedComplaints.status.closed')}</option>
             </select>
           </div>
         </div>
@@ -93,25 +96,32 @@ const AssignedComplaints = () => {
         {/* Table */}
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
           {loading ? (
-            <div className="flex h-32 items-center justify-center text-slate-500">Loading...</div>
+            <div className="flex h-32 items-center justify-center text-slate-500">{t('teacher.assignedComplaints.loading')}</div>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
-                  {['Code', 'Subject', 'Priority', 'Status', 'Date', 'Actions'].map(h => (
+                  {[
+  t('teacher.assignedComplaints.table.code'),
+  t('teacher.assignedComplaints.table.subject'),
+  t('teacher.assignedComplaints.table.priority'),
+  t('teacher.assignedComplaints.table.status'),
+  t('teacher.assignedComplaints.table.date'),
+  t('teacher.assignedComplaints.table.actions')
+].map(h => (
                     <th key={h} className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filtered.length === 0 ? (
-                  <tr><td colSpan="6" className="p-8 text-center text-slate-500">No complaints assigned to you</td></tr>
+                  <tr><td colSpan="6" className="p-8 text-center text-slate-500">{t('teacher.assignedComplaints.empty')}</td></tr>
                 ) : filtered.map(c => (
                   <tr key={c._id} className="transition-colors duration-150 hover:bg-slate-50">
                     <td className="p-4 font-medium text-cyan-600">{c.complaintCode}</td>
                     <td className="p-4 text-slate-700">{c.subject}</td>
-                    <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-medium ${priorityColors[c.priorityLevel]}`}>{c.priorityLevel}</span></td>
-                    <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[c.complaintStatus]}`}>{c.complaintStatus}</span></td>
+                    <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-medium ${priorityColors[c.priorityLevel]}`}>{t(`assignedComplaints.priority.${c.priorityLevel}`)}</span></td>
+                    <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[c.complaintStatus]}`}>{t(`assignedComplaints.status.${c.complaintStatus}`)}</span></td>
                     <td className="p-4 text-slate-500">{new Date(c.submittedDate).toLocaleDateString()}</td>
                     <td className="p-4">
                       <div className="flex gap-2">
@@ -140,8 +150,8 @@ const AssignedComplaints = () => {
             </div>
             <div className="space-y-3 text-sm">
               {[
-                { label: 'Code', value: selected.complaintCode },
-                { label: 'Category', value: selected.complaintCategory || '-' },
+                { label: t('assignedComplaints.modal.code'), value: selected.complaintCode },
+                { label: t('assignedComplaints.modal.category'), value: selected.complaintCategory || '-' },
               ].map(row => (
                 <div key={row.label} className="flex justify-between">
                   <span className="text-slate-400">{row.label}:</span>
@@ -149,24 +159,24 @@ const AssignedComplaints = () => {
                 </div>
               ))}
               <div className="flex justify-between">
-                <span className="text-slate-400">Priority:</span>
-                <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${priorityColors[selected.priorityLevel]}`}>{selected.priorityLevel}</span>
+                <span className="text-slate-400">{t('assignedComplaints.modal.priority')}:</span>
+                <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${priorityColors[selected.priorityLevel]}`}>{t(`assignedComplaints.priority.${selected.priorityLevel}`)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Status:</span>
-                <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${statusColors[selected.complaintStatus]}`}>{selected.complaintStatus}</span>
+                <span className="text-slate-400">{t('assignedComplaints.modal.status')}:</span>
+                <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${statusColors[selected.complaintStatus]}`}>{t(`assignedComplaints.status.${selected.complaintStatus}`)}</span>
               </div>
               <div>
-                <p className="mb-2 text-slate-400">Description:</p>
-                <p className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-slate-600">{selected.description || 'No description'}</p>
+                <p className="mb-2 text-slate-400">{t('assignedComplaints.modal.description')}:</p>
+                <p className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-slate-600">{selected.description || t('assignedComplaints.modal.noDescription')}</p>
               </div>
             </div>
             {selected.complaintStatus !== 'closed' && (
               <div className="mt-5 flex justify-end gap-3">
                 {selected.complaintStatus === 'open' && (
-                  <button onClick={() => updateStatus(selected._id, 'in_progress')} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100">Mark In Progress</button>
+                  <button onClick={() => updateStatus(selected._id, 'in_progress')} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100">{t('assignedComplaints.buttons.markInProgress')}</button>
                 )}
-                <button onClick={() => updateStatus(selected._id, 'closed')} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700">Mark Resolved</button>
+                <button onClick={() => updateStatus(selected._id, 'closed')} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700">{t('assignedComplaints.buttons.markResolved')}</button>
               </div>
             )}
           </div>

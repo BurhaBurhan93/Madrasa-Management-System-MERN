@@ -1,38 +1,41 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiEdit, FiBarChart2 } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
+import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
 const TeacherResults = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const cards = [
     {
-      title: 'Enter Marks',
-      description: 'Enter and save exam marks for your students.',
+      title: t('teacher.teacherResults.enterMarksTitle'),
+      description: t('teacher.teacherResults.enterMarksDescription'),
       icon: FiEdit,
       accent: 'bg-cyan-500',
       tone: 'from-cyan-500 to-sky-600',
       action: () => navigate('enter-marks'),
-      label: 'Go to Enter Marks',
+      label: t('teacher.teacherResults.enterMarksButton')
     },
     {
-      title: 'View Results',
-      description: 'View final results of your classes and subjects.',
+      title: t('teacher.teacherResults.viewResultsTitle'),
+      description: t('teacher.teacherResults.viewResultsDescription'),
       icon: FiBarChart2,
       accent: 'bg-violet-500',
       tone: 'from-violet-500 to-purple-600',
       action: () => navigate('view-results'),
-      label: 'Go to View Results',
+      label: t('teacher.teacherResults.viewResultsButton'),
     },
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
+    <div className={PANEL_PAGE_BG}>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Results</h1>
-          <p className="mt-1 text-sm text-slate-500">Manage and view student exam results</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('teacher.teacherResults.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('teacher.teacherResults.subtitle')}</p>
         </div>
 
         <section className="grid grid-cols-1 gap-5 md:grid-cols-2">

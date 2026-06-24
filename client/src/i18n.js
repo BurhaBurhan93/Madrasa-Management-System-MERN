@@ -4,7 +4,12 @@ import enTranslations from './locales/en.json';
 import dariTranslations from './locales/dari.json';
 import psTranslations from './locales/ps.json';
 
-const savedLang = localStorage.getItem('lang') || localStorage.getItem('adminLang') || 'en';
+// Prefer teacher-specific language, then user lang, then admin fallback, then default to English
+const savedLang =
+  localStorage.getItem('teacherLang') ||
+  localStorage.getItem('lang') ||
+  localStorage.getItem('adminLang') ||
+  'en';
 
 i18n
   .use(initReactI18next)

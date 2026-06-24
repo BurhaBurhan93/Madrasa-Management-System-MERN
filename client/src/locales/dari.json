@@ -1,4 +1,701 @@
 {
+  "teacher": {
+    "teacherProfile": {
+    "title": "پروفایل استاد",
+    "subtitle": "مدیریت معلومات شخصی و حرفه‌ای",
+
+    "buttons": {
+      "editProfile": "ویرایش پروفایل",
+      "cancel": "لغو",
+      "saveChanges": "ذخیره تغییرات",
+      "saving": "در حال ذخیره..."
+    },
+
+    "messages": {
+      "saveFailed": "ذخیره تغییرات موفق نشد",
+      "saveChangesFailed": "ذخیره تغییرات موفق نشد",
+      "noProfile": "اطلاعات پروفایل یافت نشد. لطفاً دوباره وارد شوید."
+    },
+
+    "status": {
+      "title": "وضعیت",
+      "active": "فعال",
+      "inactive": "غیرفعال"
+    },
+
+    "employeeId": "شناسه کارمند",
+    "department": "دیپارتمنت",
+    "designation": "وظیفه",
+    "joined": "تاریخ استخدام",
+    "modules": "ماژول‌ها",
+
+    "sections": {
+      "personalInformation": "اطلاعات شخصی",
+      "addressInformation": "اطلاعات آدرس",
+      "permanentAddress": "آدرس دایمی",
+      "currentAddress": "آدرس فعلی"
+    },
+
+    "fields": {
+      "name": "نام",
+      "email": "ایمیل",
+      "role": "نقش",
+      "phone": "شماره تماس",
+      "fatherName": "نام پدر",
+      "grandfatherName": "نام پدربزرگ",
+      "bloodType": "گروپ خون",
+      "idNumber": "شماره تذکره",
+      "province": "ولایت",
+      "district": "ولسوالی",
+      "village": "قریه"
+    }
+  },
+    "assignedComplaints": {
+    "title": "شکایت‌های سپرده‌شده",
+    "subtitle": "شکایت‌هایی که برای رسیدگی به شما سپرده شده‌اند",
+
+    "stats": {
+      "total": "مجموع",
+      "open": "باز",
+      "inProgress": "در حال بررسی",
+      "closed": "بسته"
+    },
+
+    "searchPlaceholder": "جستجوی شکایت‌ها...",
+    "allStatus": "همه وضعیت‌ها",
+
+    "status": {
+      "open": "باز",
+      "in_progress": "در حال بررسی",
+      "closed": "بسته"
+    },
+
+    "priority": {
+      "high": "بلند",
+      "medium": "متوسط",
+      "low": "پایین"
+    },
+
+    "table": {
+      "code": "کد",
+      "subject": "موضوع",
+      "priority": "اولویت",
+      "status": "وضعیت",
+      "date": "تاریخ",
+      "actions": "عملیات"
+    },
+
+    "empty": "هیچ شکایتی به شما سپرده نشده است",
+
+    "loading": "در حال بارگذاری...",
+    "updateFailed": "به‌روزرسانی شکایت موفق نشد",
+
+    "modal": {
+      "code": "کد",
+      "category": "دسته‌بندی",
+      "priority": "اولویت",
+      "status": "وضعیت",
+      "description": "توضیحات",
+      "noDescription": "بدون توضیحات"
+    },
+
+    "buttons": {
+      "markInProgress": "علامت‌گذاری به عنوان در حال بررسی",
+      "markResolved": "علامت‌گذاری به عنوان حل‌شده"
+    }
+  },
+    "viewResults": {
+    "title": "مشاهده نتایج",
+    "subtitle": "فیلتر و مشاهده نتایج امتحانات شاگردان",
+
+    "exam": "امتحان",
+    "subject": "مضمون",
+    "class": "صنف",
+
+    "allExams": "همه امتحانات",
+    "allSubjects": "همه مضامین",
+    "allClasses": "همه صنف‌ها",
+
+    "search": "جستجو",
+
+    "total": "مجموع",
+    "passed": "قبول",
+    "failed": "مردود",
+    "average": "میانگین",
+
+    "loading": "در حال بارگذاری...",
+
+    "student": "شاگرد",
+    "score": "نمره",
+    "grade": "رتبه",
+    "status": "وضعیت",
+
+    "noResults": "هیچ نتیجه‌ای یافت نشد. از فیلترهای بالا برای جستجو استفاده کنید.",
+
+    "pass": "قبول",
+    "fail": "مردود",
+    "examColumn": "امتحان",
+"subjectColumn": "مضمون"
+  },
+    "enterMarks": {
+  "title": "ثبت نمرات",
+  "subtitle": "ابتدا امتحان، مضمون و صنف را انتخاب کرده سپس شاگردان را بارگذاری کنید",
+
+  "exam": "امتحان",
+  "subject": "مضمون",
+  "class": "صنف",
+
+  "selectExam": "امتحان را انتخاب کنید",
+  "selectSubject": "مضمون را انتخاب کنید",
+  "selectClass": "صنف را انتخاب کنید",
+
+  "totalMarks": "مجموع نمرات",
+
+  "loadStudents": "بارگذاری شاگردان",
+  "loading": "در حال بارگذاری...",
+
+  "classAverage": "میانگین صنف",
+  "pass": "کامیاب",
+  "fail": "ناکام",
+
+  "student": "شاگرد",
+  "code": "کد",
+  "total": "مجموع",
+  "obtained": "نمره کسب‌شده",
+  "grade": "درجه",
+  "status": "وضعیت",
+
+  "saveMarks": "ذخیره نمرات",
+  "saving": "در حال ذخیره...",
+
+  "pleaseSelectClass": "لطفاً یک صنف را انتخاب کنید",
+  "pleaseSelectExamSubjectClass": "لطفاً امتحان، مضمون و صنف را انتخاب کنید",
+
+  "marksSavedSuccessfully": "نمرات با موفقیت ذخیره شدند",
+  "failedToSaveMarks": "ذخیره نمرات ناموفق بود"
+},
+    "teacherExams": {
+  "title": "مدیریت امتحانات",
+  "subtitle": "امتحانات خود را ایجاد و مدیریت کنید",
+  "academicYear": "سال تحصیلی",
+
+  "examTitle": "عنوان امتحان",
+  "subject": "مضمون",
+  "class": "صنف",
+  "examDate": "تاریخ امتحان",
+  "totalMarks": "مجموع نمرات",
+  "status": "وضعیت",
+  "actions": "عملیات",
+
+  "manageQuestions": "مدیریت سوالات",
+  "viewSubmissions": "مشاهده تسلیمی‌ها",
+
+  "published": "منتشر شده",
+  "draft": "پیش‌نویس",
+  "completed": "تکمیل شده",
+
+  "noExams": "هنوز امتحانی ایجاد نشده است"
+},
+    "examsList": {
+  "title": "امتحانات من",
+  "subtitle": "امتحانات خود را مدیریت و نظارت کنید",
+  "createExam": "ایجاد امتحان",
+
+  "total": "مجموع",
+  "draft": "پیش‌نویس",
+  "published": "منتشر شده",
+  "finished": "پایان یافته",
+  "cancelled": "لغو شده",
+
+  "searchExam": "جستجوی امتحان...",
+  "allStatus": "همه وضعیت‌ها",
+
+  "titleColumn": "عنوان",
+  "subject": "مضمون",
+  "class": "صنف",
+  "duration": "مدت زمان",
+  "minutes": "دقیقه",
+  "totalMarks": "مجموع نمرات",
+  "status": "وضعیت",
+  "actions": "عملیات",
+
+  "view": "مشاهده",
+  "publish": "انتشار",
+  "close": "بستن",
+  "submissions": "ارسالات",
+  "delete": "حذف",
+
+  "loading": "در حال بارگذاری...",
+  "noExamsFound": "هیچ امتحانی یافت نشد",
+
+  "deleteExamConfirm": "آیا مطمئن هستید که این امتحان حذف شود؟",
+  "failedToDelete": "حذف امتحان ناموفق بود",
+
+  "examPublished": "امتحان با موفقیت منتشر شد",
+  "failedToPublish": "انتشار امتحان ناموفق بود",
+
+  "examClosed": "امتحان با موفقیت بسته شد",
+  "failedToClose": "بستن امتحان ناموفق بود"
+},
+    "teacherAttendanceReports": {
+    "title": "گزارش حاضری",
+    "subtitle": "تحلیل ماهانه حضور شاگردان صنف‌های شما",
+
+    "filters": {
+      "class": "صنف",
+      "allClasses": "همه صنف‌ها",
+      "month": "ماه",
+      "year": "سال"
+    },
+
+    "stats": {
+      "totalSessions": "مجموع جلسات",
+      "present": "حاضر",
+      "absent": "غایب",
+      "attendanceRate": "نرخ حضور"
+    },
+
+    "chartTitle": "نمای کلی حضور شاگردان",
+
+    "table": {
+      "student": "شاگرد",
+      "code": "کد",
+      "present": "حاضر",
+      "absent": "غایب",
+      "late": "تأخیر",
+      "excused": "رخصتی",
+      "rate": "نرخ حضور",
+      "noData": "اطلاعات حاضری برای این دوره موجود نیست"
+    },
+
+    "messages": {
+      "loading": "در حال بارگذاری...",
+      "na": "نامشخص"
+    },
+
+    "months": {
+      "jan": "جنوری",
+      "feb": "فبروری",
+      "mar": "مارچ",
+      "apr": "اپریل",
+      "may": "می",
+      "jun": "جون",
+      "jul": "جولای",
+      "aug": "آگست",
+      "sep": "سپتامبر",
+      "oct": "اکتوبر",
+      "nov": "نوامبر",
+      "dec": "دسامبر"
+    }
+  },
+    "dashboard": {
+      "title": "داشبورد استاد",
+      "totalSubjects": "مجموع مضامین",
+      "welcome": "به پورتال تدریس خود خوش آمدید",
+      "quickStats": "آمار سریع",
+      "upcomingClasses": "صنفهای آینده",
+      "pendingAssignments": "تکالیف معلق",
+      "studentAttendance": "حضور و غیاب شاگردان",
+      "totalStudents": "مجموع شاگردان",
+      "activeClasses": "صنفهای فعال",
+      "averageAttendance": "میانگین حضور",
+      "recentActivity": "فعالیت اخیر",
+      "assignedToYou": "به شما اختصاص داده شده",
+      "acrossAllClasses": "در تمام صنفها",
+      "awaitingReview": "در انتظار بررسی",
+      "activeThisTerm": "فعال در این ترم",
+      "latestAssignmentsExams": "آخرین تکالیف و امتحانات",
+      "scheduledExamsSessions": "امتحانات و جلسات برنامهریزی شده",
+      "classAttendanceOverview": "مرور حضور و غیاب صنفها",
+      "averageStudentPerformance": "میانگین عملکرد شاگردان",
+      "noRecentActivity": "هنوز فعالیت اخیری موجود نیست.",
+      "noUpcomingClasses": "هیچ صنف آینده برنامهریزی نشده است."
+    },
+    "common": {
+      "assignments": "تکالیف",
+      "manageSubjectsWorkload": "مضامین تدریسی و بار کاری خود را مدیریت کنید",
+      "weeklyHours": "ساعتهای هفتگی",
+      "all": "همه",
+      "active": "فعال",
+      "completed": "تکمیل شده",
+      "upcoming": "آینده",
+      "inactive": "غیرفعال",
+      "allFields": "همه زمینهها",
+      "sortByName": "مرتبسازی بر اساس نام",
+      "sortByStudents": "مرتبسازی بر اساس شاگردان",
+      "sortByProgress": "مرتبسازی بر اساس پیشرفت",
+      "credits": "اعتبارها",
+      "description": "توضیحات",
+      "syllabusProgress": "پیشرفت سیلابس",
+      "students": "شاگردان",
+      "attendance": "حاضری",
+      "exams": "امتحانات",
+      "unnamedSubject": "مضمون بدون نام",
+      "noDescription": "هیچ توضیحی موجود نیست",
+      "noSubjectsFound": "هیچ مضمونی یافت نشد",
+      "na": "موجود نیست",
+      "students": "شاگردان",
+      "attendance": "حضور",
+      "exams": "امتحانات",
+      "results": "نتایج",
+      "profile": "پروفایل",
+      "subjects": "مضامین",
+      "sessions": "جلسات",
+      "grades": "درجات",
+      "messages": "پیامها",
+      "compose": "نوشتن",
+      "inbox": "صندوق ورودی",
+      "sent": "ارسال شده",
+      "drafts": "پیشنویسها",
+      "logout": "خروج",
+      "viewAll": "مشاهده همه",
+      "addNew": "اضافه کردن جدید",
+      "edit": "ویرایش",
+      "delete": "حذف",
+      "save": "ذخیره",
+      "cancel": "لغو",
+      "search": "جستجو",
+      "filter": "فیلتر",
+      "loading": "در حال بارگذاری...",
+      "noData": "اطلاعاتی موجود نیست",
+      "notAvailable": "—"
+    },"students": {
+  "title": "شاگردان من",
+  "subtitle": "شاگردان ثبت شده در صنف های شما",
+  "totalStudents": "مجموع شاگردان",
+  "activeStudents": "فعال",
+  "inactiveStudents": "غیرفعال",
+  "mySubjects": "مضامین من",
+  "searchPlaceholder": "جستجو بر اساس نام یا کود...",
+  "allStatus": "همه وضعیت ها",
+  "allSubjects": "همه مضامین",
+  "noStudentsFound": "هیچ شاگردی یافت نشد",
+  "registerStudentsMessage": "شاگردان را از طریق پنل کارمندان ← مدیریت کاربران ثبت نمایید",
+  "unknown": "نامشخص",
+  "notAssigned": "تعیین نشده",
+  "class": "صنف",
+  "level": "سطح",
+  "email": "ایمیل",
+  "admission": "تاریخ ثبت نام",
+  "markAttendance": "ثبت حاضری",
+  "enterMarks": "ثبت نمرات"
+},"assignments": {
+  "title": "تکالیف",
+  "subtitle": "مدیریت و پیگیری تکالیف شاگردان",
+  "createAssignment": "ایجاد تکلیف",
+  "total": "مجموع",
+  "active": "فعال",
+  "completed": "تکمیل شده",
+  "overdue": "معوق",
+  "allStatus": "همه وضعیت ها",
+  "allSubjects": "همه مضامین",
+  "loading": "در حال بارگذاری...",
+  "noAssignmentsFound": "هیچ تکلیفی یافت نشد",
+  "noSubject": "بدون مضمون",
+  "due": "موعد",
+  "overdueLabel": "معوق",
+  "maxPoints": "حداکثر نمره",
+  "markComplete": "تکمیل کردن",
+  "delete": "حذف",
+  "deleteConfirm": "آیا میخواهید این تکلیف حذف شود؟",
+  "deleteFailed": "حذف تکلیف موفق نشد",
+  "updateFailed": "بروزرسانی موفق نشد",
+  "cancelled": "لغو شده"
+},"createAssignment": {
+  "title": "ایجاد تکلیف",
+  "subtitle": "یک تکلیف جدید برای شاگردان خود ایجاد کنید",
+  "assignmentTitle": "عنوان",
+  "subject": "مضمون",
+  "selectSubject": "مضمون را انتخاب کنید",
+  "dueDate": "تاریخ تسلیمی",
+  "maxPoints": "حداکثر نمره",
+  "description": "توضیحات",
+  "status": "وضعیت",
+  "assignmentTitlePlaceholder": "عنوان تکلیف",
+  "descriptionPlaceholder": "راهنمایی ها و توضیحات تکلیف...",
+  "selectDate": "تاریخ را انتخاب کنید",
+  "requiredFields": "لطفاً تمام فیلدهای ضروری را تکمیل کنید",
+  "createdSuccess": "تکلیف موفقانه ایجاد شد",
+  "createFailed": "ایجاد تکلیف موفق نشد",
+  "creating": "در حال ایجاد...",
+  "create": "ایجاد تکلیف"
+},"attendance": {
+  "title": "حاضری",
+  "subtitle": "برای ثبت حاضری یک جلسه را انتخاب کنید",
+  "newSession": "جلسه جدید",
+  "createSession": "ایجاد جلسه",
+  "selectClass": "صنف را انتخاب کنید",
+  "selectDate": "تاریخ را انتخاب کنید",
+  "lecture": "درس",
+  "exam": "امتحان",
+  "other": "سایر",
+  "locationOptional": "موقعیت (اختیاری)",
+  "cancel": "لغو",
+  "create": "ایجاد",
+  "sessions": "جلسات",
+  "noSessions": "هنوز جلسه‌ای وجود ندارد",
+  "selectSession": "برای ثبت حاضری یک جلسه را از سمت چپ انتخاب کنید",
+  "total": "مجموع",
+  "present": "حاضر",
+  "absent": "غایب",
+  "late": "تأخیر",
+  "rate": "نرخ",
+  "allPresent": "همه حاضر",
+  "allAbsent": "همه غایب",
+  "allLate": "همه با تأخیر",
+  "allExcused": "همه با اجازه",
+  "loadingStudents": "در حال بارگذاری شاگردان...",
+  "student": "شاگرد",
+  "code": "کد",
+  "status": "وضعیت",
+  "noStudents": "در این صنف شاگردی وجود ندارد",
+  "excused": "با اجازه",
+  "saveAttendance": "ذخیره حاضری",
+  "saving": "در حال ذخیره...",
+  "attendanceSaved": "حاضری با موفقیت ذخیره شد!",
+  "failedSaveAttendance": "ذخیره حاضری ناموفق بود",
+  "failedCreateSession": "ایجاد جلسه ناموفق بود"
+},"addQuestion": {
+  "title": "افزودن سوال",
+  "subtitle": "یک سوال جدید به این امتحان اضافه کنید",
+
+  "questionType": "نوع سوال",
+  "questionText": "متن سوال",
+  "marks": "نمره",
+
+  "multipleChoice": "چهار گزینه‌ای (MCQ)",
+  "trueFalse": "درست / نادرست",
+  "shortAnswer": "پاسخ کوتاه",
+  "essay": "تشریحی",
+
+  "enterQuestion": "سوال خود را وارد کنید...",
+
+  "options": "گزینه‌ها",
+  "option": "گزینه",
+
+  "correctAnswer": "پاسخ صحیح",
+  "selectCorrectOption": "گزینه صحیح را انتخاب کنید",
+  "select": "انتخاب کنید",
+
+  "true": "درست",
+  "false": "نادرست",
+
+  "cancel": "لغو",
+  "saveQuestion": "ذخیره سوال",
+  "saving": "در حال ذخیره...",
+
+  "failedToAddQuestion": "افزودن سوال ناموفق بود"
+},"createExam": {
+  "title": "ایجاد امتحان جدید",
+  "subtitle": "جزئیات را تکمیل کرده سپس سوالات را اضافه کنید",
+
+  "examTitle": "عنوان امتحان",
+  "subject": "مضمون",
+  "class": "صنف",
+
+  "selectSubject": "مضمون را انتخاب کنید",
+  "selectClass": "صنف را انتخاب کنید",
+
+  "duration": "مدت زمان (دقیقه)",
+  "academicYear": "سال تحصیلی",
+
+  "startDate": "تاریخ شروع",
+  "endDate": "تاریخ پایان",
+
+  "selectDate": "تاریخ را انتخاب کنید",
+
+  "cancel": "لغو",
+
+  "creating": "در حال ایجاد...",
+  "createAndAddQuestions": "ایجاد و افزودن سوالات",
+
+  "failedToCreateExam": "ایجاد امتحان ناموفق بود",
+
+  "examTitlePlaceholder": "مثال: امتحان میان‌سمستر"
+  },"editQuestion": {
+  "title": "ویرایش سوال",
+
+  "questionText": "متن سوال",
+  "marks": "نمره",
+
+  "options": "گزینه‌ها",
+
+  "correctAnswer": "پاسخ صحیح",
+  "selectCorrectOption": "گزینه صحیح را انتخاب کنید",
+
+  "true": "درست",
+  "false": "نادرست",
+
+  "cancel": "لغو",
+
+  "saving": "در حال ذخیره...",
+  "updateQuestion": "بروزرسانی سوال",
+
+  "failedToUpdateQuestion": "بروزرسانی سوال ناموفق بود"
+},"examDetails": {
+  "examPublished": "امتحان منتشر شد",
+  "failedToPublish": "انتشار امتحان ناموفق بود",
+  "failedToClose": "بستن امتحان ناموفق بود",
+  "deleteQuestionConfirm": "آیا می‌خواهید این سوال حذف شود؟",
+  "failedToDeleteQuestion": "حذف سوال ناموفق بود",
+  "examNotFound": "امتحان یافت نشد",
+
+  "addQuestion": "افزودن سوال",
+  "publish": "انتشار",
+  "viewSubmissions": "مشاهده تسلیمی‌ها",
+  "closeExam": "بستن امتحان",
+
+  "status": "وضعیت",
+  "duration": "مدت زمان",
+  "minutes": "دقیقه",
+  "totalMarks": "مجموع نمرات",
+  "questionsCount": "تعداد سوالات",
+
+  "questions": "سوالات",
+  "noQuestions": "هنوز سوالی وجود ندارد",
+  "clickAddQuestion": "برای شروع روی «افزودن سوال» کلیک کنید",
+
+  "marks": "نمره",
+  "edit": "ویرایش",
+  "delete": "حذف",
+
+  "correct": "پاسخ صحیح",
+
+  "draft": "پیش‌نویس",
+  "published": "منتشر شده",
+  "finished": "پایان یافته",
+  "mcq": "چهار گزینه‌ای",
+"truefalse": "درست / نادرست",
+"shortanswer": "پاسخ کوتاه",
+"essay": "تشریحی"
+},"examSubmissions": {
+    "title": "ارسال‌ها",
+    "totalSubmissions": "مجموع ارسال‌ها",
+    "submitted": "ارسال‌شده",
+    "passed": "قبول",
+    "failed": "مردود",
+    "average": "میانگین",
+    "loading": "در حال بارگذاری...",
+    "noSubmissions": "هنوز هیچ پاسخی ثبت نشده است",
+    "student": "شاگرد",
+    "score": "نمره",
+    "total": "مجموع",
+    "percentage": "فیصدی",
+    "status": "وضعیت",
+    "submittedAt": "زمان ارسال",
+    "pass": "قبول",
+    "fail": "مردود",
+    "unknown": "نامشخص"
+  },"teacherResults": {
+    "title": "نتایج",
+    "subtitle": "مدیریت و مشاهده نتایج امتحانات شاگردان",
+
+    "enterMarksTitle": "ثبت نمرات",
+    "enterMarksDescription": "نمرات امتحانات شاگردان خود را ثبت و ذخیره کنید.",
+    "enterMarksButton": "رفتن به ثبت نمرات",
+
+    "viewResultsTitle": "مشاهده نتایج",
+    "viewResultsDescription": "نتایج نهایی صنف‌ها و مضامین خود را مشاهده کنید.",
+    "viewResultsButton": "رفتن به مشاهده نتایج"
+  },
+  "teacherSessions": {
+    "title": "جلسات صنفی",
+    "subtitle": "نمای هفتگی جلسات تدریس شما",
+    "totalSessions": "مجموع جلسات",
+    "completed": "تکمیل شده",
+    "upcoming": "در پیش رو",
+    "cancelled": "لغو شده",
+    "previousWeek": "هفته قبلی",
+    "nextWeek": "هفته بعدی",
+    "weekRange": "۱۲ جنوری - ۱۸ جنوری ۲۰۲۶",
+    "noSessions": "هیچ جلسه‌ای وجود ندارد",
+    "takeAttendance": "ثبت حاضری",
+    "viewDetails": "مشاهده جزئیات",
+    "statusUpcoming": "در پیش رو",
+    "statusCompleted": "تکمیل شده",
+    "statusCancelled": "لغو شده",
+    "monday": "دوشنبه ۱۲",
+    "tuesday": "سه‌شنبه ۱۳",
+    "wednesday": "چهارشنبه ۱۴",
+    "thursday": "پنجشنبه ۱۵",
+    "friday": "جمعه ۱۶",
+    "saturday": "شنبه ۱۷",
+    "sunday": "یکشنبه ۱۸"
+  
+},
+  "title": "گزارش حاضری",
+  "subtitle": "تحلیل ماهانه حاضری صنف‌های شما",
+
+  "filters": {
+    "class": "صنف",
+    "allClasses": "همه صنف‌ها",
+    "month": "ماه",
+    "year": "سال"
+  },
+
+  "months": {
+    "jan": "جنوری",
+    "feb": "فبروری",
+    "mar": "مارچ",
+    "apr": "اپریل",
+    "may": "می",
+    "jun": "جون",
+    "jul": "جولای",
+    "aug": "آگست",
+    "sep": "سپتمبر",
+    "oct": "اکتوبر",
+    "nov": "نوامبر",
+    "dec": "دسمبر"
+  },
+
+  "stats": {
+    "totalSessions": "مجموع جلسات",
+    "present": "حاضر",
+    "absent": "غایب",
+    "attendanceRate": "نرخ حاضری"
+  },
+
+  "chartTitle": "نمای کلی حاضری شاگردان",
+
+  "table": {
+    "student": "شاگرد",
+    "code": "کد",
+    "present": "حاضر",
+    "absent": "غایب",
+    "late": "تاخیر",
+    "excused": "رخصت",
+    "rate": "نرخ"
+  },
+
+  "messages": {
+    "loading": "در حال بارگذاری...",
+    "noData": "برای این دوره معلومات حاضری موجود نیست",
+    "na": "نامشخص"
+  }
+
+ 
+,"messagesPage": {
+    "searchPlaceholder": "جستجوی مخاطبین...",
+    "typeMessage": "پیام خود را بنویسید...",
+    "send": "ارسال",
+
+    "contacts": {
+      "adminOffice": "دفتر اداره",
+      "teacherAhmad": "استاد احمد",
+      "financeDepartment": "دیپارتمنت مالی"
+    },
+
+    "defaultMessages": {
+      "checkComplaint": "لطفاً شکایت CMP-001 را بررسی کنید.",
+      "reviewToday": "امروز آن را بررسی می‌کنم.",
+      "thankYou": "تشکر."
+    },
+
+    "labels": {
+      "you": "شما",
+      "now": "اکنون"
+    }
+  }},
   "admin": {
     "dashboard": {
       "title": "داشبورد مدیریتی",
