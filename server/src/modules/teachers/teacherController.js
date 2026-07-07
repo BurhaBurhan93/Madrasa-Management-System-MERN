@@ -7,9 +7,13 @@ const AttendanceSession = require("../../models/AttendanceSession");
 const AttendanceRecord = require("../../models/AttendanceRecord");
 const FinalResult = require("../../models/FinalResult");
 const Complaint = require("../../models/Complaint");
+const ComplaintAction = require("../../models/ComplaintAction");
+const ComplaintFeedback = require("../../models/ComplaintFeedback");
+const TeacherFeedback = require("../../models/TeacherFeedback");
 const Leave = require("../../models/Leave");
 const LeaveType = require("../../models/LeaveType");
 const SalaryPayment = require("../../models/SalaryPayment");
+const SalaryDeduction = require("../../models/SalaryDeduction");
 const Employee = require("../../models/Employee");
 const { getDateRangeFromQuery } = require("../../utils/reportDateRange");
 
@@ -391,6 +395,185 @@ exports.updateComplaintStatus = async (req, res) => {
   }
 };
 
+exports.createComplaint = async (req, res) => {
+  try {
+    const { subject, description, complaintCategory, priorityLevel } = req.body;
+    const lastComplaint = await Complaint.findOne().sort({ createdAt: -1 });
+    const nextNum = lastComplaint ? parseInt(lastComplaint.complaintCode.replace('CMP-', '')) + 1 : 1;
+    const complaintCode = 'CMP-' + String(nextNum).padStart(4, '0');
+    const complaint = await Complaint.create({
+      complaintCode,
+      complainantType: 'staff',
+      complainant: req.user.id,
+      subject,
+      description,
+      complaintCategory,
+      priorityLevel: priorityLevel || 'medium',
+      complaintStatus: 'open',
+      assignedTo: req.user.id,
+    });
+    res.status(201).json({ success: true, data: complaint });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateComplaint = async (req, res) => {
+  try {
+    const { subject, description, complaintCategory, priorityLevel, complaintStatus } = req.body;
+    const complaint = await Complaint.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...(subject && { subject }),
+        ...(description && { description }),
+        ...(complaintCategory && { complaintCategory }),
+        ...(priorityLevel && { priorityLevel }),
+        ...(complaintStatus && { complaintStatus }),
+        ...(complaintStatus === 'closed' ? { closedAt: new Date() } : {}),
+      },
+      { new: true },
+    );
+    if (!complaint) return res.status(404).json({ success: false, message: 'Complaint not found' });
+    res.json({ success: true, data: complaint });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.deleteComplaint = async (req, res) => {
+  try {
+    const complaint = await Complaint.findByIdAndDelete(req.params.id);
+    if (!complaint) return res.status(404).json({ success: false, message: 'Complaint not found' });
+    await ComplaintAction.deleteMany({ complaint: req.params.id });
+    await ComplaintFeedback.deleteMany({ complaint: req.params.id });
+    res.json({ success: true, message: 'Complaint deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getComplaintFeedback = async (req, res) => {
+  try {
+    const feedbacks = await ComplaintFeedback.find({ complaint: req.params.id })
+      .populate('feedbackBy', 'name')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, data: feedbacks });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.addComplaintFeedback = async (req, res) => {
+  try {
+    const { satisfactionLevel, comments, escalationRequired } = req.body;
+    const feedback = await ComplaintFeedback.create({
+      complaint: req.params.id,
+      feedbackBy: req.user.id,
+      satisfactionLevel,
+      comments,
+      escalationRequired: escalationRequired || false,
+    });
+    res.status(201).json({ success: true, data: feedback });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.deleteComplaintFeedback = async (req, res) => {
+  try {
+    const feedback = await ComplaintFeedback.findByIdAndDelete(req.params.id);
+    if (!feedback) return res.status(404).json({ success: false, message: 'Feedback not found' });
+    res.json({ success: true, message: 'Feedback deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ==================== TEACHER FEEDBACK ====================
+exports.getTeacherFeedbacks = async (req, res) => {
+  try {
+    const { type, category, studentId } = req.query;
+    let query = { feedbackFrom: req.user.id };
+    if (type) query.feedbackType = type;
+    if (category) query.category = category;
+    if (studentId) query.student = studentId;
+    const feedbacks = await TeacherFeedback.find(query)
+      .populate('student', 'user studentCode firstName lastName fatherName')
+      .populate({ path: 'student', populate: { path: 'user', select: 'name' } })
+      .populate('class', 'name section')
+      .populate('subjectRef', 'name')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, count: feedbacks.length, data: feedbacks });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.createTeacherFeedback = async (req, res) => {
+  try {
+    const { feedbackType, studentId, subject, category, rating, comments, classId, subjectRefId, tags } = req.body;
+    const feedback = await TeacherFeedback.create({
+      feedbackType,
+      student: studentId || undefined,
+      subject,
+      category: category || 'general',
+      rating: rating || 3,
+      comments,
+      feedbackFrom: req.user.id,
+      class: classId || undefined,
+      subjectRef: subjectRefId || undefined,
+      tags: tags || [],
+    });
+    const populated = await TeacherFeedback.findById(feedback._id)
+      .populate('student', 'user studentCode')
+      .populate({ path: 'student', populate: { path: 'user', select: 'name' } });
+    res.status(201).json({ success: true, data: populated });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateTeacherFeedback = async (req, res) => {
+  try {
+    const { subject, category, rating, comments, tags } = req.body;
+    const feedback = await TeacherFeedback.findOneAndUpdate(
+      { _id: req.params.id, feedbackFrom: req.user.id },
+      { ...(subject && { subject }), ...(category && { category }), ...(rating && { rating }), ...(comments && { comments }), ...(tags && { tags }) },
+      { new: true },
+    ).populate('student', 'user studentCode').populate({ path: 'student', populate: { path: 'user', select: 'name' } });
+    if (!feedback) return res.status(404).json({ success: false, message: 'Feedback not found' });
+    res.json({ success: true, data: feedback });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.deleteTeacherFeedback = async (req, res) => {
+  try {
+    const feedback = await TeacherFeedback.findOneAndDelete({ _id: req.params.id, feedbackFrom: req.user.id });
+    if (!feedback) return res.status(404).json({ success: false, message: 'Feedback not found' });
+    res.json({ success: true, message: 'Feedback deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getTeacherFeedbackStats = async (req, res) => {
+  try {
+    const all = await TeacherFeedback.find({ feedbackFrom: req.user.id });
+    const stats = {
+      total: all.length,
+      avgRating: all.length ? (all.reduce((a, f) => a + (f.rating || 0), 0) / all.length).toFixed(1) : 0,
+      byType: { student: all.filter(f => f.feedbackType === 'student').length, admin: all.filter(f => f.feedbackType === 'admin').length, peer: all.filter(f => f.feedbackType === 'peer').length, self: all.filter(f => f.feedbackType === 'self').length },
+      byCategory: {},
+    };
+    all.forEach(f => { stats.byCategory[f.category] = (stats.byCategory[f.category] || 0) + 1; });
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // ==================== LEAVE ====================
 exports.getLeaveTypes = async (req, res) => {
   try {
@@ -424,7 +607,21 @@ exports.applyLeave = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Employee record not found" });
-    const leave = await Leave.create({ ...req.body, employee: employee._id });
+    const { startDate, endDate, reason, leaveType } = req.body;
+    let leaveDays = req.body.leaveDays;
+    if (startDate && endDate && !leaveDays) {
+      const diff = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
+      leaveDays = Math.max(1, diff);
+    }
+    const leave = await Leave.create({
+      leaveType,
+      startDate,
+      endDate,
+      leaveDays,
+      reason,
+      leaveReason: reason,
+      employee: employee._id,
+    });
     res
       .status(201)
       .json({
@@ -445,11 +642,26 @@ exports.getMyPayslips = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Employee record not found" });
-    const payslips = await SalaryPayment.find({ employee: employee._id }).sort({
-      salaryYear: -1,
-      salaryMonth: -1,
+    const payslips = await SalaryPayment.find({ employee: employee._id })
+      .populate("approvedBy", "name email")
+      .populate("paidBy", "name email")
+      .sort({ salaryYear: -1, salaryMonth: -1 });
+    const deductionRecords = await SalaryDeduction.find({ employee: employee._id, status: "approved" }).sort({ deductionYear: -1, deductionMonth: -1 });
+    const deductionsByMonth = {};
+    deductionRecords.forEach((d) => {
+      const key = `${d.deductionYear}-${d.deductionMonth}`;
+      if (!deductionsByMonth[key]) deductionsByMonth[key] = [];
+      deductionsByMonth[key].push({
+        deductionType: d.deductionType,
+        deductionReason: d.deductionReason,
+        deductionAmount: d.deductionAmount,
+      });
     });
-    res.json({ success: true, count: payslips.length, data: payslips });
+    const data = payslips.map((p) => ({
+      ...p.toObject(),
+      deductionDetails: deductionsByMonth[`${p.salaryYear}-${p.salaryMonth}`] || [],
+    }));
+    res.json({ success: true, count: data.length, data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FiPlus, FiSearch, FiFilter, FiDownload, FiEdit, FiEye, FiTrash2 } from 'react-icons/fi';
 import { Table, Button, Card, Input, Select, Badge, Modal, Loading } from '../components/UIHelper';
 import { localizeAdminText } from '../lib/adminLocalization';
+import { readStoredLanguage } from '../lib/languageStorage';
 
 const BasicPageTemplate = ({
   title,
@@ -21,7 +22,7 @@ const BasicPageTemplate = ({
   onRowClick,
   emptyMessage = 'No records found',
 }) => {
-  const adminLang = localStorage.getItem('adminLang') || 'en';
+  const adminLang = readStoredLanguage('adminLang', 'en');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -45,12 +46,27 @@ const BasicPageTemplate = ({
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (onDelete && selectedItem) {
-      onDelete(selectedItem);
+      await onDelete(selectedItem);
     }
     setShowDeleteModal(false);
     setSelectedItem(null);
+  };
+
+  const exportCSV = () => {
+    if (!exportData || exportData.length === 0) return;
+    const keys = Object.keys(exportData[0]);
+    const csvContent = [
+      keys.join(','),
+      ...exportData.map(row => keys.map(k => JSON.stringify(String(row[k] ?? '')).replace(/^"|"$/g, '')).join(','))
+    ].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${title.toLowerCase().replace(/\s+/g, '_')}_export.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
   };
 
   const enhancedColumns = showActions ? [
@@ -145,12 +161,12 @@ const BasicPageTemplate = ({
           </div>
           <div className="flex gap-2">
             {filters.length > 0 && (
-              <Button variant="outline" icon={<FiFilter size={16} />}>
-                {localizeAdminText('Filter By', adminLang)}
+              <Button variant="outline" onClick={() => setActiveFilters({})} icon={<FiFilter size={16} />}>
+                {Object.keys(activeFilters).some(k => activeFilters[k]) ? 'Clear Filters' : localizeAdminText('Filter By', adminLang)}
               </Button>
             )}
             {exportData && (
-              <Button variant="outline" icon={<FiDownload size={16} />}>
+              <Button variant="outline" onClick={exportCSV} icon={<FiDownload size={16} />}>
                 {localizeAdminText('Export', adminLang)}
               </Button>
             )}

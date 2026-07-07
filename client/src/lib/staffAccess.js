@@ -1,9 +1,6 @@
 const DEFAULT_STAFF_MODULES = [
   "dashboard",
   "profile",
-  "students",
-  "inventory",
-  "complaints",
 ];
 const PRINT_ENABLED_STAFF_MODULES = [
   "registrar",
@@ -17,6 +14,7 @@ const PRINT_ENABLED_STAFF_MODULES = [
 
 const MODULE_ALIASES = {
   leave: "hr",
+  support: "support",
   payroll: "payroll",
   hr: "hr",
   finance: "finance",
@@ -44,14 +42,17 @@ const MODULES_BY_EMPLOYEE_TYPE = {
     "payroll",
     "kitchen",
     "hr",
-    "hostel",
+    "support",
   ],
-  finance: ["dashboard", "profile", "finance", "payroll"],
-  registrar: ["dashboard", "profile", "registrar", "students", "inventory"],
-  hr: ["dashboard", "profile", "hr", "payroll"],
+  support: ["dashboard", "profile", "support", "students", "inventory", "complaints"],
+  finance: ["dashboard", "profile", "finance"],
+  registrar: ["dashboard", "profile", "registrar"],
+  hr: ["dashboard", "profile", "hr"],
   librarian: ["dashboard", "profile", "library"],
-  kitchen: ["dashboard", "profile", "kitchen", "inventory"],
-  support: DEFAULT_STAFF_MODULES,
+  kitchen: ["dashboard", "profile", "kitchen"],
+  payroll: ["dashboard", "profile", "payroll"],
+  complaints: ["dashboard", "profile", "complaints"],
+  inventory: ["dashboard", "profile", "inventory"],
   maintenance: ["dashboard", "profile", "inventory", "complaints"],
   security: ["dashboard", "profile", "students", "complaints"],
 };
@@ -93,6 +94,10 @@ export const getAllowedStaffModules = (user) => {
 
   if (user.role !== "staff") return ["dashboard", "profile"];
 
+  const employeeTypeModules =
+    MODULES_BY_EMPLOYEE_TYPE[normalize(user.employeeType)];
+  if (employeeTypeModules) return employeeTypeModules;
+
   const explicitModules = Array.isArray(user.staffModules)
     ? user.staffModules.map(normalize).filter(Boolean)
     : [];
@@ -103,10 +108,6 @@ export const getAllowedStaffModules = (user) => {
   if (permissionModules.length)
     return [...new Set(["dashboard", "profile", ...permissionModules])];
 
-  const employeeTypeModules =
-    MODULES_BY_EMPLOYEE_TYPE[normalize(user.employeeType)];
-  if (employeeTypeModules) return employeeTypeModules;
-
   return modulesFromDepartment(user.department) || DEFAULT_STAFF_MODULES;
 };
 
@@ -115,6 +116,9 @@ export const getStaffModuleFromPath = (pathname) => {
     .replace(/^\/staff\/?/, "")
     .split("/")
     .filter(Boolean);
+  if (parts[0] === "registrar" && parts[1] && parts[1].startsWith("hostel")) {
+    return "hostel";
+  }
   const firstPart = parts[0] || "dashboard";
   return MODULE_ALIASES[firstPart] || firstPart;
 };

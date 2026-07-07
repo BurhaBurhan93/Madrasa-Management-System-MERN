@@ -98,19 +98,19 @@ const Inventory = () => {
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[
-          { label: 'Items In Stock', value: items.length, icon: FiPackage, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700' },
-          { label: 'Low Stock Alerts', value: insights.lowStock, icon: FiAlertTriangle, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700' },
-          { label: 'Out Of Stock', value: insights.outOfStock, icon: FiArchive, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700' },
-          { label: 'Inventory Value', value: formatCurrency(insights.totalValue), icon: FiTrendingUp, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700' },
-          { label: 'Items To Reorder', value: insights.reorderCount, icon: FiRefreshCcw, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700' }
+          { label: 'Items In Stock', value: items.length, icon: FiPackage, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700', chipDark: 'dark:bg-sky-900/30 dark:text-sky-400' },
+          { label: 'Low Stock Alerts', value: insights.lowStock, icon: FiAlertTriangle, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700', chipDark: 'dark:bg-amber-900/30 dark:text-amber-400' },
+          { label: 'Out Of Stock', value: insights.outOfStock, icon: FiArchive, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700', chipDark: 'dark:bg-rose-900/30 dark:text-rose-400' },
+          { label: 'Inventory Value', value: formatCurrency(insights.totalValue), icon: FiTrendingUp, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700', chipDark: 'dark:bg-emerald-900/30 dark:text-emerald-400' },
+          { label: 'Items To Reorder', value: insights.reorderCount, icon: FiRefreshCcw, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700', chipDark: 'dark:bg-violet-900/30 dark:text-violet-400' }
         ].map((item) => (
-          <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none`}>
+          <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none dark:border-slate-700 dark:bg-none dark:bg-slate-800/50`}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{item.label}</p>
-                <p className="mt-3 text-2xl font-bold text-slate-900">{item.value}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-300">{item.label}</p>
+                <p className="mt-3 text-2xl font-bold text-slate-900 dark:text-slate-100">{item.value}</p>
               </div>
-              <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.chip}`}>
+              <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.chip} ${item.chipDark}`}>
                 <item.icon size={22} />
               </span>
             </div>

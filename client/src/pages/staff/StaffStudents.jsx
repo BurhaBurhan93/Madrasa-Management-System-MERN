@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { FiSearch, FiFilter, FiDownload, FiEye, FiBook, FiMail, FiPhone, FiRefreshCw, FiX } from 'react-icons/fi';
 import Card from '../../components/UIHelper/Card';
 import { PieChartComponent, BarChartComponent } from '../../components/UIHelper/ECharts';
@@ -11,6 +13,8 @@ const StaffStudents = () => {
   const [filterClass, setFilterClass] = useState('all');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     fetchStudents();
@@ -42,6 +46,25 @@ const StaffStudents = () => {
     }
   };
 
+  const handleExport = () => {
+    const doc = new jsPDF({ orientation: 'landscape' });
+    doc.setFontSize(18);
+    doc.text('Student List', 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
+    const tableData = filteredStudents.map(s => [
+      s.name || '', s.studentId || '', s.class || '', s.email || '', s.status || ''
+    ]);
+    autoTable(doc, {
+      startY: 34,
+      head: [['Name', 'Student ID', 'Class', 'Email', 'Status']],
+      body: tableData,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [14, 165, 233] },
+    });
+    doc.save('students_export.pdf');
+  };
+
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          student.studentId?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -50,6 +73,8 @@ const StaffStudents = () => {
   });
 
   const classes = ['all', ...new Set(students.map(s => s.class).filter(Boolean))];
+  const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
+  const paginatedStudents = filteredStudents.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
 
   if (loading) {
     return (
@@ -75,7 +100,10 @@ const StaffStudents = () => {
             <FiRefreshCw size={16} />
             Refresh
           </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-md transition-shadow flex items-center gap-2">
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-md transition-shadow flex items-center gap-2"
+          >
             <FiDownload size={16} />
             Export List
           </button>
@@ -172,7 +200,7 @@ const StaffStudents = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredStudents.length > 0 ? filteredStudents.map((student) => (
+              {paginatedStudents.length > 0 ? paginatedStudents.map((student) => (
                 <tr key={student.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -224,6 +252,68 @@ const StaffStudents = () => {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">Rows per page:</span>
+            <select
+              value={rowsPerPage}
+              onChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(0); }}
+              className="px-2 py-1 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+            >
+              {[5, 10, 15, 25, 50].map(n => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+            <span className="text-sm text-gray-500 ml-2">
+              {filteredStudents.length > 0
+                ? `${page * rowsPerPage + 1}-${Math.min((page + 1) * rowsPerPage, filteredStudents.length)} of ${filteredStudents.length}`
+                : '0 of 0'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage(0)}
+              disabled={page === 0}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              First
+            </button>
+            <button
+              onClick={() => setPage(p => Math.max(0, p - 1))}
+              disabled={page === 0}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Prev
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                className={`px-3 py-1.5 rounded-lg border text-sm ${
+                  page === i
+                    ? 'border-sky-500 bg-sky-50 text-sky-700 font-medium'
+                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+              disabled={page >= totalPages - 1}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+            <button
+              onClick={() => setPage(totalPages - 1)}
+              disabled={page >= totalPages - 1}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Last
+            </button>
+          </div>
         </div>
       </div>
 

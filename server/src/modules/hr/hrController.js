@@ -4,6 +4,9 @@ const LeaveType = require("../../models/LeaveType");
 const Leave = require("../../models/Leave");
 const Employee = require("../../models/Employee");
 const EmployeeAttendance = require("../../models/EmployeeAttendance");
+const AttendanceSetting = require("../../models/AttendanceSetting");
+const AttendanceWarning = require("../../models/AttendanceWarning");
+const AttendanceCorrection = require("../../models/AttendanceCorrection");
 const User = require("../../models/User");
 const notificationService = require("../notifications/notificationService");
 const { getDateRangeFromQuery } = require("../../utils/reportDateRange");
@@ -13,13 +16,37 @@ const { getDateRangeFromQuery } = require("../../utils/reportDateRange");
 // Get all departments
 exports.getAllDepartments = async (req, res) => {
   try {
-    const departments = await Department.find()
-      .populate("departmentHead", "fullName employeeCode")
-      .sort({ createdAt: -1 });
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
+    const skip = (page - 1) * limit;
+    const search = (req.query.search || "").trim();
+
+    const filter = {};
+    if (search) {
+      const regex = new RegExp(search, "i");
+      filter.$or = [
+        { departmentName: regex },
+        { departmentCode: regex },
+        { headOfDepartment: regex },
+        { description: regex },
+      ];
+    }
+
+    const [departments, total] = await Promise.all([
+      Department.find(filter)
+        .populate("departmentHead", "fullName employeeCode")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Department.countDocuments(filter),
+    ]);
 
     res.status(200).json({
       success: true,
       count: departments.length,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
       data: departments,
     });
   } catch (error) {
@@ -141,13 +168,36 @@ exports.deleteDepartment = async (req, res) => {
 // Get all designations
 exports.getAllDesignations = async (req, res) => {
   try {
-    const designations = await Designation.find()
-      .populate("department", "departmentName departmentCode")
-      .sort({ createdAt: -1 });
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
+    const skip = (page - 1) * limit;
+    const search = (req.query.search || "").trim();
+
+    const filter = {};
+    if (search) {
+      const regex = new RegExp(search, "i");
+      filter.$or = [
+        { designationTitle: regex },
+        { jobLevel: regex },
+        { minQualification: regex },
+      ];
+    }
+
+    const [designations, total] = await Promise.all([
+      Designation.find(filter)
+        .populate("department", "departmentName departmentCode")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Designation.countDocuments(filter),
+    ]);
 
     res.status(200).json({
       success: true,
       count: designations.length,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
       data: designations,
     });
   } catch (error) {
@@ -407,29 +457,42 @@ exports.deleteLeaveType = async (req, res) => {
 // Get all employees
 exports.getAllEmployees = async (req, res) => {
   try {
-    const { status, department, employeeType, search } = req.query;
-    let query = {};
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
+    const skip = (page - 1) * limit;
+    const { status, department, employeeType, employmentType, search } = req.query;
 
-    if (status) query.status = status;
-    if (department) query.department = department;
-    if (employeeType) query.employeeType = employeeType;
+    const filter = {};
+    if (status) filter.status = status;
+    if (department) filter.department = department;
+    if (employeeType) filter.employeeType = employeeType;
+    if (employmentType) filter.employmentType = employmentType;
     if (search) {
-      query.$or = [
-        { fullName: { $regex: search, $options: "i" } },
-        { employeeCode: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
+      const regex = new RegExp(search, "i");
+      filter.$or = [
+        { fullName: regex },
+        { employeeCode: regex },
+        { email: regex },
       ];
     }
 
-    const employees = await Employee.find(query)
-      .populate("department", "departmentName")
-      .populate("designation", "designationTitle")
-      .populate("reportingManager", "fullName employeeCode")
-      .sort({ createdAt: -1 });
+    const [employees, total] = await Promise.all([
+      Employee.find(filter)
+        .populate("department", "departmentName")
+        .populate("designation", "designationTitle")
+        .populate("reportingManager", "fullName employeeCode")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Employee.countDocuments(filter),
+    ]);
 
     res.status(200).json({
       success: true,
       count: employees.length,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
       data: employees,
     });
   } catch (error) {
@@ -479,6 +542,7 @@ exports.createEmployee = async (req, res) => {
       req.body.employeeCode = `EMP${String(count + 1).padStart(5, "0")}`;
     }
     const data = { ...req.body };
+    data.user = req.user.id;
     if (!data.department) delete data.department;
     if (!data.designation) delete data.designation;
     if (!data.reportingManager) delete data.reportingManager;
@@ -572,16 +636,29 @@ exports.deleteEmployee = async (req, res) => {
 
 exports.getAllLeaves = async (req, res) => {
   try {
-    const { status, employee } = req.query;
-    let query = {};
-    if (status) query.status = status;
-    if (employee) query.employee = employee;
-    const leaves = await Leave.find(query)
-      .populate("employee", "fullName employeeCode")
-      .populate("leaveType", "leaveTypeName leaveCode")
-      .populate("approvedBy", "fullName")
-      .sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: leaves.length, data: leaves });
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
+    const skip = (page - 1) * limit;
+    const { status, employee, search } = req.query;
+
+    const filter = {};
+    if (status) filter.status = status;
+    if (employee) filter.employee = employee;
+    if (search) {
+      filter.$or = [{ leaveReason: { $regex: search, $options: "i" } }];
+    }
+
+    const [leaves, total] = await Promise.all([
+      Leave.find(filter)
+        .populate("employee", "fullName employeeCode")
+        .populate("leaveType", "leaveTypeName leaveCode")
+        .populate("approvedBy", "fullName")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Leave.countDocuments(filter),
+    ]);
+    res.status(200).json({ success: true, count: leaves.length, total, totalPages: Math.ceil(total / limit), currentPage: page, data: leaves });
   } catch (error) {
     res
       .status(500)
@@ -740,8 +817,84 @@ exports.deleteLeave = async (req, res) => {
       .json({
         success: false,
         message: "Error deleting leave",
-        error: error.message,
-      });
+      error: error.message,
+    });
+  }
+};
+
+// ==================== ATTENDANCE WARNING CONTROLLERS ====================
+
+exports.getAttendanceWarnings = async (req, res) => {
+  try {
+    const warnings = await AttendanceWarning.find()
+      .populate({ path: 'student', select: 'firstName lastName studentCode currentClass', populate: { path: 'currentClass', select: 'className' } })
+      .sort({ createdAt: -1 });
+    res.status(200).json({ success: true, count: warnings.length, data: warnings });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error fetching warnings", error: error.message });
+  }
+};
+
+exports.dismissAttendanceWarning = async (req, res) => {
+  try {
+    const warning = await AttendanceWarning.findByIdAndUpdate(
+      req.params.id,
+      { status: 'dismissed' },
+      { new: true },
+    );
+    if (!warning) return res.status(404).json({ success: false, message: "Warning not found" });
+    res.status(200).json({ success: true, message: "Warning dismissed", data: warning });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error dismissing warning", error: error.message });
+  }
+};
+
+exports.notifyAttendanceWarning = async (req, res) => {
+  try {
+    const warning = await AttendanceWarning.findByIdAndUpdate(
+      req.params.id,
+      { status: 'notified' },
+      { new: true },
+    );
+    if (!warning) return res.status(404).json({ success: false, message: "Warning not found" });
+    res.status(200).json({ success: true, message: "Warning notice sent", data: warning });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error notifying warning", error: error.message });
+  }
+};
+
+// ==================== ATTENDANCE SETTINGS CONTROLLERS ====================
+
+exports.getAttendanceSettings = async (req, res) => {
+  try {
+    let settings = await AttendanceSetting.findOne({ key: 'default' });
+    if (!settings) {
+      settings = await AttendanceSetting.create({ key: 'default' });
+    }
+    res.status(200).json({ success: true, data: settings });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error fetching attendance settings", error: error.message });
+  }
+};
+
+exports.updateAttendanceSettings = async (req, res) => {
+  try {
+    const allowed = [
+      'workingDays', 'schoolStartTime', 'schoolEndTime',
+      'lateThreshold', 'absenceThreshold', 'autoNotification',
+      'notificationEmail', 'hrEmail', 'adminEmails',
+      'periodDuration', 'breakDuration', 'allowManualOverride', 'requireApproval',
+    ];
+    const update = {};
+    allowed.forEach(f => { if (req.body[f] !== undefined) update[f] = req.body[f]; });
+    const settings = await AttendanceSetting.findOneAndUpdate(
+      { key: 'default' },
+      { $set: update },
+      { new: true, upsert: true, runValidators: true },
+    );
+    res.status(200).json({ success: true, message: "Attendance settings saved", data: settings });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error saving attendance settings", error: error.message });
   }
 };
 
@@ -770,6 +923,34 @@ exports.markAttendance = async (req, res) => {
         message: "Error marking attendance",
         error: error.message,
       });
+  }
+};
+
+exports.getAllAttendance = async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
+    const { startDate, endDate, status, employee } = req.query;
+    const filter = {};
+    if (startDate || endDate) {
+      filter.date = {};
+      if (startDate) filter.date.$gte = new Date(startDate);
+      if (endDate) filter.date.$lte = new Date(endDate);
+    }
+    if (status) filter.status = status;
+    if (employee) filter.employee = employee;
+    const [records, total] = await Promise.all([
+      EmployeeAttendance.find(filter)
+        .populate("employee", "fullName employeeCode department")
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit),
+      EmployeeAttendance.countDocuments(filter),
+    ]);
+    res.status(200).json({ success: true, count: records.length, total, totalPages: Math.ceil(total / limit), currentPage: page, data: records });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error fetching attendance", error: error.message });
   }
 };
 
@@ -916,5 +1097,92 @@ exports.getEmployeeStats = async (req, res) => {
       message: "Error fetching employee statistics",
       error: error.message,
     });
+  }
+};
+
+// ==================== ATTENDANCE CORRECTIONS CONTROLLERS ====================
+
+exports.getAttendanceCorrections = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const filter = {};
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) filter.status = status;
+
+    const corrections = await AttendanceCorrection.find(filter)
+      .populate({ path: 'employee', select: 'fullName employeeCode department designation', populate: [
+        { path: 'department', select: 'departmentName' },
+        { path: 'designation', select: 'designationTitle' },
+      ]})
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, count: corrections.length, data: corrections });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error fetching corrections", error: error.message });
+  }
+};
+
+exports.createAttendanceCorrection = async (req, res) => {
+  try {
+    const { employee, date, newStatus, correctionReason } = req.body;
+    if (!employee || !date || !newStatus || !correctionReason) {
+      return res.status(400).json({ success: false, message: "employee, date, newStatus, and correctionReason are required" });
+    }
+
+    const parsedDate = new Date(date);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return res.status(400).json({ success: false, message: "Invalid date format" });
+    }
+    const record = await EmployeeAttendance.findOne({ employee, date: parsedDate });
+    const oldStatus = record ? record.status : undefined;
+
+    const correctionData = { employee, date, oldStatus, newStatus, correctionReason };
+    if (req.user && req.user.id) correctionData.correctedBy = req.user.id;
+    const correction = await AttendanceCorrection.create(correctionData);
+
+    const populated = await correction.populate({ path: 'employee', select: 'fullName employeeCode department designation', populate: [
+      { path: 'department', select: 'departmentName' },
+      { path: 'designation', select: 'designationTitle' },
+    ]});
+
+    res.status(201).json({ success: true, data: populated });
+  } catch (error) {
+    console.error("Create correction error:", error);
+    res.status(500).json({ success: false, message: "Error creating correction", error: error.message, stack: error.stack });
+  }
+};
+
+exports.approveAttendanceCorrection = async (req, res) => {
+  try {
+    const correction = await AttendanceCorrection.findByIdAndUpdate(
+      req.params.id,
+      { status: 'approved' },
+      { new: true },
+    );
+    if (!correction) return res.status(404).json({ success: false, message: "Correction not found" });
+
+    if (correction.newStatus) {
+      await EmployeeAttendance.findOneAndUpdate(
+        { employee: correction.employee, date: correction.date },
+        { status: correction.newStatus },
+      );
+    }
+
+    res.status(200).json({ success: true, message: "Correction approved", data: correction });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error approving correction", error: error.message });
+  }
+};
+
+exports.rejectAttendanceCorrection = async (req, res) => {
+  try {
+    const correction = await AttendanceCorrection.findByIdAndUpdate(
+      req.params.id,
+      { status: 'rejected' },
+      { new: true },
+    );
+    if (!correction) return res.status(404).json({ success: false, message: "Correction not found" });
+    res.status(200).json({ success: true, message: "Correction rejected", data: correction });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error rejecting correction", error: error.message });
   }
 };

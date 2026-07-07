@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require('../../middleware/auth');
 const { authorizeRoles } = require('../../middleware/auth');
 const Complaint = require('../../models/Complaint');
+const ComplaintFeedback = require('../../models/ComplaintFeedback');
 
 router.use(auth);
 
@@ -37,9 +38,21 @@ router.get('/', async (req, res) => {
       updatedAt: c.updatedAt,
       resolvedAt: c.closedAt,
       category: c.complaintCategory,
+      adminNotes: c.adminNotes,
     }));
-    res.json(mapped);
+    res.json({ success: true, data: mapped });
   } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// Get feedback for resolved complaints (must be before /:id)
+router.get('/feedback', async (req, res) => {
+  try {
+    const feedbacks = await ComplaintFeedback.find()
+      .populate({ path: 'complaint', select: 'subject complaintCode submittedDate complainant adminNotes', populate: { path: 'complainant', select: 'name email' } })
+      .populate('feedbackBy', 'name email')
+      .sort({ feedbackDate: -1 });
+    res.json({ success: true, data: feedbacks });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 // Get single complaint
@@ -49,7 +62,7 @@ router.get('/:id', async (req, res) => {
       .populate('complainant', 'name email')
       .populate('assignedTo', 'name email');
     if (!c) return res.status(404).json({ message: 'Complaint not found' });
-    res.json(c);
+    res.json({ success: true, data: c });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
@@ -69,7 +82,7 @@ router.post('/', async (req, res) => {
       complaintStatus: req.body.status ? (req.body.status === 'pending' ? 'open' : req.body.status === 'resolved' ? 'closed' : req.body.status) : 'open',
       assignedTo: req.body.assignedTo || null,
     });
-    res.status(201).json(complaint);
+    res.status(201).json({ success: true, data: complaint });
   } catch (e) { res.status(400).json({ message: e.message }); }
 });
 
@@ -88,7 +101,7 @@ router.put('/:id', async (req, res) => {
     if (req.body.priority) updates.priorityLevel = req.body.priority;
     const complaint = await Complaint.findByIdAndUpdate(req.params.id, updates, { new: true });
     if (!complaint) return res.status(404).json({ message: 'Complaint not found' });
-    res.json(complaint);
+    res.json({ success: true, data: complaint });
   } catch (e) { res.status(400).json({ message: e.message }); }
 });
 

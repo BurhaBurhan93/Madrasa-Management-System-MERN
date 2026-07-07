@@ -9,7 +9,8 @@ const KitchenBudgetSchema = new Schema({
   spentAmount: { type: Number, default: 0 },
   remainingAmount: { type: Number, default: 0 },
   approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-  budgetStatus: { type: String, enum: ['pending','approved','rejected'], default: 'pending' }
+  budgetStatus: { type: String, enum: ['pending','approved','rejected'], default: 'pending' },
+  remarks: { type: String, default: '' }
 }, { timestamps: true });
 
 KitchenBudgetSchema.index({ month: 1, year: 1 }, { unique: true });

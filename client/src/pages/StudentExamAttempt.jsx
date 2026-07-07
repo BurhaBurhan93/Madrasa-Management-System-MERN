@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { apiFetch, parseJsonSafe } from '../lib/apiFetch';
 import { 
   FiClock, 
   FiCheckCircle, 
@@ -16,10 +16,6 @@ import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import Card from '../components/UIHelper/Card';
 import Button from '../components/UIHelper/Button';
 import Badge from '../components/UIHelper/Badge';
-
-const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentExamAttempt = () => {
   const { examId } = useParams();
@@ -48,23 +44,37 @@ const StudentExamAttempt = () => {
 
   const fetchExam = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/student/exams/${examId}`, api());
-      if (res.data.success) {
-        const examData = res.data.data;
-        setExam(examData);
-        setTimeLeft(examData.duration * 60);
+      const res = await apiFetch(`/student/exams/${examId}`);
+      const data = await parseJsonSafe(res);
+      const examData = data.success ? data.data : (data.id || data._id ? data : null);
+      if (examData) {
+        const normalized = {
+          ...examData,
+          questions: (examData.questions || []).map(q => ({
+            ...q,
+            _id: q._id || q.id,
+            questionType: q.questionType || q.type
+          }))
+        };
+        setExam(normalized);
+        setTimeLeft((normalized.duration || 60) * 60);
+      } else {
+        setError(data.message || 'Examination details not found.');
       }
     } catch (e) { 
       console.error(e);
       setError('The examination portal is currently unavailable.');
-      setExam(null); // Set null on error
     } finally { setLoading(false); }
   };
 
   const checkSubmission = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/student/exams/${examId}/my-submission`, api());
-      if (res.data.success && res.data.data) setSubmission(res.data.data);
+      const res = await apiFetch(`/student/exams/${examId}/my-submission`);
+      if (res.ok) {
+        const data = await parseJsonSafe(res);
+        if (data.success && data.data) setSubmission(data.data);
+        else if (data._id) setSubmission(data);
+      }
     } catch (e) { console.error(e); }
   };
 
@@ -76,14 +86,22 @@ const StudentExamAttempt = () => {
     if (!window.confirm('Confirm Submission? Once submitted, you cannot modify your answers.')) return;
     setSubmitting(true);
     try {
-      const res = await axios.post(`${API_BASE}/student/exams/${examId}/submit`, { answers }, api());
-      if (res.data.success) {
-        setSubmission(res.data.data);
-        alert(`Assessment completed. Your preliminary score: ${res.data.data.score} / ${res.data.data.totalMarks}`);
+      const res = await apiFetch(`/student/exams/${examId}/submit`, {
+        method: 'POST',
+        body: JSON.stringify({ answers }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await parseJsonSafe(res);
+      const submissionData = data.success ? data.data : (data._id || data.score ? data : null);
+      if (submissionData) {
+        setSubmission(submissionData);
+        alert(`Assessment completed. Your preliminary score: ${submissionData.score} / ${submissionData.totalMarks}`);
         navigate('/student/exams');
+      } else {
+        alert(data.message || 'Submission failed.');
       }
     } catch (e) { 
-      alert(e.response?.data?.message || 'Submission failed. Check your connection.'); 
+      alert('Submission failed. Check your connection.'); 
     } finally { setSubmitting(false); }
   };
 
@@ -96,6 +114,19 @@ const StudentExamAttempt = () => {
   if (loading) {
     return <PageSkeleton variant="form" />;
   }
+
+  if (error && !exam) return (
+    <div className="max-w-lg mx-auto py-20 animate-in zoom-in duration-500 text-center">
+      <div className="w-24 h-24 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
+        <FiAlertCircle className="text-5xl text-red-400" />
+      </div>
+      <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Cannot Load Exam</h2>
+      <p className="text-slate-500 dark:text-gray-400 font-medium mb-8">{error}</p>
+      <Button variant="outline" className="rounded-2xl px-8 font-black text-xs uppercase tracking-widest" onClick={() => navigate('/student/exams')}>
+        Back to Exams
+      </Button>
+    </div>
+  );
 
   if (submission) return (
     <div className="max-w-2xl mx-auto py-20 animate-in zoom-in duration-500">
@@ -131,7 +162,7 @@ const StudentExamAttempt = () => {
     </div>
   );
 
-  if (!exam) return <div className="p-6 text-red-500 text-center font-bold">Examination details not found.</div>;
+  if (!exam) return <Navigate to="/student/exams" replace />;
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500 pb-20">

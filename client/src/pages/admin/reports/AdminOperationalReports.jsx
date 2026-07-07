@@ -1,4 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 import api from "../../../lib/api";
 import {
   buildPeriodQuery,
@@ -6,6 +9,15 @@ import {
 } from "../../../utils/reportPeriods";
 
 const AdminOperationalReports = () => {
+  const { t } = useTranslation('admin');
+
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+  }, []);
   const [filters, setFilters] = useState(getDefaultPeriodFilters());
   const [loading, setLoading] = useState(true);
   const [kitchen, setKitchen] = useState(null);
@@ -48,10 +60,10 @@ const AdminOperationalReports = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Operational Reports
+            {t('reports.operationalReports')}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Kitchen, library, and facility overview for {periodLabel}
+            {t('reports.operationalOverview')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -104,20 +116,20 @@ const AdminOperationalReports = () => {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
-          <p className="text-xs font-medium text-cyan-600">Total Meals</p>
+          <p className="text-xs font-medium text-cyan-600">{t('reports.kitchenOperations')}</p>
           <p className="mt-1 text-2xl font-bold text-cyan-700">
             {loading ? "…" : (kitchen?.totalMeals ?? "—")}
           </p>
         </div>
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-          <p className="text-xs font-medium text-emerald-600">Library Books</p>
+          <p className="text-xs font-medium text-emerald-600">{t('reports.libraryOperations')}</p>
           <p className="mt-1 text-2xl font-bold text-emerald-700">
             {loading ? "…" : (library?.totalBooks ?? "—")}
           </p>
         </div>
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
           <p className="text-xs font-medium text-amber-600">
-            Kitchen Cost ({periodLabel})
+            {t('reports.kitchenBudget')}
           </p>
           <p className="mt-1 text-2xl font-bold text-amber-700">
             {loading
@@ -128,7 +140,7 @@ const AdminOperationalReports = () => {
           </p>
         </div>
         <div className="rounded-2xl border border-violet-200 bg-violet-50 p-5">
-          <p className="text-xs font-medium text-violet-600">Books Borrowed</p>
+          <p className="text-xs font-medium text-violet-600">{t('reports.booksBorrowed')}</p>
           <p className="mt-1 text-2xl font-bold text-violet-700">
             {loading ? "…" : (library?.totalBorrowed ?? "—")}
           </p>
@@ -138,32 +150,32 @@ const AdminOperationalReports = () => {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">
-            Kitchen Operations
+            {t('reports.kitchenOperations')}
           </h2>
           {loading ? (
-            <p className="text-slate-400">Loading…</p>
+            <p className="text-slate-400">{t('common.loading')}</p>
           ) : !kitchen ? (
-            <p className="text-slate-400">No kitchen data available.</p>
+            <p className="text-slate-400">{t('common.noData')}</p>
           ) : (
             <dl className="space-y-2 text-sm">
               {[
                 {
-                  label: "Total Purchases",
+                  label: t('reports.totalPurchases'),
                   value: `${(kitchen.totalPurchases || 0).toLocaleString()} AFN`,
                 },
                 {
-                  label: "Student Meals",
+                  label: t('reports.studentMeals'),
                   value: kitchen.totalStudentMeals ?? 0,
                 },
-                { label: "Staff Meals", value: kitchen.totalStaffMeals ?? 0 },
-                { label: "Total Meals", value: kitchen.totalMeals ?? 0 },
+                { label: t('reports.staffMeals'), value: kitchen.totalStaffMeals ?? 0 },
+                { label: t('reports.totalMeals'), value: kitchen.totalMeals ?? 0 },
                 {
-                  label: "Waste Records",
+                  label: t('reports.wasteRecords'),
                   value: kitchen.totalWasteRecords ?? 0,
                 },
-                { label: "Low Stock Items", value: kitchen.lowStockItems ?? 0 },
+                { label: t('reports.lowStockItems'), value: kitchen.lowStockItems ?? 0 },
                 {
-                  label: "Active Students",
+                  label: t('reports.activeStudents'),
                   value: kitchen.activeStudents ?? 0,
                 },
               ].map(({ label, value }) => (
@@ -181,25 +193,25 @@ const AdminOperationalReports = () => {
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">
-            Library Operations
+            {t('reports.libraryOperations')}
           </h2>
           {loading ? (
-            <p className="text-slate-400">Loading…</p>
+            <p className="text-slate-400">{t('common.loading')}</p>
           ) : !library ? (
-            <p className="text-slate-400">No library data available.</p>
+            <p className="text-slate-400">{t('common.noData')}</p>
           ) : (
             <dl className="space-y-2 text-sm">
               {[
-                { label: "Total Books", value: library.totalBooks ?? 0 },
+                { label: t('reports.libraryBooks'), value: library.totalBooks ?? 0 },
                 {
-                  label: "Currently Borrowed",
+                  label: t('reports.currentlyBorrowed'),
                   value: library.totalBorrowed ?? 0,
                 },
                 {
-                  label: "Total Purchases",
+                  label: t('reports.totalPurchases'),
                   value: library.totalPurchases ?? 0,
                 },
-                { label: "Total Sales", value: library.totalSales ?? 0 },
+                { label: t('reports.totalSales'), value: library.totalSales ?? 0 },
               ].map(({ label, value }) => (
                 <div
                   key={label}
@@ -215,29 +227,29 @@ const AdminOperationalReports = () => {
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">
-            Kitchen Budget
+            {t('reports.kitchenBudget')}
           </h2>
           {loading ? (
-            <p className="text-slate-400">Loading…</p>
+            <p className="text-slate-400">{t('common.loading')}</p>
           ) : !kitchen?.budget ? (
-            <p className="text-slate-400">No budget data for this period.</p>
+            <p className="text-slate-400">{t('common.noData')}</p>
           ) : (
             <dl className="space-y-2 text-sm">
               {[
                 {
-                  label: "Allocated",
+                  label: t('reports.allocated'),
                   value: `${(kitchen.budget.allocatedAmount || 0).toLocaleString()} AFN`,
                 },
                 {
-                  label: "Approved",
+                  label: t('reports.allocated'),
                   value: `${(kitchen.budget.approvedAmount || 0).toLocaleString()} AFN`,
                 },
                 {
-                  label: "Spent",
+                  label: t('reports.spent'),
                   value: `${(kitchen.budget.spentAmount || 0).toLocaleString()} AFN`,
                 },
                 {
-                  label: "Remaining",
+                  label: t('reports.remaining'),
                   value: `${(kitchen.budget.remainingAmount || 0).toLocaleString()} AFN`,
                 },
               ].map(({ label, value }) => (
@@ -251,7 +263,7 @@ const AdminOperationalReports = () => {
               ))}
               <div className="mt-3">
                 <div className="flex justify-between text-xs text-slate-500 mb-1">
-                  <span>Budget Usage</span>
+                  <span>{t('reports.budgetUsage')}</span>
                   <span>
                     {kitchen.budget.approvedAmount > 0
                       ? Math.round(

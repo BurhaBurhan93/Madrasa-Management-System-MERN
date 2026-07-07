@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../../components/UIHelper/Button';
 import Card from '../../../components/UIHelper/Card';
 import StaffPageLayout from './StaffPageLayout';
@@ -27,8 +28,8 @@ const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
   if (readMode === 'collection') {
     const res = await apiFetch(targetEndpoint);
     const data = await parseJsonSafe(res);
-    if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load record');
-    const rows = data.data || [];
+    if (!res.ok) throw new Error(data?.message || 'Failed to load record');
+    const rows = Array.isArray(data) ? data : (data?.data || []);
     const match = rows.find((row) => String(row._id) === String(id));
     if (!match) throw new Error('Record not found');
     return match;
@@ -36,32 +37,34 @@ const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
 
   const res = await apiFetch(`${targetEndpoint}/${id}`);
   const data = await parseJsonSafe(res);
-  if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load record');
-  return data.data;
+  if (!res.ok) throw new Error(data?.message || 'Failed to load record');
+  return data?.data || data;
 };
 
-const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, listPath, readMode = 'single', readEndpoint }) => {
+const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, listPath, readMode = 'single', readEndpoint, mapRowToView }) => {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const record = await loadRecordByMode({ endpoint, id, readMode, readEndpoint });
-        setItem(record);
-      } catch (err) {
-        setError(err.message || 'Load error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [endpoint, id, readMode, readEndpoint]);
+  const loadRecord = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    setItem(null);
+    try {
+      let record = await loadRecordByMode({ endpoint, id, readMode, readEndpoint });
+      if (mapRowToView) record = mapRowToView(record);
+      setItem(record);
+    } catch (err) {
+      setError(err.message || 'Load error');
+    } finally {
+      setLoading(false);
+    }
+  }, [endpoint, id, readMode, readEndpoint, mapRowToView]);
+
+  useEffect(() => { loadRecord(); }, [loadRecord]);
 
   if (loading) return (
     <StaffPageLayout eyebrow="Record View" title={title} subtitle={subtitle} tone={endpoint || title}>
@@ -84,11 +87,11 @@ const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, 
               <h3 className={`text-sm font-semibold ${isDark ? 'text-rose-200' : 'text-rose-900'}`}>Unable to Load Record</h3>
               <p className={`mt-1 text-sm ${isDark ? 'text-rose-300' : 'text-rose-700'}`}>{error}</p>
               <div className="mt-3 flex gap-3">
-                <button onClick={() => window.location.reload()} className="inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
+                <button onClick={() => loadRecord()} className="inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
                   Retry
                 </button>
                 <button
-                  onClick={() => window.history.back()}
+                  onClick={() => navigate(-1)}
                   className={`inline-flex items-center rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${isDark ? 'border-rose-500/30 bg-slate-900 text-rose-200 hover:bg-slate-800' : 'border-rose-300 bg-white text-rose-700 hover:bg-rose-50'}`}
                 >
                   Go Back
@@ -102,7 +105,7 @@ const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, 
   );
 
   return (
-    <StaffPageLayout eyebrow="Record View" title={title} subtitle={subtitle} tone={endpoint || title} actions={<>{listPath && <Button variant="outline" onClick={() => (window.location.href = listPath)}>Back To List</Button>}{editPath && <Button variant="primary" onClick={() => (window.location.href = editPath)}>Update Record</Button>}</>}>
+    <StaffPageLayout eyebrow="Record View" title={title} subtitle={subtitle} tone={endpoint || title} actions={<>{listPath && <Button variant="outline" onClick={() => navigate(listPath)}>Back To List</Button>}{editPath && <Button variant="primary" onClick={() => navigate(editPath)}>Update Record</Button>}</>}>
       <Card className="rounded-[28px] shadow-sm">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {fields.map((field) => (

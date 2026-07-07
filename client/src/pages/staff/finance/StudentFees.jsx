@@ -9,7 +9,28 @@ export const studentFeesConfig = {
   subtitle: 'Track fee assignments, outstanding balances, and collection risk by status.',
   endpoint: staffApi.finance.studentFees,
   columns: [
-    { key: 'student', header: 'Student ID' },
+    {
+      key: 'student',
+      header: 'Student',
+      render: (value, row) => {
+        const student = (typeof value === 'object' && value) ? value : (row.studentId ? { name: row.studentId } : null);
+        if (!student) return <span>{String(value || '-')}</span>;
+        const name = student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim() || student.email || student.studentCode || student._id || '-';
+        const photo = student.photo || student.image;
+        return (
+          <div className="flex items-center gap-3">
+            {photo ? (
+              <img src={photo} alt={name} className="h-8 w-8 rounded-full object-cover" loading="lazy" />
+            ) : (
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-100 text-xs font-semibold text-cyan-700">
+                {name ? name.charAt(0).toUpperCase() : '?'}
+              </span>
+            )}
+            <span className="font-medium text-slate-800">{name}</span>
+          </div>
+        );
+      }
+    },
     { key: 'feeStructure', header: 'Fee Structure ID' },
     { key: 'academicYear', header: 'Academic Year' },
     { key: 'totalAmount', header: 'Total Amount' },
@@ -18,7 +39,31 @@ export const studentFeesConfig = {
     { key: 'paymentStatus', header: 'Status' }
   ],
   formFields: [
-    { name: 'student', label: 'Student', type: 'relation', relationEndpoint: '/users?role=student', relationLabel: (r) => `${r.name} (${r.email})` },
+    {
+      name: 'student',
+      label: 'Student',
+      type: 'relation',
+      relationEndpoint: '/users?role=student',
+      relationLabel: (r) => `${r.name} (${r.email})`,
+      renderView: (value) => {
+        if (!value) return <span>-</span>;
+        if (typeof value !== 'object') return <span>{String(value)}</span>;
+        const name = value.name || `${value.firstName || ''} ${value.lastName || ''}`.trim() || value.email || value.studentCode || '-';
+        const photo = value.photo || value.image;
+        return (
+          <div className="flex items-center gap-3">
+            {photo ? (
+              <img src={photo} alt={name} className="h-10 w-10 rounded-full object-cover" loading="lazy" />
+            ) : (
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 text-sm font-semibold text-cyan-700">
+                {name.charAt(0).toUpperCase()}
+              </span>
+            )}
+            <span className="font-medium">{name}</span>
+          </div>
+        );
+      }
+    },
     { name: 'feeStructure', label: 'Fee Structure', type: 'relation', relationEndpoint: '/finance/fee-structures', relationLabel: (r) => `${r.feeName} - ${r.feeCode}` },
     { name: 'academicYear', label: 'Academic Year' },
     { name: 'totalAmount', label: 'Total Amount', type: 'number' },

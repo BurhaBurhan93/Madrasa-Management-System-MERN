@@ -31,8 +31,8 @@ const columns = [
     key: "currentClass",
     header: "Current Class",
     render: (value) =>
-      value?.className ||
-      value?.name || (
+      value?.name ||
+      value?.className || (
         <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
           Not Assigned
         </span>
@@ -82,7 +82,7 @@ const ClassAssignment = () => {
   const fetchStats = async () => {
     try {
       setPageLoading(true);
-      const res = await api.get("/students/all");
+      const res = await api.get("/student/all");
       const students = Array.isArray(res.data?.data)
         ? res.data.data
         : Array.isArray(res.data)
@@ -150,12 +150,12 @@ const ClassAssignment = () => {
     setLoading(true);
     try {
       if (modalMode === "promote") {
-        await api.post(`/students/students/${selectedStudent._id}/promote`, {
+        await api.post(`/student/students/${selectedStudent._id}/promote`, {
           newClass,
         });
       } else {
         // 'assign' and 'transfer' both use the transfer endpoint
-        await api.put(`/students/students/${selectedStudent._id}/transfer`, {
+        await api.put(`/student/students/${selectedStudent._id}/transfer`, {
           newClass,
         });
       }
@@ -312,7 +312,7 @@ const ClassAssignment = () => {
         eyebrow="Registrar"
         title="Students"
         subtitle="Click Assign Class / Transfer / Promote in the Actions column"
-        endpoint="/students/all"
+        endpoint="/student/all"
         columns={columns}
         deleteEnabled={false}
         clientSidePagination

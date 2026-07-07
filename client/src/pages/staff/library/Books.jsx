@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import ListPage from '../shared/ListPage';
-import StaffPageLayout from '../shared/StaffPageLayout';
 import Card from '../../../components/UIHelper/Card';
 import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
 import { PieChartComponent, BarChartComponent } from '../../../components/UIHelper/ECharts';
@@ -14,8 +13,9 @@ export const libraryBooksConfig = {
   endpoint: '/staff/library/books',
   columns: [
     { key: 'title', header: 'Title' },
-    { key: 'category', header: 'Category', render: (value) => value?.name || '-' },
+    { key: 'category', header: 'Category', render: (value, row) => row?.categoryName || '-' },
     { key: 'publisher', header: 'Publisher' },
+    { key: 'publisherYear', header: 'Pub. Year' },
     { key: 'pages', header: 'Pages' },
     { key: 'stock', header: 'Stock' },
     { key: 'purchasePrice', header: 'Purchase Price' },
@@ -122,102 +122,91 @@ const StaffLibraryBooks = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <StaffPageLayout eyebrow="Library" title="Library Books">
-        <PageSkeleton type="dashboard" />
-      </StaffPageLayout>
-    );
-  }
-
-  return (
-    <StaffPageLayout eyebrow="Library" title="Library Books" subtitle="Manage books with the same polished list, filter, and form experience.">
-      {/* Statistics Cards */}
+  const headerContent = stats.byCategory.length > 0 ? (
+    <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Total Books</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.totalBooks}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total Books</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalBooks}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
               <FiBook className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </Card>
-        
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Total Stock</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.totalStock}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total Stock</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalStock}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
               <FiCheckCircle className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </Card>
-        
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Inventory Value</p>
-              <p className="text-2xl font-bold text-slate-900">${stats.totalValue.toFixed(2)}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Inventory Value</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">${stats.totalValue.toFixed(2)}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
               <FiTrendingUp className="w-6 h-6 text-amber-600" />
             </div>
           </div>
         </Card>
-        
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-rose-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-rose-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Low Stock</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.lowStockBooks}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Low Stock</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.lowStockBooks}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
               <FiAlertCircle className="w-6 h-6 text-red-600" />
             </div>
           </div>
         </Card>
       </div>
-      
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Books by Category</h3>
-          {stats.byCategory.length > 0 ? (
-            <PieChartComponent data={stats.byCategory} height={250} />
-          ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
-          )}
+        <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Books by Category</h3>
+          <PieChartComponent data={stats.byCategory} height={250} />
         </Card>
-        
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Stock Distribution</h3>
-          {stats.stockDistribution.length > 0 ? (
-            <BarChartComponent data={stats.stockDistribution} dataKey="value" nameKey="name" height={250} />
-          ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
-          )}
+        <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Stock Distribution</h3>
+          <BarChartComponent data={stats.stockDistribution} dataKey="value" nameKey="name" height={250} />
         </Card>
       </div>
-      
-      {/* List Page */}
+    </>
+  ) : null;
+
+  if (loading) {
+    return (
       <ListPage
-        embedded={true}
-        title={libraryBooksConfig.title}
-        subtitle={libraryBooksConfig.subtitle}
-        endpoint={libraryBooksConfig.endpoint}
-        columns={libraryBooksConfig.columns}
+        eyebrow="Library" title="Library Books" subtitle="Manage books with the same polished list, filter, and form experience."
+        endpoint={libraryBooksConfig.endpoint} columns={libraryBooksConfig.columns}
         createPath="/staff/library/books/create"
         editPathForRow={(row) => `/staff/library/books/edit/${getId(row)}`}
         viewPathForRow={(row) => `/staff/library/books/view/${getId(row)}`}
-        searchPlaceholder="Search books..."
-        clientSidePagination={true}
+        searchPlaceholder="Search books..." clientSidePagination={true}
+        headerContent={<PageSkeleton type="dashboard" />}
       />
-    </StaffPageLayout>
+    );
+  }
+
+  return (
+    <ListPage
+      eyebrow="Library" title="Library Books" subtitle="Manage books with the same polished list, filter, and form experience."
+      endpoint={libraryBooksConfig.endpoint} columns={libraryBooksConfig.columns}
+      createPath="/staff/library/books/create"
+      editPathForRow={(row) => `/staff/library/books/edit/${getId(row)}`}
+      viewPathForRow={(row) => `/staff/library/books/view/${getId(row)}`}
+      searchPlaceholder="Search books..." clientSidePagination={true}
+      headerContent={headerContent}
+    />
   );
 };
 

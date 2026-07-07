@@ -11,6 +11,9 @@ const Assignment = require("../models/Assignment");
 const StudentLeave = require("../models/StudentLeave");
 const StudentEducation = require("../models/StudentEducation");
 const Admission = require("../models/Admission");
+const BorrowedBook = require("../models/BorrowedBook");
+const Book = require("../models/Book");
+const BookSale = require("../models/BookSale");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -21,7 +24,7 @@ const getStudentProfile = async (req, res) => {
   try {
     const student = await Student.findOne({ user: req.user.id })
       .populate("user", "-password")
-      .populate("currentClass", "className");
+      .populate("currentClass", "name");
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
@@ -45,7 +48,7 @@ const getStudentProfile = async (req, res) => {
       dob: student.dob || u.dob,
       bloodType: student.bloodType || u.bloodType,
       gender: student.gender,
-      currentClass: student.currentClass?.className || student.currentClass,
+      currentClass: student.currentClass?.name || student.currentClass,
       currentLevel: student.currentLevel,
       admissionDate: student.admissionDate,
       status: student.status,
@@ -95,20 +98,78 @@ const updateStudentProfile = async (req, res) => {
 // Get student courses
 const getStudentCourses = async (req, res) => {
   try {
-    const student = await Student.findOne({ user: req.user.id }).populate(
-      "currentClass",
-    );
+    const DegreeSubject = require('../models/DegreeSubject');
+    const StudentDegree = require('../models/StudentDegree');
+    const Subject = require('../models/Subject');
+
+    const student = await Student.findOne({ user: req.user.id });
     if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+      return res.status(404).json({ message: 'Student not found' });
     }
 
-    // Use currentClass to find subjects/courses for the student's class
-    const courses = await Course.find({ classId: student.currentClass }, null, {
-      strictPopulate: false,
-    });
+    // Get student's enrolled degrees
+    const enrollments = await StudentDegree.find({ student: student._id, status: 'active' });
+    const degreeIds = enrollments.map(e => e._id);
 
-    res.json(courses);
+    // Try to get subjects from DegreeSubject first
+    let degreeSubjects = [];
+    if (degreeIds.length > 0) {
+      degreeSubjects = await DegreeSubject.find({
+        degree: { $in: degreeIds },
+        status: 'active',
+        deletedAt: null
+      })
+        .populate('subject', 'name field')
+        .populate('teacher', 'name')
+        .populate('degree', 'name');
+    }
+
+    // Fallback: if no DegreeSubject found, try to get subjects from currentClass
+    if (degreeSubjects.length === 0 && student.currentClass) {
+      degreeSubjects = await Subject.find({
+        classId: student.currentClass,
+        deletedAt: null
+      }).lean();
+    }
+
+    // If still no subjects, return empty array
+    if (degreeSubjects.length === 0) {
+      return res.json([]);
+    }
+
+    // Map DegreeSubject results
+    if (degreeSubjects.length > 0 && degreeSubjects[0].subject) {
+      res.json(degreeSubjects.map(ds => ({
+        _id: ds._id,
+        name: ds.subject?.name || 'Subject',
+        field: ds.subject?.field || '',
+        courseCode: ds.degree?.name || '',
+        teacher: { name: ds.teacher?.name || '' },
+        status: 'active',
+        progress: 0,
+        studyDaysPerWeek: ds.studyDaysPerWeek,
+        startTime: ds.startTime,
+        endTime: ds.endTime,
+        academicYear: ds.academicYear
+      })));
+    } else {
+      // Map Subject results (fallback)
+      res.json(degreeSubjects.map(s => ({
+        _id: s._id,
+        name: s.name || 'Subject',
+        field: s.field || '',
+        courseCode: '',
+        teacher: { name: '' },
+        status: 'active',
+        progress: 0,
+        studyDaysPerWeek: 0,
+        startTime: '',
+        endTime: '',
+        academicYear: ''
+      })));
+    }
   } catch (error) {
+    console.error('[getStudentCourses] Error:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -128,9 +189,20 @@ const getAttendanceRecords = async (req, res) => {
       },
       null,
       { strictPopulate: false },
-    );
+    ).populate({
+      path: 'session',
+      select: 'sessionDate sessionType class',
+      populate: { path: 'class', select: 'name' }
+    });
 
-    res.json(records);
+    res.json(records.map(r => ({
+      _id: r._id,
+      status: r.status,
+      date: r.session?.sessionDate || r.createdAt,
+      course: { name: r.session?.class?.name || 'General Session' },
+      sessionType: r.session?.sessionType || 'lecture',
+      remarks: r.remarks
+    })));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -152,9 +224,18 @@ const getAssignments = async (req, res) => {
       },
       null,
       { strictPopulate: false },
-    );
+    ).populate('courseId', 'name');
 
-    res.json(assignments);
+    res.json(assignments.map(a => ({
+      _id: a._id,
+      title: a.title,
+      description: a.description,
+      subject: { name: a.courseId?.name || 'General' },
+      status: a.status === 'active' ? 'pending' : a.status,
+      dueDate: a.dueDate,
+      maxPoints: a.maxPoints,
+      assignedDate: a.assignedDate,
+    })));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -301,13 +382,14 @@ const getExamResults = async (req, res) => {
     const results = await ExamAnswer.find({
       student: student._id,
     })
-      .populate("exam", "title subject totalMarks")
       .populate({
-        path: "exam",
-        populate: {
-          path: "subject",
-          select: "name",
-        },
+        path: 'exam',
+        select: 'title subject totalMarks academicYear examType createdBy',
+        populate: [
+          { path: 'subject', select: 'name' },
+          { path: 'createdBy', select: 'name' },
+          { path: 'examType', select: 'name' }
+        ]
       })
       .sort({ createdAt: -1 });
 
@@ -544,11 +626,25 @@ const getStudentDegrees = async (req, res) => {
     }
 
     const degrees = await StudentDegree.find({ student: student._id })
-      .populate("degree")
+      .populate('degree', 'name image')
       .sort({ createdAt: -1 });
 
-    console.log("[StudentController] Degrees fetched:", degrees.length);
-    res.json(degrees);
+    console.log('[StudentController] Degrees fetched:', degrees.length);
+    res.json(degrees.map(d => ({
+      _id: d._id,
+      degree: {
+        name: d.degree?.name || 'Degree Program',
+        code: '',
+        duration: '',
+        credits: 0
+      },
+      academicYear: d.academicYear || '',
+      status: d.status || 'active',
+      enrollmentDate: d.createdAt,
+      progress: 0,
+      completedCourses: 0,
+      totalCourses: 0
+    })));
   } catch (error) {
     console.error("[StudentController] Error fetching degrees:", error);
     res.status(500).json({ message: error.message });
@@ -558,7 +654,6 @@ const getStudentDegrees = async (req, res) => {
 // Get all books for library
 const getBooks = async (req, res) => {
   try {
-    const Book = require("../models/Book");
     const books = await Book.find({ deletedAt: null })
       .populate("category", "name")
       .sort({ title: 1 });
@@ -587,9 +682,6 @@ const getBooks = async (req, res) => {
 // Get student's borrowed books
 const getBorrowedBooks = async (req, res) => {
   try {
-    const BorrowedBook = require("../models/BorrowedBook");
-    const Student = require("../models/Student");
-
     // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
@@ -624,7 +716,7 @@ const getBorrowedBooks = async (req, res) => {
             : "borrowed",
         image:
           record.book?.coverImage ||
-          "https://via.placeholder.com/120x160/e5e7eb/6b7280?text=BOOK",
+          "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" fill="%23e5e7eb"><rect width="120" height="160"/><text x="60" y="85" text-anchor="middle" fill="%236b7280" font-size="14" font-weight="bold">BOOK</text></svg>'),
       })),
     );
   } catch (error) {
@@ -636,11 +728,6 @@ const getBorrowedBooks = async (req, res) => {
 // Borrow a book
 const borrowBook = async (req, res) => {
   try {
-    const BorrowedBook = require("../models/BorrowedBook");
-    const Book = require("../models/Book");
-    const Student = require("../models/Student");
-
-    // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
       return res.status(404).json({ message: "Student record not found" });
@@ -696,11 +783,6 @@ const borrowBook = async (req, res) => {
 // Return a book
 const returnBook = async (req, res) => {
   try {
-    const BorrowedBook = require("../models/BorrowedBook");
-    const Book = require("../models/Book");
-    const Student = require("../models/Student");
-
-    // Find the student record for this user
     const student = await Student.findOne({ user: req.user.id });
     if (!student) {
       return res.status(404).json({ message: "Student record not found" });
@@ -742,7 +824,6 @@ const returnBook = async (req, res) => {
 // Renew a book
 const renewBook = async (req, res) => {
   try {
-    const BorrowedBook = require("../models/BorrowedBook");
     const Student = require("../models/Student");
 
     // Find the student record for this user
@@ -778,6 +859,39 @@ const renewBook = async (req, res) => {
     });
   } catch (error) {
     console.error("[StudentController] Error renewing book:", error);
+    res.status(500).json({ message: error.message     });
+  }
+};
+
+// Get student purchase history (from BookSale)
+const getStudentPurchases = async (req, res) => {
+  try {
+    const student = await Student.findOne({ user: req.user.id });
+    if (!student) {
+      return res.status(404).json({ message: "Student record not found" });
+    }
+
+    const purchases = await BookSale.find({ student: student._id })
+      .populate("book", "title author")
+      .sort({ saleDate: -1 });
+
+    res.json(
+      purchases.map((record) => ({
+        _id: record._id,
+        id: record._id,
+        purchaseCode: record.receiptNo || record._id,
+        purchaseDate: record.saleDate,
+        bookTitle: record.book?.title || "Unknown item",
+        author: record.book?.author || "Unknown",
+        category: "Library Purchase",
+        status: "completed",
+        quantity: record.quantity,
+        unitPrice: record.unitPrice,
+        totalPrice: record.totalAmount,
+      })),
+    );
+  } catch (error) {
+    console.error("[StudentController] Error fetching purchases:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -812,13 +926,24 @@ const getStudentFinalResults = async (req, res) => {
     }
 
     const results = await FinalResult.find({ student: student._id })
-      .populate("exam")
-      .populate("class")
-      .populate("course")
+      .populate('exam', 'title academicYear')
+      .populate('class', 'name')
+      .populate('subject', 'name')
       .sort({ createdAt: -1 });
 
-    console.log("[StudentController] Final results fetched:", results.length);
-    res.json(results);
+    console.log('[StudentController] Final results fetched:', results.length);
+    res.json(results.map(r => ({
+      _id: r._id,
+      exam: r.exam,
+      subject: r.subject,
+      class: r.class,
+      totalScore: r.totalScore,
+      percentage: r.totalScore || 0,
+      score: r.totalScore || 0,
+      grade: r.grade,
+      status: r.status,
+      createdAt: r.createdAt
+    })));
   } catch (error) {
     console.error("[StudentController] Error fetching final results:", error);
     res.status(500).json({ message: error.message });
@@ -832,8 +957,6 @@ const submitAssignment = async (req, res) => {
     if (!student) return res.status(404).json({ message: "Student not found" });
 
     const { title, description, course, dueDate, assignmentId } = req.body;
-    if (!title || !course)
-      return res.status(400).json({ message: "Title and course are required" });
 
     // If an assignmentId was provided, mark it submitted
     if (assignmentId) {
@@ -858,13 +981,17 @@ const submitAssignment = async (req, res) => {
       });
     }
 
+    if (!title || !course) {
+      return res.status(400).json({ message: "Title and course are required" });
+    }
+
     // Otherwise create a submission record directly
     const submission = await Assignment.create({
       title,
       description: description || "",
       courseId: course,
       dueDate: dueDate || new Date(),
-      status: "submitted",
+      status: "completed",
       createdBy: req.user.id,
     });
 
@@ -884,7 +1011,7 @@ const getAllStudents = async (req, res) => {
   try {
     const students = await Student.find({ deletedAt: null })
       .populate("user", "name email phone image")
-      .populate("currentClass", "className")
+      .populate("currentClass", "name")
       .lean();
 
     // Merge student data with user data
@@ -914,6 +1041,7 @@ const getAllAdmissions = async (req, res) => {
   try {
     const admissions = await Admission.find({ deletedAt: null })
       .populate("degree", "degreeName name")
+      .populate("user", "name email")
       .lean();
 
     res.json({
@@ -931,7 +1059,9 @@ const getAllAdmissions = async (req, res) => {
 // Create new admission
 const createAdmission = async (req, res) => {
   try {
-    const admissionData = req.body;
+    const admissionData = { ...req.body };
+    // Remove empty ObjectId fields to prevent CastError
+    ['user', 'degree', 'currentClass'].forEach(f => { if (!admissionData[f]) delete admissionData[f]; });
 
     // Handle nested address objects
     const admission = new Admission({
@@ -965,7 +1095,9 @@ const createAdmission = async (req, res) => {
 // Update admission
 const updateAdmission = async (req, res) => {
   try {
-    const admissionData = req.body;
+    const admissionData = { ...req.body };
+    // Remove empty ObjectId fields to prevent CastError
+    ['user', 'degree', 'currentClass'].forEach(f => { if (!admissionData[f]) delete admissionData[f]; });
 
     const admission = await Admission.findByIdAndUpdate(
       req.params.id,
@@ -1285,6 +1417,7 @@ module.exports = {
   returnBook,
   renewBook,
   getStudentDocuments,
+  getStudentPurchases,
   getStudentFinalResults,
 
   submitAssignment,

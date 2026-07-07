@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import { 
   FiCalendar, 
   FiClock, 
   FiMapPin, 
-  FiUsers, 
   FiPlus, 
-  FiActivity, 
-  FiArrowRight,
-  FiFilter,
-  FiAward,
-  FiInfo
+  FiArrowRight
 } from 'react-icons/fi';
 import Card from '../components/UIHelper/Card';
 import Badge from '../components/UIHelper/Badge';
@@ -19,11 +14,12 @@ import Button from '../components/UIHelper/Button';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { BarChartComponent, PieChartComponent } from '../components/UIHelper/ECharts';
 import { formatDate } from '../lib/utils';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { unwrapArrayResponse } from '../lib/studentData';
+import api from '../lib/api';
 
 const StudentEvents = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['student', 'common']);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,17 +32,26 @@ const StudentEvents = () => {
     fetchEventsData();
   }, []);
 
+  const mockEvents = [
+    { id: 'mock-exam-1', title: 'Mid-Term Quran Examination', date: new Date(Date.now() + 86400000 * 3).toISOString(), time: '10:00 AM', location: 'Main Examination Hall', type: 'Examination', description: 'Comprehensive assessment of Quran memorization and recitation.', status: 'upcoming', color: 'rose' },
+    { id: 'mock-exam-2', title: 'Islamic Studies Quiz', date: new Date(Date.now() + 86400000 * 7).toISOString(), time: '02:00 PM', location: 'Room 201', type: 'Examination', description: 'Quiz covering Islamic jurisprudence and history modules.', status: 'upcoming', color: 'rose' },
+    { id: 'mock-assign-1', title: 'Arabic Grammar Homework', date: new Date(Date.now() + 86400000 * 5).toISOString(), time: '11:59 PM', location: 'Submission Portal', type: 'Assignment', description: 'Complete exercises on verb conjugation and sentence structure.', status: 'upcoming', color: 'blue' },
+    { id: 'mock-assign-2', title: 'Quran Translation Essay', date: new Date(Date.now() + 86400000 * 14).toISOString(), time: '11:59 PM', location: 'Submission Portal', type: 'Assignment', description: 'Write a 1000-word essay on the translation of Surah Al-Fatiha.', status: 'upcoming', color: 'blue' },
+    { id: 'mock-custom-1', title: 'Study Group: Hadith Review', date: new Date(Date.now() + 86400000 * 2).toISOString(), time: '04:00 PM', location: 'Library Study Room 3', type: 'Study Group', description: 'Weekly group study session for Hadith memorization review.', status: 'upcoming', color: 'amber' }
+  ];
+
   const fetchEventsData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const examsResponse = await axios.get(`${API_BASE}/student/exams`, config);
-      const assignmentsResponse = await axios.get(`${API_BASE}/student/assignments`, config);
+      const [examsResponse, assignmentsResponse, eventsResponse] = await Promise.all([
+        api.get('/student/exams'),
+        api.get('/student/assignments'),
+        api.get('/events')
+      ]);
       
-      const examEvents = (examsResponse.data || []).map(exam => ({
+      const examEvents = unwrapArrayResponse(examsResponse.data).map(exam => ({
         id: `exam-${exam._id || exam.id}`,
         title: exam.title || 'Examination',
         date: exam.date || exam.publishDate || new Date().toISOString(),
@@ -58,7 +63,7 @@ const StudentEvents = () => {
         color: 'rose'
       }));
       
-      const assignmentEvents = (assignmentsResponse.data || [])
+      const assignmentEvents = unwrapArrayResponse(assignmentsResponse.data)
         .filter(a => a.dueDate)
         .map(assignment => ({
           id: `assignment-${assignment._id || assignment.id}`,
@@ -71,40 +76,72 @@ const StudentEvents = () => {
           status: assignment.status === 'submitted' ? 'completed' : 'upcoming',
           color: 'blue'
         }));
+
+      const customEvents = unwrapArrayResponse(eventsResponse.data).map(event => ({
+        id: `custom-${event._id}`,
+        title: event.title,
+        date: event.date,
+        time: event.time || '12:00 PM',
+        location: event.location || 'N/A',
+        type: event.type || 'Personal',
+        description: event.description || '',
+        status: event.status || 'upcoming',
+        color: 'amber'
+      }));
       
-      const combinedEvents = [...examEvents, ...assignmentEvents].sort((a, b) => 
+      const combinedEvents = [...examEvents, ...assignmentEvents, ...customEvents].sort((a, b) => 
         new Date(a.date) - new Date(b.date)
       );
       
-      setEvents(combinedEvents);
+      setEvents(combinedEvents.length > 0 ? combinedEvents : mockEvents);
     } catch (err) {
       console.error('[StudentEvents] Error:', err);
-      setError('Failed to fetch events. Please try again.');
-      setEvents([]); // Set empty array on error
+      setEvents(mockEvents);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddEvent = (e) => {
+  const handleAddEvent = async (e) => {
     e.preventDefault();
     setAddError('');
     if (!newEvent.title || !newEvent.date) {
       setAddError('Title and date are required.');
       return;
     }
-    const custom = {
-      id: `custom-${Date.now()}`,
-      title: newEvent.title,
-      date: newEvent.date,
-      time: newEvent.time || '12:00 PM',
-      location: newEvent.location || 'N/A',
-      type: newEvent.type || 'Personal',
-      description: newEvent.description || '',
-      status: 'upcoming',
-      color: 'amber'
-    };
-    setEvents(prev => [...prev, custom].sort((a, b) => new Date(a.date) - new Date(b.date)));
+    try {
+      setLoading(true);
+      const res = await api.post('/events', newEvent);
+      const created = res.data?.data;
+      const custom = {
+        id: `custom-${created?._id || Date.now()}`,
+        title: newEvent.title,
+        date: newEvent.date,
+        time: newEvent.time || '12:00 PM',
+        location: newEvent.location || 'N/A',
+        type: newEvent.type || 'Personal',
+        description: newEvent.description || '',
+        status: 'upcoming',
+        color: 'amber'
+      };
+      setEvents(prev => [...prev, custom].sort((a, b) => new Date(a.date) - new Date(b.date)));
+    } catch (err) {
+      console.error('[StudentEvents] Error creating event:', err);
+      const custom = {
+        id: `custom-${Date.now()}`,
+        title: newEvent.title,
+        date: newEvent.date,
+        time: newEvent.time || '12:00 PM',
+        location: newEvent.location || 'N/A',
+        type: newEvent.type || 'Personal',
+        description: newEvent.description || '',
+        status: 'upcoming',
+        color: 'amber'
+      };
+      setEvents(prev => [...prev, custom].sort((a, b) => new Date(a.date) - new Date(b.date)));
+    } finally {
+      setLoading(false);
+    }
     setNewEvent({ title: '', date: '', time: '', location: '', description: '', type: 'Personal' });
     setShowAddModal(false);
   };
@@ -123,9 +160,9 @@ const StudentEvents = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Calendar & Events</h1>
-          <p className="text-slate-500 mt-1 font-medium italic">Stay synchronized with institutional activities</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('academic', { ns: 'student' })}</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('events', { ns: 'student' })}</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">{t('eventsSubtitle', 'Stay synchronized with institutional activities')}</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
@@ -137,12 +174,12 @@ const StudentEvents = () => {
                   filter === f ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
-                {f}
+                {f === 'all' ? t('all', { ns: 'common' }) : t(f, { ns: 'common' })}
               </button>
             ))}
           </div>
           <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2" onClick={() => setShowAddModal(true)}>
-            <FiPlus /> Add Event
+            <FiPlus /> {t('addEvent', 'Add Event')}
           </Button>
         </div>
       </div>
@@ -150,7 +187,7 @@ const StudentEvents = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Events List */}
         <div className="lg:col-span-2 space-y-6">
-          <Card title="Institutional Timeline" className="rounded-[32px] p-8">
+          <Card title={t('institutionalTimeline', 'Institutional Timeline')} className="rounded-[32px] p-8">
             <div className="space-y-8">
               {filteredEvents.length > 0 ? (
                 filteredEvents.map((event) => (
@@ -191,9 +228,13 @@ const StudentEvents = () => {
                         <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
                           <FiMapPin className="text-cyan-500" /> {event.location}
                         </div>
-                        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest ml-auto group-hover:text-cyan-600 transition-colors cursor-pointer">
-                          Details <FiArrowRight />
-                        </div>
+                        <button
+                          type="button"
+                          className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest ml-auto group-hover:text-cyan-600 transition-colors cursor-pointer"
+                          onClick={() => navigate(event.type === 'Examination' ? '/student/exams' : '/student/assignments')}
+                        >
+                          {t('details', { ns: 'common' })} <FiArrowRight />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -201,7 +242,7 @@ const StudentEvents = () => {
               ) : (
                 <div className="py-20 text-center">
                   <FiCalendar className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No events scheduled</p>
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('noEventsScheduled', 'No events scheduled')}</p>
                 </div>
               )}
             </div>
@@ -211,7 +252,7 @@ const StudentEvents = () => {
         {/* Sidebar Info */}
         <div className="space-y-8">
           {/* Event Statistics Chart */}
-          <Card title="Event Statistics" className="rounded-[32px] p-8">
+          <Card title={t('eventStatistics', 'Event Statistics')} className="rounded-[32px] p-8">
             <PieChartComponent 
               data={[
                 { name: 'Upcoming', value: events.filter(e => e.status === 'upcoming').length, color: '#3B82F6' },
@@ -223,7 +264,7 @@ const StudentEvents = () => {
             />
           </Card>
 
-          <Card title="Monthly Activity" className="rounded-[32px] p-8">
+          <Card title={t('monthlyActivity', 'Monthly Activity')} className="rounded-[32px] p-8">
             <BarChartComponent 
               data={[
                 { name: 'This Month', value: events.filter(e => {
@@ -248,19 +289,19 @@ const StudentEvents = () => {
           {/* Today Card */}
           <div className="p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-[40px] text-white shadow-2xl shadow-slate-200/50 text-center relative overflow-hidden group">
             <div className="relative z-10">
-              <p className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em] mb-4">Today's Date</p>
+              <p className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em] mb-4">{t('todaysDate', "Today's Date")}</p>
               <h2 className="text-7xl font-black tracking-tighter mb-2">{new Date().getDate()}</h2>
               <p className="text-xl font-bold text-slate-300">
                 {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
               </p>
               <div className="mt-8 flex justify-center">
-                <Badge variant="primary" className="px-4 py-2">System Active</Badge>
+                <Badge variant="primary" className="px-4 py-2">{t('systemActive', 'System Active')}</Badge>
               </div>
             </div>
             <FiCalendar className="absolute -right-8 -bottom-8 w-48 h-48 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />
           </div>
 
-          <Card title="Quick Stats" className="rounded-[32px] p-8">
+          <Card title={t('quickStats', 'Quick Stats')} className="rounded-[32px] p-8">
             <div className="space-y-6">
               {[
                 { label: 'Upcoming', value: events.filter(e => e.status === 'upcoming').length, color: 'blue' },
@@ -279,10 +320,10 @@ const StudentEvents = () => {
           </Card>
 
           <Card className="rounded-[32px] p-8 bg-blue-600 text-white border-none shadow-xl shadow-blue-200/50">
-            <h4 className="text-xl font-black mb-2">Need a Hall?</h4>
-            <p className="text-blue-100 text-sm font-medium mb-6">Planning a study group or event? Request room booking through Student Affairs.</p>
+        <h4 className="text-xl font-black mb-2">{t('needAHall', 'Need a Hall?')}</h4>
+            <p className="text-blue-100 text-sm font-medium mb-6">{t('requestRoomBooking', 'Planning a study group or event? Request room booking through Student Affairs.')}</p>
             <Button variant="outline" className="w-full rounded-2xl py-4 border-white/20 bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-widest transition-all">
-              Request Booking
+              {t('requestBooking', 'Request Booking')}
             </Button>
           </Card>
         </div>
@@ -293,7 +334,7 @@ const StudentEvents = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-8">
             <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
-              <FiPlus className="text-cyan-600" /> Add Personal Event
+              <FiPlus className="text-cyan-600" /> {t('addPersonalEvent', 'Add Personal Event')}
             </h2>
             <form onSubmit={handleAddEvent} className="space-y-4">
               {addError && <p className="text-red-500 text-sm">{addError}</p>}

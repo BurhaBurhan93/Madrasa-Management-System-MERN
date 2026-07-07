@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getDashboardStats, getAllStudents, getStudentDetails, getInventory,
-  getRecentActivities, getAllComplaints, updateComplaintStatus,
+  getDashboardStats, getAllStudents, getStudentDetails,
+  getInventory, createInventory, updateInventory, deleteInventory,
+  addStock, removeStock,
+  getRecentActivities, getAllComplaints, getComplaintById, updateComplaintStatus,
   getComplaintActions, getComplaintActionById, createComplaintAction, updateComplaintAction, deleteComplaintAction,
   getComplaintFeedbacks, getComplaintFeedbackById, createComplaintFeedback, updateComplaintFeedback, deleteComplaintFeedback,
   getAllBooks, getBookById, createBook, updateBook, deleteBook,
@@ -27,11 +29,17 @@ router.get('/students/:id', getStudentDetails);
 
 // Inventory
 router.get('/inventory', getInventory);
+router.post('/inventory', createInventory);
+router.put('/inventory/:id', updateInventory);
+router.delete('/inventory/:id', deleteInventory);
+router.post('/inventory/:id/add', addStock);
+router.post('/inventory/:id/remove', removeStock);
 
 // Complaints
 router.get('/complaints', getAllComplaints);
 router.put('/complaints/:id', updateComplaintStatus);
 router.get('/complaints/stats', getComplaintStats);
+router.get('/complaints/:id', getComplaintById);
 router.get('/complaint-actions', getComplaintActions);
 router.get('/complaint-actions/:id', getComplaintActionById);
 router.post('/complaint-actions', createComplaintAction);

@@ -14,13 +14,16 @@ const DEMO_ACCOUNTS = {
 };
 
 const STAFF_MODULES_BY_EMPLOYEE_TYPE = {
-  admin: ['dashboard', 'profile', 'registrar', 'students', 'inventory', 'library', 'complaints', 'finance', 'payroll', 'kitchen', 'hr', 'hostel'],
-  finance: ['dashboard', 'profile', 'finance', 'payroll'],
-  registrar: ['dashboard', 'profile', 'registrar', 'students', 'inventory'],
-  hr: ['dashboard', 'profile', 'hr', 'payroll'],
+  admin: ['dashboard', 'profile', 'registrar', 'students', 'inventory', 'library', 'complaints', 'finance', 'payroll', 'kitchen', 'hr', 'support'],
+  support: ['dashboard', 'profile', 'support', 'students', 'inventory', 'complaints'],
+  finance: ['dashboard', 'profile', 'finance'],
+  registrar: ['dashboard', 'profile', 'registrar'],
+  hr: ['dashboard', 'profile', 'hr'],
   librarian: ['dashboard', 'profile', 'library'],
-  kitchen: ['dashboard', 'profile', 'kitchen', 'inventory'],
-  support: ['dashboard', 'profile', 'students', 'inventory', 'complaints'],
+  kitchen: ['dashboard', 'profile', 'kitchen'],
+  payroll: ['dashboard', 'profile', 'payroll'],
+  complaints: ['dashboard', 'profile', 'complaints'],
+  inventory: ['dashboard', 'profile', 'inventory'],
   maintenance: ['dashboard', 'profile', 'inventory', 'complaints'],
   security: ['dashboard', 'profile', 'students', 'complaints'],
 };
@@ -39,6 +42,12 @@ const getStaffModules = (user, employee) => {
   if (user.role === 'admin') return STAFF_MODULES_BY_EMPLOYEE_TYPE.admin;
   if (user.role !== 'staff') return [];
 
+  const employeeType = employee?.employeeType;
+  const employeeTypeModules = STAFF_MODULES_BY_EMPLOYEE_TYPE[employeeType];
+  if (employeeTypeModules) {
+    return employeeTypeModules;
+  }
+
   const permissionNames = getPermissionNames(user);
   const modulePermissions = permissionNames
     .filter((name) => name.startsWith('staff:'))
@@ -49,8 +58,7 @@ const getStaffModules = (user, employee) => {
     return [...new Set(['dashboard', 'profile', ...modulePermissions])];
   }
 
-  const employeeType = employee?.employeeType;
-  return STAFF_MODULES_BY_EMPLOYEE_TYPE[employeeType] || STAFF_MODULES_BY_EMPLOYEE_TYPE.support;
+  return STAFF_MODULES_BY_EMPLOYEE_TYPE.support;
 };
 
 const buildAuthUser = (user, profile = {}, staffModules = []) => ({

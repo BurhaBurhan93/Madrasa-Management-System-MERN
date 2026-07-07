@@ -41,7 +41,7 @@ export const studentProfilesConfig = {
     { key: 'name', header: 'Student Name', render: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.user?.name || '-' },
     { key: 'fatherName', header: 'Father Name' },
     { key: 'phone', header: 'Phone' },
-    { key: 'currentClass', header: 'Class', render: (value) => value?.className || '-' },
+    { key: 'currentClass', header: 'Class', render: (value) => value?.name || value?.className || '-' },
     { key: 'currentLevel', header: 'Level' },
     { key: 'status', header: 'Status', render: (value) => (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -88,7 +88,7 @@ export const studentProfilesConfig = {
     { name: 'currentAddress_village', label: 'Village (Current)', group: 'Address Information' },
     
     // Academic Information
-    { name: 'currentClass', label: 'Current Class', type: 'relation', relationEndpoint: '/academic/classes', relationLabel: (row) => row.className || row.name, group: 'Academic Information' },
+    { name: 'currentClass', label: 'Current Class', type: 'relation', relationEndpoint: '/academic/classes', relationLabel: (row) => row.name, group: 'Academic Information' },
     { name: 'currentLevel', label: 'Current Level', group: 'Academic Information' },
     { name: 'admissionDate', label: 'Admission Date', type: 'date', group: 'Academic Information' },
     { name: 'status', label: 'Status', type: 'select', options: [
@@ -242,7 +242,7 @@ const StudentProfiles = () => {
       // Group by class
       const classMap = {};
       students.forEach(s => {
-        const className = s.currentClass?.className || 'Not Assigned';
+        const className = s.currentClass?.name || s.currentClass?.className || 'Not Assigned';
         classMap[className] = (classMap[className] || 0) + 1;
       });
       const byClass = Object.entries(classMap)

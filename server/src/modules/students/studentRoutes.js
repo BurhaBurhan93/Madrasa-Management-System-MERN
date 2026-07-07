@@ -26,8 +26,8 @@ const STUDENT_SPECIFIC_PATHS = [
   '/degrees',
   '/books',
   '/borrowed-books',
-  '/final-results',
-  '/documents'
+  '/purchases',
+  '/final-results'
 ];
 
 const STAFF_MANAGEMENT_METHODS = new Set(['POST', 'PUT', 'DELETE']);
@@ -77,25 +77,25 @@ router.use((req, res, next) => {
   // First authenticate the token
   authenticateToken(req, res, () => {
     const isStaffRoute = isStaffManagementRoute(req.path, req.method);
-    // Special case: if it's a staff route but the user is a student, check if it's a student-specific path first
     const isStudentPath = STUDENT_SPECIFIC_PATHS.some(prefix => 
       req.path === prefix || req.path.startsWith(`${prefix}/`)
     );
     
-    if (isStudentPath) {
-      // Student route - ensure student
-      ensureStudent(req, res, next);
-    } else if (isStaffRoute) {
-      // Staff route - ensure staff/admin
-      ensureStaffOrAdmin(req, res, next);
-    } else {
-      // If it's not a staff route and not a student path, let's check the user's role
-      // If user is student, apply student middleware; if staff/admin, apply staff middleware
-      if (req.user.role === 'student') {
+    if (req.user.role === 'staff' || req.user.role === 'admin') {
+      // Staff/admin - allow unless it's a purely student-only path
+      if (isStudentPath && !isStaffRoute) {
         ensureStudent(req, res, next);
       } else {
-        ensureStaffOrAdmin(req, res, next);
+        next();
       }
+    } else if (req.user.role === 'student') {
+      if (isStudentPath || !isStaffRoute) {
+        ensureStudent(req, res, next);
+      } else {
+        res.status(403).json({ message: 'Access denied. Staff/Admin only.' });
+      }
+    } else {
+      res.status(403).json({ message: 'Access denied.' });
     }
   });
 });
@@ -114,7 +114,7 @@ router.get('/all/:id', async (req, res) => { // Get single student by ID
     const Student = require('../../models/Student');
     const student = await Student.findById(req.params.id)
       .populate('user', 'name email phone image')
-      .populate('currentClass', 'className')
+      .populate('currentClass', 'name')
       .lean();
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student not found' });
@@ -200,6 +200,9 @@ router.get('/borrowed-books', ctrl.getBorrowedBooks);
 router.post('/books/:id/borrow', ctrl.borrowBook);
 router.post('/books/:id/return', ctrl.returnBook);
 router.post('/books/:id/renew', ctrl.renewBook);
+
+// Purchase routes
+router.get('/purchases', ctrl.getStudentPurchases);
 
 // Documents and Results routes
 router.get('/documents', ctrl.getStudentDocuments);

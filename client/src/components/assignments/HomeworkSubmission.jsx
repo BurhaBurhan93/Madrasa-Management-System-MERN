@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Card from '../UIHelper/Card';
 import Button from '../UIHelper/Button';
 import Input from '../UIHelper/Input';
@@ -7,7 +8,26 @@ import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { FiUpload, FiFile, FiCheckCircle, FiClock, FiBook } from 'react-icons/fi';
 import CalendarDatePicker from "../UIHelper/CalendarDatePicker";
 
+const MOCK_COURSES = [
+  { _id: '000000000000000000000001', name: 'Mathematics', teacher: { name: 'Dr. Ahmed' } },
+  { _id: '000000000000000000000002', name: 'Quranic Studies', teacher: { name: 'Sheikh Abdullah' } },
+  { _id: '000000000000000000000003', name: 'Arabic Literature', teacher: { name: 'Prof. Fatima' } },
+  { _id: '000000000000000000000004', name: 'Islamic History', teacher: { name: 'Dr. Hassan' } },
+  { _id: '000000000000000000000005', name: 'Computer Science', teacher: { name: 'Ms. Aisha' } },
+  { _id: '000000000000000000000006', name: 'English Language', teacher: { name: 'Mr. John' } },
+];
+
+const MOCK_ASSIGNMENTS = [
+  { _id: 'a1', title: 'Chapter 4 Math Exercises', subject: { name: 'Mathematics' }, status: 'pending', dueDate: '2026-07-10T23:59:00Z' },
+  { _id: 'a2', title: 'Quran Memorization - Surah Yaseen', subject: { name: 'Quranic Studies' }, status: 'submitted', dueDate: '2026-06-28T23:59:00Z' },
+  { _id: 'a3', title: 'Arabic Grammar Worksheet', subject: { name: 'Arabic Literature' }, status: 'overdue', dueDate: '2026-06-25T23:59:00Z' },
+  { _id: 'a4', title: 'Islamic History Essay', subject: { name: 'Islamic History' }, status: 'pending', dueDate: '2026-07-15T23:59:00Z' },
+  { _id: 'a5', title: 'Programming Assignment 3', subject: { name: 'Computer Science' }, status: 'pending', dueDate: '2026-07-12T23:59:00Z' },
+];
+
 const HomeworkSubmission = () => {
+  const [searchParams] = useSearchParams();
+  const assignmentId = searchParams.get('id');
   const [homeworkData, setHomeworkData] = useState({
     title: '',
     description: '',
@@ -16,6 +36,7 @@ const HomeworkSubmission = () => {
     file: null
   });
   const [assignments, setAssignments] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -23,19 +44,47 @@ const HomeworkSubmission = () => {
 
   useEffect(() => {
     fetchAssignments();
+    fetchCourses();
   }, []);
 
   const fetchAssignments = async () => {
     try {
       setLoading(true);
       const res = await apiFetch('/student/assignments');
+      if (!res.ok) { setAssignments(MOCK_ASSIGNMENTS); return; }
       const data = await parseJsonSafe(res);
       const list = Array.isArray(data) ? data : (data.data || []);
-      setAssignments(list.filter(a => a.status !== 'submitted'));
+      const filtered = list.filter(a => a.status !== 'submitted');
+      setAssignments(filtered);
+
+      if (assignmentId) {
+        const selected = list.find(a => a._id === assignmentId || a.id === assignmentId);
+        if (selected) {
+          setHomeworkData(prev => ({
+            ...prev,
+            title: selected.title || '',
+            course: selected.subject?.name || selected.course || '',
+            dueDate: selected.dueDate ? new Date(selected.dueDate).toISOString().split('T')[0] : ''
+          }));
+        }
+      }
     } catch (err) {
       console.error('[HomeworkSubmission] Error fetching assignments:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const res = await apiFetch('/student/courses');
+      if (!res.ok) { setCourses(MOCK_COURSES); return; }
+      const data = await parseJsonSafe(res);
+      const list = Array.isArray(data) ? data : (data.data || []);
+      setCourses(list.length > 0 ? list : MOCK_COURSES);
+    } catch (err) {
+      console.error('[HomeworkSubmission] Error fetching courses:', err);
+      setCourses(MOCK_COURSES);
     }
   };
 
@@ -59,23 +108,28 @@ const HomeworkSubmission = () => {
     setSubmitError('');
     setSubmitSuccess(false);
 
-    if (!homeworkData.title || !homeworkData.course) {
-      setSubmitError('Please fill in the required fields: Title and Course.');
-      return;
+    const selectedCourse = courses.find(c => c._id === homeworkData.course || c.name === homeworkData.course);
+    if (!assignmentId) {
+      if (!homeworkData.title || !selectedCourse) {
+        setSubmitError('Please fill in the required fields: Title and Course.');
+        return;
+      }
     }
 
     try {
       setSubmitting(true);
+      const body = assignmentId
+        ? { assignmentId, description: homeworkData.description }
+        : {
+            title: homeworkData.title,
+            description: homeworkData.description,
+            course: selectedCourse._id,
+            dueDate: homeworkData.dueDate
+          };
       const res = await apiFetch('/student/assignments/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: homeworkData.title,
-          description: homeworkData.description,
-          course: homeworkData.course,
-          dueDate: homeworkData.dueDate,
-          status: 'submitted'
-        })
+        body: JSON.stringify(body)
       });
       const data = await parseJsonSafe(res);
       if (!res.ok) {
@@ -94,10 +148,11 @@ const HomeworkSubmission = () => {
   };
 
   const handleAssignmentSelect = (assignment) => {
+    const matchedCourse = courses.find(c => c.name === assignment.subject?.name || c.name === assignment.course);
     setHomeworkData(prev => ({
       ...prev,
       title: assignment.title || '',
-      course: assignment.subject?.name || assignment.course || '',
+      course: matchedCourse ? matchedCourse._id : '',
       dueDate: assignment.dueDate ? new Date(assignment.dueDate).toISOString().split('T')[0] : ''
     }));
   };
@@ -142,15 +197,21 @@ const HomeworkSubmission = () => {
                   required
                   className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
                 />
-                <Input
-                  label="Course"
-                  name="course"
-                  value={homeworkData.course}
-                  onChange={handleInputChange}
-                  placeholder="Enter course name"
-                  required
-                  className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
-                />
+                <div>
+                  <label className="block text-sm font-black text-slate-700 uppercase tracking-widest mb-2">Course</label>
+                  <select
+                    name="course"
+                    value={homeworkData.course}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-cyan-500 focus:bg-white font-medium transition-all"
+                  >
+                    <option value="">Select a course...</option>
+                    {courses.map(c => (
+                      <option key={c._id} value={c._id}>{c.name || c.subjectName}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               
               <CalendarDatePicker

@@ -176,8 +176,7 @@ const createAllocation = async (req, res) => {
     // Check if student already has an active allocation
     const existingAllocation = await HostelAllocation.findOne({
       student,
-      status: 'active',
-      deletedAt: null
+      status: 'active'
     });
     
     if (existingAllocation) {
@@ -220,6 +219,9 @@ const createAllocation = async (req, res) => {
     
     res.status(201).json({ success: true, data: allocation });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ success: false, message: 'Student already has an active hostel allocation' });
+    }
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -436,7 +438,7 @@ const getUpcomingMeals = async (req, res) => {
 
 const getMealAttendance = async (req, res) => {
   try {
-    const { mealId, date } = req.query;
+    const { mealId, date, page = 1, limit = 10 } = req.query;
     const query = {};
     
     if (mealId) query.meal = mealId;
@@ -445,9 +447,19 @@ const getMealAttendance = async (req, res) => {
       .populate('student', 'firstName lastName studentCode')
       .populate('meal', 'mealType date')
       .populate('markedBy', 'name')
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
       .sort({ markedAt: -1 });
     
-    res.json({ success: true, data: attendance });
+    const count = await HostelMealAttendance.countDocuments(query);
+    
+    res.json({
+      success: true,
+      data: attendance,
+      total: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

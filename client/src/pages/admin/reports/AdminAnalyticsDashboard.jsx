@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 import api from '../../../lib/api';
 
 const AdminAnalyticsDashboard = () => {
+  const { t } = useTranslation('admin');
+
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+  }, []);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -16,23 +28,23 @@ const AdminAnalyticsDashboard = () => {
   }, []);
 
   const cards = stats ? [
-    { label: 'Total Students', value: stats.students || 0, color: 'cyan' },
-    { label: 'Total Teachers', value: stats.teachers || 0, color: 'emerald' },
-    { label: 'Active Classes', value: stats.activeClasses || 0, color: 'amber' },
-    { label: 'Library Books', value: stats.libraryBooks || 0, color: 'violet' },
-    { label: 'Departments', value: stats.departments || 0, color: 'blue' },
-    { label: 'Total Users', value: stats.totalUsers || 0, color: 'rose' },
-    { label: 'Courses', value: stats.courses || 0, color: 'indigo' },
-    { label: 'Satisfaction', value: `${stats.satisfaction || 0}%`, color: 'teal' },
+    { label: t('reports.attendanceReports'), value: stats.students || 0, color: 'cyan' },
+    { label: t('reports.totalTeachers'), value: stats.teachers || 0, color: 'emerald' },
+    { label: t('reports.activeClasses'), value: stats.activeClasses || 0, color: 'amber' },
+    { label: t('reports.libraryBooks'), value: stats.libraryBooks || 0, color: 'violet' },
+    { label: t('reports.departments'), value: stats.departments || 0, color: 'blue' },
+    { label: t('reports.totalUsers'), value: stats.totalUsers || 0, color: 'rose' },
+    { label: t('reports.courses'), value: stats.courses || 0, color: 'indigo' },
+    { label: t('reports.satisfaction'), value: `${stats.satisfaction || 0}%`, color: 'teal' },
   ] : [];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Analytics Dashboard</h1>
-        <p className="mt-1 text-sm text-slate-500">Institution-wide analytics and performance metrics</p>
+        <h1 className="text-2xl font-bold text-slate-900">{t('reports.analyticsDashboard')}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t('reports.institutionAnalytics')}</p>
       </div>
-      {loading ? <p className="text-slate-400">Loading analytics...</p> : (
+      {loading ? <p className="text-slate-400">{t('common.loading')}</p> : (
         <>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             {cards.map((c, i) => (
@@ -44,24 +56,24 @@ const AdminAnalyticsDashboard = () => {
           </div>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-semibold text-slate-800">Enrollment Trends</h2>
-              <p className="text-slate-400">Monthly enrollment trends chart will appear here.</p>
+              <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('reports.enrollmentTrends')}</h2>
+              <p className="text-slate-400">{t('reports.enrollmentTrends')}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-semibold text-slate-800">Revenue Trends</h2>
-              <p className="text-slate-400">Monthly revenue trends chart will appear here.</p>
+              <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('reports.revenueTrends')}</h2>
+              <p className="text-slate-400">{t('reports.revenueTrends')}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-semibold text-slate-800">Department Performance</h2>
-              <p className="text-slate-400">Department-wise performance metrics will appear here.</p>
+              <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('reports.departmentPerformance')}</h2>
+              <p className="text-slate-400">{t('reports.departmentPerformance')}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-semibold text-slate-800">Key Insights</h2>
+              <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('reports.keyInsights')}</h2>
               <ul className="space-y-2 text-sm text-slate-500">
-                <li>• Total enrollment has reached <span className="font-semibold text-slate-700">{stats?.students || 0} students</span></li>
-                <li>• Faculty strength: <span className="font-semibold text-slate-700">{stats?.teachers || 0} teachers</span></li>
-                <li>• Library houses <span className="font-semibold text-slate-700">{stats?.libraryBooks || 0} books</span></li>
-                <li>• Overall satisfaction rate: <span className="font-semibold text-slate-700">{stats?.satisfaction || 0}%</span></li>
+                <li>• {t('reports.totalEnrollmentReached', { count: stats?.students || 0 })}</li>
+                <li>• {t('reports.facultyStrength', { count: stats?.teachers || 0 })}</li>
+                <li>• {t('reports.libraryHouses', { count: stats?.libraryBooks || 0 })}</li>
+                <li>• {t('reports.satisfactionRateText', { value: stats?.satisfaction || 0 })}</li>
               </ul>
             </div>
           </div>

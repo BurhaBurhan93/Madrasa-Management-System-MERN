@@ -1,28 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Progress from '../../components/UIHelper/Progress';
+import { useTranslation } from 'react-i18next';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
-const Panel = ({ title, subtitle, children, className = '' }) => (
-  <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
-    {(title || subtitle) && (
-      <div className="mb-5">
-        {title && <h3 className="text-lg font-semibold text-slate-900">{title}</h3>}
-        {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
-      </div>
-    )}
-    {children}
-  </div>
-);
-
 const statusVariants = {
-  active: 'bg-emerald-100 text-emerald-700',
-  completed: 'bg-sky-100 text-sky-700',
-  upcoming: 'bg-amber-100 text-amber-700',
-  inactive: 'bg-rose-100 text-rose-700',
-  default: 'bg-slate-100 text-slate-600',
+  active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  completed: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
+  upcoming: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  inactive: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
+  default: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
 };
 
 const TeacherSubjects = () => {
@@ -31,20 +18,16 @@ const TeacherSubjects = () => {
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState([]);
   const [filter, setFilter] = useState('all');
-  const [fieldFilter, setFieldFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
-
-  const uniqueFields = ['all', ...new Set(subjects.map(s => s.field).filter(Boolean))];
 
   useEffect(() => { fetchSubjects(); }, []);
 
   const fetchSubjects = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.get('http://localhost:5000/api/teacher/subjects', config);
-      setSubjects(response.data.data || []);
+      const res = await apiFetch('/teacher/subjects');
+      const data = await parseJsonSafe(res);
+      setSubjects(data.data || []);
     } catch (error) {
       console.error('Error fetching subjects:', error);
     } finally {
@@ -53,11 +36,7 @@ const TeacherSubjects = () => {
   };
 
   const filteredSubjects = subjects
-    .filter(sub => {
-      const matchStatus = filter === 'all' || (sub.status || 'active') === filter;
-      const matchField = fieldFilter === 'all' || sub.field === fieldFilter;
-      return matchStatus && matchField;
-    })
+    .filter(sub => filter === 'all' || (sub.status || 'active') === filter)
     .sort((a, b) => {
       if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
       if (sortBy === 'students') return (b.students || 0) - (a.students || 0);
@@ -70,117 +49,103 @@ const TeacherSubjects = () => {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-600" />
+      <div className={PANEL_PAGE_BG}>
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-600" />
+        </div>
       </div>
     );
   }
 
-  const statCards = [
-    { label: t('teacher.dashboard.totalSubjects'), value: subjects.length, accent: 'bg-cyan-500' },
-    { label: t('teacher.dashboard.activeClasses'), value: subjects.filter(s => (s.status || s.isActive) === 'active' || s.isActive === true).length, accent: 'bg-emerald-500' },
-    { label: t('teacher.dashboard.totalStudents'), value: totalStudents, accent: 'bg-violet-500' },
-    { label: t('teacher.common.weeklyHours'), value: totalHours, accent: 'bg-amber-500' },
-  ];
-
   return (
     <div className={PANEL_PAGE_BG}>
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-
-        {/* Header */}
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">{t('teacher.common.subjects')}</h1>
-          <p className="mt-1 text-sm text-slate-500">{t('teacher.common.manageSubjectsWorkload')}</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.common.subjects')}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.common.manageSubjectsWorkload')}</p>
         </div>
 
-        {/* Stats */}
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
-          {statCards.map(c => (
-            <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {[
+            { label: t('teacher.dashboard.totalSubjects'), value: subjects.length, accent: 'bg-cyan-500' },
+            { label: t('teacher.dashboard.activeClasses'), value: subjects.filter(s => (s.status || 'active') === 'active').length, accent: 'bg-emerald-500' },
+            { label: t('teacher.dashboard.totalStudents'), value: totalStudents, accent: 'bg-violet-500' },
+            { label: t('teacher.common.weeklyHours'), value: totalHours, accent: 'bg-amber-500' },
+          ].map(c => (
+            <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
               <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
-              <p className="text-sm font-medium text-slate-500">{c.label}</p>
-              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{c.value}</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{c.label}</p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{c.value}</p>
             </div>
           ))}
         </section>
 
-        {/* Filters */}
-        <Panel className="mb-6">
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap gap-2">
               {['all', 'active', 'completed', 'upcoming', 'inactive'].map(status => (
-                <button
-                  key={status}
-                  onClick={() => setFilter(status)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200 ${filter === status ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                >
+                <button key={status} onClick={() => setFilter(status)}
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${filter === status ? 'bg-cyan-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'}`}>
                   {t(`teacher.common.${status}`)}
                 </button>
               ))}
             </div>
-            <div className="flex gap-3">
-              <select value={fieldFilter} onChange={e => setFieldFilter(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
-                {uniqueFields.map(f => <option key={f} value={f}>{f === 'all' ? t('teacher.common.allFields') : f}</option>)}
-              </select>
-              <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
-                <option value="name">{t('teacher.common.sortByName')}</option>
-                <option value="students">{t('teacher.common.sortByStudents')}</option>
-                <option value="progress">{t('teacher.common.sortByProgress')}</option>
-              </select>
-            </div>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value)}
+              className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
+              <option value="name">{t('teacher.common.sortByName')}</option>
+              <option value="students">{t('teacher.common.sortByStudents')}</option>
+              <option value="progress">{t('teacher.common.sortByProgress')}</option>
+            </select>
           </div>
-        </Panel>
+        </div>
 
-        {/* Subject Cards */}
-        <section className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {filteredSubjects.length > 0 ? filteredSubjects.map(subject => {
-            const statusKey = subject.status || 'default';
-            const badgeClass = statusVariants[statusKey] || statusVariants.default;
-            return (
-              <div key={subject.id || subject._id} className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold text-slate-900">{subject.name || t('teacher.common.unnamedSubject')}</h3>
-                    <p className="mt-1 text-sm text-slate-500">{subject.code || t('teacher.common.na')}</p>
-                  </div>
-                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${badgeClass}`}>
-                    {subject.status ? t(`teacher.common.${subject.status}`) : (subject.isActive ? t('teacher.common.active') : t('teacher.common.inactive'))}
-                  </span>
-                </div>
-
-                <div className="mt-4 space-y-1 text-sm text-slate-600">
-                  <p><span className="text-slate-400">{t('teacher.common.credits')}:</span> {subject.credits || t('teacher.common.na')}</p>
-                  <p><span className="text-slate-400">{t('teacher.common.description')}:</span> {subject.description || t('teacher.common.noDescription')}</p>
-                </div>
-
-                <div className="mt-4">
-                  <Progress value={subject.progress || 50} max={100} label={t('teacher.common.syllabusProgress')} />
-                </div>
-
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {[
-                    { label: t('teacher.common.students'), path: `/teacher/students?subjectId=${subject._id}` },
-                    { label: t('teacher.common.attendance'), path: `/teacher/attendance?subjectId=${subject._id}` },
-                    { label: t('teacher.common.exams'), path: `/teacher/exams?subjectId=${subject._id}` },
-                  ].map(btn => (
-                    <button
-                      key={btn.label}
-                      onClick={() => navigate(btn.path)}
-                      className="rounded-2xl border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-all duration-200 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"
-                    >
-                      {btn.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          }) : (
-            <div className="col-span-3 rounded-2xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500">
-              {t('teacher.common.noSubjectsFound')}
-            </div>
-          )}
-        </section>
-
+        {filteredSubjects.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+            {t('teacher.common.noSubjectsFound')}
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.common.subjectName')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.common.code')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.common.credits')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.dashboard.totalStudents')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.common.status')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.common.actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredSubjects.map(subject => (
+                  <tr key={subject._id} className="border-b border-slate-100 hover:bg-slate-50 dark:border-slate-700/50 dark:hover:bg-slate-800/30">
+                    <td className="p-4 font-medium text-slate-900 dark:text-slate-100">{subject.name || t('teacher.common.unnamedSubject')}</td>
+                    <td className="p-4 text-slate-600 dark:text-slate-300">{subject.code || '-'}</td>
+                    <td className="p-4 text-slate-600 dark:text-slate-300">{subject.credits || '-'}</td>
+                    <td className="p-4 text-slate-600 dark:text-slate-300">{subject.students || 0}</td>
+                    <td className="p-4">
+                      <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusVariants[subject.status || 'default'] || statusVariants.default}`}>
+                        {subject.status ? t(`teacher.common.${subject.status}`) : subject.isActive ? t('teacher.common.active') : t('teacher.common.inactive')}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex gap-2">
+                        <button onClick={() => navigate(`/teacher/students?subjectId=${subject._id}`)}
+                          className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
+                          {t('teacher.common.students')}
+                        </button>
+                        <button onClick={() => navigate(`/teacher/attendance?subjectId=${subject._id}`)}
+                          className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
+                          {t('teacher.common.attendance')}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

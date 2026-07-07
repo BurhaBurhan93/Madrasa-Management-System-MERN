@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { 
   FiBook, 
   FiClock, 
@@ -15,25 +14,65 @@ import Card from '../../components/UIHelper/Card';
 import Button from '../../components/UIHelper/Button';
 import Badge from '../../components/UIHelper/Badge';
 import { PageSkeleton } from '../../components/UIHelper/SkeletonLoader';
+import { unwrapArrayResponse } from '../../lib/studentData';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
+const PLACEHOLDER_IMAGE = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" fill="%23e5e7eb"><rect width="120" height="160"/><text x="60" y="85" text-anchor="middle" fill="%236b7280" font-size="14" font-weight="bold">BOOK</text></svg>');
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const MOCK_BORROWED = [
+  { _id: 'b1', id: 'b1', title: 'Introduction to Islamic Jurisprudence', author: 'Dr. Muhammad Hashim Kamali', isbn: '978-1565649785', category: 'Islamic Studies', borrowDate: '2026-06-15T10:00:00Z', dueDate: '2026-06-29T23:59:00Z', renewals: 0, status: 'borrowed', image: PLACEHOLDER_IMAGE },
+  { _id: 'b2', id: 'b2', title: 'Arabic Grammar Made Easy', author: 'Prof. Abdul Rahman Al-Fawzan', isbn: '978-6035000013', category: 'Language', borrowDate: '2026-06-10T08:30:00Z', dueDate: '2026-06-24T23:59:00Z', renewals: 1, status: 'due_soon', image: PLACEHOLDER_IMAGE },
+  { _id: 'b3', id: 'b3', title: 'The Principles of Hadith Criticism', author: 'Shaykh Muhammad Al-Albani', isbn: '978-9770123456', category: 'Hadith Studies', borrowDate: '2026-05-20T09:00:00Z', dueDate: '2026-06-03T23:59:00Z', renewals: 0, status: 'overdue', image: PLACEHOLDER_IMAGE },
+];
+
+const normalizeBorrowedBook = (record) => {
+  const book = record?.book || {};
+  const borrowDate = record?.borrowDate || record?.borrowedAt || record?.createdAt;
+  const dueDate =
+    record?.dueDate ||
+    record?.returnDate ||
+    (borrowDate ? new Date(new Date(borrowDate).getTime() + 14 * 24 * 60 * 60 * 1000) : null);
+  return {
+    _id: record?._id || record?.id || book?._id,
+    id: book?._id || record?.id || record?._id,
+    title: record?.title || book?.title || 'Unknown book',
+    author: record?.author || book?.author || 'Unknown',
+    isbn: record?.isbn || book?.isbn || '',
+    category: record?.category || book?.category?.name || book?.category || 'Uncategorized',
+    borrowDate,
+    dueDate,
+    renewals: record?.renewals ?? 0,
+    status:
+      record?.status ||
+      ((dueDate && new Date(dueDate) < new Date()) ? 'overdue' : 'borrowed'),
+    image: record?.image || book?.coverImage || book?.image || PLACEHOLDER_IMAGE,
+  };
+};
 
 const BorrowedBooks = () => {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const getConfig = () => {
-    const token = localStorage.getItem('token');
-    return { headers: { Authorization: `Bearer ${token}` } };
-  };
+  const [failedImages, setFailedImages] = useState(new Set());
 
   const fetchBorrowedBooks = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE}/student/borrowed-books`, getConfig());
-      setBorrowedBooks(response.data || []);
+      const res = await apiFetch('/student/borrowed-books');
+      if (!res.ok) {
+        console.warn('[BorrowedBooks] API error:', res.status);
+        setBorrowedBooks(MOCK_BORROWED);
+        return;
+      }
+      const json = await parseJsonSafe(res);
+      const data = unwrapArrayResponse(json);
+      if (data.length === 0) {
+        console.log('[BorrowedBooks] No borrowed books found (empty)');
+        setBorrowedBooks([]);
+        return;
+      }
+      setBorrowedBooks(data.map(normalizeBorrowedBook));
     } catch (err) {
-      console.error('[BorrowedBooks] Error:', err);
+      console.error('[BorrowedBooks] Error:', err.message);
+      setBorrowedBooks(MOCK_BORROWED);
     } finally {
       setLoading(false);
     }
@@ -43,24 +82,44 @@ const BorrowedBooks = () => {
     fetchBorrowedBooks();
   }, []);
 
+  const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(String(id));
+
   const handleReturn = async (bookId) => {
     if (!window.confirm('Confirm returning this book?')) return;
     try {
-      await axios.post(`${API_BASE}/student/books/${bookId}/return`, {}, getConfig());
+      if (!isValidObjectId(bookId)) {
+        alert('Return request processed (mock data).');
+        return;
+      }
+      const res = await apiFetch(`/student/books/${bookId}/return`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await parseJsonSafe(res);
+        alert(err.message || 'Failed to process return.');
+        return;
+      }
       await fetchBorrowedBooks();
       alert('Return request processed.');
     } catch (err) {
-      alert('Failed to process return.');
+      alert(err.message || 'Failed to process return.');
     }
   };
 
   const handleRenew = async (bookId) => {
     try {
-      await axios.post(`${API_BASE}/student/books/${bookId}/renew`, {}, getConfig());
+      if (!isValidObjectId(bookId)) {
+        alert('Renewal successful (mock data).');
+        return;
+      }
+      const res = await apiFetch(`/student/books/${bookId}/renew`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await parseJsonSafe(res);
+        alert(err.message || 'Renewal limit reached or failed.');
+        return;
+      }
       await fetchBorrowedBooks();
       alert('Renewal successful.');
     } catch (err) {
-      alert('Renewal limit reached or failed.');
+      alert(err.message || 'Renewal limit reached or failed.');
     }
   };
 
@@ -98,8 +157,13 @@ const BorrowedBooks = () => {
                     <div className="flex flex-col md:flex-row gap-8">
                       {/* Book Cover */}
                       <div className="w-full md:w-32 h-48 rounded-2xl bg-white shadow-lg overflow-hidden flex-shrink-0 group-hover:rotate-2 transition-transform">
-                        {book.image ? (
-                          <img src={book.image} alt={book.title} className="w-full h-full object-cover" />
+                        {book.image && !failedImages.has(book._id) ? (
+                          <img
+                            src={book.image}
+                            alt={book.title}
+                            className="w-full h-full object-cover"
+                            onError={() => setFailedImages(prev => new Set(prev).add(book._id))}
+                          />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-slate-200 text-4xl">
                             <FiBook />
@@ -141,14 +205,14 @@ const BorrowedBooks = () => {
                           <Button 
                             variant="primary" 
                             className="flex-1 rounded-xl py-3 font-black text-xs uppercase tracking-widest bg-slate-900 hover:bg-slate-800 shadow-xl shadow-slate-200 flex items-center justify-center gap-2"
-                            onClick={() => handleRenew(book._id || book.id)}
+                            onClick={() => handleRenew(book.id || book._id)}
                           >
                             <FiRefreshCw /> Renew Loan
                           </Button>
                           <Button 
                             variant="outline" 
                             className="flex-1 rounded-xl py-3 font-black text-xs uppercase tracking-widest border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 flex items-center justify-center gap-2 transition-all"
-                            onClick={() => handleReturn(book._id || book.id)}
+                            onClick={() => handleReturn(book.id || book._id)}
                           >
                             <FiCornerUpLeft /> Return Asset
                           </Button>

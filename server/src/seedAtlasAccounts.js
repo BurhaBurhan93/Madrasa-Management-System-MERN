@@ -20,21 +20,19 @@ const permissionNames = [
   'staff:payroll',
   'staff:kitchen',
   'staff:hr',
-  'staff:hostel',
 ];
 
 const roleDefinitions = [
   { name: 'Administrator', description: 'Full system access', permissions: permissionNames },
-  { name: 'Finance Staff', description: 'Finance and payroll access', permissions: ['staff:finance', 'staff:payroll'] },
-  { name: 'Registrar Staff', description: 'Student affairs and registrar access', permissions: ['staff:registrar', 'staff:students', 'staff:inventory'] },
-  { name: 'HR Staff', description: 'HR and payroll access', permissions: ['staff:hr', 'staff:payroll'] },
+  { name: 'Finance Staff', description: 'Finance module access', permissions: ['staff:finance'] },
+  { name: 'Registrar Staff', description: 'Student affairs and registrar access', permissions: ['staff:registrar'] },
+  { name: 'HR Staff', description: 'HR module access', permissions: ['staff:hr'] },
   { name: 'Library Staff', description: 'Library module access', permissions: ['staff:library'] },
-  { name: 'Kitchen Staff', description: 'Kitchen and inventory access', permissions: ['staff:kitchen', 'staff:inventory'] },
-  { name: 'Payroll Staff', description: 'Payroll-only access', permissions: ['staff:payroll'] },
-  { name: 'Complaints Staff', description: 'Complaint handling access', permissions: ['staff:complaints'] },
-  { name: 'Inventory Staff', description: 'Inventory access', permissions: ['staff:inventory'] },
-  { name: 'Hostel Staff', description: 'Hostel and registrar hostel access', permissions: ['staff:registrar', 'staff:hostel'] },
-  { name: 'Support Staff', description: 'Basic support access', permissions: ['staff:students', 'staff:inventory', 'staff:complaints'] },
+  { name: 'Kitchen Staff', description: 'Kitchen module access', permissions: ['staff:kitchen'] },
+  { name: 'Payroll Staff', description: 'Payroll module access', permissions: ['staff:payroll'] },
+  { name: 'Complaints Staff', description: 'Complaints module access', permissions: ['staff:complaints'] },
+  { name: 'Inventory Staff', description: 'Inventory module access', permissions: ['staff:inventory'] },
+  { name: 'Support Staff', description: 'Basic support access', permissions: [] },
 ];
 
 const accounts = [
@@ -121,7 +119,7 @@ const accounts = [
     role: 'staff',
     roleNames: ['Payroll Staff'],
     employeeCode: 'EMP2024008',
-    employeeType: 'finance',
+    employeeType: 'payroll',
   },
   {
     name: 'Complaints Staff',
@@ -130,7 +128,7 @@ const accounts = [
     role: 'staff',
     roleNames: ['Complaints Staff'],
     employeeCode: 'EMP2024009',
-    employeeType: 'support',
+    employeeType: 'complaints',
   },
   {
     name: 'Inventory Staff',
@@ -139,16 +137,7 @@ const accounts = [
     role: 'staff',
     roleNames: ['Inventory Staff'],
     employeeCode: 'EMP2024010',
-    employeeType: 'maintenance',
-  },
-  {
-    name: 'Hostel Staff',
-    email: 'hostel@gmail.com',
-    password: 'hostel1234',
-    role: 'staff',
-    roleNames: ['Hostel Staff'],
-    employeeCode: 'EMP2024011',
-    employeeType: 'registrar',
+    employeeType: 'inventory',
   },
   {
     name: 'All Staff Modules',
@@ -156,7 +145,7 @@ const accounts = [
     password: 'staffall1234',
     role: 'staff',
     roleNames: ['Administrator'],
-    employeeCode: 'EMP2024012',
+    employeeCode: 'EMP2024011',
     employeeType: 'admin',
   },
 ];

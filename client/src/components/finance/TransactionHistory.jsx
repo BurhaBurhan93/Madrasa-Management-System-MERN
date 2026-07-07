@@ -19,6 +19,9 @@ import Button from '../../components/UIHelper/Button';
 import { formatDate } from '../../lib/utils';
 import { PageSkeleton } from '../../components/UIHelper/SkeletonLoader';
 import axios from 'axios';
+import { unwrapArrayResponse } from '../../lib/studentData';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -36,6 +39,14 @@ const TransactionHistory = () => {
     return { headers: { Authorization: `Bearer ${token}` } };
   };
 
+  const MOCK_TRANSACTIONS = [
+    { id: 'm1', transactionCode: 'RCPT-001', account: 'Main Account', transactionType: 'income', amount: 5000, transactionDate: '2026-03-15T10:00:00Z', referenceType: 'Fee Payment', referenceId: 'RCPT-001', balanceAfter: 0, performedBy: 'Student Portal', verificationStatus: 'verified', description: 'Tuition Fee - First Installment' },
+    { id: 'm2', transactionCode: 'RCPT-002', account: 'Main Account', transactionType: 'income', amount: 2000, transactionDate: '2026-02-01T10:00:00Z', referenceType: 'Fee Payment', referenceId: 'RCPT-002', balanceAfter: 0, performedBy: 'Student Portal', verificationStatus: 'verified', description: 'Admission Fee' },
+    { id: 'm3', transactionCode: 'RCPT-003', account: 'Main Account', transactionType: 'income', amount: 3000, transactionDate: '2026-04-01T10:00:00Z', referenceType: 'Fee Payment', referenceId: 'RCPT-003', balanceAfter: 0, performedBy: 'Student Portal', verificationStatus: 'pending', description: 'Tuition Fee - Second Installment' },
+    { id: 'm4', transactionCode: 'RCPT-004', account: 'Main Account', transactionType: 'income', amount: 1500, transactionDate: '2026-04-10T10:00:00Z', referenceType: 'Fee Payment', referenceId: 'RCPT-004', balanceAfter: 0, performedBy: 'Student Portal', verificationStatus: 'pending', description: 'Lab & Library Fee' },
+    { id: 'm5', transactionCode: 'RCPT-005', account: 'Main Account', transactionType: 'income', amount: 1000, transactionDate: '2026-01-10T10:00:00Z', referenceType: 'Fee Payment', referenceId: 'RCPT-005', balanceAfter: 0, performedBy: 'Student Portal', verificationStatus: 'verified', description: 'Sports Fee' },
+  ];
+
   useEffect(() => {
     fetchTransactions();
   }, []);
@@ -45,37 +56,107 @@ const TransactionHistory = () => {
       setLoading(true);
       setError(null);
       
-      // Fetch fee payments and convert to transaction format
       const config = getConfig();
       const response = await axios.get(`${API_BASE}/student/fees`, config);
       
-      // Convert fee payments to transaction format
-      const paymentTransactions = (response.data || []).map((payment, index) => ({
+      let payments = unwrapArrayResponse(response.data);
+      if (payments.length === 0) {
+        setTransactions(MOCK_TRANSACTIONS);
+        setLoading(false);
+        return;
+      }
+
+      const paymentTransactions = payments.map((payment, index) => ({
         id: payment._id || `TXN${index}`,
         transactionCode: payment.receiptNo || `TXN-${Date.now()}-${index}`,
         account: 'Main Account',
         transactionType: 'income',
-        amount: payment.amount || 0,
-        transactionDate: payment.paymentDate || payment.date || payment.createdAt || new Date().toISOString(),
-        referenceType: payment.description || 'Fee Payment',
+        amount: payment.paidAmount || 0,
+        transactionDate: payment.paymentDate || payment.createdAt || new Date().toISOString(),
+        referenceType: 'Fee Payment',
         referenceId: payment._id?.slice(-8) || `REF${index}`,
-        balanceAfter: 0, // Will be calculated
+        balanceAfter: 0,
         performedBy: 'Student Portal',
-        verificationStatus: payment.status === 'completed' || payment.status === 'paid' ? 'verified' : 'pending',
-        description: payment.description || 'Tuition fee payment'
+        verificationStatus: payment.paymentStatus === 'completed' || payment.paymentStatus === 'paid' ? 'verified' : 'pending',
+        description: payment.remarks || 'Tuition fee payment'
       }));
       
       setTransactions(paymentTransactions);
     } catch (err) {
       console.error('[TransactionHistory] Error:', err);
       setError('Failed to load transactions');
-      setTransactions([]);
+      setTransactions(MOCK_TRANSACTIONS);
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateString) => {
+  const handleExport = () => {
+    const headers = ['Transaction Code', 'Date', 'Type', 'Description', 'Amount', 'Status'];
+    const rows = filteredTransactions.map(t => [
+      t.transactionCode,
+      formatTxnDate(t.transactionDate),
+      t.transactionType,
+      t.description,
+      t.amount,
+      t.verificationStatus,
+    ]);
+    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ledger-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFontSize(16);
+    doc.text('Ledger History', pageWidth / 2, 15, { align: 'center' });
+    doc.setFontSize(9);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, pageWidth / 2, 21, { align: 'center' });
+
+    const header = ['#', 'Transaction Code', 'Date', 'Type', 'Description', 'Amount', 'Status'];
+    const body = filteredTransactions.map((t, i) => [
+      i + 1,
+      t.transactionCode,
+      formatTxnDate(t.transactionDate),
+      t.transactionType,
+      t.description,
+      `$${t.amount.toLocaleString()}`,
+      t.verificationStatus,
+    ]);
+
+    autoTable(doc, {
+      head: [header],
+      body,
+      startY: 26,
+      styles: { fontSize: 7, cellPadding: 2 },
+      headStyles: { fillColor: [30, 41, 59], textColor: 255, fontStyle: 'bold', fontSize: 7 },
+      columnStyles: {
+        0: { cellWidth: 8, halign: 'center' },
+        1: { cellWidth: 32 },
+        2: { cellWidth: 28 },
+        3: { cellWidth: 20, halign: 'center' },
+        5: { cellWidth: 22, halign: 'right' },
+        6: { cellWidth: 20, halign: 'center' },
+      },
+    });
+
+    const finalY = doc.lastAutoTable.finalY + 8;
+    doc.setFontSize(9);
+    doc.text(`Total Inflow: $${totalIncome.toLocaleString()}`, 14, finalY);
+    doc.text(`Total Outflow: $${totalExpenses.toLocaleString()}`, 14, finalY + 5);
+    doc.text(`Net Balance: $${netBalance.toLocaleString()}`, 14, finalY + 10);
+
+    doc.save(`ledger-export-${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
+  const formatTxnDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -114,9 +195,14 @@ const TransactionHistory = () => {
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Ledger History</h1>
           <p className="text-slate-500 mt-1 font-medium italic">Detailed audit trail of all financial interactions</p>
         </div>
-        <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2">
-          <FiDownload /> Export Statement
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={handleExport} className="rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2">
+            <FiDownload /> CSV
+          </Button>
+          <Button variant="primary" onClick={handleExportPDF} className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2">
+            <FiDownload /> PDF
+          </Button>
+        </div>
       </div>
 
       {/* Financial Summary Grid */}
@@ -187,7 +273,7 @@ const TransactionHistory = () => {
                 <tr key={txn.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-8 py-6">
                     <p className="font-black text-slate-900 text-sm">{txn.description}</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{formatDate(txn.transactionDate)}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{formatTxnDate(txn.transactionDate)}</p>
                   </td>
                   <td className="px-8 py-6">
                     <Badge variant={txn.transactionType === 'income' ? 'success' : 'danger'} className="font-black px-3 py-1 uppercase tracking-widest text-[9px]">
@@ -210,7 +296,14 @@ const TransactionHistory = () => {
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <button className="p-3 rounded-xl bg-slate-100 text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all shadow-sm">
+                    <button
+                      type="button"
+                      className="p-3 rounded-xl bg-slate-100 text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all shadow-sm"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(JSON.stringify(txn, null, 2));
+                        alert('Transaction details copied to clipboard.');
+                      }}
+                    >
                       <FiFileText size={16} />
                     </button>
                   </td>

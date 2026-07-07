@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n';
 import api from '../../lib/api';
+import { readStoredLanguage } from '../../lib/languageStorage';
 import {
   AreaChartComponent,
   BarChartComponent,
@@ -12,106 +13,6 @@ import {
 } from '../../components/UIHelper/ECharts';
 import Avatar from '../../components/UIHelper/Avatar';
 import { formatDate } from '../../lib/utils';
-
-const enrollmentSeedData = [
-  { month: 'Jan', students: 120 },
-  { month: 'Feb', students: 138 },
-  { month: 'Mar', students: 154 },
-  { month: 'Apr', students: 166 },
-  { month: 'May', students: 181 },
-  { month: 'Jun', students: 198 },
-];
-
-const revenueSeedData = [
-  { month: 'Jan', amount: 82000 },
-  { month: 'Feb', amount: 91000 },
-  { month: 'Mar', amount: 104000 },
-  { month: 'Apr', amount: 112000 },
-  { month: 'May', amount: 121000 },
-  { month: 'Jun', amount: 125000 },
-];
-
-const performanceRadarData = [
-  {
-    value: [84, 78, 91, 88, 73, 86],
-    name: 'Operations',
-  },
-];
-
-const performanceIndicators = [
-  { name: 'Attendance', max: 100 },
-  { name: 'Fees', max: 100 },
-  { name: 'Academics', max: 100 },
-  { name: 'Discipline', max: 100 },
-  { name: 'Satisfaction', max: 100 },
-  { name: 'Growth', max: 100 },
-];
-
-const recentActivitySeed = [
-  {
-    id: 1,
-    type: 'ST',
-    title: 'New student admission completed',
-    user: 'Admissions Office',
-    amount: null,
-    date: '2026-04-01T09:00:00.000Z',
-  },
-  {
-    id: 2,
-    type: 'FE',
-    title: 'Monthly fee collection updated',
-    user: 'Finance Team',
-    amount: '$12,400',
-    date: '2026-04-01T11:30:00.000Z',
-  },
-  {
-    id: 3,
-    type: 'HR',
-    title: 'Teacher schedule published',
-    user: 'Admin Office',
-    amount: null,
-    date: '2026-04-01T14:15:00.000Z',
-  },
-  {
-    id: 4,
-    type: 'QA',
-    title: 'Complaint review marked resolved',
-    user: 'Support Desk',
-    amount: null,
-    date: '2026-04-01T16:00:00.000Z',
-  },
-];
-
-const upcomingEventsSeed = [
-  {
-    id: 1,
-    title: 'Parent Meeting',
-    type: 'Meeting',
-    date: '2026-04-04T08:30:00.000Z',
-    time: '08:30 AM',
-  },
-  {
-    id: 2,
-    title: 'Midterm Review',
-    type: 'Academic',
-    date: '2026-04-05T10:00:00.000Z',
-    time: '10:00 AM',
-  },
-  {
-    id: 3,
-    title: 'Staff Training',
-    type: 'Training',
-    date: '2026-04-06T01:30:00.000Z',
-    time: '01:30 PM',
-  },
-  {
-    id: 4,
-    title: 'Fee Deadline',
-    type: 'Finance',
-    date: '2026-04-07T09:00:00.000Z',
-    time: '09:00 AM',
-  },
-];
 
 const quickActionItems = [
   { translationKey: 'reviewAdmissions', noteTranslationKey: 'applicationsNeedApproval', noteCount: '12', path: '/admin/users/register' },
@@ -160,12 +61,12 @@ const Panel = ({ title, subtitle, children, className = '', dark = false }) => (
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation('admin');
 
   // Sync i18n language with AdminPanel's language selection
   useEffect(() => {
     const syncLang = () => {
-      const lang = localStorage.getItem('adminLang') || 'en';
+      const lang = readStoredLanguage('adminLang', 'en');
       if (i18n.language !== lang) i18n.changeLanguage(lang);
     };
     syncLang();
@@ -173,79 +74,107 @@ const AdminDashboard = () => {
     return () => window.removeEventListener('storage', syncLang);
   }, []);
 
-  const [quickStats, setQuickStats] = useState({
+  const [dashboardData, setDashboardData] = useState({
     totalStudents: 0,
     totalTeachers: 0,
     totalStaff: 0,
-    totalCourses: 48,
-    monthlyRevenue: 125000,
-    pendingComplaints: 12,
+    totalClasses: 0,
+    totalSubjects: 0,
+    totalUsers: 0,
+    pendingComplaints: 0,
+    monthlyRevenue: 0,
+    totalIncome: 0,
+    totalExpense: 0,
+    enrollmentTrend: [],
+    revenueTrend: [],
+    recentActivity: [],
+    upcomingEvents: [],
+    performanceRadarData: [],
+    performanceIndicators: [],
+    occupancyCapacity: 240,
   });
 
-  useEffect(() => {
-    fetchStats();
+  const [loading, setLoading] = useState(true);
+
+  const fetchDashboard = useCallback(async () => {
+    try {
+      const res = await api.get('/admin/dashboard');
+      setDashboardData(res.data);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const fetchStats = async () => {
-    try {
-      const res = await api.get('/users');
-      const users = res.data.data;
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
 
-      setQuickStats((prev) => ({
-        ...prev,
-        totalStudents: users.filter((u) => u.role === 'student').length,
-        totalTeachers: users.filter((u) => u.role === 'teacher').length,
-        totalStaff: users.filter((u) => u.role === 'staff').length,
-      }));
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  };
+  const { totalStudents, totalTeachers, totalStaff, monthlyRevenue, pendingComplaints, totalUsers, enrollmentTrend, revenueTrend, recentActivity, upcomingEvents, performanceRadarData, performanceIndicators, occupancyCapacity } = dashboardData;
 
   const userDistributionData = [
-    { name: 'Students', value: quickStats.totalStudents, color: '#2563EB' },
-    { name: 'Teachers', value: quickStats.totalTeachers, color: '#14B8A6' },
-    { name: 'Staff', value: quickStats.totalStaff, color: '#F97316' },
+    { name: t('dash.totalStudents'), value: totalStudents, color: '#2563EB' },
+    { name: t('dash.teachers'), value: totalTeachers, color: '#14B8A6' },
+    { name: t('dash.supportStaff'), value: totalStaff, color: '#F97316' },
   ];
 
-  const totalUsers =
-    quickStats.totalStudents + quickStats.totalTeachers + quickStats.totalStaff;
+  const combinedUsers = totalStudents + totalTeachers + totalStaff;
 
   const occupancyRate = Math.min(
     100,
-    Math.round((quickStats.totalStudents / 240) * 100) || 0
+    Math.round((totalStudents / (occupancyCapacity || 240)) * 100) || 0
   );
 
   const statCards = [
     {
-      label: t('admin.dashboard.totalStudents'),
-      value: quickStats.totalStudents,
-      note: t('admin.dashboard.activeEnrollments'),
+      label: t('dash.totalStudents'),
+      value: totalStudents,
+      note: t('dash.activeEnrollments'),
       accentClass: 'bg-blue-500',
       iconText: 'STD',
     },
     {
-      label: t('admin.dashboard.teachers'),
-      value: quickStats.totalTeachers,
-      note: t('admin.dashboard.facultyAssigned'),
+      label: t('dash.teachers'),
+      value: totalTeachers,
+      note: t('dash.facultyAssigned'),
       accentClass: 'bg-teal-500',
       iconText: 'TCH',
     },
     {
-      label: t('admin.dashboard.supportStaff'),
-      value: quickStats.totalStaff,
-      note: t('admin.dashboard.operationsTeam'),
+      label: t('dash.supportStaff'),
+      value: totalStaff,
+      note: t('dash.operationsTeam'),
       accentClass: 'bg-orange-500',
       iconText: 'STF',
     },
     {
-      label: t('admin.dashboard.monthlyRevenue'),
-      value: `$${(quickStats.monthlyRevenue / 1000).toFixed(0)}k`,
-      note: t('admin.dashboard.collectedThisMonth'),
+      label: t('dash.monthlyRevenue'),
+      value: `$${(monthlyRevenue / 1000).toFixed(0)}k`,
+      note: t('dash.collectedThisMonth'),
       accentClass: 'bg-emerald-500',
       iconText: 'REV',
     },
   ];
+
+  const displayActivity = recentActivity.length > 0 ? recentActivity : [];
+  const displayEvents = upcomingEvents.length > 0 ? upcomingEvents : [];
+  const displayEnrollment = enrollmentTrend.length > 0 ? enrollmentTrend : [];
+  const displayRevenue = revenueTrend.length > 0 ? revenueTrend : [];
+
+  const hasRadarData = performanceRadarData.length > 0;
+  const hasIndicators = performanceIndicators.length > 0;
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-300 border-t-slate-900" />
+          <p className="mt-4 text-sm text-slate-500">{t('common.loading')}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full">
@@ -257,30 +186,30 @@ const AdminDashboard = () => {
               <div className="absolute left-40 top-10 h-32 w-32 rounded-full bg-blue-500/20 blur-3xl" />
               <div className="relative">
                 <div className="mb-5 inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-slate-200 backdrop-blur">
-                  {t('admin.dashboard.overview')}
+                  {t('dash.overview')}
                 </div>
                 <h1 className="max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
-                  {t('admin.dashboard.title')}
+                  {t('dash.title')}
                 </h1>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-                  {t('admin.dashboard.subtitle')}
+                  {t('dash.subtitle')}
                 </p>
 
-                <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                  <div className="mt-8 grid gap-4 sm:grid-cols-3">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{t('admin.dashboard.activeUsers')}</p>
-                    <p className="mt-2 text-2xl font-semibold">{totalUsers}</p>
-                    <p className="mt-1 text-sm text-slate-300">{t('admin.dashboard.combinedUsers')}</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{t('dash.activeUsers')}</p>
+                    <p className="mt-2 text-2xl font-semibold">{combinedUsers || totalUsers}</p>
+                    <p className="mt-1 text-sm text-slate-300">{t('dash.combinedUsers')}</p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{t('admin.dashboard.capacityUsed')}</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{t('dash.capacityUsed')}</p>
                     <p className="mt-2 text-2xl font-semibold">{occupancyRate}%</p>
-                    <p className="mt-1 text-sm text-slate-300">{t('admin.dashboard.basedOnTarget')}</p>
+                    <p className="mt-1 text-sm text-slate-300">{t('dash.basedOnTarget')}</p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{t('admin.dashboard.sessionDate')}</p>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-400">{t('dash.sessionDate')}</p>
                     <p className="mt-2 text-2xl font-semibold">{formatDate(new Date().toISOString())}</p>
-                    <p className="mt-1 text-sm text-slate-300">{t('admin.dashboard.snapshot')}</p>
+                    <p className="mt-1 text-sm text-slate-300">{t('dash.snapshot')}</p>
                   </div>
                 </div>
               </div>
@@ -292,9 +221,9 @@ const AdminDashboard = () => {
                   <Avatar size="xl" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-300">{t('admin.dashboard.administrator')}</p>
-                  <h2 className="text-2xl font-semibold">{t('admin.dashboard.superAdmin')}</h2>
-                  <p className="text-sm text-slate-400">ADM2024001</p>
+                  <p className="text-sm text-slate-300">{t('dash.administrator')}</p>
+                  <h2 className="text-2xl font-semibold">{t('dash.superAdmin')}</h2>
+                  <p className="text-sm text-slate-400">{t('dash.administrator')}: ADM2024001</p>
                 </div>
               </div>
 
@@ -305,11 +234,11 @@ const AdminDashboard = () => {
                     onClick={() => navigate(item.path)}
                     className="w-full text-left rounded-2xl border border-white/10 bg-slate-900/60 p-4 hover:bg-slate-800/60 transition-colors"
                   >
-                    <p className="font-medium text-white">{t(`admin.dashboard.${item.translationKey}`)}</p>
+                    <p className="font-medium text-white">{t(`dash.${item.translationKey}`)}</p>
                     <p className="mt-1 text-sm text-slate-400">
                       {item.noteCount 
-                        ? `${item.noteCount} ${t(`admin.dashboard.${item.noteTranslationKey}`)}`
-                        : t(`admin.dashboard.${item.noteTranslationKey}`)
+                        ? `${item.noteCount} ${t(`dash.${item.noteTranslationKey}`)}`
+                        : t(`dash.${item.noteTranslationKey}`)
                       }
                     </p>
                   </button>
@@ -328,8 +257,8 @@ const AdminDashboard = () => {
         <section className="mt-8 grid gap-6 xl:grid-cols-[1.45fr,0.95fr]">
           <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
             <AreaChartComponent
-              title={t('admin.dashboard.enrollmentGrowth')}
-              data={enrollmentSeedData}
+              title={t('dash.enrollmentGrowth')}
+              data={displayEnrollment}
               dataKey="students"
               nameKey="month"
               height={360}
@@ -338,35 +267,35 @@ const AdminDashboard = () => {
           </div>
 
           <Panel
-            title={t('admin.dashboard.operationalSnapshot')}
-            subtitle={t('admin.dashboard.institutionHealth')}
+            title={t('dash.operationalSnapshot')}
+            subtitle={t('dash.institutionHealth')}
             className="bg-slate-900 text-white"
             dark
           >
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <p className="text-sm text-slate-300">{t('admin.dashboard.revenueTarget')}</p>
-                <p className="mt-2 text-3xl font-semibold">$140k</p>
-                <p className="mt-2 text-sm text-emerald-300">89 {t('admin.common.percent')} of target achieved</p>
+                <p className="text-sm text-slate-300">{t('dash.revenueTarget')}</p>
+                <p className="mt-2 text-3xl font-semibold">{t('dash.revenueCollected')}</p>
+                <p className="mt-2 text-sm text-emerald-300">{t('dash.targetAchieved', { value: 89 })}</p>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <p className="text-sm text-slate-300">{t('admin.dashboard.pendingComplaints')}</p>
-                <p className="mt-2 text-3xl font-semibold">{quickStats.pendingComplaints}</p>
-                <p className="mt-2 text-sm text-slate-300">{t('admin.dashboard.serviceDeskWorkload')}</p>
+                <p className="text-sm text-slate-300">{t('dash.pendingComplaints')}</p>
+                <p className="mt-2 text-3xl font-semibold">{pendingComplaints}</p>
+                <p className="mt-2 text-sm text-slate-300">{t('dash.serviceDeskWorkload')}</p>
               </div>
             </div>
             <div className="mt-5 rounded-3xl border border-white/10 bg-white/5 p-4">
               <div className="mb-3 flex items-center justify-between">
-                <p className="font-medium text-white">{t('admin.dashboard.weeklyFocus')}</p>
+                <p className="font-medium text-white">{t('dash.weeklyFocus')}</p>
                 <span className="rounded-full bg-cyan-400/15 px-3 py-1 text-xs font-medium text-cyan-200">
-                  {t('admin.common.healthy')}
+                  {t('common.healthy')}
                 </span>
               </div>
               <div className="h-3 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full w-[78%] rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-blue-500" />
               </div>
               <p className="mt-3 text-sm text-slate-300">
-                {t('admin.dashboard.operationsStable')}
+                {t('dash.operationsStable')}
               </p>
             </div>
           </Panel>
@@ -375,7 +304,7 @@ const AdminDashboard = () => {
         <section className="mt-8 grid gap-6 lg:grid-cols-3">
           <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
             <DoughnutChartComponent
-              title={t('admin.dashboard.userDistribution')}
+              title={t('dash.userDistribution')}
               data={userDistributionData}
               height={330}
               showLegend={false}
@@ -384,8 +313,8 @@ const AdminDashboard = () => {
 
           <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
             <BarChartComponent
-              title={t('admin.dashboard.monthlyRevenueChart')}
-              data={revenueSeedData}
+              title={t('dash.monthlyRevenueChart')}
+              data={displayRevenue}
               dataKey="amount"
               nameKey="month"
               height={330}
@@ -393,10 +322,10 @@ const AdminDashboard = () => {
             />
           </div>
 
-          <Panel title={t('admin.dashboard.distributionDetails')} subtitle={t('admin.dashboard.userMix')}>
+          <Panel title={t('dash.distributionDetails')} subtitle={t('dash.userMix')}>
             <div className="space-y-4">
               {userDistributionData.map((item) => {
-                const percent = totalUsers ? Math.round((item.value / totalUsers) * 100) : 0;
+                const percent = combinedUsers ? Math.round((item.value / combinedUsers) * 100) : 0;
 
                 return (
                   <div key={item.name}>
@@ -409,7 +338,7 @@ const AdminDashboard = () => {
                         <span className="font-medium text-slate-700">{item.name}</span>
                       </div>
                       <span className="text-sm text-slate-500">
-                        {item.value} {t('admin.common.users')}
+                        {item.value} {t('common.users')}
                       </span>
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-slate-100">
@@ -418,7 +347,7 @@ const AdminDashboard = () => {
                         style={{ width: `${percent}%`, backgroundColor: item.color }}
                       />
                     </div>
-                    <p className="mt-2 text-sm text-slate-500">{percent}% {t('admin.dashboard.ofTotal')}</p>
+                    <p className="mt-2 text-sm text-slate-500">{percent}% {t('dash.ofTotal')}</p>
                   </div>
                 );
               })}
@@ -430,25 +359,32 @@ const AdminDashboard = () => {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
               <RadarChartComponent
-                title={t('admin.dashboard.performanceRadar')}
-                data={performanceRadarData}
-                indicators={performanceIndicators}
+                title={t('dash.performanceRadar')}
+                data={hasRadarData ? performanceRadarData : [{ value: [84, 78, 91, 88, 73, 86], name: 'Operations' }]}
+                indicators={hasIndicators ? performanceIndicators : [
+                  { name: t('dash.radarAttendance'), max: 100 },
+                  { name: t('dash.radarFees'), max: 100 },
+                  { name: t('dash.radarAcademics'), max: 100 },
+                  { name: t('dash.radarDiscipline'), max: 100 },
+                  { name: t('dash.radarSatisfaction'), max: 100 },
+                  { name: t('dash.radarGrowth'), max: 100 },
+                ]}
                 height={330}
               />
             </div>
 
             <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
               <GaugeChartComponent
-                title={t('admin.dashboard.capacityUsage')}
+                title={t('dash.capacityUsage')}
                 value={occupancyRate}
                 height={330}
               />
             </div>
           </div>
 
-          <Panel title={t('admin.dashboard.recentActivity')} subtitle={t('admin.dashboard.adminOperations')}>
+          <Panel title={t('dash.recentActivity')} subtitle={t('dash.adminOperations')}>
             <div className="space-y-4">
-              {recentActivitySeed.map((activity) => (
+              {(displayActivity.length > 0 ? displayActivity : []).map((activity) => (
                 <div
                   key={activity.id}
                   className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50/50 p-4"
@@ -463,7 +399,7 @@ const AdminDashboard = () => {
                     </div>
                     <p className="mt-1 text-sm text-slate-500">
                       {activity.user}
-                      {activity.amount ? ` - ${activity.amount}` : ''}
+                      {activity.amount ? ` - $${typeof activity.amount === 'number' ? activity.amount.toLocaleString() : activity.amount}` : ''}
                     </p>
                   </div>
                 </div>
@@ -473,9 +409,9 @@ const AdminDashboard = () => {
         </section>
 
         <section className="mt-8">
-          <Panel title={t('admin.dashboard.upcomingEvents')} subtitle={t('admin.dashboard.importantDates')}>
+          <Panel title={t('dash.upcomingEvents')} subtitle={t('dash.importantDates')}>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {upcomingEventsSeed.map((event) => (
+              {(displayEvents.length > 0 ? displayEvents : []).map((event) => (
                 <div
                   key={event.id}
                   className="rounded-3xl border border-white/60 bg-white/40 backdrop-blur-xl p-5 shadow-sm"

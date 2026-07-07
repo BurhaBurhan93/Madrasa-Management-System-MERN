@@ -24,6 +24,7 @@ import StaffLibrarySalesView from "../pages/staff/library/SalesView";
 import StaffLibraryReports from "../pages/staff/library/Reports";
 import StaffComplaintsList from "../pages/staff/complaints/ComplaintsList";
 import StaffComplaintsView from "../pages/staff/complaints/ComplaintsView";
+import StaffComplaintsEdit from "../pages/staff/complaints/ComplaintsEdit";
 import StaffComplaintActions from "../pages/staff/complaints/Actions";
 import StaffComplaintActionsCreate from "../pages/staff/complaints/ActionsCreate";
 import StaffComplaintActionsEdit from "../pages/staff/complaints/ActionsEdit";
@@ -127,8 +128,15 @@ import FoodRequest from "../pages/staff/Kitchen/FoodRequest";
 import KitchenReports from "../pages/staff/Kitchen/Reports";
 import StaffLeaveManagement from "../pages/StaffLeaveManagement";
 import StaffDashboard from "../pages/staff/StaffDashboard";
+import StaffSupportTickets from "../pages/staff/support/SupportTickets";
+import StaffSupportTicketCreate from "../pages/staff/support/SupportTicketCreate";
+import StaffSupportTicketEdit from "../pages/staff/support/SupportTicketEdit";
+import StaffSupportTicketView from "../pages/staff/support/SupportTicketView";
 import StaffStudents from "../pages/staff/StaffStudents";
 import StaffInventory from "../pages/staff/StaffInventory";
+import StaffInventoryCreate from "../pages/staff/StaffInventoryCreate";
+import StaffInventoryEdit from "../pages/staff/StaffInventoryEdit";
+import StaffInventoryView from "../pages/staff/StaffInventoryView";
 import StaffProfile from "../pages/staff/StaffProfile";
 import StudentRegistration from "../pages/staff/registrar/StudentRegistration";
 import StudentsList from "../pages/staff/registrar/StudentsList";
@@ -159,8 +167,17 @@ import DocumentsEdit from "../pages/staff/registrar/DocumentsEdit";
 import DocumentsView from "../pages/staff/registrar/DocumentsView";
 import RegistrarReports from "../pages/staff/registrar/RegistrarReports";
 import HostelRooms from "../pages/staff/hostel/HostelRooms";
+import HostelRoomCreate from "../pages/staff/hostel/HostelRoomCreate";
+import HostelRoomEdit from "../pages/staff/hostel/HostelRoomEdit";
+import HostelRoomView from "../pages/staff/hostel/HostelRoomView";
 import HostelAllocations from "../pages/staff/hostel/HostelAllocations";
+import HostelAllocationCreate from "../pages/staff/hostel/HostelAllocationCreate";
+import HostelAllocationEdit from "../pages/staff/hostel/HostelAllocationEdit";
+import HostelAllocationView from "../pages/staff/hostel/HostelAllocationView";
 import HostelMeals from "../pages/staff/hostel/HostelMeals";
+import HostelMealCreate from "../pages/staff/hostel/HostelMealCreate";
+import HostelMealEdit from "../pages/staff/hostel/HostelMealEdit";
+import HostelMealView from "../pages/staff/hostel/HostelMealView";
 
 const ComingSoon = ({ title }) => (
   <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 text-slate-400">
@@ -176,6 +193,9 @@ const staffRoutes = (
     <Route path="dashboard" element={<StaffDashboard />} />
     <Route path="students" element={<StaffStudents />} />
     <Route path="inventory" element={<StaffInventory />} />
+    <Route path="inventory/create" element={<StaffInventoryCreate />} />
+    <Route path="inventory/edit/:id" element={<StaffInventoryEdit />} />
+    <Route path="inventory/view/:id" element={<StaffInventoryView />} />
     <Route path="profile" element={<StaffProfile />} />
 
     <Route path="library/categories" element={<StaffLibraryCategories />} />
@@ -228,6 +248,7 @@ const staffRoutes = (
     <Route path="library/reports" element={<StaffLibraryReports />} />
 
     <Route path="complaints" element={<StaffComplaintsList />} />
+    <Route path="complaints/edit/:id" element={<StaffComplaintsEdit />} />
     <Route path="complaints/view/:id" element={<StaffComplaintsView />} />
     <Route path="complaints/actions" element={<StaffComplaintActions />} />
     <Route
@@ -470,10 +491,46 @@ const staffRoutes = (
     <Route path="registrar/hostel" element={<HostelAllocations />} />
     <Route path="registrar/hostel-rooms" element={<HostelRooms />} />
     <Route
+      path="registrar/hostel-rooms/create"
+      element={<HostelRoomCreate />}
+    />
+    <Route
+      path="registrar/hostel-rooms/edit/:id"
+      element={<HostelRoomEdit />}
+    />
+    <Route
+      path="registrar/hostel-rooms/view/:id"
+      element={<HostelRoomView />}
+    />
+    <Route
       path="registrar/hostel-allocations"
       element={<HostelAllocations />}
     />
+    <Route
+      path="registrar/hostel-allocations/create"
+      element={<HostelAllocationCreate />}
+    />
+    <Route
+      path="registrar/hostel-allocations/edit/:id"
+      element={<HostelAllocationEdit />}
+    />
+    <Route
+      path="registrar/hostel-allocations/view/:id"
+      element={<HostelAllocationView />}
+    />
     <Route path="registrar/hostel-meals" element={<HostelMeals />} />
+    <Route
+      path="registrar/hostel-meals/create"
+      element={<HostelMealCreate />}
+    />
+    <Route
+      path="registrar/hostel-meals/edit/:id"
+      element={<HostelMealEdit />}
+    />
+    <Route
+      path="registrar/hostel-meals/view/:id"
+      element={<HostelMealView />}
+    />
     <Route
       path="registrar/student-registration"
       element={<StudentRegistration />}
@@ -523,6 +580,11 @@ const staffRoutes = (
     <Route path="registrar/documents/edit/:id" element={<DocumentsEdit />} />
     <Route path="registrar/documents/view/:id" element={<DocumentsView />} />
     <Route path="registrar/reports" element={<RegistrarReports />} />
+
+    <Route path="support/tickets" element={<StaffSupportTickets />} />
+    <Route path="support/tickets/create" element={<StaffSupportTicketCreate />} />
+    <Route path="support/tickets/edit/:id" element={<StaffSupportTicketEdit />} />
+    <Route path="support/tickets/view/:id" element={<StaffSupportTicketView />} />
 
     <Route path="leave" element={<StaffLeaveManagement />} />
     <Route path="print/:type/:id?" element={<PrintPage />} />

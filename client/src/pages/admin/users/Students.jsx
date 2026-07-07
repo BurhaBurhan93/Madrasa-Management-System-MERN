@@ -1,29 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 import { useNavigate } from 'react-router-dom';
-import { FiUsers, FiSearch, FiFilter, FiDownload, FiPlus, FiEdit, FiEye, FiTrash2 } from 'react-icons/fi';
+import { FiUsers, FiSearch, FiFilter, FiDownload, FiPlus, FiEdit, FiEye, FiTrash2, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { Table, Button, Card, Input, Select, Badge, Modal, Loading } from '../../../components/UIHelper';
+import api from '../../../lib/api';
 
 const Students = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation('admin');
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
+  const fetchStudents = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/student/all');
+      const data = res.data?.data || [];
+      const mapped = data.map(s => ({
+        id: s._id,
+        _id: s._id,
+        rollNo: s.studentCode || t('common.na'),
+        name: s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim() || t('users.unknown'),
+        firstName: s.firstName || '',
+        lastName: s.lastName || '',
+        class: s.currentClass?.name || t('common.na'),
+        section: 'A',
+        status: s.status || 'inactive',
+        guardian: s.guardianName || t('common.na'),
+        phone: s.phone || s.guardianPhone || t('common.na'),
+        email: s.email || '',
+        fatherName: s.fatherName || '',
+        guardianPhone: s.guardianPhone || '',
+      }));
+      setStudents(mapped);
+    } catch (err) {
+      console.error('Failed to fetch students:', err);
+      setStudents([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchStudents(); }, [fetchStudents]);
+
   useEffect(() => {
-    // Mock data - replace with API call
-    const mockStudents = [
-      { id: 1, name: 'Ahmed Khan', rollNo: '2024001', class: '10th', section: 'A', status: 'Active', guardian: 'Mr. Khan', phone: '0300-1234567' },
-      { id: 2, name: 'Fatima Ali', rollNo: '2024002', class: '9th', section: 'B', status: 'Active', guardian: 'Mr. Ali', phone: '0300-7654321' },
-      { id: 3, name: 'Usman Ahmed', rollNo: '2024003', class: '11th', section: 'A', status: 'Inactive', guardian: 'Mr. Ahmed', phone: '0300-9876543' },
-      { id: 4, name: 'Sara Khan', rollNo: '2024004', class: '10th', section: 'C', status: 'Active', guardian: 'Mrs. Khan', phone: '0300-4567890' },
-      { id: 5, name: 'Bilal Raza', rollNo: '2024005', class: '8th', section: 'A', status: 'Active', guardian: 'Mr. Raza', phone: '0300-2345678' },
-    ];
-    setStudents(mockStudents);
-    setLoading(false);
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+    window.addEventListener('storage', syncLang);
+    return () => window.removeEventListener('storage', syncLang);
   }, []);
 
   const filteredStudents = students.filter(student => {
@@ -34,6 +69,9 @@ const Students = () => {
     const matchesStatus = !selectedStatus || student.status === selectedStatus;
     return matchesSearch && matchesClass && matchesStatus;
   });
+
+  const classOptions = [t('users.class8th'), t('users.class9th'), t('users.class10th'), t('users.class11th'), t('users.class12th')];
+  const uniqueClasses = [...new Set(students.map(s => s.class).filter(Boolean))];
 
   const handleView = (id) => {
     navigate(`/admin/users/students/view/${id}`);
@@ -48,35 +86,55 @@ const Students = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
-    // API call to delete student
-    setStudents(students.filter(s => s.id !== selectedStudent.id));
+  const confirmDelete = async () => {
+    if (!selectedStudent) return;
+    try {
+      await api.delete(`/student/${selectedStudent._id}`);
+      setStudents(students.filter(s => s.id !== selectedStudent.id));
+    } catch (err) {
+      console.error('Failed to delete student:', err);
+    }
     setShowDeleteModal(false);
     setSelectedStudent(null);
   };
 
+  const exportCSV = () => {
+    if (students.length === 0) return;
+    const keys = ['rollNo', 'name', 'class', 'section', 'status', 'guardian', 'phone'];
+    const csvContent = [
+      keys.join(','),
+      ...students.map(row => keys.map(k => JSON.stringify(String(row[k] ?? '')).replace(/^"|"$/g, '')).join(','))
+    ].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'students_export.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
   const columns = [
-    { key: 'rollNo', label: 'Roll No', sortable: true },
-    { key: 'name', label: 'Student Name', sortable: true },
-    { key: 'class', label: 'Class', sortable: true },
-    { key: 'section', label: 'Section' },
-    { 
-      key: 'status', 
-      label: 'Status', 
+    { key: 'rollNo', label: t('users.rollNo'), sortable: true },
+    { key: 'name', label: t('users.studentName'), sortable: true },
+    { key: 'class', label: t('users.class'), sortable: true },
+    { key: 'section', label: t('users.section') },
+    {
+      key: 'status',
+      label: t('users.status'),
       render: (value) => (
-        <Badge 
-          color={value === 'Active' ? 'green' : 'red'}
+        <Badge
+          color={value === 'active' ? 'green' : 'red'}
           variant="subtle"
         >
-          {value}
+          {value === 'active' ? t('users.active') : t('users.inactive')}
         </Badge>
       )
     },
-    { key: 'guardian', label: 'Guardian' },
-    { key: 'phone', label: 'Phone' },
+    { key: 'guardian', label: t('users.guardian') },
+    { key: 'phone', label: t('users.phone') },
     {
       key: 'actions',
-      label: 'Actions',
+      label: t('users.actions'),
       render: (_, row) => (
         <div className="flex gap-2">
           <Button
@@ -85,7 +143,7 @@ const Students = () => {
             onClick={() => handleView(row.id)}
             icon={<FiEye size={14} />}
           >
-            View
+            {t('users.view')}
           </Button>
           <Button
             size="sm"
@@ -93,7 +151,7 @@ const Students = () => {
             onClick={() => handleEdit(row.id)}
             icon={<FiEdit size={14} />}
           >
-            Edit
+            {t('users.edit')}
           </Button>
           <Button
             size="sm"
@@ -102,7 +160,7 @@ const Students = () => {
             onClick={() => handleDelete(row)}
             icon={<FiTrash2 size={14} />}
           >
-            Delete
+            {t('users.delete')}
           </Button>
         </div>
       )
@@ -115,14 +173,14 @@ const Students = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Students Management</h1>
-          <p className="text-slate-600">Manage all student records and information</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('users.studentsManagement')}</h1>
+          <p className="text-slate-600">{t('users.manageStudents')}</p>
         </div>
         <Button
           onClick={() => navigate('/admin/users/register')}
           icon={<FiPlus size={18} />}
         >
-          Add New Student
+          {t('users.addNewStudent')}
         </Button>
       </div>
 
@@ -130,7 +188,7 @@ const Students = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="md:col-span-2">
             <Input
-              placeholder="Search by name, roll no, or guardian..."
+              placeholder={t('users.searchStudent')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               icon={<FiSearch />}
@@ -140,34 +198,34 @@ const Students = () => {
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
             options={[
-              { value: '', label: 'All Classes' },
-              { value: '8th', label: '8th Class' },
-              { value: '9th', label: '9th Class' },
-              { value: '10th', label: '10th Class' },
-              { value: '11th', label: '11th Class' },
+              { value: '', label: t('users.allClasses') },
+              ...(uniqueClasses.length > 0
+                ? uniqueClasses.map(c => ({ value: c, label: c }))
+                : classOptions.map(c => ({ value: c, label: c }))
+              ),
             ]}
           />
           <Select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
             options={[
-              { value: '', label: 'All Status' },
-              { value: 'Active', label: 'Active' },
-              { value: 'Inactive', label: 'Inactive' },
+              { value: '', label: t('users.allStatus') },
+              { value: 'active', label: t('users.active') },
+              { value: 'inactive', label: t('users.inactive') },
             ]}
           />
         </div>
 
         <div className="flex justify-between items-center mb-4">
           <div className="text-sm text-slate-600">
-            Showing {filteredStudents.length} of {students.length} students
+            {t('users.showingStudents', { count: filteredStudents.length, total: students.length })}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" icon={<FiFilter size={16} />}>
-              More Filters
+            <Button variant="outline" onClick={() => setShowFilters(!showFilters)} icon={showFilters ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}>
+              {showFilters ? t('users.hideFilters') : t('users.moreFilters')}
             </Button>
-            <Button variant="outline" icon={<FiDownload size={16} />}>
-              Export
+            <Button variant="outline" onClick={exportCSV} icon={<FiDownload size={16} />}>
+              {t('common.export')}
             </Button>
           </div>
         </div>
@@ -184,20 +242,19 @@ const Students = () => {
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title="Confirm Delete"
+        title={t('users.confirmDelete')}
         size="sm"
       >
         <div className="space-y-4">
           <p className="text-slate-700">
-            Are you sure you want to delete student <strong>{selectedStudent?.name}</strong>?
-            This action cannot be undone.
+            {t('users.deleteStudentConfirm', { name: selectedStudent?.name })}
           </p>
           <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
-              Cancel
+              {t('users.cancel')}
             </Button>
             <Button color="red" onClick={confirmDelete}>
-              Delete Student
+              {t('users.deleteStudent')}
             </Button>
           </div>
         </div>

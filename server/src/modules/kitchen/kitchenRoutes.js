@@ -38,6 +38,7 @@ router.get('/suppliers/:id/history', ctrl.getSupplierHistory);
 
 router.get('/waste', ctrl.getWaste);
 router.post('/waste', ctrl.createWaste);
+router.put('/waste/:id', ctrl.updateWaste);
 router.delete('/waste/:id', ctrl.deleteWaste);
 
 router.get('/reports', ctrl.getReports);

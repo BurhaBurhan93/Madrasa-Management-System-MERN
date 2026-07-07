@@ -1,185 +1,122 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import Card from '../../components/UIHelper/Card';
-import Button from '../../components/UIHelper/Button';
-import Badge from '../../components/UIHelper/Badge';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
+import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
-const TeacherSessions = () => {
-  const { t } = useTranslation();
-
-  /* ================= STATIC SESSIONS ================= */
-  const [sessions] = useState([
-    {
-      id: 1,
-      subject: 'Quran Tafsir',
-      date: '2026-01-12',
-      time: '08:00 - 09:30',
-      room: 'Room A1',
-      students: 35,
-      status: 'upcoming',
-    },
-    {
-      id: 2,
-      subject: 'Hadith Studies',
-      date: '2026-01-13',
-      time: '10:00 - 11:30',
-      room: 'Room B2',
-      students: 28,
-      status: 'completed',
-    },
-    {
-      id: 3,
-      subject: 'Fiqh',
-      date: '2026-01-14',
-      time: '09:00 - 10:00',
-      room: 'Room C1',
-      students: 22,
-      status: 'upcoming',
-    },
-    {
-      id: 4,
-      subject: 'Quran Tafsir',
-      date: '2026-01-14',
-      time: '01:00 - 02:00',
-      room: 'Room A1',
-      students: 35,
-      status: 'cancelled',
-    },
-  ]);
-
-  const weekDays = [
-  { key: '2026-01-12', label: t('teacherSessions.days.mon') },
-  { key: '2026-01-13', label: t('teacherSessions.days.tue') },
-  { key: '2026-01-14', label: t('teacherSessions.days.wed') },
-  { key: '2026-01-15', label: t('teacherSessions.days.thu') },
-  { key: '2026-01-16', label: t('teacherSessions.days.fri') },
-  { key: '2026-01-17', label: t('teacherSessions.days.sat') },
-  { key: '2026-01-18', label: t('teacherSessions.days.sun') },
+const MOCK = [
+  { _id: '1', sessionDate: '2026-06-28T08:00:00Z', class: { name: 'Class 10', section: 'A' }, topic: 'Surah Al-Baqarah verses 1-10' },
+  { _id: '2', sessionDate: '2026-06-27T08:00:00Z', class: { name: 'Class 9', section: 'B' }, topic: 'Hadith on Sincerity' },
+  { _id: '3', sessionDate: '2026-06-26T08:00:00Z', class: { name: 'Class 10', section: 'A' }, topic: 'Fiqh of Salah review' },
+  { _id: '4', sessionDate: '2026-06-25T08:00:00Z', class: { name: 'Class 8', section: 'A' }, topic: 'Arabic Grammar - Nouns' },
+  { _id: '5', sessionDate: '2026-06-24T08:00:00Z', class: { name: 'Class 9', section: 'A' }, topic: 'Tafsir of Surah Al-Ikhlas' },
 ];
 
-  /* ================= STATS ================= */
-  const totalSessions = sessions.length;
-  const upcomingSessions = sessions.filter(s => s.status === 'upcoming').length;
-  const completedSessions = sessions.filter(s => s.status === 'completed').length;
-  const cancelledSessions = sessions.filter(s => s.status === 'cancelled').length;
+const TeacherSessions = () => {
+  const navigate = useNavigate();
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const getStatusVariant = (status) => {
-    switch (status) {
-      case 'upcoming':
-        return 'primary';
-      case 'completed':
-        return 'success';
-      case 'cancelled':
-        return 'danger';
-      default:
-        return 'default';
+  const fieldCls = 'rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200';
+
+  useEffect(() => {
+    fetchSessions();
+  }, []);
+
+  const fetchSessions = async () => {
+    setLoading(true);
+    try {
+      const res = await apiFetch('/teacher/sessions');
+      const data = await parseJsonSafe(res);
+      if (data.success && data.data?.length > 0) setSessions(data.data);
+      else setSessions(MOCK);
+    } catch (e) {
+      console.error(e);
+      setSessions(MOCK);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const formatDate = (d) => {
+    if (!d) return '-';
+    return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  const renderLoading = () => (
+    <div className="flex items-center justify-center py-20">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-500 dark:border-slate-700 dark:border-t-cyan-400" />
+    </div>
+  );
+
+  const renderTable = () => (
+    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
+      <table className="w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 dark:border-slate-700">
+            <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Date</th>
+            <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Class</th>
+            <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Topic</th>
+            <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sessions.map((s) => (
+            <tr key={s._id} className="border-b border-slate-100 transition last:border-0 hover:bg-slate-50 dark:border-slate-700/50 dark:hover:bg-slate-800/30">
+              <td className="px-5 py-4 font-medium text-slate-900 dark:text-slate-100">{formatDate(s.sessionDate)}</td>
+              <td className="px-5 py-4 text-slate-600 dark:text-slate-300">
+                {s.class?.name ? (s.class.section ? `${s.class.name} - ${s.class.section}` : s.class.name) : '-'}
+              </td>
+              <td className="px-5 py-4 text-slate-600 dark:text-slate-300">{s.topic || '-'}</td>
+              <td className="px-5 py-4">
+                <button
+                  onClick={() => navigate('/teacher/attendance')}
+                  className="rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-xs font-medium text-cyan-700 transition hover:bg-cyan-100 dark:border-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400 dark:hover:bg-cyan-900/50"
+                >
+                  Mark Attendance
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
-
-      {/* HEADER */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">{t('teacherSessions.title')}</h1>
-        <p className="text-gray-600">
-          {t('teacherSessions.subtitle')}
-        </p>
-      </div>
-
-      {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-blue-600">
-            {totalSessions}
+    <div className={PANEL_PAGE_BG}>
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Attendance Sessions</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">View all attendance sessions</p>
           </div>
-          <div className="text-sm text-gray-600"> {t('teacherSessions.totalSessions')}</div>
-        </Card>
+          <button
+            onClick={() => navigate('/teacher/attendance/create-session')}
+            className="rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-md"
+          >
+            + New Session
+          </button>
+        </div>
 
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-green-600">
-            {completedSessions}
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Total Sessions: <span className="font-semibold text-slate-700 dark:text-slate-300">{sessions.length}</span>
+          </p>
+        </div>
+
+        {loading ? renderLoading() : sessions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="mb-4 text-5xl">📅</div>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No sessions found</p>
+            <button
+              onClick={() => navigate('/teacher/attendance/create-session')}
+              className="mt-4 rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-cyan-700"
+            >
+              Create First Session
+            </button>
           </div>
-          <div className="text-sm text-gray-600">{t('teacherSessions.completed')}</div>
-        </Card>
-
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-purple-600">
-            {upcomingSessions}
-          </div>
-          <div className="text-sm text-gray-600">{t('teacherSessions.upcoming')}</div>
-        </Card>
-
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-red-600">
-            {cancelledSessions}
-          </div>
-          <div className="text-sm text-gray-600">{t('teacherSessions.cancelled')}</div>
-        </Card>
+        ) : renderTable()}
       </div>
-
-      {/* WEEK NAVIGATION */}
-      <div className="flex justify-between items-center mb-6">
-        <Button variant="outline">← {t('teacherSessions.previousWeek')}</Button>
-        <h2 className="text-lg font-semibold">{t('teacherSessions.weekRange')}</h2>
-        <Button variant="outline">{t('teacherSessions.nextWeek')} →</Button>
-      </div>
-
-      {/* CALENDAR GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-
-        {weekDays.map((day) => {
-          const daySessions = sessions.filter(s => s.date === day.key);
-
-          return (
-            <Card key={day.key} className="min-h-[250px]">
-              <div className="p-3">
-                <h3 className="font-semibold text-sm mb-3 border-b pb-2">
-                  {day.label}
-                </h3>
-
-                {daySessions.length === 0 ? (
-                  <p className="text-xs text-gray-400">No Sessions</p>
-                ) : (
-                  daySessions.map((session) => (
-                    <div
-                      key={session.id}
-                      className="mb-3 p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
-                    >
-                      <div className="text-xs font-semibold">
-                        {session.subject}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        {session.time}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        {session.room}
-                      </div>
-
-                      <div className="mt-2">
-                        <Badge variant={getStatusVariant(session.status)}>
-                          {t(`teacherSessions.status.${session.status}`)}
-                        </Badge>
-                      </div>
-
-                      <div className="mt-2 flex flex-col gap-1">
-                        <Button size="xs" variant="outline">
-                          Take Attendance
-                        </Button>
-                        <Button size="xs" variant="outline">
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </Card>
-          );
-        })}
-
-      </div>
-
     </div>
   );
 };

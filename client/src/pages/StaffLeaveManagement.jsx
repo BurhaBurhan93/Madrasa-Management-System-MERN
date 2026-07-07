@@ -226,7 +226,7 @@ const StaffLeaveManagement = () => {
           title="Leave Management Unavailable"
           message={error}
           onRetry={fetchData}
-          onHome={() => window.location.href = '/staff/dashboard'}
+          onHome={() => navigate('/staff/dashboard')}
           showBackButton={false}
         />
       )}

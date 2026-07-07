@@ -6,6 +6,14 @@ import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+const formatAuditValue = (val) => {
+  if (val === null || val === undefined) return 'N/A';
+  if (typeof val === 'object') {
+    try { return JSON.stringify(val); } catch { return String(val); }
+  }
+  return String(val);
+};
+
 const DataCorrection = () => {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -50,6 +58,8 @@ const DataCorrection = () => {
   const fetchChangeLogs = async (studentId) => {
     try {
       setChangeLogs([]);
+      const response = await axios.get(`${API_BASE}/student/Student/${studentId}/audit-logs`, getConfig());
+      setChangeLogs(response.data?.data || response.data || []);
     } catch (err) {
       console.error('Failed to fetch change logs:', err);
     }
@@ -190,6 +200,9 @@ const DataCorrection = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Father Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -208,7 +221,18 @@ const DataCorrection = () => {
                     {student.fatherName || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {student.currentClass?.className || 'Not Assigned'}
+                    {student.currentClass?.name || student.currentClass?.className || 'Not Assigned'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {student.phone || student.user?.phone || '-'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {student.currentLevel || '-'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${student.status === 'active' ? 'bg-green-100 text-green-800' : student.status === 'inactive' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {student.status || 'N/A'}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <button
@@ -229,11 +253,14 @@ const DataCorrection = () => {
       {selectedStudent && (
         <Card className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">
-              Change History: {selectedStudent.firstName} {selectedStudent.lastName}
-            </h2>
             <button
-              onClick={() => setSelectedStudent(null)}
+              onClick={() => fetchChangeLogs(selectedStudent._id)}
+              className="text-xl font-semibold text-blue-600 hover:text-blue-800 bg-transparent border-none cursor-pointer text-left"
+            >
+              Change History: {selectedStudent.firstName} {selectedStudent.lastName}
+            </button>
+            <button
+              onClick={() => { setSelectedStudent(null); setChangeLogs([]); }}
               className="text-gray-500 hover:text-gray-700"
             >
               ✕ Close
@@ -250,6 +277,7 @@ const DataCorrection = () => {
                 'Grandfather Name': selectedStudent.grandfatherName,
                 'Date of Birth': selectedStudent.dob ? new Date(selectedStudent.dob).toLocaleDateString() : 'N/A',
                 'Blood Type': selectedStudent.bloodType || 'N/A',
+                'Current Class': selectedStudent.currentClass?.name || selectedStudent.currentClass?.className || 'Not Assigned',
                 'Phone': selectedStudent.phone || selectedStudent.user?.phone || 'N/A',
                 'WhatsApp': selectedStudent.whatsapp || 'N/A',
                 'Email': selectedStudent.email || selectedStudent.user?.email || 'N/A',
@@ -289,8 +317,8 @@ const DataCorrection = () => {
                       <p className="text-sm text-gray-600">
                         <span className="font-medium">{log.changedBy?.name || 'Unknown'}</span> changed{' '}
                         <span className="font-medium">{log.field}</span> from{' '}
-                        <span className="text-red-600">{log.oldValue}</span> to{' '}
-                        <span className="text-green-600">{log.newValue}</span>
+                        <span className="text-red-600">{formatAuditValue(log.oldValue)}</span> to{' '}
+                        <span className="text-green-600">{formatAuditValue(log.newValue)}</span>
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
                         Reason: {log.reason} | {new Date(log.changedAt).toLocaleString()}
@@ -306,7 +334,7 @@ const DataCorrection = () => {
 
       {/* Correction Form Modal */}
       {showCorrectionForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-xl font-semibold mb-4">Submit Data Correction</h3>
             
@@ -315,24 +343,18 @@ const DataCorrection = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Field to Correct
                 </label>
-                <input
-                  type="text"
-                  value={correctionData.field.replace(/_/g, ' ')}
-                  disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
-                />
+                <p className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                  {correctionData.field.replace(/_/g, ' ')}
+                </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Current Value
                 </label>
-                <input
-                  type="text"
-                  value={correctionData.oldValue}
-                  disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
-                />
+                <p className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                  {correctionData.oldValue}
+                </p>
               </div>
 
               <div>

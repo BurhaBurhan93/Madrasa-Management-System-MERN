@@ -17,6 +17,7 @@ const AdmissionSchema = new Schema({
   dob: { type: Date },
   bloodType: { type: String, enum: ['A+','A-','B+','B-','AB+','AB-','O+','O-'] },
   image: { type: String },
+  user: { type: Schema.Types.ObjectId, ref: 'User' },
   documents: [{
     fileId: String,
     filename: String,

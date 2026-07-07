@@ -1,11 +1,12 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext.jsx';
 import { localizeAdminText } from '../../lib/adminLocalization';
+import { readStoredLanguage } from '../../lib/languageStorage';
 
 const Card = ({ children, className = '', title, subtitle }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const adminLang = localStorage.getItem('adminLang') || 'en';
+  const adminLang = readStoredLanguage('adminLang', 'en');
 
   const surfaceClasses = isDark
     ? 'border-slate-700 bg-slate-900/60 text-slate-100 shadow-[0_20px_45px_-22px_rgba(0,0,0,0.55)] backdrop-blur-xl'

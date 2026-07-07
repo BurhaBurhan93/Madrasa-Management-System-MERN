@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   FiHome, FiCalendar, FiUsers, FiMapPin, FiPhone, 
   FiDollarSign, FiInfo, FiCheckCircle, FiClock,
@@ -40,6 +41,7 @@ const parseJsonSafe = async (res) => {
 
 const StudentHostel = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['student', 'common']);
   const [hostelData, setHostelData] = useState(null);
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -158,20 +160,20 @@ const StudentHostel = () => {
       {isApplyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-8">
-            <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
-              <FiHome className="text-cyan-600" /> Apply for Hostel
+              <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
+              <FiHome className="text-cyan-600" /> {t('applyForHostel', 'Apply for Hostel')}
             </h2>
 
             {applyStatus.success && (
               <div className="mb-6 p-4 bg-emerald-50 text-emerald-800 rounded-2xl border border-emerald-200">
-                <p className="font-bold">Application Submitted Successfully!</p>
-                <p className="text-sm mt-1">The Registrar will review your application soon.</p>
+                <p className="font-bold">{t('applicationSubmittedSuccessfully', 'Application Submitted Successfully!')}</p>
+                <p className="text-sm mt-1">{t('applicationReviewSoon', 'The Registrar will review your application soon.')}</p>
               </div>
             )}
 
             {existingApplication && (
               <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-2xl border border-blue-200">
-                <p className="font-bold">You already have a pending application!</p>
+                <p className="font-bold">{t('existingHostelApplication', 'You already have a pending application!')}</p>
               </div>
             )}
 
@@ -230,14 +232,14 @@ const StudentHostel = () => {
                   }}
                   className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50"
                 >
-                  Cancel
+                  {t('cancel', { ns: 'common' })}
                 </button>
                 <button
                   type="submit"
                   disabled={applyStatus.loading}
                   className="flex-1 py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 disabled:opacity-50"
                 >
-                  {applyStatus.loading ? 'Submitting...' : 'Submit Application'}
+                  {applyStatus.loading ? t('submitting', 'Submitting...') : t('submitApplication', 'Submit Application')}
                 </button>
               </div>
             </form>
@@ -249,7 +251,7 @@ const StudentHostel = () => {
       <Modal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
-        title="Report Maintenance Issue"
+        title={t('reportMaintenanceIssue', 'Report Maintenance Issue')}
       >
         <form onSubmit={handleReportSubmit} className="space-y-6">
           <div className="space-y-4">
@@ -293,20 +295,20 @@ const StudentHostel = () => {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button 
+              <Button 
               type="button" 
               variant="outline" 
               className="flex-1 rounded-2xl py-4 font-black"
               onClick={() => setIsReportModalOpen(false)}
             >
-              Cancel
+              {t('cancel', { ns: 'common' })}
             </Button>
             <Button 
               type="submit" 
               variant="primary" 
               className="flex-1 rounded-2xl py-4 font-black bg-cyan-600 hover:bg-cyan-700 shadow-lg shadow-cyan-100"
             >
-              Submit Request
+              {t('submitRequest', 'Submit Request')}
             </Button>
           </div>
         </form>
@@ -324,9 +326,9 @@ const StudentHostel = () => {
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100">
               <FiHome className="w-12 h-12 text-slate-300" />
             </div>
-            <h2 className="text-3xl font-black text-slate-900 mb-4">No Active Hostel Residency</h2>
+            <h2 className="text-3xl font-black text-slate-900 mb-4">{t('noActiveHostelResidency', 'No Active Hostel Residency')}</h2>
             <p className="text-slate-500 mb-8 max-w-md mx-auto text-lg leading-relaxed">
-              Our records indicate that you are currently not registered as a resident in any of our hostel facilities.
+              {t('noHostelResidencyDescription', 'Our records indicate that you are currently not registered as a resident in any of our hostel facilities.')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
@@ -334,19 +336,19 @@ const StudentHostel = () => {
                 className="px-8 py-3 rounded-2xl font-bold"
                 onClick={() => setIsApplyModalOpen(true)}
               >
-                Apply for Hostel
+                {t('applyForHostel', 'Apply for Hostel')}
               </Button>
               <Button 
                 variant="outline" 
                 className="px-8 py-3 rounded-2xl font-bold"
-                onClick={() => navigate('/student/complaints')}
+                onClick={() => navigate('/student/communications')}
               >
-                Contact Student Affairs
+                {t('contactStudentAffairs', 'Contact Student Affairs')}
               </Button>
             </div>
             <div className="mt-12 flex items-center justify-center gap-2 text-slate-400">
               <FiInfo className="w-5 h-5" />
-              <span className="text-sm font-medium">Need help? Visit the Hostel Warden office in Building A</span>
+              <span className="text-sm font-medium">{t('hostelHelpHint', 'Need help? Visit the Hostel Warden office in Building A')}</span>
             </div>
           </Card>
         </div>
@@ -355,9 +357,9 @@ const StudentHostel = () => {
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Accommodation</p>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight">Hostel Management</h1>
-              <p className="text-slate-500 mt-1 font-medium italic">Welcome home, {hostelData?.student?.firstName || 'Student'}</p>
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('hostel', { ns: 'student' })}</p>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('hostelManagement', 'Hostel Management')}</h1>
+              <p className="text-slate-500 mt-1 font-medium italic">{t('welcomeHome', 'Welcome home,')} {hostelData?.student?.firstName || 'Student'}</p>
             </div>
             <div className="flex gap-3">
               <Button 
@@ -365,10 +367,14 @@ const StudentHostel = () => {
                 className="rounded-2xl border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-2"
                 onClick={() => setIsReportModalOpen(true)}
               >
-                <FiTool className="w-4 h-4" /> Report Issue
+                <FiTool className="w-4 h-4" /> {t('reportIssue', 'Report Issue')}
               </Button>
-              <Button variant="primary" className="rounded-2xl bg-cyan-600 hover:bg-cyan-700 shadow-lg shadow-cyan-200/50 flex items-center gap-2">
-                <FiFileText className="w-4 h-4" /> Hostel Pass
+              <Button
+                variant="primary"
+                className="rounded-2xl bg-cyan-600 hover:bg-cyan-700 shadow-lg shadow-cyan-200/50 flex items-center gap-2"
+                onClick={() => window.print()}
+              >
+                <FiFileText className="w-4 h-4" /> {t('hostelPass', 'Hostel Pass')}
               </Button>
             </div>
           </div>
@@ -380,7 +386,7 @@ const StudentHostel = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <Badge className="bg-white/20 text-white border-none backdrop-blur-md mb-4 px-4 py-1.5 font-black uppercase tracking-widest text-[10px]">
-                      Current Allocation
+                      {t('currentAllocation', 'Current Allocation')}
                     </Badge>
                     <h2 className="text-5xl font-black tracking-tight mb-2">Room {room?.roomNumber || 'N/A'}</h2>
                     <p className="text-cyan-50 font-medium text-lg flex items-center gap-2">
@@ -394,15 +400,15 @@ const StudentHostel = () => {
                 
                 <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-8">
                   <div>
-                    <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">Bed Number</p>
+                  <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">{t('bedNumber', 'Bed Number')}</p>
                     <p className="text-2xl font-black">{allocation?.bedNumber || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">Room Type</p>
+                    <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">{t('roomType', 'Room Type')}</p>
                     <p className="text-2xl font-black capitalize">{room?.roomType || 'Standard'}</p>
                   </div>
                   <div className="hidden md:block">
-                    <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">Check-in</p>
+                    <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">{t('checkIn', 'Check-in')}</p>
                     <p className="text-2xl font-black">{allocation?.checkInDate ? new Date(allocation.checkInDate).toLocaleDateString() : '-'}</p>
                   </div>
                 </div>
@@ -416,23 +422,27 @@ const StudentHostel = () => {
             <Card className="rounded-[32px] p-8 border-none bg-white shadow-xl shadow-slate-200/50 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-black text-slate-900">Payment Status</h3>
+                  <h3 className="text-xl font-black text-slate-900">{t('paymentStatus', 'Payment Status')}</h3>
                   <Badge variant="success" className="px-3 py-1 font-bold">Paid</Badge>
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">Monthly Rent</span>
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">{t('monthlyRent', 'Monthly Rent')}</span>
                     <span className="text-xl font-black text-slate-900">${allocation?.monthlyRent || '0'}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">Security Deposit</span>
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">{t('securityDeposit', 'Security Deposit')}</span>
                     <span className="text-xl font-black text-slate-900">${allocation?.securityDeposit || '0'}</span>
                   </div>
                 </div>
               </div>
               <div className="mt-8 pt-6 border-t border-slate-100">
-                <Button variant="outline" className="w-full py-4 rounded-2xl font-black flex items-center justify-center gap-2 group">
-                  View Receipt <FiChevronRight className="group-hover:translate-x-1 transition-transform" />
+                <Button
+                  variant="outline"
+                  className="w-full py-4 rounded-2xl font-black flex items-center justify-center gap-2 group"
+                  onClick={() => navigate('/student/transactions')}
+                >
+                  {t('view', { ns: 'common' })} <FiChevronRight className="group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
             </Card>
@@ -513,7 +523,13 @@ const StudentHostel = () => {
                           <div>
                             <h4 className="text-rose-900 font-black">Missing Information</h4>
                             <p className="text-rose-600 text-sm font-medium mt-1">Please provide an emergency contact for your safety.</p>
-                            <Button variant="danger" className="mt-4 px-6 py-2 rounded-xl text-xs font-black">Update Now</Button>
+                            <Button
+                              variant="danger"
+                              className="mt-4 px-6 py-2 rounded-xl text-xs font-black"
+                              onClick={() => setIsReportModalOpen(true)}
+                            >
+                              Update Now
+                            </Button>
                           </div>
                         </div>
                       </div>

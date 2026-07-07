@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { 
   FiPlus, 
@@ -28,6 +29,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentLeave = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['student', 'common']);
   const [loading, setLoading] = useState(false);
   const [leaveHistory, setLeaveHistory] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,7 +88,7 @@ const StudentLeave = () => {
       });
     } catch (err) {
       console.error('Error fetching leave data:', err);
-      setError('Failed to fetch leave records. Please try again.');
+      setError(t('failedToFetchLeaveRecords', 'Failed to fetch leave records. Please try again.'));
       setLeaveHistory([]); // Set empty array on error
     } finally {
       setLoading(false);
@@ -109,10 +111,10 @@ const StudentLeave = () => {
       await fetchLeaveData();
       setIsModalOpen(false);
       setFormData({ leaveType: '', startDate: '', endDate: '', reason: '' });
-      alert('Leave request submitted successfully!');
+      alert(t('leaveRequestSubmitted', 'Leave request submitted successfully!'));
     } catch (err) {
       console.error('Error creating leave:', err);
-      alert('Error submitting leave request: ' + (err.response?.data?.message || err.message));
+      alert(`${t('errorSubmittingLeave', 'Error submitting leave request')}: ${err.response?.data?.message || err.message}`);
     } finally {
       setLoading(false);
     }
@@ -120,9 +122,9 @@ const StudentLeave = () => {
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'approved': return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">Approved</Badge>;
-      case 'pending': return <Badge variant="warning" className="font-black uppercase tracking-widest text-[10px]">Pending</Badge>;
-      case 'rejected': return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">Rejected</Badge>;
+      case 'approved': return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('approved', { ns: 'common' })}</Badge>;
+      case 'pending': return <Badge variant="warning" className="font-black uppercase tracking-widest text-[10px]">{t('pending', { ns: 'common' })}</Badge>;
+      case 'rejected': return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">{t('rejected', { ns: 'common' })}</Badge>;
       default: return <Badge className="font-black uppercase tracking-widest text-[10px]">{status}</Badge>;
     }
   };
@@ -141,26 +143,26 @@ const StudentLeave = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Attendance</p>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Leave Management</h1>
-          <p className="text-slate-500 mt-1 font-medium italic">Apply for absence and track your request status</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('attendance', { ns: 'student' })}</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('leave', { ns: 'student' })}</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">{t('leaveSubtitle', 'Apply for absence and track your request status')}</p>
         </div>
         <Button 
           variant="primary" 
           className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2"
           onClick={() => setIsModalOpen(true)}
         >
-          <FiPlus /> New Leave Request
+          <FiPlus /> {t('newLeaveRequest', 'New Leave Request')}
         </Button>
       </div>
 
       {/* Stats Summary Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Total Requests', value: stats.totalRequests, icon: <FiFileText />, color: 'blue' },
-          { label: 'Approved', value: stats.approved, icon: <FiCheckCircle />, color: 'emerald' },
-          { label: 'Pending', value: stats.pending, icon: <FiClock />, color: 'amber' },
-          { label: 'Total Days', value: stats.totalDays, icon: <FiCalendar />, color: 'cyan' }
+          { label: t('totalRequests', 'Total Requests'), value: stats.totalRequests, icon: <FiFileText />, color: 'blue' },
+          { label: t('approved', { ns: 'common' }), value: stats.approved, icon: <FiCheckCircle />, color: 'emerald' },
+          { label: t('pending', { ns: 'common' }), value: stats.pending, icon: <FiClock />, color: 'amber' },
+          { label: t('totalDays', 'Total Days'), value: stats.totalDays, icon: <FiCalendar />, color: 'cyan' }
         ].map((stat, i) => (
           <div key={i} className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
             <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
@@ -175,7 +177,7 @@ const StudentLeave = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Leave History List */}
         <div className="lg:col-span-2">
-          <Card title="Request History" className="rounded-[32px] p-8">
+          <Card title={t('requestHistory', 'Request History')} className="rounded-[32px] p-8">
             <div className="space-y-4">
               {leaveHistory.length > 0 ? (
                 leaveHistory.map((leave, i) => (
@@ -203,7 +205,7 @@ const StudentLeave = () => {
                     <div className="flex items-center justify-between md:flex-col md:items-end gap-2">
                       {getStatusBadge(leave.approvalStatus)}
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Submitted {formatDate(leave.createdAt || leave.startDate)}
+                        {t('submitted', { ns: 'common' })} {formatDate(leave.createdAt || leave.startDate)}
                       </p>
                     </div>
                   </div>
@@ -211,7 +213,7 @@ const StudentLeave = () => {
               ) : (
                 <div className="text-center py-20">
                   <FiFileText className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No leave requests found</p>
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('noLeaveRequestsFound', 'No leave requests found')}</p>
                 </div>
               )}
             </div>
@@ -220,7 +222,7 @@ const StudentLeave = () => {
 
         {/* Sidebar Info */}
         <div className="space-y-8">
-          <Card title="Leave Policy" className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20">
+          <Card title={t('leavePolicy', 'Leave Policy')} className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20">
             <div className="space-y-4">
               {[
                 { icon: <FiInfo />, text: 'Submit requests at least 48 hours in advance.' },
@@ -238,10 +240,14 @@ const StudentLeave = () => {
 
           <div className="p-8 bg-gradient-to-br from-cyan-600 to-blue-700 rounded-[32px] text-white shadow-xl shadow-cyan-200/50 relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="text-xl font-black mb-2">Need Help?</h4>
-              <p className="text-cyan-100 text-sm font-medium mb-6">Contact the Student Affairs office for urgent leave requests.</p>
-              <Button variant="outline" className="w-full rounded-2xl py-4 border-white/20 bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-widest transition-all">
-                Contact Office
+              <h4 className="text-xl font-black mb-2">{t('needHelp', 'Need Help?')}</h4>
+              <p className="text-cyan-100 text-sm font-medium mb-6">{t('contactStudentAffairs', 'Contact the Student Affairs office for urgent leave requests.')}</p>
+              <Button
+                variant="outline"
+                className="w-full rounded-2xl py-4 border-white/20 bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-widest transition-all"
+                onClick={() => navigate('/student/communications')}
+              >
+                {t('contactOffice', 'Contact Office')}
               </Button>
             </div>
             <FiClock className="absolute -right-6 -bottom-6 w-32 h-32 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />
@@ -253,16 +259,16 @@ const StudentLeave = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Apply for Leave"
+        title={t('applyForLeave', 'Apply for Leave')}
       >
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <Select
-              label="Leave Type"
+              label={t('leaveType', 'Leave Type')}
               name="leaveType"
               value={formData.leaveType}
               onChange={handleInputChange}
-              options={[{ value: '', label: 'Select leave type' }, ...leaveTypes]}
+              options={[{ value: '', label: t('selectLeaveType', 'Select leave type') }, ...leaveTypes]}
               required
             />
             
@@ -272,7 +278,7 @@ const StudentLeave = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 ml-1">Reason for Leave</label>
+              <label className="text-sm font-bold text-slate-700 ml-1">{t('reasonForLeave', 'Reason for Leave')}</label>
               <textarea
                 name="reason"
                 required
@@ -292,7 +298,7 @@ const StudentLeave = () => {
               className="flex-1 rounded-2xl py-4 font-black"
               onClick={() => setIsModalOpen(false)}
             >
-              Cancel
+              {t('cancel', { ns: 'common' })}
             </Button>
             <Button 
               type="submit" 
@@ -300,7 +306,7 @@ const StudentLeave = () => {
               className="flex-1 rounded-2xl py-4 font-black bg-slate-900 hover:bg-slate-800 shadow-lg shadow-slate-200"
               disabled={loading}
             >
-              {loading ? 'Submitting...' : 'Submit Request'}
+              {loading ? t('submitting', 'Submitting...') : t('submitRequest', 'Submit Request')}
             </Button>
           </div>
         </form>

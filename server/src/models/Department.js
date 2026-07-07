@@ -6,6 +6,7 @@ const DepartmentSchema = new Schema({
   departmentCode: { type: String, required: true, unique: true, trim: true },
   image: { type: String },
   departmentHead: { type: Schema.Types.ObjectId, ref: 'Employee' },
+  headOfDepartment: { type: String, trim: true },
   description: { type: String, trim: true },
   location: { type: String, trim: true },
   contactExtension: { type: String, trim: true },

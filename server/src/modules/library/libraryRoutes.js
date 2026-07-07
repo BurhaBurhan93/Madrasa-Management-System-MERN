@@ -90,7 +90,7 @@ router.delete('/books/:id', async (req, res) => {
 router.get('/borrowed', async (req, res) => {
   try {
     const records = await BorrowedBook.find()
-      .populate({ path: 'borrower', populate: { path: 'userId', select: 'name email' } })
+      .populate({ path: 'borrower', select: 'firstName lastName' })
       .populate('book', 'title')
       .sort({ borrowedAt: -1 });
     res.json({ success: true, data: records });
@@ -100,7 +100,7 @@ router.get('/borrowed', async (req, res) => {
 router.get('/borrowed/:id', async (req, res) => {
   try {
     const record = await BorrowedBook.findById(req.params.id)
-      .populate({ path: 'borrower', populate: { path: 'userId', select: 'name email' } })
+      .populate({ path: 'borrower', select: 'firstName lastName' })
       .populate('book', 'title');
     if (!record) return res.status(404).json({ success: false, message: 'Record not found' });
     res.json({ success: true, data: record });

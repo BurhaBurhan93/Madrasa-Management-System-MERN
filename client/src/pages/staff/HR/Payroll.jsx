@@ -1,162 +1,161 @@
-import { useState, useEffect } from 'react';
-import api from '../../../lib/api';
-
-const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+import { useEffect, useMemo, useState } from 'react';
+import ListPage from '../shared/ListPage';
+import Card from '../../../components/UIHelper/Card';
+import StaffPageLayout from '../shared/StaffPageLayout';
+import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
+import { BarChartComponent, PieChartComponent } from '../../../components/UIHelper/ECharts';
+import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
+import { formatCurrency, getLastMonths, groupCountBy } from '../shared/staffInsights';
+import { staffApi } from '../../../api/staffApi';
+import { FiAlertTriangle, FiCalendar, FiCheckCircle, FiCreditCard, FiDollarSign } from 'react-icons/fi';
 
 const HRPayroll = () => {
   const [payments, setPayments] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [filters, setFilters] = useState({ employee: '', month: '', year: '' });
-  const [loading, setLoading] = useState(false);
-
-  const token = () => localStorage.getItem('token');
-  const headers = () => ({ Authorization: `Bearer ${token()}` });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchEmployees();
-    fetchPayments();
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [payRes, empRes] = await Promise.all([
+          apiFetch(`${staffApi.payroll.salaryPayments}?limit=200`),
+          apiFetch(staffApi.hr.employees)
+        ]);
+        const payData = await parseJsonSafe(payRes);
+        const empData = await parseJsonSafe(empRes);
+        if (payRes.ok && payData.success) setPayments(Array.isArray(payData.data) ? payData.data : []);
+        if (empRes.ok && empData.success) setEmployees(Array.isArray(empData.data) ? empData.data : []);
+      } catch (error) {
+        console.error('Failed to load HR payroll data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
-  const fetchEmployees = async () => {
-    try {
-      const res = await api.get('/hr/employees');
-      if (res.data.success) setEmployees(res.data.data);
-    } catch (error) {
-      console.error('Error fetching employees:', error);
+  const insights = useMemo(() => {
+    const paidThisMonth = payments.filter((payment) => {
+      const paymentDate = new Date(payment.paymentDate || payment.createdAt);
+      const now = new Date();
+      return paymentDate.getMonth() === now.getMonth() && paymentDate.getFullYear() === now.getFullYear();
+    });
+    const totalAmountDisbursed = payments.reduce((sum, payment) => sum + Number(payment.netSalary || 0), 0);
+    const pendingPayments = payments.filter((payment) => payment.paymentStatus === 'pending').length;
+    const failedPayments = payments.filter((payment) => payment.paymentStatus === 'failed').length;
+    const nextPending = payments
+      .filter((payment) => payment.paymentStatus === 'pending')
+      .sort((a, b) => new Date(a.paymentDate || a.createdAt) - new Date(b.paymentDate || b.createdAt))[0];
+
+    return {
+      paidThisMonth: paidThisMonth.length,
+      totalAmountDisbursed,
+      pendingPayments,
+      failedPayments,
+      nextPayrollDate: nextPending?.paymentDate ? new Date(nextPending.paymentDate).toLocaleDateString('en-US') : 'No pending payroll',
+      byMethod: groupCountBy(payments, (payment) => payment.paymentMethod || 'unknown'),
+      byStatus: groupCountBy(payments, (payment) => payment.paymentStatus || 'unknown'),
+      monthlyPayroll: getLastMonths(payments, (payment) => payment.paymentDate || payment.createdAt, (payment) => payment.netSalary)
+    };
+  }, [payments]);
+
+  const getEmployeeName = (empId) => {
+    if (!empId) return '-';
+    const id = empId._id || empId;
+    const emp = employees.find(e => e._id?.toString() === id.toString());
+    return emp ? `${emp.fullName} (${emp.employeeCode || ''})` : '-';
+  };
+
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  const columns = [
+    {
+      key: 'employee',
+      header: 'Employee',
+      render: (value, row) => {
+        const empId = value?._id || value;
+        const emp = employees.find(e => e._id?.toString() === empId?.toString());
+        return emp?.fullName || '-';
+      }
+    },
+    {
+      key: 'salaryMonth',
+      header: 'Month',
+      render: (value, row) => `${months[value - 1] || ''} ${row.salaryYear || ''}`
+    },
+    { key: 'grossSalary', header: 'Gross Salary', render: (value) => `${(value || 0).toLocaleString()} AFN` },
+    { key: 'totalDeduction', header: 'Deductions', render: (value) => `${(value || 0).toLocaleString()} AFN` },
+    { key: 'netSalary', header: 'Net Salary', render: (value) => `${(value || 0).toLocaleString()} AFN` },
+    { key: 'paymentMethod', header: 'Method' },
+    {
+      key: 'paymentStatus',
+      header: 'Status',
+      render: (value) => (
+        <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+          value === 'paid' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+          value === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
+          'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+        }`}>
+          {value}
+        </span>
+      )
     }
-  };
+  ];
 
-  const fetchPayments = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get('/payroll/salary-payments?limit=100');
-      if (res.data.success) setPayments(res.data.data);
-    } catch (error) {
-      console.error('Error fetching payments:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (loading) {
+    return (
+      <StaffPageLayout eyebrow="HR" title="Payroll" subtitle="Employee salary payment records, disbursement totals, and payment status monitoring.">
+        <PageSkeleton type="dashboard" />
+      </StaffPageLayout>
+    );
+  }
 
-  const filtered = payments.filter(p => {
-    if (filters.employee && p.employee?.toString() !== filters.employee) return false;
-    if (filters.month && p.salaryMonth !== parseInt(filters.month)) return false;
-    if (filters.year && p.salaryYear !== parseInt(filters.year)) return false;
-    return true;
-  });
-
-  const totalNet = filtered.reduce((sum, p) => sum + (p.netSalary || 0), 0);
-  const totalGross = filtered.reduce((sum, p) => sum + (p.grossSalary || 0), 0);
-  const totalDeductions = filtered.reduce((sum, p) => sum + (p.totalDeduction || 0), 0);
-
-  const statusColors = {
-    paid: 'bg-green-100 text-green-700',
-    pending: 'bg-yellow-100 text-yellow-700',
-    failed: 'bg-red-100 text-red-700',
-  };
-
-  return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">HR Payroll</h1>
-        <p className="text-sm text-gray-500 mt-1">View employee salary payment history</p>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4">
+  const headerContent = (
+    <>
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[
-          { label: 'Total Gross', value: totalGross, color: 'text-blue-600' },
-          { label: 'Total Deductions', value: totalDeductions, color: 'text-red-600' },
-          { label: 'Total Net Paid', value: totalNet, color: 'text-green-600' },
-        ].map(card => (
-          <div key={card.label} className="bg-white rounded-xl shadow p-4">
-            <p className="text-sm text-gray-500">{card.label}</p>
-            <p className={`text-2xl font-bold mt-1 ${card.color}`}>
-              {card.value.toLocaleString()} AFN
-            </p>
-          </div>
+          { label: 'Paid This Month', value: insights.paidThisMonth, icon: FiCheckCircle, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700' },
+          { label: 'Amount Disbursed', value: formatCurrency(insights.totalAmountDisbursed), icon: FiDollarSign, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700' },
+          { label: 'Pending Payments', value: insights.pendingPayments, icon: FiCreditCard, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700' },
+          { label: 'Failed Payments', value: insights.failedPayments, icon: FiAlertTriangle, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700' },
+          { label: 'Next Payroll Date', value: insights.nextPayrollDate, icon: FiCalendar, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700' }
+        ].map((item) => (
+          <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none`}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{item.label}</p>
+                <p className="mt-3 text-2xl font-bold text-slate-900">{item.value}</p>
+              </div>
+              <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.chip}`}>
+                <item.icon size={22} />
+              </span>
+            </div>
+          </Card>
         ))}
       </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-xl shadow p-4 flex gap-4 flex-wrap">
-        <select
-          value={filters.employee}
-          onChange={e => setFilters({ ...filters, employee: e.target.value })}
-          className="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500"
-        >
-          <option value="">All Employees</option>
-          {employees.map(e => <option key={e._id} value={e._id}>{e.fullName} ({e.employeeCode})</option>)}
-        </select>
-        <select
-          value={filters.month}
-          onChange={e => setFilters({ ...filters, month: e.target.value })}
-          className="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500"
-        >
-          <option value="">All Months</option>
-          {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
-        </select>
-        <input
-          type="number"
-          value={filters.year}
-          onChange={e => setFilters({ ...filters, year: e.target.value })}
-          placeholder="Year"
-          className="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500 w-24"
-        />
-        <button
-          onClick={() => setFilters({ employee: '', month: '', year: '' })}
-          className="text-sm text-gray-500 hover:text-gray-700 underline"
-        >
-          Clear
-        </button>
+      <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <BarChartComponent title="Monthly Payroll" data={insights.monthlyPayroll} dataKey="value" nameKey="name" height={320} />
+        <PieChartComponent title="Payment Method Distribution" data={insights.byMethod} height={320} donut />
+        <PieChartComponent title="Payment Status Breakdown" data={insights.byStatus} height={320} />
       </div>
+    </>
+  );
 
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading...</div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50 text-gray-600 text-sm">
-              <tr>
-                <th className="p-3 text-left">Employee</th>
-                <th className="p-3 text-left">Month/Year</th>
-                <th className="p-3 text-left">Gross</th>
-                <th className="p-3 text-left">Deductions</th>
-                <th className="p-3 text-left">Net Salary</th>
-                <th className="p-3 text-left">Method</th>
-                <th className="p-3 text-left">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr><td colSpan="7" className="p-8 text-center text-gray-500">No salary payments found</td></tr>
-              ) : (
-                filtered.map(p => {
-                  const empId = p.employee?._id || p.employee;
-                  const emp = employees.find(e => e._id?.toString() === empId?.toString());
-                  return (
-                    <tr key={p._id} className="border-t hover:bg-gray-50">
-                      <td className="p-3 font-medium">{emp?.fullName || '-'}</td>
-                      <td className="p-3">{months[p.salaryMonth - 1]} {p.salaryYear}</td>
-                      <td className="p-3">{p.grossSalary?.toLocaleString()} AFN</td>
-                      <td className="p-3 text-red-600">-{p.totalDeduction?.toLocaleString()} AFN</td>
-                      <td className="p-3 font-semibold text-green-700">{p.netSalary?.toLocaleString()} AFN</td>
-                      <td className="p-3 capitalize">{p.paymentMethod}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-1 text-xs rounded-full font-medium ${statusColors[p.paymentStatus]}`}>
-                          {p.paymentStatus}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
+  return (
+    <ListPage
+      title="HR Payroll"
+      subtitle="Employee salary payment records, disbursement totals, and payment status monitoring."
+      endpoint={staffApi.payroll.salaryPayments}
+      columns={columns}
+      createPath="/staff/payroll/salary-payments/create"
+      editPathForRow={(row) => `/staff/payroll/salary-payments/edit/${row._id}`}
+      viewPathForRow={(row) => `/staff/payroll/salary-payments/view/${row._id}`}
+      searchPlaceholder="Search salary payments..."
+      eyebrow="HR"
+      headerContent={headerContent}
+      enableExport={true}
+    />
   );
 };
 

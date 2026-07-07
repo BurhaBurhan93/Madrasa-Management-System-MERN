@@ -1,41 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import { FiSearch, FiFilter, FiDownload, FiUser, FiDatabase, FiCalendar, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
-import { Table, Button, Card, Input, Select, Badge, Loading } from '../../../components/UIHelper';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
+import { FiSearch, FiFilter, FiDownload, FiUser, FiDatabase, FiCalendar, FiAlertCircle, FiCheckCircle, FiFileText, FiTrash2 } from 'react-icons/fi';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { Table, Button, Card, Input, Select, Badge, Loading, Modal } from '../../../components/UIHelper';
+import api from '../../../lib/api';
 
 const AuditLogs = () => {
+  const { t } = useTranslation('admin');
   const [logs, setLogs] = useState([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
   const [dateRange, setDateRange] = useState('');
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const exportRef = useRef(null);
 
   useEffect(() => {
-    const mockLogs = [
-      { id: 1, timestamp: '2024-01-15 10:30:25', user: 'admin@madrasa.edu', action: 'CREATE', module: 'Users', details: 'Created new student: Ahmed Khan', ip: '192.168.1.100', status: 'SUCCESS' },
-      { id: 2, timestamp: '2024-01-15 11:15:42', user: 'registrar@madrasa.edu', action: 'UPDATE', module: 'Students', details: 'Updated student profile: Roll No 2024001', ip: '192.168.1.101', status: 'SUCCESS' },
-      { id: 3, timestamp: '2024-01-15 14:20:18', user: 'teacher@madrasa.edu', action: 'READ', module: 'Attendance', details: 'Viewed attendance report for Class 10A', ip: '192.168.1.102', status: 'SUCCESS' },
-      { id: 4, timestamp: '2024-01-15 16:45:33', user: 'admin@madrasa.edu', action: 'DELETE', module: 'Users', details: 'Deleted user: test@example.com', ip: '192.168.1.100', status: 'SUCCESS' },
-      { id: 5, timestamp: '2024-01-16 09:10:55', user: 'accountant@madrasa.edu', action: 'CREATE', module: 'Finance', details: 'Created fee payment record', ip: '192.168.1.103', status: 'SUCCESS' },
-      { id: 6, timestamp: '2024-01-16 11:30:12', user: 'librarian@madrasa.edu', action: 'UPDATE', module: 'Library', details: 'Updated book inventory', ip: '192.168.1.104', status: 'SUCCESS' },
-      { id: 7, timestamp: '2024-01-16 13:45:29', user: 'unknown@madrasa.edu', action: 'LOGIN', module: 'Auth', details: 'Failed login attempt', ip: '203.0.113.25', status: 'FAILED' },
-      { id: 8, timestamp: '2024-01-16 15:20:47', user: 'admin@madrasa.edu', action: 'EXPORT', module: 'Reports', details: 'Exported financial report', ip: '192.168.1.100', status: 'SUCCESS' },
-      { id: 9, timestamp: '2024-01-17 08:55:10', user: 'registrar@madrasa.edu', action: 'CREATE', module: 'Admissions', details: 'Processed new admission application', ip: '192.168.1.101', status: 'SUCCESS' },
-      { id: 10, timestamp: '2024-01-17 12:15:38', user: 'teacher@madrasa.edu', action: 'UPDATE', module: 'Exams', details: 'Updated exam marks for Class 9B', ip: '192.168.1.102', status: 'SUCCESS' },
-    ];
-    setLogs(mockLogs);
-    setLoading(false);
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+    window.addEventListener('storage', syncLang);
+    return () => window.removeEventListener('storage', syncLang);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (exportRef.current && !exportRef.current.contains(e.target)) setShowExportMenu(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const exportPDF = () => {
+    setShowExportMenu(false);
+    const doc = new jsPDF({ orientation: 'landscape' });
+    doc.setFontSize(18);
+    doc.text(t('users.auditLogs'), 14, 20);
+    doc.setFontSize(10);
+    doc.text(t('users.generated', { date: new Date().toLocaleDateString() }), 14, 28);
+    const cols = columns.filter(c => c.key);
+    const head = cols.map(c => c.label);
+    const body = filteredLogs.map(row => cols.map(c => row[c.key]));
+    autoTable(doc, { startY: 34, head: [head], body, styles: { fontSize: 8 }, headStyles: { fillColor: [79, 70, 229] } });
+    doc.save(`audit-logs-${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
+  const exportCSV = () => {
+    setShowExportMenu(false);
+    const cols = columns.filter(c => c.key);
+    const head = cols.map(c => `"${c.label}"`).join(',');
+    const body = filteredLogs.map(row => cols.map(c => `"${(row[c.key] || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+    const csv = `${head}\n${body}`;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `audit-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleClearOldLogs = async () => {
+    setClearing(true);
+    try {
+      await api.delete('/admin/audit-logs/clear', { params: { days: 30 } });
+      setShowClearModal(false);
+      fetchLogs();
+    } catch (err) {
+      alert(err.response?.data?.message || t('users.failedToClear'));
+    } finally {
+      setClearing(false);
+    }
+  };
+
+  const fetchLogs = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = {};
+      if (selectedAction) params.action = selectedAction.toLowerCase();
+      if (searchTerm) params.search = searchTerm;
+      const res = await api.get('/admin/audit-logs', { params });
+      const data = res.data?.data || [];
+      const mapped = data.map(l => ({
+        id: l._id,
+        _id: l._id,
+        timestamp: l.timestamp ? new Date(l.timestamp).toLocaleString(i18n.language === 'ps' ? 'ps-AF' : i18n.language === 'prs' ? 'prs-AF' : 'en-CA', { hour12: false }).replace(',', '') : t('common.na'),
+        user: l.changedBy?.email || l.changedBy?.name || t('users.system'),
+        action: (l.action || '').toUpperCase(),
+        module: l.entityType || t('common.na'),
+        details: `${l.field}: ${l.reason || t('users.noDetails')}`,
+        ip: l.metadata?.ip || t('common.na'),
+        status: 'SUCCESS',
+      }));
+      setLogs(mapped);
+      setTotal(res.data?.total || mapped.length);
+    } catch (err) {
+      console.error('Failed to fetch audit logs:', err);
+      setLogs([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm, selectedAction]);
+
+  useEffect(() => { fetchLogs(); }, [fetchLogs]);
+
   const filteredLogs = logs.filter(log => {
-    const matchesSearch = log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         log.module.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesAction = !selectedAction || log.action === selectedAction;
     const matchesUser = !selectedUser || log.user === selectedUser;
     const matchesDate = !dateRange || log.timestamp.startsWith(dateRange);
-    return matchesSearch && matchesAction && matchesUser && matchesDate;
+    return matchesUser && matchesDate;
   });
+
+  const uniqueUsers = [...new Set(logs.map(l => l.user).filter(Boolean))];
 
   const getActionColor = (action) => {
     switch(action) {
@@ -43,8 +130,6 @@ const AuditLogs = () => {
       case 'UPDATE': return 'blue';
       case 'DELETE': return 'red';
       case 'READ': return 'gray';
-      case 'LOGIN': return 'purple';
-      case 'EXPORT': return 'yellow';
       default: return 'gray';
     }
   };
@@ -54,9 +139,9 @@ const AuditLogs = () => {
   };
 
   const columns = [
-    { 
-      key: 'timestamp', 
-      label: 'Timestamp', 
+    {
+      key: 'timestamp',
+      label: t('users.timestamp'),
       sortable: true,
       render: (value) => (
         <div className="flex items-center gap-2">
@@ -65,9 +150,9 @@ const AuditLogs = () => {
         </div>
       )
     },
-    { 
-      key: 'user', 
-      label: 'User', 
+    {
+      key: 'user',
+      label: t('users.user'),
       render: (value) => (
         <div className="flex items-center gap-2">
           <FiUser className="text-slate-400" size={14} />
@@ -75,18 +160,18 @@ const AuditLogs = () => {
         </div>
       )
     },
-    { 
-      key: 'action', 
-      label: 'Action', 
+    {
+      key: 'action',
+      label: t('users.action'),
       render: (value) => (
         <Badge color={getActionColor(value)} variant="subtle">
           {value}
         </Badge>
       )
     },
-    { 
-      key: 'module', 
-      label: 'Module',
+    {
+      key: 'module',
+      label: t('users.module'),
       render: (value) => (
         <div className="flex items-center gap-2">
           <FiDatabase className="text-slate-400" size={14} />
@@ -94,15 +179,15 @@ const AuditLogs = () => {
         </div>
       )
     },
-    { key: 'details', label: 'Details' },
-    { key: 'ip', label: 'IP Address' },
-    { 
-      key: 'status', 
-      label: 'Status', 
+    { key: 'details', label: t('users.details') },
+    { key: 'ip', label: t('users.ipAddress') },
+    {
+      key: 'status',
+      label: t('users.status'),
       render: (value) => (
         <div className="flex items-center gap-2">
           {getStatusIcon(value)}
-          <Badge 
+          <Badge
             color={value === 'SUCCESS' ? 'green' : 'red'}
             variant="subtle"
           >
@@ -119,15 +204,21 @@ const AuditLogs = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Audit Logs</h1>
-          <p className="text-slate-600">Track all system activities and user actions</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('users.auditLogs')}</h1>
+          <p className="text-slate-600">{t('users.trackAudit')}</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" icon={<FiDownload size={16} />}>
-            Export Logs
+        <div className="flex gap-2 relative" ref={exportRef}>
+          <Button variant="outline" icon={<FiDownload size={16} />} onClick={() => setShowExportMenu(!showExportMenu)}>
+            {t('users.exportLogs')}
           </Button>
-          <Button variant="outline" color="red">
-            Clear Old Logs
+          {showExportMenu && (
+            <div className="absolute top-full right-36 mt-1 bg-white border rounded-lg shadow-lg z-10 w-36">
+              <button onClick={exportPDF} className="w-full px-4 py-2 text-sm text-left hover:bg-slate-50 flex items-center gap-2"><FiFileText size={14} /> {t('users.exportPdf')}</button>
+              <button onClick={exportCSV} className="w-full px-4 py-2 text-sm text-left hover:bg-slate-50 flex items-center gap-2"><FiDownload size={14} /> {t('users.exportCsv')}</button>
+            </div>
+          )}
+          <Button variant="outline" color="red" icon={<FiTrash2 size={16} />} onClick={() => setShowClearModal(true)}>
+            {t('users.clearOldLogs')}
           </Button>
         </div>
       </div>
@@ -136,7 +227,7 @@ const AuditLogs = () => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
           <div className="md:col-span-2">
             <Input
-              placeholder="Search by user, details, or module..."
+              placeholder={t('users.searchByDetails')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               icon={<FiSearch />}
@@ -146,45 +237,36 @@ const AuditLogs = () => {
             value={selectedAction}
             onChange={(e) => setSelectedAction(e.target.value)}
             options={[
-              { value: '', label: 'All Actions' },
-              { value: 'CREATE', label: 'Create' },
-              { value: 'UPDATE', label: 'Update' },
-              { value: 'DELETE', label: 'Delete' },
-              { value: 'READ', label: 'Read' },
-              { value: 'LOGIN', label: 'Login' },
-              { value: 'EXPORT', label: 'Export' },
+              { value: '', label: t('users.allActions') },
+              { value: 'CREATE', label: t('users.create') },
+              { value: 'UPDATE', label: t('users.update') },
+              { value: 'DELETE', label: t('users.delete') },
             ]}
           />
           <Select
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
             options={[
-              { value: '', label: 'All Users' },
-              { value: 'admin@madrasa.edu', label: 'Admin' },
-              { value: 'registrar@madrasa.edu', label: 'Registrar' },
-              { value: 'teacher@madrasa.edu', label: 'Teacher' },
-              { value: 'accountant@madrasa.edu', label: 'Accountant' },
-              { value: 'librarian@madrasa.edu', label: 'Librarian' },
+              { value: '', label: t('users.allUsers') },
+              ...uniqueUsers.map(u => ({ value: u, label: u })),
             ]}
           />
           <Select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
             options={[
-              { value: '', label: 'All Dates' },
-              { value: '2024-01-15', label: 'Jan 15, 2024' },
-              { value: '2024-01-16', label: 'Jan 16, 2024' },
-              { value: '2024-01-17', label: 'Jan 17, 2024' },
+              { value: '', label: t('users.allDates') },
+              { value: new Date().toISOString().slice(0, 10), label: t('users.today') },
             ]}
           />
         </div>
 
         <div className="flex justify-between items-center mb-4">
           <div className="text-sm text-slate-600">
-            Showing {filteredLogs.length} of {logs.length} audit logs
+            {t('users.showingLogs', { count: filteredLogs.length, total: total })}
           </div>
           <Button variant="outline" icon={<FiFilter size={16} />}>
-            Advanced Filters
+            {t('users.advancedFilters')}
           </Button>
         </div>
 
@@ -198,28 +280,40 @@ const AuditLogs = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4">
-          <div className="text-sm text-slate-500 mb-1">Total Logs</div>
-          <div className="text-2xl font-bold text-slate-900">{logs.length}</div>
+          <div className="text-sm text-slate-500 mb-1">{t('users.totalLogs')}</div>
+          <div className="text-2xl font-bold text-slate-900">{total}</div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-slate-500 mb-1">Successful Actions</div>
+          <div className="text-sm text-slate-500 mb-1">{t('users.successfulActions')}</div>
           <div className="text-2xl font-bold text-green-600">
             {logs.filter(l => l.status === 'SUCCESS').length}
           </div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-slate-500 mb-1">Failed Actions</div>
+          <div className="text-sm text-slate-500 mb-1">{t('users.failedActions')}</div>
           <div className="text-2xl font-bold text-red-600">
             {logs.filter(l => l.status === 'FAILED').length}
           </div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-slate-500 mb-1">Unique Users</div>
+          <div className="text-sm text-slate-500 mb-1">{t('users.uniqueUsers')}</div>
           <div className="text-2xl font-bold text-blue-600">
-            {[...new Set(logs.map(l => l.user))].length}
+            {uniqueUsers.length}
           </div>
         </Card>
       </div>
+      {showClearModal && (
+        <Modal onClose={() => setShowClearModal(false)}>
+          <div className="p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">{t('users.clearLogsTitle')}</h3>
+            <p className="text-slate-600 mb-4">{t('users.clearLogsBody')}</p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" onClick={() => setShowClearModal(false)}>{t('users.cancel')}</Button>
+              <Button color="red" onClick={handleClearOldLogs} disabled={clearing}>{clearing ? t('common.loading') : t('users.clearLogs')}</Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

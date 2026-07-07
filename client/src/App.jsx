@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ExamProvider } from './contexts/ExamContext';
@@ -33,12 +33,23 @@ import TeacherExamSubmissions from './pages/teacher/TeacherExamSubmissions';
 import TeacherStudents from './pages/teacher/TeacherStudents';
 import TeacherAssignments from './pages/teacher/TeacherAssignments';
 import TeacherAttendance from './pages/teacher/TeacherAttendance';
+import CreateSession from './pages/teacher/CreateSession';
 import TeacherAttendanceReports from './pages/teacher/TeacherAttendanceReport';
 import TeacherViewResults from './pages/teacher/TeacherViewResults';
 import TeacherEnterMarks from './pages/teacher/TeacherEnterMarks';
 import TeacherResults from './pages/teacher/TeacherResults';
 import AssignedComplaints from './pages/teacher/AssignedCompliants';
 import CreateAssignment from './pages/teacher/CreateAssignment';
+import TeacherLeaveList from './pages/teacher/TeacherLeaveList';
+import TeacherLeaveApply from './pages/teacher/TeacherLeaveApply';
+import TeacherPayslips from './pages/teacher/TeacherPayslips';
+import TeacherClasses from './pages/teacher/TeacherClasses';
+import TeacherAnnouncements from './pages/teacher/TeacherAnnouncements';
+import TeacherFeedback from './pages/teacher/TeacherFeedback';
+import TeacherSyllabus from './pages/teacher/TeacherSyllabus';
+import TeacherGradingSchemes from './pages/teacher/TeacherGradingSchemes';
+import TeacherSessions from './pages/teacher/TeacherSessions';
+import Messages from './pages/teacher/Messages';
 
 // Student
 import StudentDashboard from './pages/StudentDashboard';
@@ -50,6 +61,8 @@ import StudentExamResults from './pages/StudentExamResults';
 import StudentTimetable from './pages/StudentTimetable';
 import StudentSchedule from './pages/StudentSchedule';
 import StudentExams from './pages/StudentExams';
+import StudentDegree from './pages/StudentDegree';
+import StudentEducation from './pages/StudentEducation';
 import StudentExamAttempt from './pages/StudentExamAttempt';
 import StudentFees from './pages/StudentFees';
 import StudentLibrary from './pages/StudentLibrary';
@@ -58,6 +71,7 @@ import StudentEvents from './pages/StudentEvents';
 import StudentHostel from './pages/StudentHostel';
 import StudentLeave from './pages/StudentLeave';
 import StudentSettings from './pages/StudentSettings';
+import StudentAssignments from './pages/StudentAssignments';
 import LearningResources from './components/library/LearningResources';
 import BorrowedBooks from './components/library/BorrowedBooks';
 import PurchaseHistory from './components/library/PurchaseHistory';
@@ -73,10 +87,10 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const HomeWithRedirect = ({ isAuthenticated, loading }) => {
   const navigate = useNavigate();
-  const [redirecting, setRedirecting] = useState(false);
+  const redirecting = !loading && isAuthenticated;
 
   useEffect(() => {
-    if (!loading && isAuthenticated) {
+    if (redirecting) {
       const lastPath = localStorage.getItem('lastPath');
       if (lastPath) {
         navigate(lastPath, { replace: true });
@@ -92,9 +106,8 @@ const HomeWithRedirect = ({ isAuthenticated, loading }) => {
           navigate(defaultPaths[role], { replace: true });
         }
       }
-      setRedirecting(true);
     }
-  }, [navigate, isAuthenticated, loading]);
+  }, [redirecting, navigate]);
 
   if (loading || redirecting) {
     return <div className="flex h-screen items-center justify-center text-slate-500">Loading...</div>;
@@ -102,9 +115,17 @@ const HomeWithRedirect = ({ isAuthenticated, loading }) => {
   return <Home />;
 };
 
+const ProtectedRoute = ({ children, allowedRoles, isAuthenticated, loading }) => {
+  const role = getUserRole();
+  if (loading) return <div className="flex h-screen items-center justify-center text-slate-500">Loading...</div>;
+  if (!isAuthenticated || !isTokenValid()) { clearAuth(); return <Navigate to="/login" replace />; }
+  if (allowedRoles && !allowedRoles.includes(role)) return <Navigate to="/" replace />;
+  return children;
+};
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => localStorage.getItem('isAuthenticated') === 'true');
-  const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole'));
+  const [, setUserRole] = useState(() => localStorage.getItem('userRole'));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -142,7 +163,7 @@ function App() {
           setUserRole(role);
         }
         setIsAuthenticated(true);
-      } catch (error) {
+      } catch {
         clearAuth();
         if (mounted) {
           setIsAuthenticated(false);
@@ -160,14 +181,6 @@ function App() {
     };
   }, []);
 
-  const ProtectedRoute = ({ children, allowedRoles }) => {
-    const role = getUserRole();
-    if (loading) return <div className="flex h-screen items-center justify-center text-slate-500">Loading...</div>;
-    if (!isAuthenticated || !isTokenValid()) { clearAuth(); return <Navigate to="/login" replace />; }
-    if (allowedRoles && !allowedRoles.includes(role)) return <Navigate to="/" replace />;
-    return children;
-  };
-
   const adminRoles = ['admin'];
   const teacherRoles = ['teacher'];
   const staffRoles = ['staff'];
@@ -184,7 +197,7 @@ function App() {
 
           {/* ── Admin ── */}
           <Route path="/admin/*" element={
-            <ProtectedRoute allowedRoles={adminRoles}>
+            <ProtectedRoute allowedRoles={adminRoles} isAuthenticated={isAuthenticated} loading={loading}>
               <AdminPanel />
             </ProtectedRoute>
           }>
@@ -193,7 +206,7 @@ function App() {
 
           {/* ── Teacher ── */}
           <Route path="/teacher/*" element={
-            <ProtectedRoute allowedRoles={teacherRoles}>
+            <ProtectedRoute allowedRoles={teacherRoles} isAuthenticated={isAuthenticated} loading={loading}>
               <TeacherPanel />
             </ProtectedRoute>
           }>
@@ -204,7 +217,9 @@ function App() {
             <Route path="students" element={<TeacherStudents />} />
             <Route path="assignments" element={<TeacherAssignments />} />
             <Route path="create-assignments" element={<CreateAssignment />} />
+            <Route path="sessions" element={<TeacherSessions />} />
             <Route path="attendance" element={<TeacherAttendance />} />
+            <Route path="attendance/create-session" element={<CreateSession />} />
             <Route path="attendance-reports" element={<TeacherAttendanceReports />} />
             <Route path="exams" element={<TeacherExamsList />} />
             <Route path="exams/create" element={<TeacherCreateExam />} />
@@ -216,12 +231,20 @@ function App() {
             <Route path="results/enter-marks" element={<TeacherEnterMarks />} />
             <Route path="results/view-results" element={<TeacherViewResults />} />
             <Route path="complaints" element={<AssignedComplaints />} />
+            <Route path="leaves" element={<TeacherLeaveList />} />
+            <Route path="leaves/apply" element={<TeacherLeaveApply />} />
+            <Route path="payslips" element={<TeacherPayslips />} />
+            <Route path="classes" element={<TeacherClasses />} />
+            <Route path="announcements" element={<TeacherAnnouncements />} />
+            <Route path="feedback" element={<TeacherFeedback />} />
+            <Route path="syllabus" element={<TeacherSyllabus />} />
+            <Route path="grading" element={<TeacherGradingSchemes />} />
             <Route path="print/:type/:id?" element={<PrintPage />} />
           </Route>
 
           {/* ── Staff ── */}
           <Route path="/staff/*" element={
-            <ProtectedRoute allowedRoles={staffRoles}>
+            <ProtectedRoute allowedRoles={staffRoles} isAuthenticated={isAuthenticated} loading={loading}>
               <StaffPanel />
             </ProtectedRoute>
           }>
@@ -230,7 +253,7 @@ function App() {
 
           {/* ── Student ── */}
           <Route path="/student/*" element={
-            <ProtectedRoute allowedRoles={studentRoles}>
+            <ProtectedRoute allowedRoles={studentRoles} isAuthenticated={isAuthenticated} loading={loading}>
               <StudentPanel />
             </ProtectedRoute>
           }>
@@ -239,13 +262,15 @@ function App() {
             <Route path="profile" element={<StudentProfile />} />
             <Route path="courses" element={<StudentCourses />} />
             <Route path="attendance" element={<StudentAttendance />} />
-            <Route path="assignments" element={<TeacherAssignments />} />
+            <Route path="assignments" element={<StudentAssignments />} />
             <Route path="homework-submission" element={<HomeworkSubmission />} />
             <Route path="results" element={<StudentResults />} />
             <Route path="exam-results" element={<StudentExamResults />} />
             <Route path="timetable" element={<StudentTimetable />} />
             <Route path="schedule" element={<StudentSchedule />} />
             <Route path="exams" element={<StudentExams />} />
+            <Route path="degrees" element={<StudentDegree />} />
+            <Route path="education" element={<StudentEducation />} />
             <Route path="exams/:examId/attempt" element={<StudentExamAttempt />} />
             <Route path="fees" element={<StudentFees />} />
             <Route path="library" element={<StudentLibrary />} />

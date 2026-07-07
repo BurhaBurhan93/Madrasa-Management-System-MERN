@@ -12,14 +12,14 @@ router.use(auth, authorizeRoles('admin', 'staff', 'teacher'));
 // ── Degrees ──────────────────────────────────────────────
 router.get('/degrees', async (req, res) => {
   try {
-    const degrees = await Degree.find({ deletedAt: null }).sort({ name: 1 });
+    const degrees = await Degree.find({ deletedAt: null }).sort({ name: 1 }).populate('department', 'departmentName');
     res.json({ success: true, data: degrees });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 router.get('/degrees/:id', async (req, res) => {
   try {
-    const degree = await Degree.findById(req.params.id);
+    const degree = await Degree.findById(req.params.id).populate('department', 'departmentName');
     if (!degree) return res.status(404).json({ success: false, message: 'Degree not found' });
     res.json({ success: true, data: degree });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
@@ -27,14 +27,17 @@ router.get('/degrees/:id', async (req, res) => {
 
 router.post('/degrees', async (req, res) => {
   try {
-    const degree = await Degree.create(req.body);
-    res.status(201).json({ success: true, data: degree });
+    const { name, code, duration, level, department, description, image } = req.body;
+    const degree = await Degree.create({ name, code, duration, level, department, description, image });
+    const populated = await Degree.populate(degree, { path: 'department', select: 'departmentName' });
+    res.status(201).json({ success: true, data: populated });
   } catch (e) { res.status(400).json({ success: false, message: e.message }); }
 });
 
 router.put('/degrees/:id', async (req, res) => {
   try {
-    const degree = await Degree.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { name, code, duration, level, department, description, image } = req.body;
+    const degree = await Degree.findByIdAndUpdate(req.params.id, { name, code, duration, level, department, description, image }, { new: true, runValidators: true }).populate('department', 'departmentName');
     if (!degree) return res.status(404).json({ success: false, message: 'Degree not found' });
     res.json({ success: true, data: degree });
   } catch (e) { res.status(400).json({ success: false, message: e.message }); }
@@ -95,14 +98,16 @@ router.get('/syllabus', async (req, res) => {
 
 router.post('/syllabus', async (req, res) => {
   try {
-    const item = await Syllabus.create(req.body);
+    const { className, subject, topic, description, semester, order } = req.body;
+    const item = await Syllabus.create({ className, subject, topic, description, semester, order: order != null ? Number(order) : 0 });
     res.status(201).json({ success: true, data: item });
   } catch (e) { res.status(400).json({ success: false, message: e.message }); }
 });
 
 router.put('/syllabus/:id', async (req, res) => {
   try {
-    const item = await Syllabus.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { className, subject, topic, description, semester, order } = req.body;
+    const item = await Syllabus.findByIdAndUpdate(req.params.id, { className, subject, topic, description, semester, order: order != null ? Number(order) : 0 }, { new: true, runValidators: true });
     if (!item) return res.status(404).json({ success: false, message: 'Not found' });
     res.json({ success: true, data: item });
   } catch (e) { res.status(400).json({ success: false, message: e.message }); }
@@ -185,12 +190,81 @@ router.delete('/subjects/:id', async (req, res) => {
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+// ── Timetable ──────────────────────────────────────────────
+const Timetable = require('../../models/Timetable');
+
+router.get('/timetable', async (req, res) => {
+  try {
+    const filter = { deletedAt: null };
+    if (req.query.classId) filter.classId = req.query.classId;
+    const slots = await Timetable.find(filter).sort({ day: 1, period: 1 });
+    res.json({ success: true, data: slots });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+router.post('/timetable', async (req, res) => {
+  try {
+    const slot = await Timetable.create(req.body);
+    res.status(201).json({ success: true, data: slot });
+  } catch (e) { res.status(400).json({ success: false, message: e.message }); }
+});
+
+router.put('/timetable/:id', async (req, res) => {
+  try {
+    const slot = await Timetable.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!slot) return res.status(404).json({ success: false, message: 'Slot not found' });
+    res.json({ success: true, data: slot });
+  } catch (e) { res.status(400).json({ success: false, message: e.message }); }
+});
+
+router.delete('/timetable/:id', async (req, res) => {
+  try {
+    await Timetable.findByIdAndUpdate(req.params.id, { deletedAt: new Date() });
+    res.json({ success: true, message: 'Slot deleted' });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// ── Exam Types ─────────────────────────────────────────────
+const ExamType = require('../../models/ExamType');
+
+router.get('/examtypes', async (req, res) => {
+  try {
+    const types = await ExamType.find({ deletedAt: null }).sort({ name: 1 });
+    res.json({ success: true, data: types });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+router.post('/examtypes', async (req, res) => {
+  try {
+    const type = await ExamType.create(req.body);
+    res.status(201).json({ success: true, data: type });
+  } catch (e) { res.status(400).json({ success: false, message: e.message }); }
+});
+
+router.put('/examtypes/:id', async (req, res) => {
+  try {
+    const type = await ExamType.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!type) return res.status(404).json({ success: false, message: 'Exam type not found' });
+    res.json({ success: true, data: type });
+  } catch (e) { res.status(400).json({ success: false, message: e.message }); }
+});
+
+router.delete('/examtypes/:id', async (req, res) => {
+  try {
+    await ExamType.findByIdAndUpdate(req.params.id, { deletedAt: new Date() });
+    res.json({ success: true, message: 'Exam type deleted' });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 // ── Exams (basic CRUD) ──────────────────────────────────────
 const Exam = require('../../models/Exam');
 
 router.get('/exams', async (req, res) => {
   try {
-    const exams = await Exam.find({ deletedAt: null }).sort({ createdAt: -1 });
+    const exams = await Exam.find({ deletedAt: null })
+      .populate('examType', 'name')
+      .populate('class', 'name')
+      .sort({ createdAt: -1 });
     res.json({ success: true, data: exams });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });

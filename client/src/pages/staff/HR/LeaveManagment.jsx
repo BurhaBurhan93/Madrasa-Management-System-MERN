@@ -143,7 +143,7 @@ const LeaveManagement = () => {
 
       {/* Create Form */}
       {showForm && (
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 shadow-sm">
           <div className="h-1 w-full rounded-t-2xl bg-gradient-to-r from-cyan-500 to-sky-500" />
           <div className="p-6">
             <h2 className="mb-5 text-base font-semibold text-slate-900">New Leave Request</h2>
@@ -153,7 +153,7 @@ const LeaveManagement = () => {
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Employee <span className="text-rose-500">*</span></label>
                   <select required value={form.employee} onChange={e => set('employee', e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100">
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 outline-none transition focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-cyan-100">
                     <option value="">Select Employee</option>
                     {employees.map(e => <option key={e._id} value={e._id}>{e.fullName} ({e.employeeCode})</option>)}
                   </select>
@@ -162,7 +162,7 @@ const LeaveManagement = () => {
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Leave Type <span className="text-rose-500">*</span></label>
                   <select required value={form.leaveType} onChange={e => set('leaveType', e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100">
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 outline-none transition focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-cyan-100">
                     <option value="">Select Leave Type</option>
                     {leaveTypes.map(lt => <option key={lt._id} value={lt._id}>{lt.leaveTypeName} ({lt.leaveCode})</option>)}
                   </select>
@@ -187,7 +187,7 @@ const LeaveManagement = () => {
               </div>
               <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-5">
                 <button type="button" onClick={() => { setShowForm(false); setForm(EMPTY_FORM); }}
-                  className="rounded-2xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50">
+                  className="rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-6 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-600">
                   Cancel
                 </button>
                 <button type="submit" disabled={saving}
@@ -202,7 +202,7 @@ const LeaveManagement = () => {
       )}
 
       {/* Filter + Search Bar */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           {/* Search */}
           <div className="flex-1">
@@ -211,14 +211,14 @@ const LeaveManagement = () => {
                 <circle cx="6.5" cy="6.5" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/>
               </svg>
               <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search by employee, leave type, status..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-4 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100" />
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 py-2.5 pl-9 pr-4 text-sm text-slate-700 dark:text-slate-200 outline-none transition focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-cyan-100" />
             </div>
           </div>
           {/* Status Tabs */}
           <div className="flex gap-2">
             {[['', 'All'], ['pending', 'Pending'], ['approved', 'Approved'], ['rejected', 'Rejected']].map(([val, label]) => (
               <button key={val} onClick={() => { setFilterStatus(val); setPage(1); }}
-                className={`rounded-xl px-4 py-2 text-sm font-medium transition ${filterStatus === val ? 'bg-cyan-600 text-white shadow-sm' : 'border border-slate-200 bg-white text-slate-600 hover:border-cyan-300 hover:bg-cyan-50'}`}>
+                className={`rounded-xl px-4 py-2 text-sm font-medium transition ${filterStatus === val ? 'bg-cyan-600 text-white shadow-sm' : 'border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:border-cyan-300 hover:bg-cyan-50 dark:hover:bg-slate-600'}`}>
                 {label}
               </button>
             ))}
@@ -227,7 +227,7 @@ const LeaveManagement = () => {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <div>
             <h2 className="text-base font-semibold text-slate-900">Leave Requests</h2>
@@ -237,9 +237,9 @@ const LeaveManagement = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50">
+              <tr className="border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                 {['#', 'Employee', 'Leave Type', 'Days', 'Request Date', 'Reason', 'Status', 'Actions'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 whitespace-nowrap">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -300,7 +300,7 @@ const LeaveManagement = () => {
       {/* Reject Modal */}
       {rejectId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-xl">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl">
             <div className="h-1 w-full rounded-t-2xl bg-gradient-to-r from-rose-500 to-rose-400" />
             <div className="p-6 space-y-4">
               <h3 className="text-base font-semibold text-slate-900">Rejection Reason</h3>

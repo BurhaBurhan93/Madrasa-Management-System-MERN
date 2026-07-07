@@ -15,7 +15,7 @@ export const educationHistoryConfig = {
   editPathForRow: (row) => `/staff/registrar/education-history/edit/${row._id}`,
   viewPathForRow: (row) => `/staff/registrar/education-history/view/${row._id}`,
   columns: [
-    { key: 'student', header: 'Student', render: (value, row) => row.student?.user?.name || '-' },
+    { key: 'student', header: 'Student', render: (value, row) => `${row.student?.firstName || ''} ${row.student?.lastName || ''}`.trim() || row.student?.studentCode || '-' },
     { key: 'previousDegree', header: 'Previous Degree' },
     { key: 'previousInstitution', header: 'Institution' },
     { key: 'location', header: 'Location' },

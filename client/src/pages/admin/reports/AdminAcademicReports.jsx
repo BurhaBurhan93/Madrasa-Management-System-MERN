@@ -1,4 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 import api from "../../../lib/api";
 import {
   getDefaultPeriodFilters,
@@ -6,6 +9,15 @@ import {
 } from "../../../utils/reportPeriods";
 
 const AdminAcademicReports = () => {
+  const { t } = useTranslation('admin');
+
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+  }, []);
   const [filters, setFilters] = useState(getDefaultPeriodFilters());
   const [loading, setLoading] = useState(true);
   const [classes, setClasses] = useState([]);
@@ -74,10 +86,10 @@ const AdminAcademicReports = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Academic Reports
+            {t('reports.academicReports')}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Academic performance analysis and insights
+            {t('reports.academicPerformance')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -129,7 +141,7 @@ const AdminAcademicReports = () => {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
-          <p className="text-xs font-medium text-cyan-600">Total Students</p>
+          <p className="text-xs font-medium text-cyan-600">{t('reports.attendanceReports')}</p>
           <p className="mt-1 text-2xl font-bold text-cyan-700">
             {loading ? "…" : stats.totalStudents}
           </p>
@@ -144,14 +156,14 @@ const AdminAcademicReports = () => {
         </div>
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
           <p className="text-xs font-medium text-amber-600">
-            Exams ({periodLabel})
+            {t('reports.examsCount')} ({periodLabel})
           </p>
           <p className="mt-1 text-2xl font-bold text-amber-700">
             {loading ? "…" : stats.totalExams}
           </p>
         </div>
         <div className="rounded-2xl border border-violet-200 bg-violet-50 p-5">
-          <p className="text-xs font-medium text-violet-600">Total Classes</p>
+          <p className="text-xs font-medium text-violet-600">{t('reports.activeClasses')}</p>
           <p className="mt-1 text-2xl font-bold text-violet-700">
             {loading ? "…" : stats.totalClasses}
           </p>
@@ -160,11 +172,11 @@ const AdminAcademicReports = () => {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-800">Classes</h2>
+          <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('reports.activeClasses')}</h2>
           {loading ? (
-            <p className="text-slate-400">Loading…</p>
+            <p className="text-slate-400">{t('common.loading')}</p>
           ) : classes.length === 0 ? (
-            <p className="text-slate-400">No classes found.</p>
+            <p className="text-slate-400">{t('common.noData')}</p>
           ) : (
             <table className="w-full text-left text-sm">
               <thead className="border-b border-slate-200 bg-slate-50">
@@ -204,13 +216,13 @@ const AdminAcademicReports = () => {
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">
-            Exams — {periodLabel}
+            {t('reports.examsCount')} — {periodLabel}
           </h2>
           {loading ? (
-            <p className="text-slate-400">Loading…</p>
+            <p className="text-slate-400">{t('common.loading')}</p>
           ) : exams.length === 0 ? (
             <p className="text-slate-400">
-              No exams scheduled for this period.
+              {t('common.noData')}
             </p>
           ) : (
             <table className="w-full text-left text-sm">

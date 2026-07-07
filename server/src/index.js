@@ -19,8 +19,10 @@ console.log('[Server] .env loaded, PORT:', process.env.PORT || '5000 (default)')
 console.log('[Server] MONGODB_URI exists:', !!(process.env.MONGODB_URI || process.env.MONGO_URI));
 
 // Apply security headers with Helmet
-app.use(helmet());
-console.log('[Server] Helmet security middleware applied');
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
+console.log('[Server] Helmet security middleware applied (cross-origin resource policy enabled)');
 
 // Compress all responses
 app.use(compression());
@@ -72,6 +74,8 @@ const examRoutes = require('./modules/teachers/examRoutes');
 console.log('[Routes] ✓ examRoutes loaded');
 const communicationRoutes = require('./modules/communications/communicationRoutes');
 console.log('[Routes] ✓ communicationRoutes loaded');
+const eventRoutes = require('./modules/events/eventRoutes');
+console.log('[Routes] ✓ eventRoutes loaded');
 
 // Notification routes
 console.log('[Routes] Loading notificationRoutes...');
@@ -143,6 +147,16 @@ try {
   console.error('[Routes] ✗ Error loading complaintRoutes:', error.message);
 }
 
+// Support ticket routes
+console.log('[Routes] Loading ticketRoutes...');
+let ticketRoutes;
+try {
+  ticketRoutes = require('./modules/support/ticketRoutes');
+  console.log('[Routes] ✓ ticketRoutes loaded');
+} catch (error) {
+  console.error('[Routes] ✗ Error loading ticketRoutes:', error.message);
+}
+
 // Load user routes with error handling
 console.log('[Routes] Loading userRoutes...');
 let userRoutes;
@@ -159,7 +173,9 @@ console.log('[Routes] Registering routes...');
 app.use('/api/auth', loginLimiter, authRoutes);
 console.log('[Routes] ✓ /api/auth registered (with rate limiter)');
 app.use('/api/student', studentRoutes);
+app.use('/api/students', studentRoutes);
 console.log('[Routes] ✓ /api/student registered');
+console.log('[Routes] ✓ /api/students registered');
 app.use('/api/staff', staffRoutes);
 console.log('[Routes] ✓ /api/staff registered');
 app.use('/api/teacher', teacherRoutes);
@@ -176,6 +192,8 @@ app.use('/api/hostel', hostelRoutes);
 console.log('[Routes] ✓ /api/hostel registered');
 app.use('/api/communications', communicationRoutes);
 console.log('[Routes] ✓ /api/communications registered');
+app.use('/api/events', eventRoutes);
+console.log('[Routes] ✓ /api/events registered');
 
 if (notificationRoutes) {
   app.use('/api/notifications', notificationRoutes);
@@ -210,6 +228,11 @@ if (academicRoutes) {
 if (complaintRoutes) {
   app.use('/api/complaints', complaintRoutes);
   console.log('[Routes] ✓ /api/complaints registered');
+}
+
+if (ticketRoutes) {
+  app.use('/api/support/tickets', ticketRoutes);
+  console.log('[Routes] ✓ /api/support/tickets registered');
 }
 app.use('/api', examRoutes);
 console.log('[Routes] ✓ /api (examRoutes) registered');

@@ -5,13 +5,13 @@ import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker"
 
 const statusOptions = ['present', 'absent', 'late', 'half-day', 'on-leave'];
 
-const statusColors = {
-  present: 'bg-green-100 text-green-700',
-  absent: 'bg-red-100 text-red-700',
-  late: 'bg-yellow-100 text-yellow-700',
-  'half-day': 'bg-orange-100 text-orange-700',
-  'on-leave': 'bg-blue-100 text-blue-700',
-};
+  const statusColors = {
+    present: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+    absent: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+    late: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+    'half-day': 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+    'on-leave': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+  };
 
 const HRAttendance = () => {
   const [employees, setEmployees] = useState([]);
@@ -100,7 +100,7 @@ const HRAttendance = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow overflow-hidden">
+      <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow overflow-hidden">
         {fetching ? (
           <div className="p-8 text-center text-gray-500">Loading...</div>
         ) : (

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import ListPage from '../shared/ListPage';
-import StaffPageLayout from '../shared/StaffPageLayout';
 import Card from '../../../components/UIHelper/Card';
 import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
 import { PieChartComponent, BarChartComponent } from '../../../components/UIHelper/ECharts';
@@ -16,13 +15,12 @@ export const complaintsConfig = {
   columns: [
     { key: 'complaintCode', header: 'Complaint Code' },
     { key: 'subject', header: 'Subject' },
-    { key: 'complaintCategory', header: 'Category' },
-    { key: 'priorityLevel', header: 'Priority' },
-    { key: 'complaintStatus', header: 'Status' },
-    { key: 'complainantType', header: 'Type' },
+    { key: 'category', header: 'Category' },
+    { key: 'priority', header: 'Priority' },
+    { key: 'status', header: 'Status' },
+    { key: 'submittedBy', header: 'Submitted By', render: (value) => value?.name || '-' },
     { key: 'assignedTo', header: 'Assigned To', render: (value) => value?.name || '-' },
-    { key: 'submittedDate', header: 'Submitted Date', render: (value, row) => value || row.createdAt ? new Date(value || row.createdAt).toISOString().slice(0, 10) : '-' },
-    { key: 'confidentialityLevel', header: 'Confidentiality' }
+    { key: 'createdAt', header: 'Submitted Date', render: (value) => value ? new Date(value).toISOString().slice(0, 10) : '-' },
   ],
   formFields: [
     { name: 'complaintCode', label: 'Complaint Code', required: true },
@@ -49,7 +47,19 @@ export const complaintsConfig = {
       { value: 'medium', label: 'Medium' },
       { value: 'high', label: 'High' }
     ]}
-  ]
+  ],
+  initialForm: { complaintCode: '', complainantType: 'student', complaintCategory: '', subject: '', description: '', priorityLevel: 'medium', complaintStatus: 'open', confidentialityLevel: 'low' },
+  mapFormToPayload: (form) => ({ ...form }),
+  mapRowToForm: (row) => ({
+    complaintCode: row.complaintCode || '',
+    complainantType: row.complainantType || 'student',
+    complaintCategory: row.complaintCategory || '',
+    subject: row.subject || '',
+    description: row.description || '',
+    priorityLevel: row.priorityLevel || 'medium',
+    complaintStatus: row.complaintStatus || 'open',
+    confidentialityLevel: row.confidentialityLevel || 'low'
+  })
 };
 
 const StaffComplaintsList = () => {
@@ -134,83 +144,73 @@ const StaffComplaintsList = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <StaffPageLayout eyebrow="Complaints" title="Complaints">
-        <PageSkeleton type="dashboard" />
-      </StaffPageLayout>
-    );
-  }
-
-  return (
-    <StaffPageLayout eyebrow="Complaints" title="Complaints" subtitle="Track complaint records with the same clean table, filters, and status workflow.">
-      {/* Statistics Cards */}
+  const headerContent = (
+    <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Total</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.totalComplaints}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalComplaints}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
               <FiAlertCircle className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-gray-50 to-slate-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-gray-50 to-slate-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Open</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.openComplaints}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Open</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.openComplaints}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-900/30 flex items-center justify-center">
               <FiClock className="w-6 h-6 text-gray-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">In Progress</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.inProgressComplaints}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">In Progress</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.inProgressComplaints}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
               <FiTrendingUp className="w-6 h-6 text-amber-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Closed</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.closedComplaints}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Closed</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.closedComplaints}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
               <FiCheckCircle className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-rose-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-rose-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">High Priority</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.highPriority}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">High Priority</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.highPriority}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
               <FiFlag className="w-6 h-6 text-red-600" />
             </div>
           </div>
         </Card>
       </div>
       
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Complaints by Category</h3>
+        <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Complaints by Category</h3>
           {stats.byCategory.length > 0 ? (
             <PieChartComponent data={stats.byCategory} height={250} />
           ) : (
@@ -218,8 +218,8 @@ const StaffComplaintsList = () => {
           )}
         </Card>
         
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Complaints by Priority</h3>
+        <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Complaints by Priority</h3>
           {stats.byPriority.length > 0 ? (
             <BarChartComponent data={stats.byPriority} dataKey="value" nameKey="name" height={250} />
           ) : (
@@ -227,24 +227,43 @@ const StaffComplaintsList = () => {
           )}
         </Card>
       </div>
-      
-      {/* List Page */}
+    </>
+  );
+
+  if (loading) {
+    return (
       <ListPage
-        embedded={true}
-        title={complaintsConfig.title}
-        subtitle={complaintsConfig.subtitle}
-        endpoint={complaintsConfig.endpoint}
-        columns={complaintsConfig.columns}
+        eyebrow="Complaints" title="Complaints"
+        endpoint={complaintsConfig.endpoint} columns={complaintsConfig.columns}
         viewPathForRow={(row) => `/staff/complaints/view/${getId(row)}`}
+        editPathForRow={(row) => `/staff/complaints/edit/${getId(row)}`}
         searchPlaceholder="Search complaints..."
         clientSidePagination={true}
         deleteEnabled={false}
-        extraActionItemsForRow={(row) => [
-          row.complaintStatus !== 'in_progress' ? { label: 'Mark In Progress', className: 'text-amber-700 hover:bg-amber-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'in_progress' }) }); window.location.reload(); } } : null,
-          row.complaintStatus !== 'closed' ? { label: 'Close Complaint', className: 'text-rose-700 hover:bg-rose-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'closed' }) }); window.location.reload(); } } : null
+        extraActionItemsForRow={(row, refetch) => [
+          row.status !== 'in_progress' && row.status !== 'in-progress' ? { label: 'Mark In Progress', className: 'text-amber-700 hover:bg-amber-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'in_progress' }) }); refetch(); } } : null,
+          row.status !== 'closed' && row.status !== 'resolved' ? { label: 'Close Complaint', className: 'text-rose-700 hover:bg-rose-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'resolved' }) }); refetch(); } } : null
         ].filter(Boolean)}
+        headerContent={<PageSkeleton type="dashboard" />}
       />
-    </StaffPageLayout>
+    );
+  }
+
+  return (
+    <ListPage
+      eyebrow="Complaints" title="Complaints" subtitle="Track complaint records with the same clean table, filters, and status workflow."
+      endpoint={complaintsConfig.endpoint} columns={complaintsConfig.columns}
+      viewPathForRow={(row) => `/staff/complaints/view/${getId(row)}`}
+      editPathForRow={(row) => `/staff/complaints/edit/${getId(row)}`}
+      searchPlaceholder="Search complaints..."
+      clientSidePagination={true}
+      deleteEnabled={false}
+      extraActionItemsForRow={(row, refetch) => [
+        row.status !== 'in_progress' && row.status !== 'in-progress' ? { label: 'Mark In Progress', className: 'text-amber-700 hover:bg-amber-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'in_progress' }) }); refetch(); } } : null,
+        row.status !== 'closed' && row.status !== 'resolved' ? { label: 'Close Complaint', className: 'text-rose-700 hover:bg-rose-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'resolved' }) }); refetch(); } } : null
+      ].filter(Boolean)}
+      headerContent={headerContent}
+    />
   );
 };
 

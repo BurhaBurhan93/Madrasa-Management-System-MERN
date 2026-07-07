@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import ListPage from '../shared/ListPage';
-import StaffPageLayout from '../shared/StaffPageLayout';
 import Card from '../../../components/UIHelper/Card';
 import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
 import { BarChartComponent } from '../../../components/UIHelper/ECharts';
@@ -16,17 +15,19 @@ export const libraryPurchasesConfig = {
     { key: 'purchaseCode', header: 'Purchase Code' },
     { key: 'purchaseDate', header: 'Purchase Date', render: (value) => value ? new Date(value).toISOString().slice(0, 10) : '-' },
     { key: 'supplierName', header: 'Supplier' },
+    { key: 'invoiceReference', header: 'Invoice Ref' },
     { key: 'book', header: 'Book', render: (value) => value?.title || '-' },
     { key: 'quantity', header: 'Quantity' },
+    { key: 'unit', header: 'Unit' },
     { key: 'unitPrice', header: 'Unit Price' },
     { key: 'totalPrice', header: 'Total Price' },
-    { key: 'paymentMethod', header: 'Payment Method' }
+    { key: 'paymentMethod', header: 'Payment' }
   ],
   formFields: [
     { name: 'purchaseCode', label: 'Purchase Code', required: true },
     { name: 'supplierName', label: 'Supplier Name' },
     { name: 'invoiceReference', label: 'Invoice Reference' },
-    { name: 'book', label: 'Book', type: 'relation', relationEndpoint: '/staff/library/books', relationValue: (row) => row._id || row.id, relationLabel: (row) => row.title },
+    { name: 'book', label: 'Book', type: 'relation', relationEndpoint: '/staff/library/books', relationValue: (row) => row._id || row.id, relationLabel: (row) => row.title, renderView: (value) => value?.title || '-' },
     { name: 'quantity', label: 'Quantity', type: 'number', required: true },
     { name: 'unit', label: 'Unit' },
     { name: 'unitPrice', label: 'Unit Price', type: 'number', required: true },
@@ -137,71 +138,61 @@ const StaffLibraryPurchases = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <StaffPageLayout eyebrow="Library" title="Book Purchases">
-        <PageSkeleton type="dashboard" />
-      </StaffPageLayout>
-    );
-  }
-
-  return (
-    <StaffPageLayout eyebrow="Library" title="Book Purchases" subtitle="Manage purchase records with the same reusable library management layout.">
-      {/* Statistics Cards */}
+  const headerContent = (
+    <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Total Purchases</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.totalPurchases}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total Purchases</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalPurchases}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
               <FiShoppingCart className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-violet-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-violet-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Total Quantity</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.totalQuantity}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total Quantity</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalQuantity}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
               <FiPackage className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Total Spent</p>
-              <p className="text-2xl font-bold text-slate-900">${stats.totalSpent.toFixed(2)}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total Spent</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">${stats.totalSpent.toFixed(2)}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
               <FiDollarSign className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">This Month</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.recentPurchases}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">This Month</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.recentPurchases}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
               <FiTrendingUp className="w-6 h-6 text-amber-600" />
             </div>
           </div>
         </Card>
       </div>
       
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Purchases by Supplier</h3>
+        <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Purchases by Supplier</h3>
           {stats.bySupplier.length > 0 ? (
             <BarChartComponent data={stats.bySupplier} dataKey="value" nameKey="name" height={250} />
           ) : (
@@ -209,8 +200,8 @@ const StaffLibraryPurchases = () => {
           )}
         </Card>
         
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Monthly Purchase Trend</h3>
+        <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Monthly Purchase Trend</h3>
           {stats.monthlyPurchases.length > 0 ? (
             <BarChartComponent data={stats.monthlyPurchases} dataKey="value" nameKey="name" height={250} />
           ) : (
@@ -218,10 +209,33 @@ const StaffLibraryPurchases = () => {
           )}
         </Card>
       </div>
-      
-      {/* List Page */}
-      <ListPage embedded={true} title={libraryPurchasesConfig.title} subtitle={libraryPurchasesConfig.subtitle} endpoint={libraryPurchasesConfig.endpoint} columns={libraryPurchasesConfig.columns} createPath="/staff/library/purchases/create" editPathForRow={(row) => `/staff/library/purchases/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/library/purchases/view/${getId(row)}`} searchPlaceholder="Search purchases..." clientSidePagination={true} />
-    </StaffPageLayout>
+    </>
+  );
+
+  if (loading) {
+    return (
+      <ListPage
+        eyebrow="Library" title="Book Purchases" subtitle="Manage purchase records with the same reusable library management layout."
+        endpoint={libraryPurchasesConfig.endpoint} columns={libraryPurchasesConfig.columns}
+        createPath="/staff/library/purchases/create"
+        editPathForRow={(row) => `/staff/library/purchases/edit/${getId(row)}`}
+        viewPathForRow={(row) => `/staff/library/purchases/view/${getId(row)}`}
+        searchPlaceholder="Search purchases..." clientSidePagination={true}
+        headerContent={<PageSkeleton type="dashboard" />}
+      />
+    );
+  }
+
+  return (
+    <ListPage
+      eyebrow="Library" title="Book Purchases" subtitle="Manage purchase records with the same reusable library management layout."
+      endpoint={libraryPurchasesConfig.endpoint} columns={libraryPurchasesConfig.columns}
+      createPath="/staff/library/purchases/create"
+      editPathForRow={(row) => `/staff/library/purchases/edit/${getId(row)}`}
+      viewPathForRow={(row) => `/staff/library/purchases/view/${getId(row)}`}
+      searchPlaceholder="Search purchases..." clientSidePagination={true}
+      headerContent={headerContent}
+    />
   );
 };
 

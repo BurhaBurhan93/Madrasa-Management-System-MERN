@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
-const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-
 const statusColors = {
-  active: 'bg-emerald-100 text-emerald-700',
-  completed: 'bg-sky-100 text-sky-700',
-  cancelled: 'bg-rose-100 text-rose-700'
+  active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  completed: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
+  cancelled: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
 };
 
 const TeacherAssignments = () => {
@@ -26,29 +24,35 @@ const TeacherAssignments = () => {
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/teacher/assignments', api());
-      if (res.data.success) setAssignments(res.data.data);
+      const res = await apiFetch('/teacher/assignments');
+      const data = await parseJsonSafe(res);
+      if (data.success) setAssignments(data.data);
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
   const fetchSubjects = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/teacher/subjects', api());
-      if (res.data.success) setSubjects(res.data.data);
+      const res = await apiFetch('/teacher/subjects');
+      const data = await parseJsonSafe(res);
+      if (data.success) setSubjects(data.data);
     } catch (e) { console.error(e); }
   };
 
   const handleDelete = async (id) => {
-   if (!window.confirm(t('teacher.assignments.deleteConfirm'))) return;
+    if (!window.confirm(t('teacher.assignments.deleteConfirm'))) return;
     try {
-      await axios.delete(`http://localhost:5000/api/teacher/assignments/${id}`, api());
+      await apiFetch(`/teacher/assignments/${id}`, { method: 'DELETE' });
       fetchAssignments();
     } catch (e) { alert(t('teacher.assignments.deleteFailed')); }
   };
 
   const handleStatusChange = async (id, status) => {
     try {
-      await axios.put(`http://localhost:5000/api/teacher/assignments/${id}`, { status }, api());
+      await apiFetch(`/teacher/assignments/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
       fetchAssignments();
     } catch (e) { alert(t('teacher.assignments.updateFailed')); }
   };
@@ -66,140 +70,112 @@ const TeacherAssignments = () => {
     overdue: assignments.filter(a => new Date(a.dueDate) < new Date() && a.status === 'active').length,
   };
 
-  const statCards = [
-  {
-    label: t('teacher.assignments.total'),
-    value: stats.total,
-    accent: 'bg-cyan-500'
-  },
-  {
-    label: t('teacher.assignments.active'),
-    value: stats.active,
-    accent: 'bg-emerald-500'
-  },
-  {
-    label: t('teacher.assignments.completed'),
-    value: stats.completed,
-    accent: 'bg-violet-500'
-  },
-  {
-    label: t('teacher.assignments.overdue'),
-    value: stats.overdue,
-    accent: 'bg-rose-500'
-  }
-];
-
   return (
     <div className={PANEL_PAGE_BG}>
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{t('teacher.assignments.title')}</h1>
-            <p className="mt-1 text-sm text-slate-500">{t('teacher.assignments.subtitle')}</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.assignments.title')}</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.assignments.subtitle')}</p>
           </div>
-          <button onClick={() => navigate('/teacher/create-assignments')} className="rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-md">
+          <button onClick={() => navigate('/teacher/create-assignments')}
+            className="rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-md">
             + {t('teacher.assignments.createAssignment')}
           </button>
         </div>
 
-        {/* Stats */}
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
-          {statCards.map(c => (
-            <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {[
+            { label: t('teacher.assignments.total'), value: stats.total, accent: 'bg-cyan-500' },
+            { label: t('teacher.assignments.active'), value: stats.active, accent: 'bg-emerald-500' },
+            { label: t('teacher.assignments.completed'), value: stats.completed, accent: 'bg-violet-500' },
+            { label: t('teacher.assignments.overdue'), value: stats.overdue, accent: 'bg-rose-500' },
+          ].map(c => (
+            <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
               <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
-              <p className="text-sm font-medium text-slate-500">{c.label}</p>
-              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{c.value}</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{c.label}</p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{c.value}</p>
             </div>
           ))}
         </section>
 
-        {/* Filters */}
-        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           <div className="flex flex-wrap gap-3">
-            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
-              <option value="all">
-  {t('teacher.assignments.allStatus')}
-</option>
-              <option value="active">
-  {t('teacher.common.active')}
-</option>
-              <option value="completed">
-  {t('teacher.common.completed')}
-</option>
-              <option value="cancelled">
-  {t('teacher.assignments.cancelled')}
-</option>
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+              className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
+              <option value="all">{t('teacher.assignments.allStatus')}</option>
+              <option value="active">{t('teacher.common.active')}</option>
+              <option value="completed">{t('teacher.common.completed')}</option>
+              <option value="cancelled">{t('teacher.assignments.cancelled')}</option>
             </select>
-            <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100">
-              <option value="all">
-  {t('teacher.assignments.allSubjects')}
-</option>
+            <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)}
+              className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
+              <option value="all">{t('teacher.assignments.allSubjects')}</option>
               {subjects.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
             </select>
           </div>
         </div>
 
-        {/* Cards */}
         {loading ? (
-          <div className="flex h-32 items-center justify-center text-slate-500">{t('teacher.assignments.loading')}</div>
+          <div className="flex h-32 items-center justify-center text-slate-500 dark:text-slate-400">{t('teacher.assignments.loading')}</div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+            {t('teacher.assignments.noAssignmentsFound')}
+          </div>
         ) : (
-          <section className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.length === 0 ? (
-              <div className="col-span-3 rounded-2xl border border-dashed border-slate-200 px-4 py-12 text-center text-sm text-slate-500">
-                {t('teacher.assignments.noAssignmentsFound')}
-              </div>
-            ) : filtered.map(a => {
-              const isOverdue = new Date(a.dueDate) < new Date() && a.status === 'active';
-              return (
-                <div key={a._id} className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold text-slate-900">{a.title}</h3>
-                      <p className="mt-1 text-sm text-slate-500">{a.courseId?.name || t('teacher.assignments.noSubject')}</p>
-                    </div>
-                    <span
-  className={`rounded-full px-3 py-1 text-xs font-medium ${
-    statusColors[a.status] || 'bg-slate-100 text-slate-600'
-  }`}
->
-  {a.status === 'active'
-    ? t('teacher.common.active')
-    : a.status === 'completed'
-    ? t('teacher.common.completed')
-    : a.status === 'cancelled'
-    ? t('teacher.assignments.cancelled')
-    : a.status}
-</span>
-                  </div>
-
-                  <p className="mt-3 text-sm text-slate-600 line-clamp-2">{a.description}</p>
-
-                  <div className="mt-3 space-y-1 text-sm">
-                    <p className={`font-medium ${isOverdue ? 'text-rose-600' : 'text-slate-600'}`}>
-                      {t('teacher.assignments.due')}: {new Date(a.dueDate).toLocaleDateString()} {isOverdue && (
-  <> ⚠️ {t('teacher.assignments.overdueLabel')}</>
-)}
-                    </p>
-                    <p className="text-slate-500">{t('teacher.assignments.maxPoints')}: {a.maxPoints}</p>
-                  </div>
-
-                  <div className="mt-4 flex gap-2">
-                    {a.status === 'active' && (
-                      <button onClick={() => handleStatusChange(a._id, 'completed')} className="rounded-2xl border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-700 transition-all duration-200 hover:bg-sky-100">
-                        {t('teacher.assignments.markComplete')}
-                      </button>
-                    )}
-                    <button onClick={() => handleDelete(a._id)} className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-700 transition-all duration-200 hover:bg-rose-100">
-                      {t('teacher.assignments.delete')}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </section>
+          <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.assignments.title')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.assignments.subject')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.assignments.dueDate')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.assignments.maxPoints')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.assignments.status')}</th>
+                  <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('teacher.common.actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(a => {
+                  const isOverdue = new Date(a.dueDate) < new Date() && a.status === 'active';
+                  return (
+                    <tr key={a._id} className="border-b border-slate-100 hover:bg-slate-50 dark:border-slate-700/50 dark:hover:bg-slate-800/30">
+                      <td className="p-4 font-medium text-slate-900 dark:text-slate-100">{a.title}</td>
+                      <td className="p-4 text-slate-600 dark:text-slate-300">{a.courseId?.name || t('teacher.assignments.noSubject')}</td>
+                      <td className={`p-4 ${isOverdue ? 'text-rose-600 dark:text-rose-400' : 'text-slate-600 dark:text-slate-300'}`}>
+                        {new Date(a.dueDate).toLocaleDateString()} {isOverdue && <span className="ml-1 text-xs">⚠</span>}
+                      </td>
+                      <td className="p-4 text-slate-600 dark:text-slate-300">{a.maxPoints}</td>
+                      <td className="p-4">
+                        <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[a.status] || 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'}`}>
+                          {a.status === 'active' ? t('teacher.common.active') : a.status === 'completed' ? t('teacher.common.completed') : a.status === 'cancelled' ? t('teacher.assignments.cancelled') : a.status}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex gap-2">
+                          <button onClick={() => navigate(`/teacher/create-assignments?id=${a._id}`)}
+                            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
+                            {t('teacher.common.edit')}
+                          </button>
+                          {a.status === 'active' && (
+                            <button onClick={() => handleStatusChange(a._id, 'completed')}
+                              className="rounded-xl border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-400 dark:hover:bg-sky-900/50">
+                              {t('teacher.assignments.markComplete')}
+                            </button>
+                          )}
+                          <button onClick={() => handleDelete(a._id)}
+                            className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-700 transition hover:bg-rose-100 dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-900/50">
+                            {t('teacher.assignments.delete')}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
-
       </div>
     </div>
   );

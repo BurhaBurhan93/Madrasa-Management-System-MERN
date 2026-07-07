@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import { 
   FiAward, 
   FiDownload, 
@@ -19,10 +20,12 @@ import Button from '../components/UIHelper/Button';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { PieChartComponent } from '../components/UIHelper/ECharts';
 import { formatDate } from '../lib/utils';
+import { unwrapArrayResponse } from '../lib/studentData';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const StudentCertificates = () => {
+  const { t } = useTranslation(['student', 'common']);
   const [certificates, setCertificates] = useState([]);
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +66,7 @@ const StudentCertificates = () => {
       const docsResponse = await axios.get(`${API_BASE}/student/documents`, config);
       const resultsResponse = await axios.get(`${API_BASE}/student/final-results`, config);
       
-      const docs = docsResponse.data || [];
+      const docs = unwrapArrayResponse(docsResponse.data);
       const formattedCerts = docs.map(doc => ({
         id: doc._id,
         title: doc.type || 'Certificate of Excellence',
@@ -75,7 +78,7 @@ const StudentCertificates = () => {
       }));
       setCertificates(formattedCerts);
       
-      const results = resultsResponse.data || [];
+      const results = unwrapArrayResponse(resultsResponse.data);
       const formattedAchievements = results
         .filter(r => r.grade && r.status === 'pass')
         .map((r, index) => ({
@@ -122,10 +125,10 @@ const StudentCertificates = () => {
       {/* Hero Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Total Certificates', value: certificates.length, icon: <FiAward />, color: 'blue' },
-          { label: 'Academic Badges', value: achievements.length, icon: <FiTrendingUp />, color: 'emerald' },
-          { label: 'Course Credits', value: certificates.length * 3, icon: <FiActivity />, color: 'purple' },
-          { label: 'Verified Status', value: '100%', icon: <FiCheckCircle />, color: 'cyan' }
+          { label: t('totalCertificates', 'Total Certificates'), value: certificates.length, icon: <FiAward />, color: 'blue' },
+          { label: t('academicBadges', 'Academic Badges'), value: achievements.length, icon: <FiTrendingUp />, color: 'emerald' },
+          { label: t('courseCredits', 'Course Credits'), value: certificates.length * 3, icon: <FiActivity />, color: 'purple' },
+          { label: t('verifiedStatus', 'Verified Status'), value: '100%', icon: <FiCheckCircle />, color: 'cyan' }
         ].map((stat, i) => (
           <div key={i} className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
             <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
@@ -140,7 +143,7 @@ const StudentCertificates = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Certificates List */}
         <div className="lg:col-span-2 space-y-6">
-          <Card title="Earned Certificates" className="rounded-[32px] p-8">
+          <Card title={t('earnedCertificates', 'Earned Certificates')} className="rounded-[32px] p-8">
             <div className="space-y-6">
               {certificates.length > 0 ? (
                 certificates.map((cert) => (
@@ -170,6 +173,8 @@ const StudentCertificates = () => {
                           onClick={() => {
                             if (cert.downloadUrl) {
                               window.open(cert.downloadUrl, '_blank');
+                            } else {
+                              alert('No online file is attached to this certificate.');
                             }
                           }}
                         >
@@ -184,6 +189,8 @@ const StudentCertificates = () => {
                               link.href = cert.downloadUrl;
                               link.download = `${cert.title}.pdf`;
                               link.click();
+                            } else {
+                              alert('No downloadable file is attached to this certificate.');
                             }
                           }}
                         >
@@ -196,14 +203,14 @@ const StudentCertificates = () => {
               ) : (
                 <div className="py-20 text-center">
                   <FiAward className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No certificates earned yet</p>
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('noCertificatesYet', 'No certificates earned yet')}</p>
                 </div>
               )}
             </div>
           </Card>
 
           {/* Badges Section */}
-          <Card title="Skills & Achievements" className="rounded-[32px] p-8">
+          <Card title={t('skillsAchievements', 'Skills & Achievements')} className="rounded-[32px] p-8">
             {achievements.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {achievements.map((achievement) => (
@@ -224,7 +231,7 @@ const StudentCertificates = () => {
 
         {/* Sidebar Analytics */}
         <div className="space-y-8">
-          <Card title="Portfolio Health" className="rounded-[32px] p-8">
+          <Card title={t('portfolioHealth', 'Portfolio Health')} className="rounded-[32px] p-8">
             <PieChartComponent 
               data={[
                 { name: 'Completed', value: certificates.length, color: '#3B82F6' },

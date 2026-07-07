@@ -19,6 +19,7 @@ const listModel = async (Model, req, res, options = {}) => {
     const skip = (page - 1) * limit;
 
     const query = {};
+    if (options.filters) Object.assign(query, options.filters);
     if (options.searchFields && req.query.search) {
       const safe = String(req.query.search).trim();
       if (safe.length > 0) {
@@ -26,8 +27,14 @@ const listModel = async (Model, req, res, options = {}) => {
       }
     }
 
+    let findQuery = Model.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
+    if (options.populate) {
+      const populates = Array.isArray(options.populate) ? options.populate : [options.populate];
+      populates.forEach((p) => { findQuery = findQuery.populate(p); });
+    }
+
     const [data, total] = await Promise.all([
-      Model.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      findQuery,
       Model.countDocuments(query)
     ]);
 
@@ -37,9 +44,14 @@ const listModel = async (Model, req, res, options = {}) => {
   }
 };
 
-const getById = async (Model, req, res) => {
+const getById = async (Model, req, res, options = {}) => {
   try {
-    const item = await Model.findById(req.params.id);
+    let query = Model.findById(req.params.id);
+    if (options.populate) {
+      const populates = Array.isArray(options.populate) ? options.populate : [options.populate];
+      populates.forEach((p) => { query = query.populate(p); });
+    }
+    const item = await query;
     if (!item) return res.status(404).json({ success: false, message: 'Record not found' });
     res.json({ success: true, data: item });
   } catch (error) {
@@ -133,7 +145,8 @@ exports.getAccountById = (req, res) => getById(Account, req, res);
 exports.createAccount = (req, res) => createItem(Account, req, res, (body) => {
   const openingBalance = toNumber(body.openingBalance, 0) || 0;
   const currentBalance = body.currentBalance !== undefined ? toNumber(body.currentBalance, openingBalance) : openingBalance;
-  return { ...body, openingBalance, currentBalance };
+  const accountCode = body.accountCode || `ACC-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  return { ...body, accountCode, openingBalance, currentBalance };
 });
 exports.updateAccount = (req, res) => updateItem(Account, req, res, (body) => {
   if (body.openingBalance !== undefined) body.openingBalance = toNumber(body.openingBalance, 0);
@@ -145,19 +158,32 @@ exports.deleteAccount = (req, res) => deleteItem(Account, req, res);
 // Fee Structures
 exports.listFeeStructures = (req, res) => listModel(FeeStructure, req, res, { searchFields: ['feeCode', 'feeName'] });
 exports.getFeeStructureById = (req, res) => getById(FeeStructure, req, res);
-exports.createFeeStructure = (req, res) => createItem(FeeStructure, req, res);
+exports.createFeeStructure = (req, res) => createItem(FeeStructure, req, res, (body) => {
+  const feeCode = body.feeCode || `FEE-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  return { ...body, feeCode };
+});
 exports.updateFeeStructure = (req, res) => updateItem(FeeStructure, req, res);
 exports.deleteFeeStructure = (req, res) => deleteItem(FeeStructure, req, res);
 
 // Student Fees
-exports.listStudentFees = (req, res) => listModel(StudentFee, req, res);
-exports.getStudentFeeById = (req, res) => getById(StudentFee, req, res);
+exports.listStudentFees = (req, res) => listModel(StudentFee, req, res, {
+  populate: [{ path: 'student', select: 'firstName lastName image studentCode email' }]
+});
+exports.getStudentFeeById = (req, res) => getById(StudentFee, req, res, {
+  populate: [{ path: 'student', select: 'firstName lastName image studentCode email' }]
+});
 exports.createStudentFee = (req, res) => createItem(StudentFee, req, res);
 exports.updateStudentFee = (req, res) => updateItem(StudentFee, req, res);
 exports.deleteStudentFee = (req, res) => deleteItem(StudentFee, req, res);
 
 // Fee Payments
-exports.listFeePayments = (req, res) => listModel(FeePayment, req, res, { searchFields: ['receiptNo', 'transactionReference'] });
+exports.listFeePayments = (req, res) => listModel(FeePayment, req, res, {
+  searchFields: ['receiptNo', 'transactionReference'],
+  populate: [{ path: 'studentFee', select: 'student feeStructure totalAmount payableAmount academicYear', populate: [
+    { path: 'student', select: 'firstName lastName studentCode' },
+    { path: 'feeStructure', select: 'feeName feeCode' }
+  ]}]
+});
 exports.getFeePaymentById = (req, res) => getById(FeePayment, req, res);
 exports.createFeePayment = (req, res) => createItem(FeePayment, req, res);
 exports.updateFeePayment = (req, res) => updateItem(FeePayment, req, res);
@@ -166,12 +192,20 @@ exports.deleteFeePayment = (req, res) => deleteItem(FeePayment, req, res);
 // Expenses
 exports.listExpenses = (req, res) => listModel(Expense, req, res, { searchFields: ['expenseCode', 'category', 'title'] });
 exports.getExpenseById = (req, res) => getById(Expense, req, res);
-exports.createExpense = (req, res) => createItem(Expense, req, res);
+exports.createExpense = (req, res) => createItem(Expense, req, res, (body) => {
+  const expenseCode = body.expenseCode || `EXP-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  return { ...body, expenseCode };
+});
 exports.updateExpense = (req, res) => updateItem(Expense, req, res);
 exports.deleteExpense = (req, res) => deleteItem(Expense, req, res);
 
 // Financial Reports
-exports.listFinancialReports = (req, res) => listModel(FinancialReport, req, res, { searchFields: ['reportType', 'reportPeriod'] });
+exports.listFinancialReports = (req, res) => {
+  const filters = {};
+  if (req.query.period) filters.reportPeriod = req.query.period;
+  if (req.query.type) filters.reportType = req.query.type;
+  return listModel(FinancialReport, req, res, { searchFields: ['reportType', 'reportPeriod'], filters });
+};
 exports.getFinancialReportById = (req, res) => getById(FinancialReport, req, res);
 exports.createFinancialReport = (req, res) => createItem(FinancialReport, req, res);
 exports.updateFinancialReport = (req, res) => updateItem(FinancialReport, req, res);

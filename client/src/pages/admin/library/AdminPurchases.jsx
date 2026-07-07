@@ -1,63 +1,142 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 import api from '../../../lib/api';
+import { FiSearch, FiRefreshCw } from 'react-icons/fi';
+
+const PAGE_SIZE = 10;
 
 const BookPurchases = () => {
   const [items, setItems] = useState([]);
+  const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({ bookTitle: '', isbn: '', supplier: '', quantity: '', unitPrice: '', purchaseDate: '' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [form, setForm] = useState({ book: '', supplierName: '', quantity: '', unitPrice: '', purchaseDate: '' });
+
+  const { t } = useTranslation('admin');
+
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+  }, []);
 
   const fetchData = async () => {
-    try { const { data } = await api.get('/library/purchases'); setItems(Array.isArray(data) ? data : data.data || []); }
-    catch { setItems([]); } finally { setLoading(false); }
+    setLoading(true);
+    try {
+      const [purchasesRes, booksRes] = await Promise.all([
+        api.get('/library/purchases'),
+        api.get('/library/books'),
+      ]);
+      setItems(Array.isArray(purchasesRes.data) ? purchasesRes.data : purchasesRes.data.data || []);
+      setBooks(Array.isArray(booksRes.data) ? booksRes.data : booksRes.data.data || []);
+    } catch { setItems([]); setBooks([]); } finally { setLoading(false); }
   };
   useEffect(() => { fetchData(); }, []);
+  useEffect(() => { setPage(1); }, [searchTerm]);
+
+  const filtered = useMemo(() => {
+    const s = searchTerm.toLowerCase();
+    return items.filter(item =>
+      (item.book?.title || '').toLowerCase().includes(s) ||
+      (item.supplierName || '').toLowerCase().includes(s)
+    );
+  }, [items, searchTerm]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try { if (editingId) await api.put(`/library/purchases/${editingId}`, form); else await api.post('/library/purchases', form); setShowForm(false); setEditingId(null); fetchData(); } catch (err) { console.error(err); }
+    try {
+      const qty = Number(form.quantity) || 0;
+      const price = Number(form.unitPrice) || 0;
+      await api.post('/library/purchases', {
+        book: form.book,
+        supplierName: form.supplierName,
+        quantity: qty,
+        unitPrice: price,
+        totalPrice: qty * price,
+        purchaseDate: form.purchaseDate || undefined,
+        purchaseCode: `PUR-${Date.now()}`,
+      });
+      setShowForm(false); setForm({ book: '', supplierName: '', quantity: '', unitPrice: '', purchaseDate: '' }); fetchData();
+    } catch (err) { console.error(err); }
   };
-  const handleEdit = (item) => { setForm({ bookTitle: item.bookTitle || '', isbn: item.isbn || '', supplier: item.supplier || '', quantity: item.quantity || '', unitPrice: item.unitPrice || '', purchaseDate: item.purchaseDate || '' }); setEditingId(item._id); setShowForm(true); };
-  const handleDelete = async (id) => { if (!window.confirm('Delete this record?')) return; try { await api.delete(`/library/purchases/${id}`); fetchData(); } catch (err) { console.error(err); } };
 
-  if (loading) return <div className="flex items-center justify-center py-20 text-slate-500">Loading...</div>;
+  const handleDelete = async (id) => { if (!window.confirm(t('library.deleteBookConfirm'))) return; try { await api.delete(`/library/purchases/${id}`); fetchData(); } catch (err) { console.error(err); } };
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="flex items-center gap-3 text-slate-400">
+        <FiRefreshCw className="animate-spin h-6 w-6" />
+        <span className="text-lg">{t('common.loading')}</span>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-slate-900">Book Purchases</h1><p className="mt-1 text-sm text-slate-500">Manage book purchase orders and records</p></div>
-        <button onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ bookTitle: '', isbn: '', supplier: '', quantity: '', unitPrice: '', purchaseDate: '' }); }} className="rounded-xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-cyan-200 hover:bg-cyan-700">{showForm ? 'Cancel' : '+ Add New'}</button>
-      </div>
-      {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Book Title</label><input value={form.bookTitle} onChange={e => setForm({ ...form, bookTitle: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Isbn</label><input value={form.isbn} onChange={e => setForm({ ...form, isbn: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"  /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Supplier</label><input value={form.supplier} onChange={e => setForm({ ...form, supplier: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"  /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Quantity</label><input value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"  /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Unit Price</label><input value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"  /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Purchase Date</label><input value={form.purchaseDate} onChange={e => setForm({ ...form, purchaseDate: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"  /></div>
+    <div className="w-full min-h-screen bg-gray-50 p-6">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div><h1 className="text-2xl font-bold text-slate-900">{t('library.bookPurchases')}</h1><p className="mt-1 text-sm text-slate-500">{t('library.managePurchases')}</p></div>
+          <button onClick={() => { setShowForm(!showForm); setForm({ book: '', supplierName: '', quantity: '', unitPrice: '', purchaseDate: '' }); }} className="rounded-xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-cyan-200 hover:bg-cyan-700">{showForm ? t('common.cancel') : t('common.add')}</button>
+        </div>
+        {showForm && (
+          <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('library.bookTitle')}</label>
+                <select value={form.book} onChange={e => setForm({ ...form, book: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required>
+                  <option value="">{t('common.select')}</option>
+                  {books.map(b => <option key={b._id} value={b._id}>{b.title}</option>)}
+                </select>
+              </div>
+              <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('library.supplier')}</label><input value={form.supplierName} onChange={e => setForm({ ...form, supplierName: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+              <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('library.quantity')}</label><input type="number" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" min="1" /></div>
+              <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('library.unitPrice')}</label><input type="number" value={form.unitPrice} onChange={e => setForm({ ...form, unitPrice: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" min="0" /></div>
+              <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('library.purchaseDate')}</label><input type="date" value={form.purchaseDate} onChange={e => setForm({ ...form, purchaseDate: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+            </div>
+            <button type="submit" className="mt-4 rounded-lg bg-cyan-600 px-6 py-2 text-sm font-medium text-white hover:bg-cyan-700">{t('common.create')}</button>
+          </form>
+        )}
+        <div className="relative">
+          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
+          <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={t('common.search') + '...'} className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 shadow-sm" />
+        </div>
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-slate-200 bg-slate-50"><tr><th className="px-5 py-3 font-semibold text-slate-600">{t('library.book')}</th><th className="px-5 py-3 font-semibold text-slate-600">{t('library.supplier')}</th><th className="px-5 py-3 font-semibold text-slate-600">{t('library.qty')}</th><th className="px-5 py-3 font-semibold text-slate-600">{t('library.price')}</th><th className="px-5 py-3 font-semibold text-slate-600">{t('common.actions')}</th></tr></thead>
+            <tbody>
+              {filtered.length === 0 && !loading && <tr><td colSpan={5} className="px-5 py-10 text-center text-slate-400">{t('common.noRecords')}</td></tr>}
+              {paginated.map(item => (
+                <tr key={item._id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="px-5 py-3 text-slate-600 font-medium">{item.book?.title || item.book || '-'}</td>
+                  <td className="px-5 py-3 text-slate-600">{item.supplierName || '-'}</td>
+                  <td className="px-5 py-3 text-slate-600">{item.quantity || '-'}</td>
+                  <td className="px-5 py-3 text-slate-600">{item.totalPrice ? `Rs. ${item.totalPrice}` : '-'}</td>
+                  <td className="px-5 py-3"><button onClick={() => handleDelete(item._id)} className="rounded-lg bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">{t('common.delete')}</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-slate-500">{t('common.page')} {page} {t('common.of')} {totalPages}</span>
+            <div className="flex gap-1.5">
+              <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Prev</button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                <button key={p} onClick={() => setPage(p)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${page === p ? 'bg-slate-800 text-white shadow-md' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{p}</button>
+              ))}
+              <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Next</button>
+            </div>
           </div>
-          <button type="submit" className="mt-4 rounded-lg bg-cyan-600 px-6 py-2 text-sm font-medium text-white hover:bg-cyan-700">{editingId ? 'Update' : 'Create'}</button>
-        </form>
-      )}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50"><tr><th className="px-5 py-3 font-semibold text-slate-600">Book</th><th className="px-5 py-3 font-semibold text-slate-600">ISBN</th><th className="px-5 py-3 font-semibold text-slate-600">Supplier</th><th className="px-5 py-3 font-semibold text-slate-600">Qty</th><th className="px-5 py-3 font-semibold text-slate-600">Price</th><th className="px-5 py-3 font-semibold text-slate-600">Actions</th></tr></thead>
-          <tbody>
-            {items.length === 0 && <tr><td colSpan={6} className="px-5 py-10 text-center text-slate-400">No records found</td></tr>}
-            {items.map(item => (
-              <tr key={item._id} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="px-5 py-3 text-slate-600">{item.bookTitle || '-'}</td>
-                <td className="px-5 py-3 text-slate-600">{item.isbn || '-'}</td>
-                <td className="px-5 py-3 text-slate-600">{item.supplier || '-'}</td>
-                <td className="px-5 py-3 text-slate-600">{item.quantity || '-'}</td>
-                <td className="px-5 py-3"><div className="flex gap-2"><button onClick={() => handleEdit(item)} className="rounded-lg bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100">Edit</button><button onClick={() => handleDelete(item._id)} className="rounded-lg bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">Delete</button></div></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        )}
       </div>
     </div>
   );

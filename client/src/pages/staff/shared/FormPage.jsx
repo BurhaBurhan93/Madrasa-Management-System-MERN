@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../../../components/UIHelper/Card';
 import Button from '../../../components/UIHelper/Button';
 import Input from '../../../components/UIHelper/Input';
@@ -9,6 +10,7 @@ import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { getStaffToneStyles } from './staffTheme';
 import { localizeAdminText } from '../../../lib/adminLocalization';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 
 const formatFieldLabel = (label = '') => label.toLowerCase().replace(/\s+/g, ' ');
 
@@ -75,8 +77,8 @@ const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
   if (readMode === 'collection') {
     const res = await apiFetch(targetEndpoint);
     const data = await parseJsonSafe(res);
-    if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load');
-    const rows = data.data || [];
+    if (!res.ok) throw new Error(data?.message || 'Failed to load');
+    const rows = Array.isArray(data) ? data : (data?.data || []);
     const match = rows.find((row) => String(row._id) === String(id));
     if (!match) throw new Error('Record not found');
     return match;
@@ -84,8 +86,8 @@ const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
 
   const res = await apiFetch(`${targetEndpoint}/${id}`);
   const data = await parseJsonSafe(res);
-  if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load');
-  return data.data;
+  if (!res.ok) throw new Error(data?.message || 'Failed to load');
+  return data?.data || data;
 };
 
 const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, mapRowToForm, mapFormToPayload, mode, id, onSavedPath, readMode = 'single', readEndpoint }) => {
@@ -95,9 +97,10 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const adminLang = localStorage.getItem('adminLang') || 'en';
+  const adminLang = readStoredLanguage('adminLang', 'en');
   const toneStyles = getStaffToneStyles(endpoint || titleCreate || titleEdit);
 
   const stepCount = formFields.length > 16 ? 5 : 4;
@@ -138,6 +141,11 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
           newFieldErrors[name] = 'Only numbers are allowed';
         }
       });
+      formFields.forEach(({ name, required }) => {
+        if (required && (!form[name] || form[name] === '')) {
+          newFieldErrors[name] = 'This field is required';
+        }
+      });
       if (Object.keys(newFieldErrors).length > 0) {
         setFieldErrors(newFieldErrors);
         throw new Error(localizeAdminText('Please correct the highlighted fields.', adminLang));
@@ -151,7 +159,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       });
       const data = await parseJsonSafe(res);
       if (!res.ok || !data.success) throw new Error(data.message || 'Save failed');
-      if (onSavedPath) window.location.href = onSavedPath;
+      if (onSavedPath) navigate(onSavedPath);
     } catch (err) {
       setError(err.message || localizeAdminText('Save error', adminLang));
     } finally {
@@ -325,7 +333,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       title={mode === 'edit' ? titleEdit : titleCreate}
       subtitle="A phased entry flow keeps create and edit tasks easier to complete without overwhelming the form."
       tone={endpoint || titleCreate || titleEdit}
-      actions={<Button variant="outline" onClick={() => window.history.back()}>{localizeAdminText('Back', adminLang)}</Button>}
+      actions={<Button variant="outline" onClick={() => navigate(-1)}>{localizeAdminText('Back', adminLang)}</Button>}
     >
       <Card className="rounded-[28px] shadow-sm">
         {loading ? (
@@ -381,7 +389,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
                     <h3 className={`text-sm font-semibold ${isDark ? 'text-rose-200' : 'text-rose-900'}`}>{localizeAdminText('Form Error', adminLang)}</h3>
                     <p className={`mt-1 text-sm ${isDark ? 'text-rose-300' : 'text-rose-700'}`}>{error}</p>
                     <button
-                      onClick={() => window.location.reload()}
+                      onClick={() => setError('')}
                       className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700"
                     >
                       {localizeAdminText('Retry', adminLang)}
@@ -393,7 +401,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
 
             <div className={`flex flex-col gap-3 border-t pt-5 sm:flex-row sm:justify-between ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => window.history.back()}>{localizeAdminText('Cancel', adminLang)}</Button>
+                <Button variant="outline" onClick={() => navigate(-1)}>{localizeAdminText('Cancel', adminLang)}</Button>
               </div>
               <div className="flex gap-3">
                 {canGoBack && <Button variant="outline" onClick={goBack}>{localizeAdminText('Back', adminLang)}</Button>}

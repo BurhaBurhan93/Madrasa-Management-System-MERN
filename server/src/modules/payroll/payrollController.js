@@ -17,6 +17,7 @@ const listModel = async (Model, req, res, options = {}) => {
     const skip = (page - 1) * limit;
 
     const query = {};
+    if (options.filters) Object.assign(query, options.filters);
     if (options.searchFields && req.query.search) {
       const safe = String(req.query.search).trim();
       if (safe.length > 0) {
@@ -24,8 +25,13 @@ const listModel = async (Model, req, res, options = {}) => {
       }
     }
 
+    let findQuery = Model.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
+    if (options.populate) {
+      const populates = Array.isArray(options.populate) ? options.populate : [options.populate];
+      populates.forEach((p) => { findQuery = findQuery.populate(p); });
+    }
     const [data, total] = await Promise.all([
-      Model.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      findQuery,
       Model.countDocuments(query)
     ]);
 
@@ -82,7 +88,11 @@ exports.updateSalaryStructure = (req, res) => updateItem(SalaryStructure, req, r
 exports.deleteSalaryStructure = (req, res) => deleteItem(SalaryStructure, req, res);
 
 // Salary Payments
-exports.listSalaryPayments = (req, res) => listModel(SalaryPayment, req, res);
+exports.listSalaryPayments = async (req, res) => {
+  const options = { populate: [{ path: 'employee', select: 'fullName employeeCode department' }] };
+  if (req.query.search) options.searchFields = ['transactionReference'];
+  return listModel(SalaryPayment, req, res, options);
+};
 exports.getSalaryPaymentById = (req, res) => getById(SalaryPayment, req, res);
 exports.createSalaryPayment = (req, res) => createItem(SalaryPayment, req, res);
 exports.updateSalaryPayment = (req, res) => updateItem(SalaryPayment, req, res);
@@ -110,4 +120,10 @@ exports.listEmployees = async (req, res) => {
   } catch (e) {
     res.status(500).json({ success: false, message: e.message });
   }
+};
+
+// Employee types for dynamic dropdown
+const EMPLOYEE_TYPES = ['teacher','admin','finance','registrar','hr','librarian','kitchen','security','support','maintenance'];
+exports.listEmployeeTypes = (req, res) => {
+  res.json({ success: true, data: EMPLOYEE_TYPES.map((t) => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) })) });
 };

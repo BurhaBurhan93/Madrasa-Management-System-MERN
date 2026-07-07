@@ -6,6 +6,9 @@ const ctrl = require('./payrollController');
 
 router.use(auth, authorizeRoles('admin', 'staff'));
 
+// Employee types for dynamic dropdown
+router.get('/employee-types', ctrl.listEmployeeTypes);
+
 // Employees list for relation dropdowns
 router.get('/employees', ctrl.listEmployees);
 

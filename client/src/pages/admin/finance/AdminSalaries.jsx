@@ -1,73 +1,332 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import api from '../../../lib/api';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
+import { FiSearch, FiRefreshCw, FiDollarSign, FiPlus, FiEdit2, FiTrash2, FiCheckCircle, FiClock, FiXCircle, FiUsers } from 'react-icons/fi';
+
+const PAGE_SIZE = 10;
+const emptyForm = { employee: '', salaryMonth: 1, salaryYear: new Date().getFullYear(), grossSalary: '', totalAllowance: '', totalDeduction: '', netSalary: 0, paymentDate: '', paymentMethod: 'cash', transactionReference: '', paymentStatus: 'pending' };
 
 const AdminSalaries = () => {
+  const { t } = useTranslation('admin');
   const [salaries, setSalaries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({ employeeName: '', designation: '', basicSalary: '', allowances: '', deductions: '', month: '', status: 'pending' });
+  const [employees, setEmployees] = useState([]);
+  const [form, setForm] = useState(emptyForm);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [saving, setSaving] = useState(false);
 
   const fetchData = async () => {
+    setLoading(true);
     try { const { data } = await api.get('/payroll/salary-payments'); setSalaries(Array.isArray(data) ? data : data.data || []); }
     catch { setSalaries([]); } finally { setLoading(false); }
   };
-  useEffect(() => { fetchData(); }, []);
+  const fetchEmployees = async () => {
+    try { const { data } = await api.get('/payroll/employees'); setEmployees(Array.isArray(data) ? data : data.data || []); } catch { setEmployees([]); }
+  };
+  useEffect(() => { fetchData(); fetchEmployees(); }, []);
+  useEffect(() => { const lang = readStoredLanguage(); if (lang) i18n.changeLanguage(lang); }, []);
+  useEffect(() => { setPage(1); }, [searchTerm, statusFilter]);
+
+  const monthNames = [t('common.jan'),t('common.feb'),t('common.mar'),t('common.apr'),t('common.may'),t('common.jun'),t('common.jul'),t('common.aug'),t('common.sep'),t('common.oct'),t('common.nov'),t('common.dec')];
+
+  const calcNet = (gross, allow, deduct) => {
+    const g = Number(gross) || 0; const a = Number(allow) || 0; const d = Number(deduct) || 0;
+    return g + a - d;
+  };
+
+  const handleChange = (key, val) => {
+    const next = { ...form, [key]: val };
+    next.netSalary = calcNet(next.grossSalary, next.totalAllowance, next.totalDeduction);
+    setForm(next);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try { if (editingId) await api.put(`/payroll/salary-payments/${editingId}`, form); else await api.post('/payroll/salary-payments', form); setShowForm(false); setEditingId(null); fetchData(); } catch (err) { console.error(err); }
+    setSaving(true);
+    const payload = {
+      employee: form.employee,
+      salaryMonth: Number(form.salaryMonth),
+      salaryYear: Number(form.salaryYear),
+      grossSalary: Number(form.grossSalary) || 0,
+      totalAllowance: Number(form.totalAllowance) || 0,
+      totalDeduction: Number(form.totalDeduction) || 0,
+      netSalary: calcNet(form.grossSalary, form.totalAllowance, form.totalDeduction),
+      paymentDate: form.paymentDate || undefined,
+      paymentMethod: form.paymentMethod,
+      transactionReference: form.transactionReference,
+      paymentStatus: form.paymentStatus,
+    };
+    try {
+      if (editingId) await api.put(`/payroll/salary-payments/${editingId}`, payload);
+      else await api.post('/payroll/salary-payments', payload);
+      setShowForm(false); setEditingId(null); setForm(emptyForm);
+      fetchData();
+    } catch (err) { console.error(err); } finally { setSaving(false); }
   };
-  const handleEdit = (item) => { setForm({ employeeName: item.employeeName || '', designation: item.designation || '', basicSalary: item.basicSalary || '', allowances: item.allowances || '', deductions: item.deductions || '', month: item.month || '', status: item.status || 'pending' }); setEditingId(item._id); setShowForm(true); };
-  const handleDelete = async (id) => { if (!window.confirm('Delete this record?')) return; try { await api.delete(`/payroll/salary-payments/${id}`); fetchData(); } catch (err) { console.error(err); } };
 
-  const totalPayable = salaries.filter(s => s.status !== 'paid').reduce((sum, s) => sum + ((parseFloat(s.basicSalary) || 0) + (parseFloat(s.allowances) || 0) - (parseFloat(s.deductions) || 0)), 0);
+  const handleEdit = (item) => {
+    const empId = item.employee?._id || item.employee || '';
+    setForm({
+      employee: empId,
+      salaryMonth: item.salaryMonth || 1,
+      salaryYear: item.salaryYear || new Date().getFullYear(),
+      grossSalary: item.grossSalary || 0,
+      totalAllowance: item.totalAllowance || 0,
+      totalDeduction: item.totalDeduction || 0,
+      netSalary: item.netSalary || 0,
+      paymentDate: item.paymentDate ? item.paymentDate.slice(0, 10) : '',
+      paymentMethod: item.paymentMethod || 'cash',
+      transactionReference: item.transactionReference || '',
+      paymentStatus: item.paymentStatus || 'paid',
+    });
+    setEditingId(item._id); setShowForm(true);
+  };
 
-  if (loading) return <div className="flex items-center justify-center py-20 text-slate-500">Loading...</div>;
+  const handleDelete = async (id) => {
+    if (!window.confirm(t('finance.deleteSalaryConfirm'))) return;
+    try { await api.delete(`/payroll/salary-payments/${id}`); fetchData(); } catch (err) { console.error(err); }
+  };
+
+  const getEmployeeName = (p) => {
+    if (p.employee?.fullName) return p.employee.fullName;
+    if (p.employeeName) return p.employeeName;
+    return '-';
+  };
+
+  const filtered = useMemo(() => {
+    const s = searchTerm.toLowerCase();
+    let result = salaries.filter(sal => {
+      const name = getEmployeeName(sal).toLowerCase();
+      return name.includes(s);
+    });
+    if (statusFilter !== 'all') result = result.filter(sal => sal.paymentStatus === statusFilter);
+    return result;
+  }, [salaries, searchTerm, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const stats = useMemo(() => ({
+    total: salaries.length,
+    payable: salaries.filter(s => s.paymentStatus !== 'paid').reduce((sum, s) => sum + (s.netSalary || 0), 0),
+    paid: salaries.filter(s => s.paymentStatus === 'paid').reduce((sum, s) => sum + (s.netSalary || 0), 0),
+    paidCount: salaries.filter(s => s.paymentStatus === 'paid').length,
+    pendingCount: salaries.filter(s => s.paymentStatus === 'pending').length,
+  }), [salaries]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex items-center gap-3 text-slate-400">
+          <FiRefreshCw className="animate-spin h-6 w-6" />
+          <span className="text-lg">{t('common.loading')}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-slate-900">Salaries</h1><p className="mt-1 text-sm text-slate-500">Manage employee salary records and payments</p></div>
-        <button onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ employeeName: '', designation: '', basicSalary: '', allowances: '', deductions: '', month: '', status: 'pending' }); }} className="rounded-xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-cyan-200 hover:bg-cyan-700">{showForm ? 'Cancel' : '+ Add Salary'}</button>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">{t('finance.salaries')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('finance.manageSalaries')}</p>
+        </div>
+        <button
+          onClick={() => { setShowForm(!showForm); setEditingId(null); setForm(emptyForm); }}
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-cyan-200 hover:shadow-xl hover:from-cyan-600 hover:to-blue-700 transition-all"
+        >
+          <FiPlus size={16} /> {showForm ? t('common.cancel') : t('finance.addSalary')}
+        </button>
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-xs font-medium text-slate-500">Total Records</p><p className="mt-1 text-2xl font-bold text-slate-900">{salaries.length}</p></div>
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5"><p className="text-xs font-medium text-amber-600">Total Payable</p><p className="mt-1 text-2xl font-bold text-amber-700">₨ {totalPayable.toLocaleString()}</p></div>
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5"><p className="text-xs font-medium text-emerald-600">Paid</p><p className="mt-1 text-2xl font-bold text-emerald-700">{salaries.filter(s => s.status === 'paid').length}</p></div>
+
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {[
+          { label: 'Total', value: stats.total, gradient: 'from-slate-500 to-slate-600', icon: FiUsers },
+          { label: t('finance.totalPayable'), value: `₨${stats.payable.toLocaleString()}`, gradient: 'from-amber-500 to-orange-600', icon: FiClock },
+          { label: t('finance.paid'), value: `₨${stats.paid.toLocaleString()} (${stats.paidCount})`, gradient: 'from-emerald-500 to-teal-600', icon: FiCheckCircle },
+          { label: t('finance.pending'), value: stats.pendingCount, gradient: 'from-rose-500 to-pink-600', icon: FiXCircle },
+        ].map((stat, i) => (
+          <div key={i} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${stat.gradient} p-5 text-white shadow-lg`}>
+            <div className="relative z-10">
+              <p className="text-sm font-medium text-white/80">{stat.label}</p>
+              <p className="mt-1 text-2xl font-bold truncate">{stat.value}</p>
+            </div>
+            <stat.icon className="absolute right-3 top-3 h-12 w-12 text-white/10" />
+          </div>
+        ))}
       </div>
+
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="relative flex-1">
+          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
+          <input
+            type="text"
+            placeholder={t('finance.searchSalaries') || 'Search salaries...'}
+            className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+          className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 shadow-sm"
+        >
+          <option value="all">{t('common.all')}</option>
+          {['paid', 'pending', 'failed'].map(s => (
+            <option key={s} value={s}>{t(`finance.${s}`) || s}</option>
+          ))}
+        </select>
+      </div>
+
       {showForm && (
         <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Employee Name</label><input value={form.employeeName} onChange={e => setForm({ ...form, employeeName: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Designation</label><input value={form.designation} onChange={e => setForm({ ...form, designation: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Basic Salary</label><input type="number" value={form.basicSalary} onChange={e => setForm({ ...form, basicSalary: +e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Allowances</label><input type="number" value={form.allowances} onChange={e => setForm({ ...form, allowances: +e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Deductions</label><input type="number" value={form.deductions} onChange={e => setForm({ ...form, deductions: +e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">Month</label><input type="month" value={form.month} onChange={e => setForm({ ...form, month: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('common.employee')} *</label>
+              <select value={form.employee} onChange={e => handleChange('employee', e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" required>
+                <option value="">{t('common.select')} {t('common.employee')}</option>
+                {employees.map(emp => <option key={emp._id} value={emp._id}>{emp.fullName || emp.employeeCode}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('common.month')} *</label>
+              <select value={form.salaryMonth} onChange={e => handleChange('salaryMonth', +e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" required>
+                {monthNames.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('common.year')} *</label>
+              <input type="number" value={form.salaryYear} onChange={e => handleChange('salaryYear', +e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" required />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.grossSalary')} *</label>
+              <input type="number" value={form.grossSalary} onChange={e => handleChange('grossSalary', e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" required />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.allowances')}</label>
+              <input type="number" value={form.totalAllowance} onChange={e => handleChange('totalAllowance', e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.deductions')}</label>
+              <input type="number" value={form.totalDeduction} onChange={e => handleChange('totalDeduction', e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.netSalary')}</label>
+              <input type="number" value={form.netSalary} readOnly className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.paymentDate')}</label>
+              <input type="date" value={form.paymentDate} onChange={e => handleChange('paymentDate', e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.paymentMethod')}</label>
+              <select value={form.paymentMethod} onChange={e => handleChange('paymentMethod', e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                <option value="cash">{t('finance.cash')}</option><option value="bank">{t('finance.bank')}</option><option value="card">{t('finance.card')}</option><option value="other">{t('finance.other')}</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.transactionRef')}</label>
+              <input value={form.transactionReference} onChange={e => handleChange('transactionReference', e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('common.status')}</label>
+              <select value={form.paymentStatus} onChange={e => handleChange('paymentStatus', e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                <option value="pending">{t('finance.pending')}</option><option value="paid">{t('finance.paid')}</option><option value="failed">{t('finance.failed')}</option>
+              </select>
+            </div>
           </div>
-          <button type="submit" className="mt-4 rounded-lg bg-cyan-600 px-6 py-2 text-sm font-medium text-white hover:bg-cyan-700">{editingId ? 'Update' : 'Add'} Salary</button>
+          <div className="mt-4 flex gap-3">
+            <button type="submit" disabled={saving || !form.employee} className="flex-1 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+              {saving ? <span className="flex items-center justify-center gap-2"><FiRefreshCw className="animate-spin h-4 w-4" /> {t('common.saving')}</span> : editingId ? t('common.update') : t('finance.addSalary')}
+            </button>
+            <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }} className="flex-1 rounded-lg border border-slate-300 px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">{t('common.cancel')}</button>
+          </div>
         </form>
       )}
+
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50"><tr><th className="px-5 py-3 font-semibold text-slate-600">Employee</th><th className="px-5 py-3 font-semibold text-slate-600">Basic</th><th className="px-5 py-3 font-semibold text-slate-600">Allowances</th><th className="px-5 py-3 font-semibold text-slate-600">Deductions</th><th className="px-5 py-3 font-semibold text-slate-600">Net</th><th className="px-5 py-3 font-semibold text-slate-600">Status</th><th className="px-5 py-3 font-semibold text-slate-600">Actions</th></tr></thead>
-          <tbody>
-            {salaries.length === 0 && <tr><td colSpan={7} className="px-5 py-10 text-center text-slate-400">No salary records</td></tr>}
-            {salaries.map(s => { const net = (parseFloat(s.basicSalary)||0) + (parseFloat(s.allowances)||0) - (parseFloat(s.deductions)||0); return (
-              <tr key={s._id} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="px-5 py-3 font-medium text-slate-800">{s.employeeName || '-'}</td>
-                <td className="px-5 py-3 text-slate-600">₨ {(s.basicSalary||0).toLocaleString()}</td>
-                <td className="px-5 py-3 text-emerald-600">+₨ {(s.allowances||0).toLocaleString()}</td>
-                <td className="px-5 py-3 text-rose-600">-₨ {(s.deductions||0).toLocaleString()}</td>
-                <td className="px-5 py-3 font-bold text-slate-800">₨ {net.toLocaleString()}</td>
-                <td className="px-5 py-3"><span className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${s.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{s.status || 'pending'}</span></td>
-                <td className="px-5 py-3"><div className="flex gap-2"><button onClick={() => handleEdit(s)} className="rounded-lg bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100">Edit</button><button onClick={() => handleDelete(s._id)} className="rounded-lg bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">Delete</button></div></td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-slate-200 bg-slate-50">
+              <tr>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('common.employee')}</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('common.month')}</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('finance.grossSalary')}</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('finance.allowances')}</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('finance.deductions')}</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('finance.netSalary')}</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('finance.method')}</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('common.status')}</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('common.actions')}</th>
               </tr>
-            ); })}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {paginated.length === 0 && (
+                <tr><td colSpan={9} className="px-5 py-14 text-center text-slate-400">{t('finance.noSalaries')}</td></tr>
+              )}
+              {paginated.map(s => (
+                <tr key={s._id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 text-xs font-bold text-cyan-700">
+                        {getEmployeeName(s).charAt(0) || '?'}
+                      </div>
+                      <span className="font-medium text-slate-800">{getEmployeeName(s)}</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3 text-sm text-slate-600">{monthNames[(s.salaryMonth || 1) - 1]} {s.salaryYear}</td>
+                  <td className="px-5 py-3 font-medium text-slate-800">₨ {(s.grossSalary || 0).toLocaleString()}</td>
+                  <td className="px-5 py-3 font-medium text-emerald-600">+₨{(s.totalAllowance || 0).toLocaleString()}</td>
+                  <td className="px-5 py-3 font-medium text-rose-600">-₨{(s.totalDeduction || 0).toLocaleString()}</td>
+                  <td className="px-5 py-3 font-bold text-slate-800">₨ {(s.netSalary || 0).toLocaleString()}</td>
+                  <td className="px-5 py-3">
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 capitalize">{s.paymentMethod || '-'}</span>
+                  </td>
+                  <td className="px-5 py-3">
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium capitalize ${
+                      s.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' :
+                      s.paymentStatus === 'failed' ? 'bg-rose-100 text-rose-700' :
+                      'bg-amber-100 text-amber-700'
+                    }`}>
+                      {s.paymentStatus === 'paid' ? <FiCheckCircle className="h-3 w-3" /> :
+                       s.paymentStatus === 'failed' ? <FiXCircle className="h-3 w-3" /> :
+                       <FiClock className="h-3 w-3" />}
+                      {t(`finance.${s.paymentStatus}`) || s.paymentStatus || 'pending'}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3">
+                    <div className="flex gap-1.5">
+                      <button onClick={() => handleEdit(s)} className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 transition-colors" title={t('common.edit')}><FiEdit2 size={14} /></button>
+                      <button onClick={() => handleDelete(s._id)} className="rounded-lg bg-rose-50 p-2 text-rose-600 hover:bg-rose-100 transition-colors" title={t('common.delete')}><FiTrash2 size={14} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-slate-500">{t('common.page')} {page} {t('common.of')} {totalPages}</span>
+          <div className="flex gap-1.5">
+            <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Prev</button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <button key={p} onClick={() => setPage(p)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${page === p ? 'bg-slate-800 text-white shadow-md' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{p}</button>
+            ))}
+            <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Next</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

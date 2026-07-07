@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Card from '../UIHelper/Card';
 import Badge from '../UIHelper/Badge';
@@ -6,11 +7,13 @@ import Button from '../UIHelper/Button';
 import Input from '../UIHelper/Input';
 import ErrorPage from '../UIHelper/ErrorPage';
 import { PageSkeleton } from '../UIHelper/SkeletonLoader';
+import { unwrapArrayResponse } from '../../lib/studentData';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const POLL_INTERVAL = 10000;
 
 const Library = () => {
+  const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -34,8 +37,8 @@ const Library = () => {
         axios.get(`${API_BASE}/student/books`, getConfig()),
         axios.get(`${API_BASE}/student/borrowed-books`, getConfig())
       ]);
-      setBooks(booksResponse.data || []);
-      setBorrowedBooks(borrowedResponse.data || []);
+      setBooks(unwrapArrayResponse(booksResponse.data));
+      setBorrowedBooks(unwrapArrayResponse(borrowedResponse.data));
     } catch (err) {
       setError('Failed to fetch library data. Please try again.');
       if (!silent) {
@@ -114,7 +117,7 @@ const Library = () => {
           title="Library Service Unavailable"
           message={error}
           onRetry={fetchLibraryData}
-          onHome={() => { window.location.href = '/student/dashboard'; }}
+          onHome={() => navigate('/student/dashboard')}
           showBackButton={false}
         />
       )}
@@ -177,8 +180,8 @@ const Library = () => {
                       <p className="text-sm text-gray-600">Borrowed: {new Date(book.borrowDate).toLocaleDateString()}</p>
                       <p className="text-sm text-gray-600">Due: {new Date(book.dueDate).toLocaleDateString()}</p>
                       <div className="mt-3 flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => handleRenew(book.id)}>Renew</Button>
-                        <Button size="sm" variant="danger" onClick={() => handleReturn(book.id)}>Return</Button>
+                        <Button size="sm" variant="outline" onClick={() => handleRenew(book._id || book.id)}>Renew</Button>
+                        <Button size="sm" variant="danger" onClick={() => handleReturn(book._id || book.id)}>Return</Button>
                       </div>
                     </div>
                   </div>

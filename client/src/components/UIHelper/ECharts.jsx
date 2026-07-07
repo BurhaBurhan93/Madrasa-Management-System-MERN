@@ -66,9 +66,9 @@ const ChartContainer = ({
   className = ''
 }) => {
   return (
-    <div className={`w-full bg-white/40 backdrop-blur-xl rounded-2xl shadow-md border border-white/60 p-6 ${className}`}>
+    <div className={`w-full bg-white/40 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl shadow-md border border-white/60 dark:border-slate-700 p-6 ${className}`}>
       {title && (
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100 mb-4">{title}</h3>
       )}
       <div style={{ height }} className="relative">
         {loading ? (

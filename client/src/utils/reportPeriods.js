@@ -10,6 +10,10 @@ export const formatMonthInput = (value = new Date()) => {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
 };
 
+export const formatYearInput = (value = new Date()) => {
+  return String(new Date(value).getFullYear());
+};
+
 export const formatWeekInput = (value = new Date()) => {
   const date = new Date(value);
   date.setHours(0, 0, 0, 0);
@@ -60,7 +64,7 @@ export const getDateRangeFromWeekValue = (weekValue) => {
   };
 };
 
-export const getPeriodDateRange = ({ period = 'monthly', date, week, month } = {}) => {
+export const getPeriodDateRange = ({ period = 'monthly', date, week, month, year } = {}) => {
   if (period === 'daily') {
     const start = new Date(date || formatDateInput(new Date()));
     start.setHours(0, 0, 0, 0);
@@ -74,17 +78,25 @@ export const getPeriodDateRange = ({ period = 'monthly', date, week, month } = {
     return { start, end };
   }
 
+  if (period === 'yearly') {
+    const yearValue = Number(year || new Date().getFullYear());
+    const start = new Date(yearValue, 0, 1);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(yearValue, 11, 31, 23, 59, 59, 999);
+    return { start, end };
+  }
+
   const monthValue = month || formatMonthInput(new Date());
   const [yearPart, monthPart] = monthValue.split('-');
-  const year = Number(yearPart);
+  const yearNum = Number(yearPart);
   const monthIndex = Number(monthPart) - 1;
-  const start = new Date(year, monthIndex, 1);
+  const start = new Date(yearNum, monthIndex, 1);
   start.setHours(0, 0, 0, 0);
-  const end = new Date(year, monthIndex + 1, 0, 23, 59, 59, 999);
+  const end = new Date(yearNum, monthIndex + 1, 0, 23, 59, 59, 999);
   return { start, end };
 };
 
-export const buildPeriodQuery = ({ period = 'monthly', date, week, month } = {}) => {
+export const buildPeriodQuery = ({ period = 'monthly', date, week, month, year } = {}) => {
   if (period === 'daily') {
     return { period, date: date || formatDateInput(new Date()) };
   }
@@ -94,9 +106,13 @@ export const buildPeriodQuery = ({ period = 'monthly', date, week, month } = {})
     return { period, startDate, endDate };
   }
 
+  if (period === 'yearly') {
+    return { period, year: Number(year || new Date().getFullYear()) };
+  }
+
   const monthValue = month || formatMonthInput(new Date());
-  const [year, monthNumber] = monthValue.split('-');
-  return { period, month: Number(monthNumber), year: Number(year) };
+  const [yearNum, monthNumber] = monthValue.split('-');
+  return { period, month: Number(monthNumber), year: Number(yearNum) };
 };
 
 export const getDefaultPeriodFilters = () => {
@@ -105,7 +121,8 @@ export const getDefaultPeriodFilters = () => {
     period: 'monthly',
     date: formatDateInput(now),
     week: formatWeekInput(now),
-    month: formatMonthInput(now)
+    month: formatMonthInput(now),
+    year: formatYearInput(now)
   };
 };
 

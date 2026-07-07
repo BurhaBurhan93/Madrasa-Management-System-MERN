@@ -5,7 +5,7 @@ import api from '../../lib/api';
 import CalendarDatePicker from "../../components/UIHelper/CalendarDatePicker";
 
 const AdminUsers = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('admin');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -41,12 +41,12 @@ const AdminUsers = () => {
     
     // Validate form data
     if (!formData.name || !formData.email || !formData.role) {
-      alert(t('admin.users.fillRequired'));
+      alert(t('users.fillRequired'));
       return;
     }
     
     if (!editMode && !formData.password) {
-      alert(t('admin.users.passwordRequired'));
+      alert(t('users.passwordRequired'));
       return;
     }
 
@@ -58,14 +58,14 @@ const AdminUsers = () => {
         if (!updateData.dob) delete updateData.dob;
         if (!updateData.idNumber) delete updateData.idNumber;
         await api.put(`/users/${currentUser._id}`, updateData);
-        alert(t('admin.users.userUpdated'));
+        alert(t('users.userUpdated'));
       } else {
         const payload = { ...formData };
         if (!payload.bloodType) delete payload.bloodType;
         if (!payload.dob) delete payload.dob;
         if (!payload.idNumber) delete payload.idNumber;
         await api.post('/users', payload);
-        alert(t('admin.users.userCreated'));
+        alert(t('users.userCreated'));
       }
       resetForm();
       fetchUsers();
@@ -75,15 +75,15 @@ const AdminUsers = () => {
       if (error.response) {
         // Server responded with error
         console.error('Error response:', error.response.data);
-        alert(`Error: ${error.response.data.message || 'Server error'}`);
+        alert(`${t('users.generalError')}: ${error.response.data.message || t('users.serverError')}`);
       } else if (error.request) {
         // Request made but no response
         console.error('No response from server');
-        alert('Error: Cannot connect to server. Make sure the server is running on http://localhost:5000');
+        alert(t('users.connectionError'));
       } else {
         // Something else happened
         console.error('Error:', error.message);
-        alert(`Error: ${error.message}`);
+        alert(`${t('users.generalError')}: ${error.message}`);
       }
     }
   };
@@ -96,13 +96,13 @@ const AdminUsers = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm(t('admin.users.confirmDelete'))) return;
+    if (!window.confirm(t('users.confirmDelete'))) return;
     try {
       await api.delete(`/users/${id}`);
-      alert(t('admin.users.userDeleted'));
+      alert(t('users.userDeleted'));
       fetchUsers();
     } catch (error) {
-      alert(t('admin.users.userDeletedError'));
+      alert(t('users.userDeletedError'));
     }
   };
 
@@ -129,39 +129,39 @@ const AdminUsers = () => {
     return colors[role] || 'bg-gray-100 text-gray-800';
   };
 
-  if (loading) return <div className="p-6">{t('admin.common.loading')}</div>;
+  if (loading) return <div className="p-6">{t('common.loading')}</div>;
 
   return (
     <div className="w-full bg-gray-50 min-h-screen p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">{t('admin.users.userManagement')}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('users.userManagement')}</h1>
         <button
           onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          {t('admin.users.addUser')}
+          {t('users.addUser')}
         </button>
       </div>
 
       <Card>
         <div className="mb-4 flex gap-2">
-          <button onClick={() => setFilterRole('')} className={`px-4 py-2 rounded ${!filterRole ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>{t('admin.users.all')}</button>
-          <button onClick={() => setFilterRole('admin')} className={`px-4 py-2 rounded ${filterRole === 'admin' ? 'bg-red-600 text-white' : 'bg-gray-200'}`}>{t('admin.users.admin')}</button>
-          <button onClick={() => setFilterRole('teacher')} className={`px-4 py-2 rounded ${filterRole === 'teacher' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>{t('admin.users.teacher')}</button>
-          <button onClick={() => setFilterRole('student')} className={`px-4 py-2 rounded ${filterRole === 'student' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>{t('admin.users.student')}</button>
-          <button onClick={() => setFilterRole('staff')} className={`px-4 py-2 rounded ${filterRole === 'staff' ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}>{t('admin.users.staff')}</button>
+          <button onClick={() => setFilterRole('')} className={`px-4 py-2 rounded ${!filterRole ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>{t('users.all')}</button>
+          <button onClick={() => setFilterRole('admin')} className={`px-4 py-2 rounded ${filterRole === 'admin' ? 'bg-red-600 text-white' : 'bg-gray-200'}`}>{t('users.admin')}</button>
+          <button onClick={() => setFilterRole('teacher')} className={`px-4 py-2 rounded ${filterRole === 'teacher' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>{t('users.teacher')}</button>
+          <button onClick={() => setFilterRole('student')} className={`px-4 py-2 rounded ${filterRole === 'student' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>{t('users.student')}</button>
+          <button onClick={() => setFilterRole('staff')} className={`px-4 py-2 rounded ${filterRole === 'staff' ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}>{t('users.staff')}</button>
         </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('admin.users.name')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('admin.users.email')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('admin.users.role')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('admin.users.phone')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('admin.users.status')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('admin.users.actions')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('users.name')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('users.email')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('users.role')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('users.phone')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('users.status')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('users.actions')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -174,15 +174,15 @@ const AdminUsers = () => {
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.phone || t('admin.common.na')}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.phone || t('common.na')}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                       {user.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onClick={() => handleEdit(user)} className="text-blue-600 hover:text-blue-900 mr-3">{t('admin.users.edit')}</button>
-                    <button onClick={() => handleDelete(user._id)} className="text-red-600 hover:text-red-900">{t('admin.users.delete')}</button>
+                    <button onClick={() => handleEdit(user)} className="text-blue-600 hover:text-blue-900 mr-3">{t('users.edit')}</button>
+                    <button onClick={() => handleDelete(user._id)} className="text-red-600 hover:text-red-900">{t('users.delete')}</button>
                   </td>
                 </tr>
               ))}
@@ -197,7 +197,7 @@ const AdminUsers = () => {
             {/* Header */}
             <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-t-xl">
               <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">{editMode ? t('admin.users.editUser') : t('admin.users.addNewUser')}</h2>
+                <h2 className="text-2xl font-bold">{editMode ? t('users.editUser') : t('users.addNewUser')}</h2>
                 <button onClick={resetForm} className="text-white hover:text-gray-200 text-2xl">&times;</button>
               </div>
             </div>
@@ -205,37 +205,37 @@ const AdminUsers = () => {
             <form onSubmit={handleSubmit} className="p-6">
               {/* Basic Information */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('admin.users.basicInformation')}</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('users.basicInformation')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.users.name')} {t('admin.common.required')}</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.name')} {t('common.required')}</label>
                     <input
                       type="text"
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder={t('admin.users.enterFullName')}
+                      placeholder={t('users.enterFullName')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.users.fatherName')}</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.fatherName')}</label>
                     <input
                       type="text"
                       value={formData.fatherName}
                       onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder={t('admin.users.fathersName')}
+                      placeholder={t('users.fathersName')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.users.grandfatherName')}</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.grandfatherName')}</label>
                     <input
                       type="text"
                       value={formData.grandfatherName}
                       onChange={(e) => setFormData({ ...formData, grandfatherName: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder={t('admin.users.grandfathersName')}
+                      placeholder={t('users.grandfathersName')}
                     />
                   </div>
                 </div>
@@ -243,22 +243,22 @@ const AdminUsers = () => {
 
               {/* Account Information */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('admin.users.accountInformation')}</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('users.accountInformation')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.users.email')} {t('admin.common.required')}</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.email')} {t('common.required')}</label>
                     <input
                       type="email"
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder={t('admin.users.emailPlaceholder')}
+                      placeholder={t('users.emailPlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('admin.users.password')} {editMode && <span className="text-gray-500 text-xs">({t('admin.users.leaveBlank')})</span>}
+                      {t('users.password')} {editMode && <span className="text-gray-500 text-xs">({t('users.leaveBlank')})</span>}
                     </label>
                     <input
                       type="password"
@@ -266,31 +266,31 @@ const AdminUsers = () => {
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder={t('admin.users.enterPassword')}
+                      placeholder={t('users.enterPassword')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.users.role')} {t('admin.common.required')}</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.role')} {t('common.required')}</label>
                     <select
                       value={formData.role}
                       onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
-                      <option value="student">👨‍🎓 Student</option>
-                      <option value="teacher">👨‍🏫 Teacher</option>
-                      <option value="staff">⚙️ Staff</option>
-                      <option value="admin">🔑 Admin</option>
+                      <option value="student">👨‍🎓 {t('users.student')}</option>
+                      <option value="teacher">👨‍🏫 {t('users.teacher')}</option>
+                      <option value="staff">⚙️ {t('users.staff')}</option>
+                      <option value="admin">🔑 {t('users.admin')}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.status')}</label>
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
-                      <option value="active">✅ Active</option>
-                      <option value="inactive">❌ Inactive</option>
+                      <option value="active">✅ {t('users.active')}</option>
+                      <option value="inactive">❌ {t('users.inactive')}</option>
                     </select>
                   </div>
                 </div>
@@ -298,30 +298,30 @@ const AdminUsers = () => {
 
               {/* Personal Information */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('admin.users.personalInformation')}</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('users.personalInformation')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">ID Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.idNumber')}</label>
                     <input
                       type="text"
                       value={formData.idNumber}
                       onChange={(e) => setFormData({ ...formData, idNumber: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="National ID"
+                      placeholder={t('users.nationalId')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                    <CalendarDatePicker value={formData.dob} onChange={(date) => setFormData({ ...formData, dob: date })} placeholder="Select date" />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.dateOfBirth')}</label>
+                    <CalendarDatePicker value={formData.dob} onChange={(date) => setFormData({ ...formData, dob: date })} placeholder={t('users.selectDob')} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Blood Type</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.bloodType')}</label>
                     <select
                       value={formData.bloodType}
                       onChange={(e) => setFormData({ ...formData, bloodType: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
-                      <option value="">Select blood type</option>
+                      <option value="">{t('users.selectBlood')}</option>
                       <option value="A+">A+</option>
                       <option value="A-">A-</option>
                       <option value="B+">B+</option>
@@ -337,10 +337,10 @@ const AdminUsers = () => {
 
               {/* Contact Information */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📞 Contact Information</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📞 {t('users.contactInformation')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.phone')}</label>
                     <input
                       type="tel"
                       value={formData.phone}
@@ -350,7 +350,7 @@ const AdminUsers = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.whatsapp')}</label>
                     <input
                       type="tel"
                       value={formData.whatsapp}
@@ -364,36 +364,36 @@ const AdminUsers = () => {
 
               {/* Permanent Address */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">🏠 Permanent Address</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">🏠 {t('users.permanentAddress')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.province')}</label>
                     <input
                       type="text"
                       value={formData.permanentAddress.province}
                       onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, province: e.target.value } })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Province"
+                      placeholder={t('users.province')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.district')}</label>
                     <input
                       type="text"
                       value={formData.permanentAddress.district}
                       onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, district: e.target.value } })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="District"
+                      placeholder={t('users.district')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.village')}</label>
                     <input
                       type="text"
                       value={formData.permanentAddress.village}
                       onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, village: e.target.value } })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Village"
+                      placeholder={t('users.village')}
                     />
                   </div>
                 </div>
@@ -401,36 +401,36 @@ const AdminUsers = () => {
 
               {/* Current Address */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📍 Current Address</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📍 {t('users.currentAddress')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.province')}</label>
                     <input
                       type="text"
                       value={formData.currentAddress.province}
                       onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, province: e.target.value } })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Province"
+                      placeholder={t('users.province')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.district')}</label>
                     <input
                       type="text"
                       value={formData.currentAddress.district}
                       onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, district: e.target.value } })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="District"
+                      placeholder={t('users.district')}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.village')}</label>
                     <input
                       type="text"
                       value={formData.currentAddress.village}
                       onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, village: e.target.value } })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Village"
+                      placeholder={t('users.village')}
                     />
                   </div>
                 </div>
@@ -442,14 +442,14 @@ const AdminUsers = () => {
                   type="submit"
                   className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg transition-all"
                 >
-                  {editMode ? '💾 Update User' : '➕ Create User'}
+                  {editMode ? `💾 ${t('users.updateUser')}` : `➕ ${t('users.createUser')}`}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
                   className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold transition-all"
                 >
-                  ❌ Cancel
+                  ❌ {t('common.cancel')}
                 </button>
               </div>
             </form>

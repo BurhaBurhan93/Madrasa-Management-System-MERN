@@ -1,367 +1,401 @@
-import React, { useState, useEffect } from 'react';
-import Card from '../../../components/UIHelper/Card';
-import { FiDollarSign, FiUsers, FiCalendar, FiPlus, FiEdit2, FiTrash2, FiSearch, FiDownload } from 'react-icons/fi';
+import React, { useState, useEffect, useMemo } from 'react';
+import { FiDollarSign, FiCalendar, FiPlus, FiEdit2, FiTrash2, FiSearch, FiDownload, FiCheck, FiX, FiBook, FiRefreshCw } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
+import api from '../../../lib/api';
+
+const PAGE_SIZE = 10;
+const INITIAL_FEE = { feeCode: '', feeName: '', class: '', feeType: 'tuition', amount: '', frequency: 'monthly', applicableFrom: '', applicableTo: '', isMandatory: true, status: 'active' };
 
 const AdminFeeStructure = () => {
-  const [feeStructures, setFeeStructures] = useState([
-    { id: 1, name: 'Primary School', class: 'Class 1-5', amount: 5000, frequency: 'Monthly', students: 150, dueDate: '5th of each month' },
-    { id: 2, name: 'Middle School', class: 'Class 6-8', amount: 6000, frequency: 'Monthly', students: 120, dueDate: '5th of each month' },
-    { id: 3, name: 'High School', class: 'Class 9-10', amount: 7000, frequency: 'Monthly', students: 90, dueDate: '5th of each month' },
-    { id: 4, name: 'Admission Fee', class: 'All Classes', amount: 10000, frequency: 'One-time', students: 45, dueDate: 'On admission' },
-    { id: 5, name: 'Exam Fee', class: 'All Classes', amount: 2000, frequency: 'Per Exam', students: 360, dueDate: 'Before exams' },
-    { id: 6, name: 'Library Fee', class: 'All Classes', amount: 500, frequency: 'Annual', students: 360, dueDate: 'Start of year' },
-  ]);
-
+  const { t } = useTranslation('admin');
+  const [feeStructures, setFeeStructures] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newFee, setNewFee] = useState({
-    name: '',
-    class: '',
-    amount: '',
-    frequency: 'Monthly',
-    dueDate: ''
-  });
+  const [feeFilter, setFeeFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(INITIAL_FEE);
+  const [saving, setSaving] = useState(false);
 
-  const filteredFees = feeStructures.filter(fee =>
-    fee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    fee.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    fee.frequency.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => { const lang = readStoredLanguage(); if (lang) i18n.changeLanguage(lang); }, []);
 
-  const totalMonthlyRevenue = feeStructures
-    .filter(fee => fee.frequency === 'Monthly')
-    .reduce((sum, fee) => sum + (fee.amount * fee.students), 0);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [feeRes, clsRes] = await Promise.all([
+        api.get('/finance/fee-structures'),
+        api.get('/academic/classes'),
+      ]);
+      setFeeStructures(Array.isArray(feeRes.data) ? feeRes.data : feeRes.data?.data || []);
+      setClasses(Array.isArray(clsRes.data) ? clsRes.data : clsRes.data?.data || []);
+    } catch { setFeeStructures([]); setClasses([]); } finally { setLoading(false); }
+  };
+  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { setPage(1); }, [searchTerm, feeFilter]);
 
-  const totalAnnualRevenue = feeStructures
-    .reduce((sum, fee) => {
-      const multiplier = fee.frequency === 'Monthly' ? 12 : 
-                        fee.frequency === 'Annual' ? 1 : 
-                        fee.frequency === 'Per Exam' ? 2 : 1;
-      return sum + (fee.amount * fee.students * multiplier);
-    }, 0);
+  const filteredFees = useMemo(() => {
+    const s = searchTerm.toLowerCase();
+    let result = feeStructures.filter(f =>
+      (f.feeName || '').toLowerCase().includes(s) ||
+      (f.feeCode || '').toLowerCase().includes(s) ||
+      (f.feeType || '').toLowerCase().includes(s)
+    );
+    if (feeFilter === 'active') result = result.filter(f => f.status === 'active');
+    else if (feeFilter === 'inactive') result = result.filter(f => f.status === 'inactive');
+    else if (feeFilter === 'monthly') result = result.filter(f => f.frequency === 'monthly');
+    else if (feeFilter === 'yearly') result = result.filter(f => f.frequency === 'yearly');
+    else if (feeFilter === 'one-time') result = result.filter(f => f.frequency === 'one-time');
+    return result;
+  }, [feeStructures, searchTerm, feeFilter]);
 
-  const handleAddFee = () => {
-    if (!newFee.name || !newFee.class || !newFee.amount) {
-      alert('Please fill all required fields');
-      return;
-    }
+  const totalPages = Math.max(1, Math.ceil(filteredFees.length / PAGE_SIZE));
+  const paginatedFees = filteredFees.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-    const newFeeObj = {
-      id: feeStructures.length + 1,
-      name: newFee.name,
-      class: newFee.class,
-      amount: parseInt(newFee.amount),
-      frequency: newFee.frequency,
-      students: 0,
-      dueDate: newFee.dueDate || '5th of each month'
-    };
+  const stats = useMemo(() => ({
+    total: feeStructures.length,
+    monthly: feeStructures.filter(f => f.frequency === 'monthly').reduce((s, f) => s + (f.amount || 0), 0),
+    annual: feeStructures.reduce((s, f) => s + (f.amount || 0) * (f.frequency === 'monthly' ? 12 : f.frequency === 'yearly' ? 1 : 1), 0),
+    active: feeStructures.filter(f => f.status === 'active').length,
+  }), [feeStructures]);
 
-    setFeeStructures([...feeStructures, newFeeObj]);
-    setNewFee({ name: '', class: '', amount: '', frequency: 'Monthly', dueDate: '' });
-    setShowAddModal(false);
-    alert('Fee structure added successfully');
+  const handleSubmit = async () => {
+    if (!form.feeName || !form.amount) return;
+    setSaving(true);
+    try {
+      const payload = { ...form };
+      if (!payload.applicableFrom) delete payload.applicableFrom;
+      if (!payload.applicableTo) delete payload.applicableTo;
+      if (!payload.class) delete payload.class;
+
+      if (editingId) await api.put(`/finance/fee-structures/${editingId}`, payload);
+      else await api.post('/finance/fee-structures', payload);
+
+      setShowModal(false);
+      setEditingId(null);
+      setForm(INITIAL_FEE);
+      fetchData();
+    } catch (err) { console.error(err); } finally { setSaving(false); }
   };
 
-  const handleDeleteFee = (id) => {
-    if (window.confirm('Are you sure you want to delete this fee structure?')) {
-      setFeeStructures(feeStructures.filter(fee => fee.id !== id));
-      alert('Fee structure deleted successfully');
-    }
+  const handleEdit = (fee) => {
+    setForm({
+      feeCode: fee.feeCode || '',
+      feeName: fee.feeName || '',
+      class: fee.class?._id || fee.class || '',
+      feeType: fee.feeType || 'tuition',
+      amount: fee.amount || '',
+      frequency: fee.frequency || 'monthly',
+      applicableFrom: fee.applicableFrom ? fee.applicableFrom.slice(0, 10) : '',
+      applicableTo: fee.applicableTo ? fee.applicableTo.slice(0, 10) : '',
+      isMandatory: fee.isMandatory !== undefined ? fee.isMandatory : true,
+      status: fee.status || 'active',
+    });
+    setEditingId(fee._id);
+    setShowModal(true);
   };
 
-  const FeeCard = ({ fee }) => (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-xl font-bold text-gray-900">{fee.name}</h3>
-          <p className="text-gray-600">Class: {fee.class}</p>
-        </div>
-        <div className="flex gap-2">
-          <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-            <FiEdit2 size={18} />
-          </button>
-          <button 
-            onClick={() => handleDeleteFee(fee.id)}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-          >
-            <FiTrash2 size={18} />
-          </button>
-        </div>
-      </div>
+  const handleDelete = async (id) => {
+    if (!window.confirm(t('finance.deleteFeeConfirm'))) return;
+    try { await api.delete(`/finance/fee-structures/${id}`); fetchData(); } catch (err) { console.error(err); }
+  };
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
-            <FiDollarSign size={20} />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Amount</p>
-            <p className="font-semibold text-gray-900">Rs. {fee.amount.toLocaleString()}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
-            <FiUsers size={20} />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Students</p>
-            <p className="font-semibold text-gray-900">{fee.students}</p>
-          </div>
-        </div>
-      </div>
+  const exportPDF = async () => {
+    const { default: jsPDF } = await import('jspdf');
+    const { default: autoTable } = await import('jspdf-autotable');
+    const doc = new jsPDF('l', 'mm', 'a4');
+    doc.setFontSize(16);
+    doc.text('Fee Structures Report', 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
+    autoTable(doc, {
+      startY: 34,
+      head: [['Code', 'Name', 'Type', 'Amount', 'Frequency', 'From', 'To', 'Mandatory', 'Status']],
+      body: feeStructures.map(f => [
+        f.feeCode || '-', f.feeName || '-', f.feeType || '-',
+        `Rs.${(f.amount || 0).toLocaleString()}`,
+        f.frequency || '-',
+        f.applicableFrom ? new Date(f.applicableFrom).toLocaleDateString() : '-',
+        f.applicableTo ? new Date(f.applicableTo).toLocaleDateString() : '-',
+        f.isMandatory ? 'Yes' : 'No',
+        f.status || '-',
+      ]),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [59, 130, 246] },
+    });
+    doc.save('fee-structures.pdf');
+  };
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500">Frequency:</span>
-          <span className="font-medium text-gray-900">{fee.frequency}</span>
-        </div>
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500">Due Date:</span>
-          <span className="font-medium text-gray-900">{fee.dueDate}</span>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex items-center gap-3 text-slate-400">
+          <FiRefreshCw className="animate-spin h-6 w-6" />
+          <span className="text-lg">{t('common.loading')}</span>
         </div>
       </div>
-
-      <div className="mt-4 pt-4 border-t border-gray-100">
-        <p className="text-sm text-gray-500">Monthly Collection</p>
-        <p className="text-lg font-bold text-green-600">
-          Rs. {(fee.amount * fee.students).toLocaleString()}
-        </p>
-      </div>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">💰 Fee Structure Management</h1>
-          <p className="text-gray-600 mt-1">Manage all fee structures and pricing</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('finance.feeStructure')}</h1>
+          <p className="mt-1 text-sm text-slate-500">{t('finance.manageFeeStructures')}</p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 font-semibold">
-            <FiDownload size={18} /> Export Report
+          <button onClick={exportPDF} className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
+            <FiDownload size={16} /> {t('attendance.exportReport')}
           </button>
           <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg"
+            onClick={() => { setShowModal(true); setEditingId(null); setForm(INITIAL_FEE); }}
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-200 hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all"
           >
-            <FiPlus size={18} /> Add New Fee
+            <FiPlus size={16} /> {t('finance.addNewFee')}
           </button>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">Total Fee Structures</p>
-              <p className="text-2xl font-bold">{feeStructures.length}</p>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {[
+          { label: t('finance.totalFeeStructures'), value: stats.total, gradient: 'from-slate-500 to-slate-600', icon: FiBook },
+          { label: t('finance.monthlyRevenue'), value: `Rs.${stats.monthly.toLocaleString()}`, gradient: 'from-emerald-500 to-teal-600', icon: FiDollarSign },
+          { label: t('finance.annualRevenue'), value: `Rs.${stats.annual.toLocaleString()}`, gradient: 'from-blue-500 to-indigo-600', icon: FiCalendar },
+          { label: t('common.active'), value: stats.active, gradient: 'from-amber-500 to-orange-600', icon: FiCheck },
+        ].map((stat, i) => (
+          <div key={i} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${stat.gradient} p-5 text-white shadow-lg`}>
+            <div className="relative z-10">
+              <p className="text-sm font-medium text-white/80">{stat.label}</p>
+              <p className="mt-1 text-2xl font-bold truncate">{stat.value}</p>
             </div>
-            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
-              <FiDollarSign size={24} />
-            </div>
+            <stat.icon className="absolute right-3 top-3 h-12 w-12 text-white/10" />
           </div>
-        </Card>
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">Monthly Revenue</p>
-              <p className="text-2xl font-bold">Rs. {totalMonthlyRevenue.toLocaleString()}</p>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
-              <FiCalendar size={24} />
-            </div>
-          </div>
-        </Card>
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">Annual Revenue</p>
-              <p className="text-2xl font-bold">Rs. {totalAnnualRevenue.toLocaleString()}</p>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
-              <FiDollarSign size={24} />
-            </div>
-          </div>
-        </Card>
-        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">Active Students</p>
-              <p className="text-2xl font-bold">{new Set(feeStructures.flatMap(fee => fee.students)).size}</p>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
-              <FiUsers size={24} />
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Search and Filter */}
-      <Card className="mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search fee structures by name, class, or frequency..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="flex gap-2">
-            <select className="px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
-              <option>All Frequencies</option>
-              <option>Monthly</option>
-              <option>Annual</option>
-              <option>One-time</option>
-              <option>Per Exam</option>
-            </select>
-            <select className="px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
-              <option>Sort by Name</option>
-              <option>Sort by Amount</option>
-              <option>Sort by Students</option>
-            </select>
-          </div>
-        </div>
-      </Card>
-
-      {/* Fee Structures Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredFees.map(fee => (
-          <FeeCard key={fee.id} fee={fee} />
         ))}
       </div>
 
-      {/* Revenue Summary */}
-      <Card className="mt-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Revenue Summary</h3>
+      <div className="relative">
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
+        <input
+          type="text"
+          placeholder={t('finance.searchFeeStructures')}
+          className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      {/* Filter tabs */}
+      <div className="flex flex-wrap gap-2">
+        {[
+          { key: 'all', label: t('common.all') },
+          { key: 'active', label: t('common.active') },
+          { key: 'inactive', label: t('common.inactive') || 'Inactive' },
+          { key: 'monthly', label: t('finance.monthly') },
+          { key: 'yearly', label: t('finance.annual') },
+          { key: 'one-time', label: t('finance.oneTime') },
+        ].map(ft => (
+          <button
+            key={ft.key}
+            onClick={() => setFeeFilter(ft.key)}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+              feeFilter === ft.key
+                ? 'bg-slate-800 text-white shadow-md'
+                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+            }`}
+          >{ft.label}</button>
+        ))}
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fee Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Students</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Frequency</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Monthly Collection</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Annual Collection</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.feeCode')}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.feeName')}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.feeType')}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.amount')}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.frequency')}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.applicableFrom')}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.applicableTo')}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.mandatory')}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('common.status')}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('users.actions')}</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {feeStructures.map(fee => {
-                const monthlyCollection = fee.amount * fee.students;
-                const annualMultiplier = fee.frequency === 'Monthly' ? 12 : 
-                                       fee.frequency === 'Annual' ? 1 : 
-                                       fee.frequency === 'Per Exam' ? 2 : 1;
-                const annualCollection = monthlyCollection * annualMultiplier;
-
-                return (
-                  <tr key={fee.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{fee.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rs. {fee.amount.toLocaleString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{fee.students}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {fee.frequency}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                      Rs. {monthlyCollection.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-purple-600">
-                      Rs. {annualCollection.toLocaleString()}
-                    </td>
-                  </tr>
-                );
-              })}
+            <tbody>
+              {paginatedFees.length === 0 && (
+                <tr><td colSpan={10} className="px-4 py-14 text-center text-slate-400">{t('common.noRecords')}</td></tr>
+              )}
+              {paginatedFees.map((f, i) => (
+                <tr key={f._id || i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                  <td className="px-4 py-3 font-mono text-xs font-medium text-slate-700">{f.feeCode || '-'}</td>
+                  <td className="px-4 py-3 font-medium text-slate-800">{f.feeName}</td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700 capitalize">{f.feeType}</span>
+                  </td>
+                  <td className="px-4 py-3 font-medium text-slate-800">Rs.{(f.amount || 0).toLocaleString()}</td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${
+                      f.frequency === 'monthly' ? 'bg-emerald-100 text-emerald-700' :
+                      f.frequency === 'yearly' ? 'bg-purple-100 text-purple-700' :
+                      'bg-slate-100 text-slate-600'
+                    }`}>{f.frequency}</span>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
+                    {f.applicableFrom ? new Date(f.applicableFrom).toLocaleDateString() : '-'}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
+                    {f.applicableTo ? new Date(f.applicableTo).toLocaleDateString() : '-'}
+                  </td>
+                  <td className="px-4 py-3">
+                    {f.isMandatory ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-600"><FiCheck className="h-3.5 w-3.5" /> {t('common.yes')}</span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-slate-400"><FiX className="h-3.5 w-3.5" /> {t('common.no')}</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                      f.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                    }`}>{f.status}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-1.5">
+                      <button onClick={() => handleEdit(f)} className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 transition-colors" title={t('common.edit')}><FiEdit2 size={14} /></button>
+                      <button onClick={() => handleDelete(f._id)} className="rounded-lg bg-rose-50 p-2 text-rose-600 hover:bg-rose-100 transition-colors" title={t('common.delete')}><FiTrash2 size={14} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
-      {/* Add Fee Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Add New Fee Structure</h3>
-            
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-slate-500">{t('common.page')} {page} {t('common.of')} {totalPages}</span>
+          <div className="flex gap-1.5">
+            <button
+              disabled={page === 1}
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >Prev</button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
+                  page === p ? 'bg-slate-800 text-white shadow-md' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >{p}</button>
+            ))}
+            <button
+              disabled={page === totalPages}
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >Next</button>
+          </div>
+        </div>
+      )}
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-slate-900 mb-5">
+              {editingId ? t('common.edit') : t('finance.addFeeStructure')}
+            </h3>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Fee Name *</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                  value={newFee.name}
-                  onChange={(e) => setNewFee({...newFee, name: e.target.value})}
-                  placeholder="e.g., Tuition Fee"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.feeCode')}</label>
+                  <input type="text" value={form.feeCode} onChange={e => setForm({...form, feeCode: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder="e.g., FEE-001" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.feeName')} *</label>
+                  <input type="text" value={form.feeName} onChange={e => setForm({...form, feeName: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder={t('finance.feeNamePlaceholder')} required />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Applicable Class/Level *</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                  value={newFee.class}
-                  onChange={(e) => setNewFee({...newFee, class: e.target.value})}
-                  placeholder="e.g., Class 1-5 or All Classes"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.feeType')}</label>
+                  <select value={form.feeType} onChange={e => setForm({...form, feeType: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                    <option value="tuition">{t('finance.tuitionFee')}</option>
+                    <option value="admission">{t('finance.admissionFee')}</option>
+                    <option value="other">{t('finance.other')}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.amountLabel')} *</label>
+                  <input type="number" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder={t('finance.enterAmount')} min="0" required />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Amount (Rs.) *</label>
-                <input
-                  type="number"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                  value={newFee.amount}
-                  onChange={(e) => setNewFee({...newFee, amount: e.target.value})}
-                  placeholder="Enter amount"
-                  min="0"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.frequency')}</label>
+                  <select value={form.frequency} onChange={e => setForm({...form, frequency: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                    <option value="monthly">{t('finance.monthly')}</option>
+                    <option value="yearly">{t('finance.annual')}</option>
+                    <option value="one-time">{t('finance.oneTime')}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.class')}</label>
+                  <select value={form.class} onChange={e => setForm({...form, class: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                    <option value="">{t('academic.selectClass')}</option>
+                    {classes.map(cls => (
+                      <option key={cls._id} value={cls._id}>{cls.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Frequency *</label>
-                <select
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                  value={newFee.frequency}
-                  onChange={(e) => setNewFee({...newFee, frequency: e.target.value})}
-                >
-                  <option value="Monthly">Monthly</option>
-                  <option value="Annual">Annual</option>
-                  <option value="One-time">One-time</option>
-                  <option value="Per Exam">Per Exam</option>
-                  <option value="Quarterly">Quarterly</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.applicableFrom')}</label>
+                  <input type="date" value={form.applicableFrom} onChange={e => setForm({...form, applicableFrom: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.applicableTo')}</label>
+                  <input type="date" value={form.applicableTo} onChange={e => setForm({...form, applicableTo: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                  value={newFee.dueDate}
-                  onChange={(e) => setNewFee({...newFee, dueDate: e.target.value})}
-                  placeholder="e.g., 5th of each month"
-                />
+              <div className="flex items-center gap-6">
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <input type="checkbox" checked={form.isMandatory} onChange={e => setForm({...form, isMandatory: e.target.checked})} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-200" />
+                  {t('finance.mandatory')}
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <input type="checkbox" checked={form.status === 'active'} onChange={e => setForm({...form, status: e.target.checked ? 'active' : 'inactive'})} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-200" />
+                  {t('common.active')}
+                </label>
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="mt-6 flex gap-3">
               <button
-                onClick={handleAddFee}
-                className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 font-semibold"
+                onClick={handleSubmit}
+                disabled={saving || !form.feeName || !form.amount}
+                className="flex-1 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                Add Fee Structure
+                {saving ? (
+                  <span className="flex items-center justify-center gap-2"><FiRefreshCw className="animate-spin h-4 w-4" /> {t('common.saving')}</span>
+                ) : editingId ? t('common.edit') : t('finance.addFeeStructure')}
               </button>
               <button
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg hover:bg-gray-300 font-semibold"
+                onClick={() => { setShowModal(false); setEditingId(null); setForm(INITIAL_FEE); }}
+                className="flex-1 rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>

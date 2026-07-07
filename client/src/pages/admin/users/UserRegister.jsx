@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 import Card from '../../../components/UIHelper/Card';
 import { CreateUserModal } from '../../../components/UIHelper';
 import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 import api from '../../../lib/api';
 
 const UserRegister = () => {
+  const { t } = useTranslation('admin');
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -20,12 +24,22 @@ const UserRegister = () => {
 
   const totalSteps = 4;
 
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+    window.addEventListener('storage', syncLang);
+    return () => window.removeEventListener('storage', syncLang);
+  }, []);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('Image size must be less than 5MB');
+        alert(t('users.imageSizeError'));
         return;
       }
       
@@ -72,10 +86,10 @@ const UserRegister = () => {
       if (!payload.dob) delete payload.dob;
       if (!payload.idNumber) delete payload.idNumber;
       await api.post('/users', payload);
-      alert('User created successfully');
+      alert(t('users.userCreated'));
       navigate('/admin/users');
     } catch (error) {
-      alert(error.response?.data?.message || 'Error creating user');
+      alert(error.response?.data?.message || t('users.errorCreatingUser'));
     }
   };
 
@@ -92,19 +106,19 @@ const UserRegister = () => {
       case 1:
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Step 1: Basic & Account Information</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('users.step1Basic')}</h3>
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Name *</label>
-                <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Full name" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.name')} *</label>
+                <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder={t('users.fullName')} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Father Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.fatherName')}</label>
                 <input type="text" value={formData.fatherName} onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Grandfather Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.grandfatherName')}</label>
                 <input type="text" value={formData.grandfatherName} onChange={(e) => setFormData({ ...formData, grandfatherName: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
@@ -112,27 +126,27 @@ const UserRegister = () => {
             {/* Account Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.email')} *</label>
                 <input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.password')} *</label>
                 <input type="password" required value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Role *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.role')} *</label>
                 <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                  <option value="student">Student</option>
-                  <option value="teacher">Teacher</option>
-                  <option value="staff">Staff</option>
-                  <option value="admin">Admin</option>
+                  <option value="student">{t('users.student')}</option>
+                  <option value="teacher">{t('users.teacher')}</option>
+                  <option value="staff">{t('users.staff')}</option>
+                  <option value="admin">{t('users.admin')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.status')}</label>
                 <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="active">{t('users.active')}</option>
+                  <option value="inactive">{t('users.inactive')}</option>
                 </select>
               </div>
             </div>
@@ -141,32 +155,32 @@ const UserRegister = () => {
       case 2:
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Step 2: Personal Information</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('users.step2Personal')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">ID Number</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.idNumber')}</label>
                 <input type="text" value={formData.idNumber} onChange={(e) => setFormData({ ...formData, idNumber: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.dateOfBirth')}</label>
                 <CalendarDatePicker
                   value={formData.dob}
                   onChange={(date) => setFormData({ ...formData, dob: date })}
-                  placeholder="Select date of birth"
+                  placeholder={t('users.selectDateOfBirth')}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Blood Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.bloodType')}</label>
                 <select value={formData.bloodType} onChange={(e) => setFormData({ ...formData, bloodType: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                  <option value="">Select</option>
-                  <option value="A+">A+</option>
-                  <option value="A-">A-</option>
-                  <option value="B+">B+</option>
-                  <option value="B-">B-</option>
-                  <option value="AB+">AB+</option>
-                  <option value="AB-">AB-</option>
-                  <option value="O+">O+</option>
-                  <option value="O-">O-</option>
+                  <option value="">{t('users.select')}</option>
+                  <option value="A+">{t('users.bloodTypeA+')}</option>
+                  <option value="A-">{t('users.bloodTypeA-')}</option>
+                  <option value="B+">{t('users.bloodTypeB+')}</option>
+                  <option value="B-">{t('users.bloodTypeB-')}</option>
+                  <option value="AB+">{t('users.bloodTypeAB+')}</option>
+                  <option value="AB-">{t('users.bloodTypeAB-')}</option>
+                  <option value="O+">{t('users.bloodTypeO+')}</option>
+                  <option value="O-">{t('users.bloodTypeO-')}</option>
                 </select>
               </div>
             </div>
@@ -175,7 +189,7 @@ const UserRegister = () => {
             <div className="flex items-center gap-6">
               <div className="flex-shrink-0">
                 {imagePreview ? (
-                  <img src={imagePreview} alt="Preview" className="h-24 w-24 rounded-full object-cover border-4 border-blue-200 shadow" />
+                  <img src={imagePreview} alt={t('users.preview')} className="h-24 w-24 rounded-full object-cover border-4 border-blue-200 shadow" />
                 ) : (
                   <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-3xl">
                     👤
@@ -183,9 +197,9 @@ const UserRegister = () => {
                 )}
               </div>
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.uploadPhoto')}</label>
                 <input type="file" accept="image/*" onChange={handleImageChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700 file:font-medium file:text-sm" />
-                <p className="text-xs text-gray-500 mt-1">JPG, PNG or GIF. Max 2MB recommended.</p>
+                <p className="text-xs text-gray-500 mt-1">{t('users.photoHint')}</p>
               </div>
             </div>
           </div>
@@ -193,14 +207,14 @@ const UserRegister = () => {
       case 3:
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Step 3: Contact Information</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('users.step3Contact')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.phone')}</label>
                 <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.whatsapp')}</label>
                 <input type="tel" value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
@@ -209,21 +223,21 @@ const UserRegister = () => {
       case 4:
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Step 4: Address Information</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{t('users.step4Address')}</h3>
             {/* Permanent Address */}
             <div>
-              <h4 className="text-md font-semibold text-gray-700 mb-3">🏠 Permanent Address</h4>
+              <h4 className="text-md font-semibold text-gray-700 mb-3">{t('users.permanentAddress')}</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.province')}</label>
                   <input type="text" value={formData.permanentAddress.province} onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, province: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.district')}</label>
                   <input type="text" value={formData.permanentAddress.district} onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, district: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.village')}</label>
                   <input type="text" value={formData.permanentAddress.village} onChange={(e) => setFormData({ ...formData, permanentAddress: { ...formData.permanentAddress, village: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
@@ -231,18 +245,18 @@ const UserRegister = () => {
 
             {/* Current Address */}
             <div>
-              <h4 className="text-md font-semibold text-gray-700 mb-3">📍 Current Address</h4>
+              <h4 className="text-md font-semibold text-gray-700 mb-3">{t('users.currentAddress')}</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.province')}</label>
                   <input type="text" value={formData.currentAddress.province} onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, province: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.district')}</label>
                   <input type="text" value={formData.currentAddress.district} onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, district: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.village')}</label>
                   <input type="text" value={formData.currentAddress.village} onChange={(e) => setFormData({ ...formData, currentAddress: { ...formData.currentAddress, village: e.target.value } })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
@@ -259,10 +273,10 @@ const UserRegister = () => {
       <div className="mb-6 flex items-start justify-between">
         <div>
           <button onClick={() => navigate('/admin/users')} className="text-blue-600 hover:text-blue-800 mb-4">
-            ← Back to Users
+            {t('users.backToUsers')}
           </button>
-          <h1 className="text-3xl font-bold text-gray-900"> Register New User</h1>
-          <p className="text-gray-600 mt-1">Create a new user account in 4 simple steps</p>
+          <h1 className="text-3xl font-bold text-gray-900"> {t('users.registerNewUser')}</h1>
+          <p className="text-gray-600 mt-1">{t('users.createUserDesc')}</p>
         </div>
 
       </div>
@@ -280,7 +294,7 @@ const UserRegister = () => {
                 {step}
               </div>
               <p className={`text-xs mt-2 ${currentStep >= step ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
-                {step === 1 ? 'Basic Info' : step === 2 ? 'Personal Info' : step === 3 ? 'Contact' : 'Address'}
+                {step === 1 ? t('users.basicInfo') : step === 2 ? t('users.personalInfo') : step === 3 ? t('users.contact') : t('users.address')}
               </p>
             </div>
           ))}
@@ -305,7 +319,7 @@ const UserRegister = () => {
                 onClick={prevStep}
                 className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold"
               >
-                ← Previous
+                {t('users.previous')}
               </button>
             )}
             {currentStep < totalSteps ? (
@@ -314,15 +328,15 @@ const UserRegister = () => {
                 onClick={nextStep}
                 className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold"
               >
-                Next →
+                {t('users.next')}
               </button>
             ) : (
               <>
                 <button type="submit" className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 font-semibold">
-                  ✅ Create User
+                  {t('users.createUser')}
                 </button>
                 <button type="button" onClick={() => navigate('/admin/users')} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold">
-                  ❌ Cancel
+                  {t('users.cancel')}
                 </button>
               </>
             )}

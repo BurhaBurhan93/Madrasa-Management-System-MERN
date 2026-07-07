@@ -19,13 +19,6 @@ const StudentExamResults = () => {
     passRate: 0
   });
 
-  // Get API config with auth token — kept for reference but replaced by apiFetch
-  const getConfig = () => ({});
-
-  useEffect(() => {
-    fetchExamResults();
-  }, []);
-
   const fetchExamResults = async () => {
     try {
       setLoading(true);
@@ -34,22 +27,30 @@ const StudentExamResults = () => {
       const res = await apiFetch('/student/results');
       const data = await parseJsonSafe(res);
       const examResults = Array.isArray(data) ? data : (data.data || []);
-      setResults(examResults);
+      // Normalize ExamAnswer fields to UI-expected shape
+      const normalized = examResults.map(r => ({
+        _id: r._id,
+        examTitle: r.exam?.title || 'Examination',
+        subjectName: r.exam?.subject?.name || 'N/A',
+        teacherName: r.exam?.createdBy?.name || 'N/A',
+        examType: r.exam?.examType?.name || 'General',
+        academicYear: r.exam?.academicYear || '',
+        score: r.score || 0,
+        totalMarks: r.totalMarks || r.exam?.totalMarks || 0,
+        grade: r.grade || null,
+        submittedAt: r.submittedAt || r.createdAt,
+        createdAt: r.createdAt
+      }));
+      setResults(normalized);
 
-      // Calculate statistics
-      if (examResults.length > 0) {
-        const totalScore = examResults.reduce((sum, r) => sum + (r.score || 0), 0);
-        const totalMarks = examResults.reduce((sum, r) => sum + (r.totalMarks || 0), 0);
-        const passedExams = examResults.filter(r => {
-          const percentage = (r.score / r.totalMarks) * 100;
-          return percentage >= 40; // Assuming 40% is passing
-        }).length;
-
+      if (normalized.length > 0) {
+        const scores = normalized.map(r => r.totalMarks > 0 ? Math.round((r.score / r.totalMarks) * 100) : 0);
+        const passedExams = scores.filter(pct => pct >= 40).length;
         setStats({
-          totalExams: examResults.length,
-          averageScore: Math.round(totalScore / examResults.length),
-          highestScore: Math.max(...examResults.map(r => r.score || 0)),
-          passRate: Math.round((passedExams / examResults.length) * 100)
+          totalExams: normalized.length,
+          averageScore: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
+          highestScore: Math.max(...scores),
+          passRate: Math.round((passedExams / normalized.length) * 100)
         });
       }
     } catch (err) {
@@ -60,6 +61,10 @@ const StudentExamResults = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchExamResults();
+  }, []);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -94,13 +99,13 @@ const StudentExamResults = () => {
   }
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in duration-500">
+    <div className="w-full space-y-8 animate-in fade-in duration-500 dark:text-gray-100">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Exam Results</h1>
-          <p className="text-slate-500 mt-1 font-medium italic">View all your examination results with teacher information</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Exam Results</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">View all your examination results with teacher information</p>
         </div>
         <Button 
           variant="primary" 
@@ -132,12 +137,12 @@ const StudentExamResults = () => {
       </div>
 
       {/* Results Table */}
-      <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
+      <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50 dark:bg-gray-800">
         <div className="overflow-x-auto -mx-8">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Exam Details</th>
+                <tr className="border-b border-slate-100 dark:border-gray-700">
+                  <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 dark:text-gray-400 uppercase tracking-widest">Exam Details</th>
                 <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Subject</th>
                 <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Teacher</th>
                 <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
@@ -147,7 +152,7 @@ const StudentExamResults = () => {
                 <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-50 dark:divide-gray-700">
               {results.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="px-8 py-16 text-center">
@@ -159,22 +164,22 @@ const StudentExamResults = () => {
                 </tr>
               ) : (
                 results.map((result, index) => (
-                  <tr key={result._id || index} className="hover:bg-slate-50/50 transition-colors group">
+                  <tr key={result._id || index} className="hover:bg-slate-50/50 dark:hover:bg-gray-700/30 transition-colors group">
                     <td className="px-8 py-5">
                       <div>
-                        <p className="font-black text-slate-900">{result.examTitle || 'Exam'}</p>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{result.academicYear}</p>
+                        <p className="font-black text-slate-900 dark:text-white">{result.examTitle || 'Exam'}</p>
+                        <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">{result.academicYear}</p>
                       </div>
                     </td>
                     <td className="px-8 py-5">
-                      <span className="text-sm font-bold text-slate-700">{result.subjectName || 'N/A'}</span>
+                      <span className="text-sm font-bold text-slate-700 dark:text-gray-300">{result.subjectName || 'N/A'}</span>
                     </td>
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 font-black text-sm">
+                        <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-gray-700 flex items-center justify-center text-slate-600 dark:text-gray-300 font-black text-sm">
                           {result.teacherName?.charAt(0) || 'T'}
                         </div>
-                        <span className="text-sm font-bold text-slate-700">{result.teacherName || 'N/A'}</span>
+                        <span className="text-sm font-bold text-slate-700 dark:text-gray-300">{result.teacherName || 'N/A'}</span>
                       </div>
                     </td>
                     <td className="px-8 py-5">
@@ -182,7 +187,7 @@ const StudentExamResults = () => {
                     </td>
                     <td className="px-8 py-5">
                       <div>
-                        <p className="font-black text-slate-900">{result.score || 0} <span className="text-slate-400">/ {result.totalMarks || 0}</span></p>
+                        <p className="font-black text-slate-900 dark:text-white">{result.score || 0} <span className="text-slate-400 dark:text-gray-500">/ {result.totalMarks || 0}</span></p>
                         <p className="text-xs font-bold text-cyan-600">{Math.round(((result.score || 0) / (result.totalMarks || 1)) * 100)}%</p>
                       </div>
                     </td>
@@ -192,7 +197,7 @@ const StudentExamResults = () => {
                       </Badge>
                     </td>
                     <td className="px-8 py-5">{getStatusBadge(result.score || 0, result.totalMarks || 0)}</td>
-                    <td className="px-8 py-5 text-sm font-bold text-slate-500">{formatDate(result.submittedAt || result.createdAt)}</td>
+                    <td className="px-8 py-5 text-sm font-bold text-slate-500 dark:text-gray-400">{formatDate(result.submittedAt || result.createdAt)}</td>
                   </tr>
                 ))
               )}

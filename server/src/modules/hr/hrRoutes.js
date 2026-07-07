@@ -32,6 +32,7 @@ router.post('/employees', hrController.createEmployee);
 router.put('/employees/:id', hrController.updateEmployee);
 router.delete('/employees/:id', hrController.deleteEmployee);
 
+router.get('/attendance', hrController.getAllAttendance);
 router.post('/attendance', hrController.markAttendance);
 router.get('/attendance/date/:date', hrController.getAttendanceByDate);
 router.get('/attendance/employee/:employeeId', hrController.getAttendanceByEmployee);

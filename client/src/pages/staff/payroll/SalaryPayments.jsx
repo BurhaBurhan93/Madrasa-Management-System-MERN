@@ -134,13 +134,13 @@ const SalaryPayments = () => {
           { label: 'Failed Payments', value: insights.failedPayments, icon: FiAlertTriangle, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700' },
           { label: 'Next Payroll Date', value: insights.nextPayrollDate, icon: FiCalendar, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700' }
         ].map((item) => (
-          <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none`}>
+          <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none dark:border-slate-700 dark:bg-none dark:bg-slate-800/50`}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{item.label}</p>
-                <p className="mt-3 text-2xl font-bold text-slate-900">{item.value}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-300">{item.label}</p>
+                <p className="mt-3 text-2xl font-bold text-slate-900 dark:text-slate-100">{item.value}</p>
               </div>
-              <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.chip}`}>
+              <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.chip} dark:bg-slate-700 dark:text-slate-200`}>
                 <item.icon size={22} />
               </span>
             </div>

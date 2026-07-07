@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import api from "../../../lib/api";
 import StaffPageLayout from "../shared/StaffPageLayout";
 import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
@@ -48,13 +50,75 @@ const RegistrarReports = () => {
       }
 
       const params = new URLSearchParams(query);
-      const res = await api.get(`/students/reports?${params}`);
+      const res = await api.get(`/student/reports?${params}`);
       setReport(res.data.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to generate report");
     } finally {
       setLoading(false);
     }
+  };
+
+  const exportPDF = () => {
+    if (!report?.students?.length) return;
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.setFontSize(18);
+    doc.text("Registrar Report", 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
+
+    let y = 38;
+    doc.setFontSize(12);
+    doc.text("Summary", 14, y);
+    y += 8;
+    doc.setFontSize(10);
+    doc.text(`Total Students: ${report.stats?.totalStudents || 0}`, 14, y);
+    y += 7;
+    doc.text(`Active: ${report.stats?.activeStudents || 0}`, 14, y);
+    y += 7;
+    doc.text(`Inactive: ${report.stats?.inactiveStudents || 0}`, 14, y);
+    y += 7;
+    doc.text(`Classes: ${Object.keys(report.stats?.byClass || {}).length}`, 14, y);
+    y += 12;
+
+    const classEntries = Object.entries(report.stats?.byClass || {});
+    if (classEntries.length > 0) {
+      doc.setFontSize(12);
+      doc.text("Class Distribution", 14, y);
+      y += 8;
+      autoTable(doc, {
+        startY: y,
+        head: [["Class", "Count"]],
+        body: classEntries.map(([cls, count]) => [cls, String(count)]),
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [6, 182, 212] },
+      });
+      y = doc.lastAutoTable.finalY + 12;
+    }
+
+    const tableData = (report.students || []).map((student, index) => [
+      String(index + 1),
+      student.studentCode || "",
+      `${student.firstName || ""} ${student.lastName || ""}`.trim() ||
+        student.user?.name ||
+        "",
+      student.fatherName || "",
+      student.currentClass?.name || student.currentClass?.className || "",
+      student.status || "",
+      student.admissionDate
+        ? new Date(student.admissionDate).toLocaleDateString()
+        : "",
+    ]);
+    autoTable(doc, {
+      startY: y,
+      head: [
+        ["#", "Code", "Name", "Father Name", "Class", "Status", "Admission Date"],
+      ],
+      body: tableData,
+      styles: { fontSize: 7 },
+      headStyles: { fillColor: [6, 182, 212] },
+    });
+    doc.save(`registrar_report_${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   const exportCSV = () => {
@@ -65,7 +129,7 @@ const RegistrarReports = () => {
         student.user?.name ||
         "",
       student.fatherName || "",
-      student.currentClass?.className || "",
+      student.currentClass?.name || student.currentClass?.className || "",
       student.status || "",
       student.admissionDate
         ? new Date(student.admissionDate).toLocaleDateString()
@@ -117,26 +181,48 @@ const RegistrarReports = () => {
       subtitle="Generate and export student reports with daily, weekly, monthly, or custom date filters."
       actions={
         report && (
-          <button
-            onClick={exportCSV}
-            className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-          >
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 15 15"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          <div className="flex gap-2">
+            <button
+              onClick={exportPDF}
+              className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
             >
-              <path d="M7.5 10V2" />
-              <polyline points="4 7 7.5 10 11 7" />
-              <path d="M2 13h11" />
-            </svg>
-            Export CSV
-          </button>
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 15 15"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M7.5 10V2" />
+                <polyline points="4 7 7.5 10 11 7" />
+                <path d="M2 13h11" />
+              </svg>
+              Export PDF
+            </button>
+            <button
+              onClick={exportCSV}
+              className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 15 15"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M7.5 10V2" />
+                <polyline points="4 7 7.5 10 11 7" />
+                <path d="M2 13h11" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
         )
       }
     >
@@ -362,7 +448,7 @@ const RegistrarReports = () => {
                         {student.fatherName || "—"}
                       </td>
                       <td className="px-4 py-3 text-slate-700">
-                        {student.currentClass?.className || "Not Assigned"}
+                        {student.currentClass?.name || student.currentClass?.className || "Not Assigned"}
                       </td>
                       <td className="px-4 py-3">
                         <span

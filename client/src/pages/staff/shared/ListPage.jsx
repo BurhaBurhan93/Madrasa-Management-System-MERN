@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import Card from "../../../components/UIHelper/Card";
 import Button from "../../../components/UIHelper/Button";
 import Badge from "../../../components/UIHelper/Badge";
@@ -31,6 +33,18 @@ const getCellValue = (row, key) => {
     );
   }
   return String(value);
+};
+
+const getRowValue = (row, key, column) => {
+  if (column?.render) {
+    try {
+      const rendered = column.render(row[key], row);
+      if (typeof rendered === "string") return rendered;
+      if (typeof rendered === "number" || typeof rendered === "boolean")
+        return String(rendered);
+    } catch {}
+  }
+  return getCellValue(row, key);
 };
 
 const formatStatusLabel = (value) =>
@@ -218,22 +232,33 @@ const ListPage = ({
 
   const filteredSortedItems = useMemo(() => {
     let nextItems = [...items];
-    if (filterValue.trim()) {
-      const normalized = filterValue.trim().toLowerCase();
-      nextItems = nextItems.filter((row) => {
-        if (filterColumn === "all")
-          return filterableColumns.some((column) =>
-            getCellValue(row, column.key).toLowerCase().includes(normalized),
-          );
-        return getCellValue(row, filterColumn)
-          .toLowerCase()
-          .includes(normalized);
-      });
+    const searchTerm = filterValue.trim().toLowerCase();
+    const queryTerm = query.trim().toLowerCase();
+
+    const matchesFilter = (row, term) => {
+      if (filterColumn === "all")
+        return filterableColumns.some((col) =>
+          getRowValue(row, col.key, col).toLowerCase().includes(term),
+        );
+      const col = filterableColumns.find((c) => c.key === filterColumn);
+      return getRowValue(row, filterColumn, col).toLowerCase().includes(term);
+    };
+
+    if (searchTerm) {
+      nextItems = nextItems.filter((row) => matchesFilter(row, searchTerm));
+    }
+    if (queryTerm && queryTerm !== searchTerm) {
+      nextItems = nextItems.filter((row) =>
+        filterableColumns.some((col) =>
+          getRowValue(row, col.key, col).toLowerCase().includes(queryTerm),
+        ),
+      );
     }
     if (sortKey) {
+      const sortCol = filterableColumns.find((c) => c.key === sortKey);
       nextItems.sort((a, b) => {
-        const aValue = getCellValue(a, sortKey).toLowerCase();
-        const bValue = getCellValue(b, sortKey).toLowerCase();
+        const aValue = getRowValue(a, sortKey, sortCol).toLowerCase();
+        const bValue = getRowValue(b, sortKey, sortCol).toLowerCase();
         if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
         if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
         return 0;
@@ -244,6 +269,7 @@ const ListPage = ({
     items,
     filterColumn,
     filterValue,
+    query,
     filterableColumns,
     sortDirection,
     sortKey,
@@ -329,6 +355,30 @@ const ListPage = ({
     ? filteredSortedItems.length
     : total;
 
+  const handlePDFExport = () => {
+    const exportableColumns = columns.filter(
+      (column) => column.key && !String(column.key).startsWith("__"),
+    );
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.setFontSize(18);
+    doc.text(title || "Report", 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
+    const tableData = filteredSortedItems.map((row) =>
+      exportableColumns.map((column) => getRowValue(row, column.key, column)),
+    );
+    autoTable(doc, {
+      startY: 34,
+      head: [exportableColumns.map((column) => column.header)],
+      body: tableData,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [6, 182, 212] },
+    });
+    doc.save(
+      `${(title || "export").toLowerCase().replace(/[^a-z0-9]+/gi, "-")}.pdf`,
+    );
+  };
+
   const handleExport = () => {
     const exportableColumns = columns.filter(
       (column) => column.key && !String(column.key).startsWith("__"),
@@ -359,9 +409,14 @@ const ListPage = ({
   const pageActions = (
     <div className="flex flex-wrap items-center justify-end gap-3">
       {enableExport ? (
-        <Button variant="outline" icon={FiDownload} onClick={handleExport}>
-          {localizeAdminText("Export", adminLang)} CSV
-        </Button>
+        <>
+          <Button variant="outline" icon={FiDownload} onClick={handlePDFExport}>
+            {localizeAdminText("Export", adminLang)} PDF
+          </Button>
+          <Button variant="outline" icon={FiDownload} onClick={handleExport}>
+            {localizeAdminText("Export", adminLang)} CSV
+          </Button>
+        </>
       ) : null}
       {extraActions}
       {createPath ? (

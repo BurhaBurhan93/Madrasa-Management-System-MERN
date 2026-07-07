@@ -2,15 +2,16 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const AttendanceCorrectionSchema = new Schema({
-  record: { type: Schema.Types.ObjectId, ref: 'AttendanceRecord', required: true },
-  oldStatus: { type: String, enum: ['present','absent','late','excused'] },
-  newStatus: { type: String, enum: ['present','absent','late','excused'] },
-  correctionReason: { type: String },
+  employee: { type: Schema.Types.ObjectId, ref: 'Employee', required: true },
+  date: { type: Date, required: true },
+  oldStatus: { type: String, enum: ['present','absent','late','half-day','on-leave'] },
+  newStatus: { type: String, enum: ['present','absent','late','half-day','on-leave'], required: true },
+  correctionReason: { type: String, required: true },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   correctedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   correctedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-// Index for lookup by attendance record
-AttendanceCorrectionSchema.index({ record: 1, correctedAt: -1 });
+AttendanceCorrectionSchema.index({ employee: 1, date: -1 });
 
 module.exports = mongoose.model('AttendanceCorrection', AttendanceCorrectionSchema);

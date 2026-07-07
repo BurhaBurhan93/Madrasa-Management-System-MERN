@@ -39,7 +39,7 @@ export const studentsConfig = {
     { key: 'name', header: 'Student Name', render: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.user?.name || '-' },
     { key: 'fatherName', header: 'Father Name' },
     { key: 'phone', header: 'Phone' },
-    { key: 'currentClass', header: 'Class', render: (value) => value?.className || '-' },
+    { key: 'currentClass', header: 'Class', render: (value) => value?.name || value?.className || '-' },
     { key: 'currentLevel', header: 'Level' },
     { key: 'status', header: 'Status' },
     { key: 'admissionDate', header: 'Admission Date', render: (value) => value ? new Date(value).toLocaleDateString() : '-' }
@@ -47,7 +47,7 @@ export const studentsConfig = {
   formFields: [
     { name: 'user', label: 'User Account', type: 'relation', relationEndpoint: '/users/students', relationLabel: (row) => `${row.name || row.email}` },
     { name: 'studentCode', label: 'Student Code', required: true },
-    { name: 'currentClass', label: 'Current Class', type: 'relation', relationEndpoint: '/academic/classes', relationLabel: (row) => row.className || row.name },
+    { name: 'currentClass', label: 'Current Class', type: 'relation', relationEndpoint: '/academic/classes', relationLabel: (row) => row.name },
     { name: 'currentLevel', label: 'Current Level' },
     { name: 'admissionDate', label: 'Admission Date', type: 'date' },
     { name: 'status', label: 'Status', type: 'select', options: [

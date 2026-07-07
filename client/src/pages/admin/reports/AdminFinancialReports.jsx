@@ -1,4 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 import api from "../../../lib/api";
 import {
   getDefaultPeriodFilters,
@@ -6,6 +9,15 @@ import {
 } from "../../../utils/reportPeriods";
 
 const AdminFinancialReports = () => {
+  const { t } = useTranslation('admin');
+
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+  }, []);
   const [filters, setFilters] = useState(getDefaultPeriodFilters());
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -106,10 +118,10 @@ const AdminFinancialReports = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Financial Reports
+            {t('reports.financialReportsPage')}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Revenue, expenses, and financial analytics for {periodLabel}
+            {t('reports.revenueExpenses')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -161,13 +173,13 @@ const AdminFinancialReports = () => {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-          <p className="text-xs font-medium text-emerald-600">Total Revenue</p>
+          <p className="text-xs font-medium text-emerald-600">{t('reports.revenueExpenses')}</p>
           <p className="mt-1 text-2xl font-bold text-emerald-700">
             {loading ? "…" : fmt(stats.revenue)}
           </p>
         </div>
         <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5">
-          <p className="text-xs font-medium text-rose-600">Total Expenses</p>
+          <p className="text-xs font-medium text-rose-600">{t('reports.revenueExpenses')}</p>
           <p className="mt-1 text-2xl font-bold text-rose-700">
             {loading ? "…" : fmt(stats.expenses)}
           </p>
@@ -178,7 +190,7 @@ const AdminFinancialReports = () => {
           <p
             className={`text-xs font-medium ${stats.net >= 0 ? "text-cyan-600" : "text-amber-600"}`}
           >
-            Net Balance
+            {t('reports.financialReportsPage')}
           </p>
           <p
             className={`mt-1 text-2xl font-bold ${stats.net >= 0 ? "text-cyan-700" : "text-amber-700"}`}
@@ -187,7 +199,7 @@ const AdminFinancialReports = () => {
           </p>
         </div>
         <div className="rounded-2xl border border-violet-200 bg-violet-50 p-5">
-          <p className="text-xs font-medium text-violet-600">Fee Collections</p>
+          <p className="text-xs font-medium text-violet-600">{t('reports.feeCollections')}</p>
           <p className="mt-1 text-2xl font-bold text-violet-700">
             {loading ? "…" : stats.collections}
           </p>
@@ -197,20 +209,20 @@ const AdminFinancialReports = () => {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">
-            Revenue by Payment Method
+            {t('reports.revenueByMethod')}
           </h2>
           {loading ? (
-            <p className="text-slate-400">Loading…</p>
+            <p className="text-slate-400">{t('common.loading')}</p>
           ) : feeBreakdown.length === 0 ? (
             <p className="text-slate-400">
-              No fee payments found for this period.
+              {t('common.noData')}
             </p>
           ) : (
             <table className="w-full text-sm">
               <thead className="border-b border-slate-100">
                 <tr>
                   <th className="py-2 text-left text-xs font-semibold text-slate-500">
-                    Method
+                    {t('reports.method')}
                   </th>
                   <th className="py-2 text-right text-xs font-semibold text-slate-500">
                     Amount (AFN)
@@ -233,18 +245,18 @@ const AdminFinancialReports = () => {
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">
-            Expense by Category
+            {t('reports.expenseByCategory')}
           </h2>
           {loading ? (
-            <p className="text-slate-400">Loading…</p>
+            <p className="text-slate-400">{t('common.loading')}</p>
           ) : expenseBreakdown.length === 0 ? (
-            <p className="text-slate-400">No expenses found for this period.</p>
+            <p className="text-slate-400">{t('common.noData')}</p>
           ) : (
             <table className="w-full text-sm">
               <thead className="border-b border-slate-100">
                 <tr>
                   <th className="py-2 text-left text-xs font-semibold text-slate-500">
-                    Category
+                    {t('reports.expenseByCategory')}
                   </th>
                   <th className="py-2 text-right text-xs font-semibold text-slate-500">
                     Amount (AFN)

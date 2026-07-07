@@ -169,7 +169,7 @@ const CrudPage = ({
             <DataTable
               columns={columns}
               data={items}
-              rowClassName="odd:bg-white even:bg-gray-50"
+              rowClassName="odd:bg-white dark:odd:bg-slate-800/30 even:bg-gray-50 dark:even:bg-slate-800/10"
               headerClassName="bg-gray-100 text-gray-700"
             />
           )}

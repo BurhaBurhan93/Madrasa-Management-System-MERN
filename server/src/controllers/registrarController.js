@@ -275,7 +275,7 @@ const transferStudent = async (req, res) => {
       entityType: 'Student',
       entityId: student._id,
       field: 'currentClass',
-      oldValue: oldClass,
+      oldValue: oldClass || 'Unassigned',
       newValue: newClass,
       changedBy: req.user.id,
       reason: 'Class transfer',
@@ -430,23 +430,33 @@ const getStudentReports = async (req, res) => {
       if (endDate) query.admissionDate.$lte = new Date(endDate);
     }
     
-    const students = await Student.find(query);
+    const students = await Student.find(query)
+      .populate("currentClass", "name")
+      .populate("user", "name email phone")
+      .lean();
+    
+    const enrichedStudents = students.map((student) => ({
+      ...student,
+      firstName: student.user?.name?.split(" ")[0] || student.firstName,
+      lastName: student.user?.name?.split(" ")[1] || student.lastName || "",
+      name: student.user?.name,
+    }));
     
     const stats = {
-      totalStudents: students.length,
-      activeStudents: students.filter(s => s.status === 'active').length,
-      inactiveStudents: students.filter(s => s.status === 'inactive').length,
+      totalStudents: enrichedStudents.length,
+      activeStudents: enrichedStudents.filter(s => s.status === 'active').length,
+      inactiveStudents: enrichedStudents.filter(s => s.status === 'inactive').length,
       byClass: {},
-      byGender: {} // If gender field exists
+      byGender: {}
     };
     
     // Group by class
-    students.forEach(student => {
-      const className = student.currentClass?.className || 'Not Assigned';
+    enrichedStudents.forEach(student => {
+      const className = student.currentClass?.name || student.currentClass?.className || 'Not Assigned';
       stats.byClass[className] = (stats.byClass[className] || 0) + 1;
     });
     
-    res.json({ success: true, data: { students, stats } });
+    res.json({ success: true, data: { students: enrichedStudents, stats } });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

@@ -6,6 +6,7 @@ const AttendanceWarningSchema = new Schema({
   warningType: { type: String, enum: ['low_attendance','excessive_late'], required: true },
   threshold: { type: Number, required: true },
   currentValue: { type: Number, default: 0 },
+  status: { type: String, enum: ['active', 'notified', 'dismissed'], default: 'active' },
   issuedAt: { type: Date, default: Date.now },
   remarks: { type: String }
 }, { timestamps: true });

@@ -24,7 +24,7 @@ const toIsoDate = (day) => {
   return utcDate.toISOString().split('T')[0];
 };
 
-const CalendarDatePicker = ({ value, onChange, placeholder = 'Select date', name }) => {
+const CalendarDatePicker = ({ value, onChange, placeholder = 'Select date', name, required, ...rest }) => {
   const { calSys } = useCalendar();
   const inputRef = useRef(null);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -82,7 +82,9 @@ const CalendarDatePicker = ({ value, onChange, placeholder = 'Select date', name
         value={formatDateForDisplay(inputValue)}
         onChange={handleNativeChange}
         placeholder={placeholder}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 [color-scheme:light]"
+        required={required}
+        {...rest}
+        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 [color-scheme:light] dark:[color-scheme:dark]"
       />
       {!inputValue && (
         <button

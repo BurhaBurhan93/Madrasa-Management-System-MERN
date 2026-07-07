@@ -15,27 +15,33 @@ export const documentsManagementConfig = {
   editPathForRow: (row) => `/staff/registrar/documents/edit/${row._id}`,
   viewPathForRow: (row) => `/staff/registrar/documents/view/${row._id}`,
   columns: [
-    { key: 'student', header: 'Student', render: (value, row) => row.student?.user?.name || '-' },
+    { key: 'student', header: 'Student', render: (value, row) => `${row.student?.firstName || ''} ${row.student?.lastName || ''}`.trim() || row.student?.studentCode || row.user?.name || '-' },
     { key: 'type', header: 'Document Type' },
     { key: 'title', header: 'Title' },
-    { key: 'uploadDate', header: 'Upload Date', render: (value) => value ? new Date(value).toLocaleDateString() : '-' },
-    { key: 'status', header: 'Status' },
-    { key: 'actions', header: 'Actions', render: (value, row, actions) => (
-      <div className="flex gap-2">
-        <button 
-          onClick={() => window.open(row.filePath, '_blank')}
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-        >
-          📄 View
-        </button>
-        <button 
-          onClick={() => actions.onDelete(row)}
-          className="text-red-600 hover:text-red-800 text-sm font-medium"
-        >
-          🗑️ Delete
-        </button>
-      </div>
-    )}
+    { key: 'description', header: 'Description' },
+    { key: 'createdAt', header: 'Upload Date', render: (value) => value ? new Date(value).toLocaleDateString() : '-' },
+    { key: 'status', header: 'Status' }
+  ],
+  extraActionItemsForRow: (row) => [
+    {
+      label: 'View File',
+      onClick: () => {
+        const raw = row.filePath;
+        const path = typeof raw === 'object' ? raw.url : raw;
+        if (!path) return;
+        if (path.startsWith('data:')) {
+          const a = document.createElement('a');
+          a.href = path;
+          a.download = row.title || 'document';
+          a.click();
+        } else if (path.startsWith('http')) {
+          window.open(path, '_blank');
+        } else {
+          window.open(`${API_BASE.replace(/\/api$/, '')}${path}`, '_blank');
+        }
+      },
+      className: 'border-blue-200 bg-blue-50 text-blue-700 hover:border-blue-300 hover:bg-blue-100'
+    }
   ],
   formFields: [
     { name: 'student', label: 'Student', type: 'relation', relationEndpoint: '/student/all', relationLabel: (row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.user?.name, required: true },
@@ -64,7 +70,7 @@ export const documentsManagementConfig = {
     status: 'active'
   },
   mapRowToForm: (row) => ({
-    student: row.student?._id || row.student || '',
+    student: row.student?._id || row.student || row.user?._id || row.user || '',
     type: row.type || '',
     title: row.title || '',
     description: row.description || '',

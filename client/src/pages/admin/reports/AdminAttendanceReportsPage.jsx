@@ -1,4 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 import api from "../../../lib/api";
 import {
   buildPeriodQuery,
@@ -9,6 +12,15 @@ const getCount = (statuses, status) =>
   statuses?.find((item) => item.status === status)?.count || 0;
 
 const AdminAttendanceReportsPage = () => {
+  const { t } = useTranslation('admin');
+
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+  }, []);
   const [filters, setFilters] = useState(getDefaultPeriodFilters());
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState([]);
@@ -69,10 +81,10 @@ const AdminAttendanceReportsPage = () => {
   }, [filters.period, filters.date, filters.week, filters.month]);
 
   const subtitle = useMemo(() => {
-    if (filters.period === "daily") return "Attendance analytics for today";
+    if (filters.period === "daily") return t('reports.attendanceAnalytics');
     if (filters.period === "weekly")
-      return "Attendance analytics for this week";
-    return "Attendance analytics across all departments";
+      return t('reports.attendanceAnalytics');
+    return t('reports.attendanceAnalytics');
   }, [filters.period]);
 
   return (
@@ -80,7 +92,7 @@ const AdminAttendanceReportsPage = () => {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Attendance Reports
+            {t('reports.attendanceReports')}
           </h1>
           <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
         </div>
@@ -92,9 +104,9 @@ const AdminAttendanceReportsPage = () => {
             }
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm"
           >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
+            <option value="daily">{t('common.daily')}</option>
+            <option value="weekly">{t('common.weekly')}</option>
+            <option value="monthly">{t('common.monthly')}</option>
           </select>
           {filters.period === "daily" && (
             <input
@@ -131,7 +143,7 @@ const AdminAttendanceReportsPage = () => {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-          <p className="text-xs font-medium text-emerald-600">Overall Rate</p>
+          <p className="text-xs font-medium text-emerald-600">{t('reports.attendanceAnalytics')}</p>
           <p className="mt-1 text-2xl font-bold text-emerald-700">
             {loading ? "…" : `${stats.rate}%`}
           </p>
@@ -143,13 +155,13 @@ const AdminAttendanceReportsPage = () => {
           </p>
         </div>
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-          <p className="text-xs font-medium text-amber-600">Late Arrivals</p>
+          <p className="text-xs font-medium text-amber-600">{t('reports.lateArrivals')}</p>
           <p className="mt-1 text-2xl font-bold text-amber-700">
             {loading ? "…" : stats.late}
           </p>
         </div>
         <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5">
-          <p className="text-xs font-medium text-rose-600">Absences</p>
+          <p className="text-xs font-medium text-rose-600">{t('reports.absences')}</p>
           <p className="mt-1 text-2xl font-bold text-rose-700">
             {loading ? "…" : stats.absent}
           </p>
@@ -160,19 +172,20 @@ const AdminAttendanceReportsPage = () => {
         <table className="w-full text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50">
             <tr>
-              <th className="px-5 py-3 font-semibold text-slate-600">
-                Employee
-              </th>
-              <th className="px-5 py-3 font-semibold text-slate-600">Code</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">
+                  Employee
+                </th>
+                <th className="px-5 py-3 font-semibold text-slate-600">Code</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('reports.attendanceReports')}</th>
               <th className="px-5 py-3 text-center font-semibold text-emerald-600">
                 Present
               </th>
-              <th className="px-5 py-3 text-center font-semibold text-rose-600">
-                Absent
-              </th>
-              <th className="px-5 py-3 text-center font-semibold text-amber-600">
-                Late
-              </th>
+                <th className="px-5 py-3 text-center font-semibold text-rose-600">
+                  {t('reports.absences')}
+                </th>
+                <th className="px-5 py-3 text-center font-semibold text-amber-600">
+                  {t('reports.lateArrivals')}
+                </th>
               <th className="px-5 py-3 text-center font-semibold text-slate-600">
                 Rate
               </th>
@@ -183,9 +196,9 @@ const AdminAttendanceReportsPage = () => {
               <tr>
                 <td
                   colSpan={6}
-                  className="px-5 py-10 text-center text-slate-400"
+                   className="px-5 py-10 text-center text-slate-400"
                 >
-                  Loading…
+                  {t('common.loading')}
                 </td>
               </tr>
             )}
@@ -195,7 +208,7 @@ const AdminAttendanceReportsPage = () => {
                   colSpan={6}
                   className="px-5 py-10 text-center text-slate-400"
                 >
-                  No attendance records found for this period.
+                  {t('common.noData')}
                 </td>
               </tr>
             )}

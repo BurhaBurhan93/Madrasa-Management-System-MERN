@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext.jsx';
 import { localizeAdminText } from '../../lib/adminLocalization';
+import { readStoredLanguage } from '../../lib/languageStorage';
 
 const Input = ({
   label,
@@ -18,7 +19,7 @@ const Input = ({
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const adminLang = localStorage.getItem('adminLang') || 'en';
+  const adminLang = readStoredLanguage('adminLang', 'en');
 
   return (
     <div className="space-y-2">

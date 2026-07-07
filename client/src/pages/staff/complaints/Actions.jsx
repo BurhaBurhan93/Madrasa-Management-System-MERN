@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import ListPage from '../shared/ListPage';
-import StaffPageLayout from '../shared/StaffPageLayout';
 import Card from '../../../components/UIHelper/Card';
 import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
 import { BarChartComponent } from '../../../components/UIHelper/ECharts';
@@ -119,71 +118,61 @@ const StaffComplaintActions = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <StaffPageLayout eyebrow="Complaints" title="Complaint Actions">
-        <PageSkeleton type="dashboard" />
-      </StaffPageLayout>
-    );
-  }
-
-  return (
-    <StaffPageLayout eyebrow="Complaints" title="Complaint Actions" subtitle="Manage complaint actions using the same consistent complaints workflow design.">
-      {/* Statistics Cards */}
+  const headerContent = (
+    <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Total Actions</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.totalActions}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total Actions</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalActions}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
               <FiClipboard className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Completed</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.completed}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Completed</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.completed}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
               <FiCheckCircle className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Pending</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.pending}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Pending</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.pending}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
               <FiClock className="w-6 h-6 text-amber-600" />
             </div>
           </div>
         </Card>
         
-        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-violet-50 p-5">
+        <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-purple-50 to-violet-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 mb-1">Follow-ups</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.followUpScheduled}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Follow-ups</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.followUpScheduled}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
               <FiCalendar className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </Card>
       </div>
       
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="rounded-[28px] border border-slate-200 p-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">Monthly Actions Trend</h3>
+        <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Monthly Actions Trend</h3>
           {stats.byMonth.length > 0 ? (
             <BarChartComponent data={stats.byMonth} dataKey="value" nameKey="name" height={250} />
           ) : (
@@ -191,10 +180,33 @@ const StaffComplaintActions = () => {
           )}
         </Card>
       </div>
-      
-      {/* List Page */}
-      <ListPage embedded={true} title={complaintActionsConfig.title} subtitle={complaintActionsConfig.subtitle} endpoint={complaintActionsConfig.endpoint} columns={complaintActionsConfig.columns} createPath="/staff/complaints/actions/create" editPathForRow={(row) => `/staff/complaints/actions/edit/${getId(row)}`} viewPathForRow={(row) => `/staff/complaints/actions/view/${getId(row)}`} searchPlaceholder="Search complaint actions..." clientSidePagination={true} />
-    </StaffPageLayout>
+    </>
+  );
+
+  if (loading) {
+    return (
+      <ListPage
+        eyebrow="Complaints" title="Complaint Actions" subtitle="Manage complaint actions using the same consistent complaints workflow design."
+        endpoint={complaintActionsConfig.endpoint} columns={complaintActionsConfig.columns}
+        createPath="/staff/complaints/actions/create"
+        editPathForRow={(row) => `/staff/complaints/actions/edit/${getId(row)}`}
+        viewPathForRow={(row) => `/staff/complaints/actions/view/${getId(row)}`}
+        searchPlaceholder="Search complaint actions..." clientSidePagination={true}
+        headerContent={<PageSkeleton type="dashboard" />}
+      />
+    );
+  }
+
+  return (
+    <ListPage
+      eyebrow="Complaints" title="Complaint Actions" subtitle="Manage complaint actions using the same consistent complaints workflow design."
+      endpoint={complaintActionsConfig.endpoint} columns={complaintActionsConfig.columns}
+      createPath="/staff/complaints/actions/create"
+      editPathForRow={(row) => `/staff/complaints/actions/edit/${getId(row)}`}
+      viewPathForRow={(row) => `/staff/complaints/actions/view/${getId(row)}`}
+      searchPlaceholder="Search complaint actions..." clientSidePagination={true}
+      headerContent={headerContent}
+    />
   );
 };
 

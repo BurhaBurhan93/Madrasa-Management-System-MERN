@@ -14,6 +14,7 @@ import TeacherStudents from '../pages/teacher/TeacherStudents';
 import TeacherAssignments from '../pages/teacher/TeacherAssignments';
 import TeacherSessions from '../pages/teacher/TeacherSessions';
 import TeacherAttendance from '../pages/teacher/TeacherAttendance';
+import CreateSession from '../pages/teacher/CreateSession';
 import TeacherAttendanceReports from '../pages/teacher/TeacherAttendanceReport';
 import TeacherViewResults from '../pages/teacher/TeacherViewResults';
 import TeacherEnterMarks from '../pages/teacher/TeacherEnterMarks';
@@ -21,6 +22,9 @@ import TeacherResults from '../pages/teacher/TeacherResults';
 import AssignedComplaints from '../pages/teacher/AssignedCompliants';
 import Messages from '../pages/teacher/Messages';
 import CreateAssignment from '../pages/teacher/CreateAssignment';
+import TeacherLeaveList from '../pages/teacher/TeacherLeaveList';
+import TeacherLeaveApply from '../pages/teacher/TeacherLeaveApply';
+import TeacherPayslips from '../pages/teacher/TeacherPayslips';
 
 const TeacherRoutes = () => (
   <Route path="/teacher/*" element={<TeacherPanel />}>
@@ -31,6 +35,7 @@ const TeacherRoutes = () => (
     <Route path='assignments' element={<TeacherAssignments />} />
     <Route path='sessions' element={<TeacherSessions />} />
     <Route path='attendance' element={<TeacherAttendance />} />
+    <Route path='attendance/create-session' element={<CreateSession />} />
     <Route path='attendance-reports' element={<TeacherAttendanceReports />} />
     <Route path='create-assignments' element={<CreateAssignment />} />
     <Route path="exams">
@@ -48,6 +53,9 @@ const TeacherRoutes = () => (
     </Route>
     <Route path="complaints" element={<AssignedComplaints />} />
     <Route path="messages" element={<Messages />} />
+    <Route path="leaves" element={<TeacherLeaveList />} />
+    <Route path="leaves/apply" element={<TeacherLeaveApply />} />
+    <Route path="payslips" element={<TeacherPayslips />} />
   </Route>
 );
 

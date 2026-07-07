@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import {
   AreaChartComponent,
   BarChartComponent,
@@ -16,9 +16,6 @@ import {
   FiInbox,
   FiUsers,
 } from 'react-icons/fi';
-
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const RESOURCE_DEFS = [
   { key: 'users', label: 'Users', path: '/users', route: '/staff/users' },
@@ -38,11 +35,6 @@ const RESOURCE_DEFS = [
   { key: 'kitchenInventory', label: 'Kitchen Inventory', path: '/kitchen/inventory', route: '/staff/kitchen/inventory' },
   { key: 'kitchenBudgets', label: 'Kitchen Budgets', path: '/kitchen/budgets', route: '/staff/kitchen/requests' },
 ];
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
 
 const extractPayload = (json) => {
   if (Array.isArray(json)) return json;
@@ -120,15 +112,14 @@ const StaffDashboard = () => {
       const responses = await Promise.all(
         RESOURCE_DEFS.map(async (def) => {
           try {
-            const res = await axios.get(`${API_BASE}${def.path}`, {
-              headers: getAuthHeaders(),
-            });
+            const res = await apiFetch(def.path);
+            const json = await parseJsonSafe(res);
 
             return {
               key: def.key,
               label: def.label,
               ok: true,
-              data: extractPayload(res.data),
+              data: extractPayload(json),
             };
           } catch {
             return {
@@ -178,7 +169,6 @@ const StaffDashboard = () => {
   const salaryAdvances = Array.isArray(resources.salaryAdvances) ? resources.salaryAdvances : [];
   const kitchenInventory = Array.isArray(resources.kitchenInventory) ? resources.kitchenInventory : [];
   const kitchenBudgets = Array.isArray(resources.kitchenBudgets) ? resources.kitchenBudgets : [];
-
   const borrowedBooks = inventory.filter((item) => {
     const status = String(item?.status || item?.availability || '').toLowerCase();
     return status.includes('borrow') || status.includes('issued') || item?.borrowed === true;

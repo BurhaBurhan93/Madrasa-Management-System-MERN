@@ -53,7 +53,7 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
     payroll: { label: 'Payroll Staff', username: 'payroll@gmail.com', password: 'payroll1234' },
     complaints: { label: 'Complaints Staff', username: 'complaints@gmail.com', password: 'complaints1234' },
     inventory: { label: 'Inventory Staff', username: 'inventory@gmail.com', password: 'inventory1234' },
-    hostel: { label: 'Hostel Staff', username: 'hostel@gmail.com', password: 'hostel1234' },
+
     all: { label: 'All Staff Modules', username: 'staff.all@gmail.com', password: 'staffall1234' }
   };
 

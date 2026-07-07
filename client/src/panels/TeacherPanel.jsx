@@ -18,128 +18,24 @@ import {
   FiEdit,
   FiSun,
   FiMoon,
-  FiGlobe,
   FiPrinter,
 } from "react-icons/fi";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { useTheme } from "../contexts/ThemeContext";
 import { CalendarProvider, useCalendar } from "../contexts/CalendarContext";
-import { clearAuth } from "../lib/auth";
+import { clearAuth, getToken } from "../lib/auth";
+import { API_BASE } from "../lib/apiFetch";
 import NotificationDropdown from "../components/UIHelper/NotificationDropdown";
 import { CALENDAR_SYSTEMS, calendarLabels, setCalendarSystem } from '../lib/dateUtils';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import { getMadrasaLogo, getMadrasaDisplayName } from '../lib/madrasaInfo';
 import useMadrasaInfo from '../hooks/useMadrasaInfo';
+import i18n from '../i18n';
+import { useTranslation } from 'react-i18next';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-// ── Localization strings ──
-const translations = {
-  en: {
-    console: "Teacher Console",
-    workspace: "Teacher Workspace",
-    welcome: "Welcome back,",
-    subtitle: "Manage your classes and students efficiently.",
-    search: "Search students, classes...",
-    overview: "Overview",
-    teaching: "Teaching",
-    dashboard: "Dashboard",
-    academic: "Academic",
-    mySubjects: "My Subjects",
-    myStudents: "My Students",
-    assignments: "Assignments",
-    createAssignment: "Create Assignment",
-    attendance: "Attendance",
-    markAttendance: "Mark Attendance",
-    attendanceReports: "Attendance Reports",
-    exams: "Exams",
-    myExams: "My Exams",
-    createExam: "Create Exam",
-    results: "Results",
-    enterMarks: "Enter Marks",
-    viewResults: "View Results",
-    communications: "Communications",
-    assignedComplaints: "Assigned Complaints",
-    profile: "Profile",
-    profileSub: "Account and identity",
-    logout: "Logout",
-    logoutSub: "Exit this workspace",
-    theme: "Toggle theme",
-    language: "Language",
-    collapseSidebar: "Collapse sidebar",
-    expandSidebar: "Expand sidebar",
-    print: "Print",
-  },
-  dari: {
-    console: "کنسول استاد",
-    workspace: "فضای کاری استاد",
-    welcome: "خوش آمدید،",
-    subtitle: "مدیریت مؤثر صنف‌ها و شاگردان.",
-    search: "جستجوی شاگردان، صنف‌ها...",
-    overview: "مرور کلی",
-    teaching: "تدریس",
-    dashboard: "داشبورد",
-    academic: "علمی",
-    mySubjects: "مضامین من",
-    myStudents: "شاگردان من",
-    assignments: "تکالیف",
-    createAssignment: "ایجاد تکلیف",
-    attendance: "حاضری",
-    markAttendance: "ثبت حاضری",
-    attendanceReports: "گزارش‌های حاضری",
-    exams: "امتحانات",
-    myExams: "امتحانات من",
-    createExam: "ایجاد امتحان",
-    results: "نتایج",
-    enterMarks: "درج نمرات",
-    viewResults: "مشاهده نتایج",
-    communications: "ارتباطات",
-    assignedComplaints: "شکایات محوله",
-    profile: "پروفایل",
-    profileSub: "حساب و هویت",
-    logout: "خروج",
-    logoutSub: "خروج از فضای کاری",
-    theme: "تغییر تم",
-    language: "زبان",
-    collapseSidebar: "جمع کردن نوار کناری",
-    expandSidebar: "باز کردن نوار کناری",
-    print: "چاپ",
-  },
-  ps: {
-    console: "د ښوونکي کنسول",
-    workspace: "د ښوونکي کاري فضا",
-    welcome: "ښه راغلاست،",
-    subtitle: "په مؤثره توګه خپل ټولګي او زده‌کوونکي اداره کړئ.",
-    search: "زده‌کوونکي، ټولګي ولټوئ...",
-    overview: "لنډه کتنه",
-    teaching: "تدریس",
-    dashboard: "ډشبورډ",
-    academic: "تعلیمي",
-    mySubjects: "زما مضمونونه",
-    myStudents: "زما زده‌کوونکي",
-    assignments: "تکالیف",
-    createAssignment: "تکلیف جوړ کړئ",
-    attendance: "حاضری",
-    markAttendance: "حاضری ثبت کړئ",
-    attendanceReports: "د حاضرۍ راپورونه",
-    exams: "امتحانونه",
-    myExams: "زما امتحانونه",
-    createExam: "امتحان جوړ کړئ",
-    results: "پایلې",
-    enterMarks: "نمرې درج کړئ",
-    viewResults: "پایلې وګورئ",
-    communications: "اړیکې",
-    assignedComplaints: "ټاکل شوي شکایتونه",
-    profile: "پروفایل",
-    profileSub: "حساب او هویت",
-    logout: "وتل",
-    logoutSub: "له کاري فضا څخه وتل",
-    theme: "تیم بدل کړئ",
-    language: "ژبه",
-    collapseSidebar: "د اړخ پټۍ ټولول",
-    expandSidebar: "د اړخ پټۍ خلاصول",
-    print: "چاپ",
-  },
-};
+
 
 const TeacherPanelContent = () => {
   const navigate = useNavigate();
@@ -156,14 +52,23 @@ const TeacherPanelContent = () => {
   const { calSys, setCalSys } = useCalendar();
   const [madrasaInfo] = useMadrasaInfo({ fetchRemote: true });
   const isRTL = lang === "dari" || lang === "ps";
-  const t = translations[lang] || translations.en;
+    const { t, i18n: i18nHook } = useTranslation(['teacher', 'common', 'nav', 'app']);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [, forceReRender] = useState(0);
+
+  useEffect(() => {
+    const handler = () => forceReRender(v => v + 1);
+    i18nHook.on('languageChanged', handler);
+    return () => i18nHook.off('languageChanged', handler);
+  }, [i18nHook]);
 
   useEffect(() => {
     document.documentElement.dir = isRTL ? "rtl" : "ltr";
     document.documentElement.lang = lang;
     return () => { document.documentElement.dir = 'ltr'; };
   }, [lang, isRTL]);
+
+  useEffect(() => { i18n.changeLanguage(lang === 'dari' ? 'prs' : lang); }, [lang]);
 
   useEffect(() => {
     fetchUserData();
@@ -173,7 +78,9 @@ const TeacherPanelContent = () => {
     try {
       const userId = localStorage.getItem("userId");
       if (userId) {
-        const res = await fetch(`http://localhost:5000/api/users/${userId}`);
+        const res = await fetch(`${API_BASE}/users/${userId}`, {
+          headers: { Authorization: `Bearer ${getToken()}` }
+        });
         const data = await res.json();
         if (data.success) setUser(data.data);
       }
@@ -200,28 +107,31 @@ const TeacherPanelContent = () => {
       id: "dashboard",
       icon: <FiHome size={19} />,
       path: "",
-      label: t.dashboard,
+      label: t('dashboard'),
       type: "link",
     },
     {
       id: "print",
       icon: <FiPrinter size={19} />,
       path: "print/home",
-      label: t.print,
+      label: t('print'),
       type: "link",
     },
     {
       id: "academic",
       icon: <FiBookOpen size={19} />,
-      label: t.academic,
+      label: t('academic'),
       type: "dropdown",
       items: [
-        { id: "subjects", label: t.mySubjects, path: "subjects" },
-        { id: "students", label: t.myStudents, path: "students" },
-        { id: "assignments", label: t.assignments, path: "assignments" },
+        { id: "subjects", label: t('mySubjects'), path: "subjects" },
+        { id: "classes", label: t('myClasses'), path: "classes" },
+        { id: "students", label: t('myStudents'), path: "students" },
+        { id: "syllabus", label: t('syllabus'), path: "syllabus" },
+        { id: "grading", label: t('grading'), path: "grading" },
+        { id: "assignments", label: t('assignments'), path: "assignments" },
         {
           id: "create-assignment",
-          label: t.createAssignment,
+          label: t('createAssignment'),
           path: "create-assignments",
         },
       ],
@@ -229,13 +139,14 @@ const TeacherPanelContent = () => {
     {
       id: "attendance",
       icon: <FiCalendar size={19} />,
-      label: t.attendance,
+      label: t('attendance'),
       type: "dropdown",
       items: [
-        { id: "mark-attendance", label: t.markAttendance, path: "attendance" },
+        { id: "sessions", label: t('sessions'), path: "sessions" },
+        { id: "mark-attendance", label: t('markAttendance'), path: "attendance" },
         {
           id: "attendance-reports",
-          label: t.attendanceReports,
+          label: t('attendanceReports'),
           path: "attendance-reports",
         },
       ],
@@ -243,23 +154,23 @@ const TeacherPanelContent = () => {
     {
       id: "exams",
       icon: <FiClipboard size={19} />,
-      label: t.exams,
+      label: t('exams'),
       type: "dropdown",
       items: [
-        { id: "exams-list", label: t.myExams, path: "exams" },
-        { id: "create-exam", label: t.createExam, path: "exams/create" },
+        { id: "exams-list", label: t('myExams'), path: "exams" },
+        { id: "create-exam", label: t('createExam'), path: "exams/create" },
       ],
     },
     {
       id: "results",
       icon: <FiBarChart2 size={19} />,
-      label: t.results,
+      label: t('results'),
       type: "dropdown",
       items: [
-        { id: "enter-marks", label: t.enterMarks, path: "results/enter-marks" },
+        { id: "enter-marks", label: t('enterMarks'), path: "results/enter-marks" },
         {
           id: "view-results",
-          label: t.viewResults,
+          label: t('viewResults'),
           path: "results/view-results",
         },
       ],
@@ -267,11 +178,30 @@ const TeacherPanelContent = () => {
     {
       id: "communications",
       icon: <FiMessageSquare size={19} />,
-      label: t.communications,
+      label: t('communications'),
       type: "dropdown",
       items: [
-        { id: "complaints", label: t.assignedComplaints, path: "complaints" },
+        { id: "announcements", label: t('announcements'), path: "announcements" },
+        { id: "complaints", label: t('assignedComplaints'), path: "complaints" },
+        { id: "feedback", label: t('feedback'), path: "feedback" },
       ],
+    },
+    {
+      id: "leave",
+      icon: <FiCalendar size={19} />,
+      label: t('leave'),
+      type: "dropdown",
+      items: [
+        { id: "my-leaves", label: t('myLeaves'), path: "leaves" },
+        { id: "apply-leave", label: t('applyLeave'), path: "leaves/apply" },
+      ],
+    },
+    {
+      id: "payslips",
+      icon: <FiClipboard size={19} />,
+      path: "payslips",
+      label: t('payslips'),
+      type: "link",
     },
   ];
 
@@ -295,7 +225,7 @@ const TeacherPanelContent = () => {
 
     const heading = contentNode.querySelector("h1, h2, h3");
     return {
-      title: heading?.textContent?.trim() || t.print,
+      title: heading?.textContent?.trim() || t('print'),
       subtitle: "Current page capture",
       sections: [
         {
@@ -372,7 +302,7 @@ const TeacherPanelContent = () => {
     });
 
     return () => window.cancelAnimationFrame(frameId);
-  }, [location.pathname, t.print]);
+  }, [location.pathname, t('print')]);
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
@@ -385,8 +315,8 @@ const TeacherPanelContent = () => {
 
   const groupedMenu = useMemo(
     () => [
-      { title: t.overview, items: menuItems.slice(0, 2) },
-      { title: t.teaching, items: menuItems.slice(2) },
+      { title: t('overview'), items: menuItems.slice(0, 2) },
+      { title: t('teaching'), items: menuItems.slice(2) },
     ],
     [location.pathname, lang],
   );
@@ -407,9 +337,14 @@ const TeacherPanelContent = () => {
               <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
                 {getMadrasaLogo(madrasaInfo) ? (
                   <img
+                    key={getMadrasaLogo(madrasaInfo)}
                     src={getMadrasaLogo(madrasaInfo)}
                     alt={`${getMadrasaDisplayName(madrasaInfo)} logo`}
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.target.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="%2306b6d4"/><text x="24" y="30" text-anchor="middle" fill="white" font-size="20" font-weight="bold">' + (getMadrasaDisplayName(madrasaInfo)[0]?.toUpperCase() || 'M') + '</text></svg>');
+                      e.target.onerror = null;
+                    }}
                   />
                 ) : (
                   <span>
@@ -426,7 +361,7 @@ const TeacherPanelContent = () => {
                   <div
                     className={`mt-1 text-lg font-semibold ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}
                   >
-                    {t.workspace}
+                    {t('workspace')}
                   </div>
                 </div>
               )}
@@ -552,10 +487,10 @@ const TeacherPanelContent = () => {
               <button
                 onClick={() => setSidebarOpen(false)}
                 className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition-all duration-200 ${theme === "dark" ? "border-slate-700/60 text-slate-400 hover:bg-slate-800 hover:text-slate-200" : "border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
-                title={t.collapseSidebar}
+                title={t('collapseSidebar')}
               >
                 <FiChevronLeft size={18} />
-                <span className="text-xs font-medium">{t.collapseSidebar}</span>
+                <span className="text-xs font-medium">{t('collapseSidebar')}</span>
               </button>
             </div>
           )}
@@ -564,7 +499,7 @@ const TeacherPanelContent = () => {
               <button
                 onClick={() => setSidebarOpen(true)}
                 className={`flex h-10 w-10 items-center justify-center rounded-2xl border transition-all duration-200 ${theme === "dark" ? "border-slate-700/60 text-slate-400 hover:bg-slate-800 hover:text-slate-200" : "border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
-                title={t.expandSidebar}
+                title={t('expandSidebar')}
               >
                 <FiChevronRight size={18} />
               </button>
@@ -580,7 +515,7 @@ const TeacherPanelContent = () => {
               <button
                 onClick={() => handleNavigation("profile")}
                 className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all duration-200 ${isActive("profile") ? (theme === "dark" ? "bg-gradient-to-r from-cyan-900/30 to-sky-900/30 text-cyan-300" : "bg-gradient-to-r from-cyan-50 to-sky-50 text-cyan-700") : theme === "dark" ? "text-slate-400 hover:bg-slate-700 hover:text-slate-200" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
-                title={!sidebarOpen ? "Profile" : ""}
+                title={!sidebarOpen ? t('profile') : ""}
               >
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${isActive("profile") ? "bg-cyan-600 text-white" : theme === "dark" ? "bg-slate-700 text-slate-400 group-hover:bg-cyan-900/50 group-hover:text-cyan-400" : "bg-slate-100 text-slate-500 group-hover:bg-cyan-100 group-hover:text-cyan-700"}`}
@@ -589,15 +524,15 @@ const TeacherPanelContent = () => {
                 </span>
                 {sidebarOpen && (
                   <div>
-                    <p className="text-[13px] font-medium">{t.profile}</p>
-                    <p className="text-xs text-slate-400">{t.profileSub}</p>
+                    <p className="text-[13px] font-medium">{t('profile')}</p>
+                    <p className="text-xs text-slate-400">{t('profileSub')}</p>
                   </div>
                 )}
               </button>
               <button
                 onClick={handleLogout}
                 className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all duration-200 ${theme === "dark" ? "text-rose-400 hover:bg-rose-900/20 hover:text-rose-300" : "text-rose-600 hover:bg-rose-50 hover:text-rose-700"}`}
-                title={!sidebarOpen ? t.logout : ""}
+                title={!sidebarOpen ? t('logout') : ""}
               >
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all duration-200 ${theme === "dark" ? "bg-rose-900/30 text-rose-400 group-hover:bg-rose-900/50 group-hover:text-rose-300" : "bg-rose-50 text-rose-500 group-hover:bg-rose-100 group-hover:text-rose-600"}`}
@@ -606,8 +541,8 @@ const TeacherPanelContent = () => {
                 </span>
                 {sidebarOpen && (
                   <div>
-                    <p className="text-[13px] font-medium">{t.logout}</p>
-                    <p className="text-xs text-rose-300">{t.logoutSub}</p>
+                    <p className="text-[13px] font-medium">{t('logout')}</p>
+                    <p className="text-xs text-rose-300">{t('logoutSub')}</p>
                   </div>
                 )}
               </button>
@@ -641,12 +576,12 @@ const TeacherPanelContent = () => {
                 <p
                   className={`text-xs font-semibold uppercase tracking-[0.24em] ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`}
                 >
-                  {t.console}
+                  {t('console')}
                 </p>
                 <h1
                   className={`mt-1 text-lg font-semibold lg:text-xl ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}
                 >
-                  {t.welcome}{" "}
+                  {t('welcome')}{" "}
                   <span className="bg-gradient-to-r from-cyan-600 to-sky-600 bg-clip-text text-transparent">
                     {user?.name || "Teacher"}
                   </span>
@@ -654,7 +589,7 @@ const TeacherPanelContent = () => {
                 <p
                   className={`mt-1 text-xs lg:text-sm ${theme === "dark" ? "text-slate-500" : "text-slate-500"}`}
                 >
-                  {t.subtitle}
+                  {t('subtitle')}
                 </p>
               </div>
             </div>
@@ -666,14 +601,14 @@ const TeacherPanelContent = () => {
                 <FiSearch className="mr-2 text-slate-400" size={18} />
                 <input
                   type="text"
-                  placeholder={t.search}
+                  placeholder={t('search')}
                   className={`w-48 bg-transparent text-sm outline-none ${theme === "dark" ? "text-slate-300 placeholder:text-slate-500" : "text-slate-600"}`}
                 />
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={toggleTheme}
-                  title={t.theme}
+                  title={t('theme')}
                   className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
                 >
                   {theme === "dark" ? (
@@ -682,12 +617,7 @@ const TeacherPanelContent = () => {
                     <FiMoon size={19} />
                   )}
                 </button>
-                <button onClick={() => { const langs = ['en', 'dari', 'ps']; setLang(langs[(langs.indexOf(lang) + 1) % langs.length]); }} title={t.language} className={`flex h-11 items-center gap-1 rounded-2xl border px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}>
-                  <FiGlobe size={17} />
-                  <span className="text-xs font-semibold">
-                    {lang === "en" ? "EN" : lang === "dari" ? "دری" : "پښتو"}
-                  </span>
-                </button>
+                <LanguageSwitcher onChange={(code) => setLang(code === 'prs' ? 'dari' : code)} dark={theme === 'dark'} />
                 <button
                   onClick={() => {
                     const sys = [
@@ -724,9 +654,9 @@ const TeacherPanelContent = () => {
         isOpen={showLogoutConfirm}
         onClose={() => setShowLogoutConfirm(false)}
         onConfirm={confirmLogout}
-        title="Logout"
+        title={t('logout')}
         message="Are you sure you want to logout?"
-        confirmText="Logout"
+        confirmText={t('logout')}
         cancelText="Cancel"
       />
     </div>

@@ -3,6 +3,19 @@ import { useParams } from 'react-router-dom';
 import RecordViewPage from '../shared/RecordViewPage';
 import { studentProfilesConfig } from './StudentProfiles';
 
+const mapRowToView = (row) => ({
+  ...row,
+  permanentAddress_province: row.permanentAddress?.province || '',
+  permanentAddress_district: row.permanentAddress?.district || '',
+  permanentAddress_village: row.permanentAddress?.village || '',
+  currentAddress_province: row.currentAddress?.province || '',
+  currentAddress_district: row.currentAddress?.district || '',
+  currentAddress_village: row.currentAddress?.village || '',
+  email: row.email || row.user?.email || '',
+  phone: row.phone || row.user?.phone || '',
+  image: row.image || row.user?.image || ''
+});
+
 const StudentView = () => {
   const { id } = useParams();
   
@@ -28,7 +41,8 @@ const StudentView = () => {
       fields={viewFields}
       listPath="/staff/registrar/students"
       editPath={`/staff/registrar/students/edit/${id}`}
-      readMode="collection" // because /student/all is collection endpoint
+      readMode="collection"
+      mapRowToView={mapRowToView}
     />
   );
 };

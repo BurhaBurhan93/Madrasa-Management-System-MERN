@@ -1,11 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { BarChartComponent } from '../../components/UIHelper/ECharts';
 import { useTranslation } from 'react-i18next';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 import { buildPeriodQuery, getDefaultPeriodFilters } from '../../utils/reportPeriods';
-
-const api = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
 const TeacherAttendanceReports = () => {
   const { t } = useTranslation();
@@ -14,10 +12,13 @@ const TeacherAttendanceReports = () => {
   const [filters, setFilters] = useState({ classId: '', ...getDefaultPeriodFilters() });
   const [loading, setLoading] = useState(false);
 
+  const fieldCls = 'rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200';
+
   async function fetchClasses() {
     try {
-      const res = await axios.get('http://localhost:5000/api/teacher/classes', api());
-      if (res.data.success) setClasses(res.data.data);
+      const res = await apiFetch('/teacher/classes');
+      const data = await parseJsonSafe(res);
+      if (data.success) setClasses(data.data);
     } catch (e) {
       console.error(e);
     }
@@ -30,8 +31,9 @@ const TeacherAttendanceReports = () => {
         ...buildPeriodQuery(filters),
         ...(filters.classId && { classId: filters.classId }),
       });
-      const res = await axios.get(`http://localhost:5000/api/teacher/attendance/report?${params}`, api());
-      if (res.data.success) setSummary(res.data.data);
+      const res = await apiFetch(`/teacher/attendance/report?${params}`);
+      const data = await parseJsonSafe(res);
+      if (data.success) setSummary(data.data);
     } catch (e) {
       console.error(e);
       setSummary([]);
@@ -61,8 +63,6 @@ const TeacherAttendanceReports = () => {
 
   const totalSessions = totals.present + totals.absent + totals.late + totals.excused;
   const rate = totalSessions > 0 ? Math.round((totals.present / totalSessions) * 100) : 0;
-
-  const inputCls = 'rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100';
 
   const statCards = [
     { label: t('teacher.teacherAttendanceReports.stats.totalSessions', 'Total Sessions'), value: totalSessions, accent: 'bg-cyan-500' },
@@ -94,25 +94,25 @@ const TeacherAttendanceReports = () => {
 
   return (
     <div className={PANEL_PAGE_BG}>
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">{t('teacher.teacherAttendanceReports.title', 'Attendance Reports')}</h1>
-          <p className="mt-1 text-sm text-slate-500">{periodSubtitle}</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.teacherAttendanceReports.title', 'Attendance Reports')}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{periodSubtitle}</p>
         </div>
 
-        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           <div className="flex flex-wrap items-end gap-4">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.teacherAttendanceReports.filters.class', 'Class')}</label>
-              <select value={filters.classId} onChange={e => setFilters(current => ({ ...current, classId: e.target.value }))} className={inputCls}>
+              <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.class', 'Class')}</label>
+              <select value={filters.classId} onChange={e => setFilters(current => ({ ...current, classId: e.target.value }))} className={fieldCls}>
                 <option value="">{t('teacher.teacherAttendanceReports.filters.allClasses', 'All Classes')}</option>
                 {classes.map(c => <option key={c._id} value={c._id}>{c.name} {c.section}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.teacherAttendanceReports.filters.period', 'Period')}</label>
-              <select value={filters.period} onChange={e => setFilters(current => ({ ...current, period: e.target.value }))} className={inputCls}>
+              <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.period', 'Period')}</label>
+              <select value={filters.period} onChange={e => setFilters(current => ({ ...current, period: e.target.value }))} className={fieldCls}>
                 <option value="daily">{t('teacher.teacherAttendanceReports.periods.daily', 'Daily')}</option>
                 <option value="weekly">{t('teacher.teacherAttendanceReports.periods.weekly', 'Weekly')}</option>
                 <option value="monthly">{t('teacher.teacherAttendanceReports.periods.monthly', 'Monthly')}</option>
@@ -121,30 +121,30 @@ const TeacherAttendanceReports = () => {
 
             {filters.period === 'daily' && (
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.teacherAttendanceReports.filters.date', 'Date')}</label>
-                <input type="date" value={filters.date} onChange={e => setFilters(current => ({ ...current, date: e.target.value }))} className={inputCls} />
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.date', 'Date')}</label>
+                <input type="date" value={filters.date} onChange={e => setFilters(current => ({ ...current, date: e.target.value }))} className={fieldCls} />
               </div>
             )}
 
             {filters.period === 'weekly' && (
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.teacherAttendanceReports.filters.week', 'Week')}</label>
-                <input type="week" value={filters.week} onChange={e => setFilters(current => ({ ...current, week: e.target.value }))} className={inputCls} />
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.week', 'Week')}</label>
+                <input type="week" value={filters.week} onChange={e => setFilters(current => ({ ...current, week: e.target.value }))} className={fieldCls} />
               </div>
             )}
 
             {filters.period === 'monthly' && (
               <>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.teacherAttendanceReports.filters.month', 'Month')}</label>
-                  <select value={filters.month} onChange={e => setFilters(current => ({ ...current, month: e.target.value }))} className={inputCls}>
+                  <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.month', 'Month')}</label>
+                  <select value={filters.month} onChange={e => setFilters(current => ({ ...current, month: e.target.value }))} className={fieldCls}>
                     <option value="">{t('teacher.teacherAttendanceReports.filters.selectMonth', 'Select month')}</option>
                     {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-500">{t('teacher.teacherAttendanceReports.filters.year', 'Year')}</label>
-                  <input type="number" value={filters.year || ''} onChange={e => setFilters(current => ({ ...current, year: e.target.value }))} className={`${inputCls} w-24`} />
+                  <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.year', 'Year')}</label>
+                  <input type="number" value={filters.year || ''} onChange={e => setFilters(current => ({ ...current, year: e.target.value }))} className={`${fieldCls} w-24`} />
                 </div>
               </>
             )}
@@ -153,40 +153,40 @@ const TeacherAttendanceReports = () => {
 
         <section className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {statCards.map(card => (
-            <div key={card.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div key={card.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
               <div className={`absolute inset-x-0 top-0 h-1 ${card.accent}`} />
-              <p className="text-sm font-medium text-slate-500">{card.label}</p>
-              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{card.value}</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{card.label}</p>
+              <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{card.value}</p>
             </div>
           ))}
         </section>
 
         {chartData.length > 0 && (
-          <div className="mb-6 rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="mb-6 rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
             <BarChartComponent data={chartData} dataKey="present" nameKey="name" title={t('teacher.teacherAttendanceReports.chartTitle', 'Student Attendance Overview')} height={300} color="#0EA5E9" />
           </div>
         )}
 
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           {loading ? (
-            <div className="flex h-32 items-center justify-center text-slate-500">{t('teacher.teacherAttendanceReports.messages.loading', 'Loading...')}</div>
+            <div className="flex h-32 items-center justify-center text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.messages.loading', 'Loading...')}</div>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50">
-                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t('teacher.teacherAttendanceReports.table.student', 'Student')}</th>
-                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t('teacher.teacherAttendanceReports.table.code', 'Code')}</th>
+                <tr className="border-b border-slate-100 bg-slate-50 dark:border-slate-700/50 dark:bg-slate-800/80">
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{t('teacher.teacherAttendanceReports.table.student', 'Student')}</th>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{t('teacher.teacherAttendanceReports.table.code', 'Code')}</th>
                   <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-emerald-600">{t('teacher.teacherAttendanceReports.table.present', 'Present')}</th>
                   <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-rose-600">{t('teacher.teacherAttendanceReports.table.absent', 'Absent')}</th>
                   <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-amber-600">{t('teacher.teacherAttendanceReports.table.late', 'Late')}</th>
                   <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-600">{t('teacher.teacherAttendanceReports.table.excused', 'Excused')}</th>
-                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{t('teacher.teacherAttendanceReports.table.rate', 'Rate')}</th>
+                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{t('teacher.teacherAttendanceReports.table.rate', 'Rate')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
                 {summary.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-8 text-center text-slate-500">{t('teacher.teacherAttendanceReports.messages.noData', 'No attendance data for the selected period')}</td>
+                    <td colSpan="7" className="p-8 text-center text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.messages.noData', 'No attendance data for the selected period')}</td>
                   </tr>
                 ) : (
                   summary.map(row => {
@@ -197,9 +197,9 @@ const TeacherAttendanceReports = () => {
                     const total = present + absent + late + excused;
                     const rowRate = total > 0 ? Math.round((present / total) * 100) : 0;
                     return (
-                      <tr key={row._id} className="transition-colors duration-150 hover:bg-slate-50">
-                        <td className="p-4 font-medium text-slate-900">{row.user?.name}</td>
-                        <td className="p-4 text-slate-500">{row.student?.studentCode}</td>
+                      <tr key={row._id} className="transition-colors duration-150 hover:bg-slate-50 dark:border-slate-700/50 dark:hover:bg-slate-800/30">
+                        <td className="p-4 font-medium text-slate-900 dark:text-slate-100">{row.user?.name}</td>
+                        <td className="p-4 text-slate-500 dark:text-slate-400">{row.student?.studentCode}</td>
                         <td className="p-4 text-center font-semibold text-emerald-600">{present}</td>
                         <td className="p-4 text-center font-semibold text-rose-600">{absent}</td>
                         <td className="p-4 text-center font-semibold text-amber-600">{late}</td>

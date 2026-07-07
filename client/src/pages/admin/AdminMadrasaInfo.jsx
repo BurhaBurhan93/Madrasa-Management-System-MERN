@@ -1,15 +1,31 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
+import { readStoredLanguage } from '../../lib/languageStorage';
 import {
   FiEdit2, FiSave, FiX, FiMapPin, FiPhone, FiMail, FiGlobe,
   FiUser, FiCalendar, FiHash, FiUsers, FiInfo, FiUpload
 } from 'react-icons/fi';
-import { setCachedMadrasaInfo } from '../../lib/madrasaInfo';
+import { setCachedMadrasaInfo, normalizeLogoUrl } from '../../lib/madrasaInfo';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const getToken = () => localStorage.getItem('token');
 
-const FileField = ({ label, icon, value, name, type = 'text', options, editing, form, handleChange }) => (
+const AdminMadrasaInfo = () => {
+  const { t } = useTranslation('admin');
+
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+    window.addEventListener('storage', syncLang);
+    return () => window.removeEventListener('storage', syncLang);
+  }, []);
+
+  const FileField = ({ label, icon, value, name, type = 'text', options, editing, form, handleChange }) => (
   <div>
     <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">
       {icon && <span className="inline-flex mr-1 align-middle">{icon}</span>}{label}
@@ -42,7 +58,7 @@ const FileField = ({ label, icon, value, name, type = 'text', options, editing, 
         />
       )
     ) : (
-      <p className="text-sm text-slate-800 py-2">{value || <span className="text-slate-400 italic">Not set</span>}</p>
+      <p className="text-sm text-slate-800 py-2">{value || <span className="text-slate-400 italic">{t('madrasaInfo.notSet')}</span>}</p>
     )}
   </div>
 );
@@ -56,8 +72,6 @@ const Section = ({ title, icon, children }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">{children}</div>
   </div>
 );
-
-const AdminMadrasaInfo = () => {
   const [info, setInfo] = useState(null);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({});
@@ -66,8 +80,13 @@ const AdminMadrasaInfo = () => {
   const [error, setError] = useState('');
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoPreview, setLogoPreview] = useState('');
+  const [logoErrored, setLogoErrored] = useState(false);
 
   useEffect(() => { fetchInfo(); }, []);
+
+  useEffect(() => {
+    setLogoErrored(false);
+  }, [editing ? normalizeLogoUrl(logoPreview || form.logo) : normalizeLogoUrl(info?.logo)]);
 
   const fetchInfo = async () => {
     try {
@@ -75,13 +94,16 @@ const AdminMadrasaInfo = () => {
       const res = await fetch(`${API_BASE}/admin/madrasa-info`, {
         headers: { Authorization: `Bearer ${getToken()}` }
       });
+      if (!res.ok) {
+        throw new Error(t('madrasaInfo.failedToLoad'));
+      }
       const data = await res.json();
       setInfo(data);
       setForm(flattenInfo(data));
       setLogoPreview(data?.logo || '');
       setCachedMadrasaInfo(data);
     } catch {
-      setError('Failed to load Madrasa information.');
+      setError(t('madrasaInfo.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -122,7 +144,7 @@ const AdminMadrasaInfo = () => {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setError('Please select an image file.');
+      setError(t('madrasaInfo.selectImage'));
       return;
     }
 
@@ -147,14 +169,14 @@ const AdminMadrasaInfo = () => {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Upload failed');
+        throw new Error(t('madrasaInfo.uploadFailed'));
       }
 
       const uploadedUrl = new URL(data.data.url, API_BASE).toString();
       setForm(prev => ({ ...prev, logo: uploadedUrl }));
       setLogoPreview(uploadedUrl);
     } catch (uploadError) {
-      setError(uploadError.message || 'Failed to upload logo.');
+      setError(uploadError.message || t('madrasaInfo.uploadFailed'));
       setLogoPreview(info?.logo || '');
     } finally {
       setLogoUploading(false);
@@ -205,7 +227,7 @@ const AdminMadrasaInfo = () => {
       setCachedMadrasaInfo(updated);
       setEditing(false);
     } catch {
-      setError('Failed to save. Please try again.');
+      setError(t('madrasaInfo.failedToSave'));
     } finally {
       setSaving(false);
     }
@@ -222,25 +244,25 @@ const AdminMadrasaInfo = () => {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Madrasa Information</h1>
-          <p className="text-sm text-slate-500 mt-1">View and manage your institution's details</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('madrasaInfo.title')}</h1>
+          <p className="text-sm text-slate-500 mt-1">{t('madrasaInfo.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           {editing ? (
             <>
               <button onClick={() => { setEditing(false); setForm(flattenInfo(info)); setError(''); }}
                 className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
-                <FiX size={16} /> Cancel
+                <FiX size={16} /> {t('madrasaInfo.cancel')}
               </button>
               <button onClick={handleSave} disabled={saving}
                 className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:from-cyan-600 hover:to-sky-700 disabled:opacity-60">
-                <FiSave size={16} /> {saving ? 'Saving...' : 'Save Changes'}
+                <FiSave size={16} /> {saving ? t('madrasaInfo.saving') : t('madrasaInfo.saveChanges')}
               </button>
             </>
           ) : (
             <button onClick={() => setEditing(true)}
               className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:from-cyan-600 hover:to-sky-700">
-              <FiEdit2 size={16} /> Edit Information
+              <FiEdit2 size={16} /> {t('madrasaInfo.editInformation')}
             </button>
           )}
         </div>
@@ -254,9 +276,14 @@ const AdminMadrasaInfo = () => {
       <div className="bg-gradient-to-br from-cyan-600 via-sky-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg">
         <div className="flex flex-wrap items-center gap-6">
           <div className="flex-shrink-0">
-            {(editing ? (logoPreview || form.logo) : info?.logo) ? (
-              <img src={editing ? (logoPreview || form.logo) : info.logo} alt="Madrasa Logo"
-                className="h-24 w-24 rounded-2xl object-cover border-2 border-white/40 bg-white/20" />
+            {(editing ? (logoPreview || form.logo) : info?.logo) && !logoErrored ? (
+              <img
+                key={normalizeLogoUrl(editing ? (logoPreview || form.logo) : info.logo)}
+                src={normalizeLogoUrl(editing ? (logoPreview || form.logo) : info.logo)}
+                alt="Madrasa Logo"
+                className="h-24 w-24 rounded-2xl object-cover border-2 border-white/40 bg-white/20"
+                onError={() => setLogoErrored(true)}
+              />
             ) : (
               <div className="h-24 w-24 rounded-2xl bg-white/20 flex items-center justify-center text-3xl font-bold border-2 border-white/40">
                 {(form.name || info?.name || 'M')[0].toUpperCase()}
@@ -267,7 +294,7 @@ const AdminMadrasaInfo = () => {
             <p className="text-xs font-semibold uppercase tracking-widest text-cyan-200 mb-1">
               {info?.code || form.code || 'EMIS'}
             </p>
-            <h2 className="text-2xl font-bold truncate">{info?.name || 'Madrasa Name'}</h2>
+            <h2 className="text-2xl font-bold truncate">{info?.name || t('madrasaInfo.madrasaName')}</h2>
             {info?.nameArabic && <p className="text-lg text-cyan-100 mt-0.5 font-arabic">{info.nameArabic}</p>}
             <div className="flex flex-wrap gap-4 mt-3 text-sm text-cyan-100">
               {info?.address?.fullAddress && (
@@ -280,21 +307,21 @@ const AdminMadrasaInfo = () => {
           {info?.establishedYear && (
             <div className="text-center bg-white/15 rounded-xl px-5 py-3 border border-white/20">
               <p className="text-2xl font-bold">{info.establishedYear}</p>
-              <p className="text-xs text-cyan-200">Established</p>
+              <p className="text-xs text-cyan-200">{t('madrasaInfo.established')}</p>
             </div>
           )}
         </div>
         {editing && (
           <div className="mt-4 pt-4 border-t border-white/20">
             <label className="block text-xs font-semibold text-cyan-100 mb-1.5 uppercase tracking-wide">
-              <FiUpload className="inline mr-1" size={12} />Logo URL or Image File
+              <FiUpload className="inline mr-1" size={12} />{t('madrasaInfo.uploadLogo')}
             </label>
             <input
               type="url"
               name="logo"
               value={form.logo}
               onChange={handleChange}
-              placeholder="https://example.com/logo.png"
+              placeholder={t('madrasaInfo.logoPlaceholder')}
               className="w-full rounded-xl border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/50 focus:border-white/60 focus:outline-none"
             />
             <div className="mt-3">
@@ -305,10 +332,10 @@ const AdminMadrasaInfo = () => {
                 className="block w-full rounded-xl border border-white/30 bg-white/10 px-3 py-2 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-cyan-700 hover:file:bg-cyan-50"
               />
               <p className="mt-2 text-xs text-cyan-100/80">
-                Upload an image from your computer or paste a direct image URL.
+                {t('madrasaInfo.uploadImageHint')}
               </p>
               {logoUploading && (
-                <p className="mt-2 text-xs font-medium text-cyan-100">Uploading logo...</p>
+                <p className="mt-2 text-xs font-medium text-cyan-100">{t('madrasaInfo.uploadingLogo')}</p>
               )}
             </div>
           </div>
@@ -316,50 +343,50 @@ const AdminMadrasaInfo = () => {
       </div>
 
       {/* Basic Info */}
-      <Section title="Basic Information" icon={<FiInfo size={18} />}>
-        <FileField label="Institution Name" icon={<FiInfo size={13} />} name="name" value={info?.name} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Arabic Name" icon={<FiInfo size={13} />} name="nameArabic" value={info?.nameArabic} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Institution Code" icon={<FiHash size={13} />} name="code" value={info?.code} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Type" icon={<FiInfo size={13} />} name="type" value={info?.type} editing={editing} form={form} handleChange={handleChange}
+      <Section title={t('madrasaInfo.basicInformation')} icon={<FiInfo size={18} />}>
+        <FileField label={t('madrasaInfo.institutionName')} icon={<FiInfo size={13} />} name="name" value={info?.name} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.arabicName')} icon={<FiInfo size={13} />} name="nameArabic" value={info?.nameArabic} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.institutionCode')} icon={<FiHash size={13} />} name="code" value={info?.code} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.institutionType')} icon={<FiInfo size={13} />} name="type" value={info?.type} editing={editing} form={form} handleChange={handleChange}
           type="select" options={[
-            { value: 'madrasa', label: 'Madrasa' },
-            { value: 'school', label: 'School' },
-            { value: 'institute', label: 'Institute' },
-            { value: 'university', label: 'University' },
+            { value: 'madrasa', label: t('madrasaInfo.madrasa') },
+            { value: 'school', label: t('madrasaInfo.school') },
+            { value: 'institute', label: t('madrasaInfo.institute') },
+            { value: 'university', label: t('madrasaInfo.university') },
           ]} />
-        <FileField label="Registration Number" icon={<FiHash size={13} />} name="registrationNumber" value={info?.registrationNumber} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Established Year" icon={<FiCalendar size={13} />} name="establishedYear" type="number" value={info?.establishedYear} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Total Capacity" icon={<FiUsers size={13} />} name="totalCapacity" type="number" value={info?.totalCapacity} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.registrationNumber')} icon={<FiHash size={13} />} name="registrationNumber" value={info?.registrationNumber} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.establishedYear')} icon={<FiCalendar size={13} />} name="establishedYear" type="number" value={info?.establishedYear} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.totalCapacity')} icon={<FiUsers size={13} />} name="totalCapacity" type="number" value={info?.totalCapacity} editing={editing} form={form} handleChange={handleChange} />
         <div className="md:col-span-2">
-          <FileField label="Description" icon={<FiInfo size={13} />} name="description" type="textarea" value={info?.description} editing={editing} form={form} handleChange={handleChange} />
+          <FileField label={t('common.description')} icon={<FiInfo size={13} />} name="description" type="textarea" value={info?.description} editing={editing} form={form} handleChange={handleChange} />
         </div>
       </Section>
 
       {/* Contact Info */}
-      <Section title="Contact Information" icon={<FiPhone size={18} />}>
-        <FileField label="Phone" icon={<FiPhone size={13} />} name="phone" type="tel" value={info?.phone} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="WhatsApp" icon={<FiPhone size={13} />} name="whatsapp" type="tel" value={info?.whatsapp} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Email" icon={<FiMail size={13} />} name="email" type="email" value={info?.email} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Website" icon={<FiGlobe size={13} />} name="website" type="url" value={info?.website} editing={editing} form={form} handleChange={handleChange} />
+      <Section title={t('madrasaInfo.contactInformation')} icon={<FiPhone size={18} />}>
+        <FileField label={t('madrasaInfo.phone')} icon={<FiPhone size={13} />} name="phone" type="tel" value={info?.phone} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.whatsapp')} icon={<FiPhone size={13} />} name="whatsapp" type="tel" value={info?.whatsapp} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.email')} icon={<FiMail size={13} />} name="email" type="email" value={info?.email} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.website')} icon={<FiGlobe size={13} />} name="website" type="url" value={info?.website} editing={editing} form={form} handleChange={handleChange} />
       </Section>
 
       {/* Address */}
-      <Section title="Address" icon={<FiMapPin size={18} />}>
-        <FileField label="Province" icon={<FiMapPin size={13} />} name="province" value={info?.address?.province} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="District" icon={<FiMapPin size={13} />} name="district" value={info?.address?.district} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Village / Area" icon={<FiMapPin size={13} />} name="village" value={info?.address?.village} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Full Address" icon={<FiMapPin size={13} />} name="fullAddress" value={info?.address?.fullAddress} editing={editing} form={form} handleChange={handleChange} />
+      <Section title={t('madrasaInfo.addressInfo')} icon={<FiMapPin size={18} />}>
+        <FileField label={t('madrasaInfo.province')} icon={<FiMapPin size={13} />} name="province" value={info?.address?.province} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.district')} icon={<FiMapPin size={13} />} name="district" value={info?.address?.district} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.villageArea')} icon={<FiMapPin size={13} />} name="village" value={info?.address?.village} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.fullAddress')} icon={<FiMapPin size={13} />} name="fullAddress" value={info?.address?.fullAddress} editing={editing} form={form} handleChange={handleChange} />
       </Section>
 
       {/* Principal Info */}
-      <Section title="Principal Information" icon={<FiUser size={18} />}>
-        <FileField label="Principal Name" icon={<FiUser size={13} />} name="principalName" value={info?.principalName} editing={editing} form={form} handleChange={handleChange} />
-        <FileField label="Principal Phone" icon={<FiPhone size={13} />} name="principalPhone" type="tel" value={info?.principalPhone} editing={editing} form={form} handleChange={handleChange} />
+      <Section title={t('madrasaInfo.principalInformation')} icon={<FiUser size={18} />}>
+        <FileField label={t('madrasaInfo.principalName')} icon={<FiUser size={13} />} name="principalName" value={info?.principalName} editing={editing} form={form} handleChange={handleChange} />
+        <FileField label={t('madrasaInfo.principalPhone')} icon={<FiPhone size={13} />} name="principalPhone" type="tel" value={info?.principalPhone} editing={editing} form={form} handleChange={handleChange} />
       </Section>
 
       {info?.updatedBy?.name && (
         <p className="text-xs text-slate-400 text-right">
-          Last updated by: <span className="font-medium text-slate-500">{info.updatedBy.name}</span>
+          {t('madrasaInfo.lastUpdatedBy')} <span className="font-medium text-slate-500">{info.updatedBy.name}</span>
           {info.updatedAt && <> · {new Date(info.updatedAt).toLocaleDateString()}</>}
         </p>
       )}

@@ -14,11 +14,15 @@ const HostelMealSchema = new Schema({
     beverage: { type: String, trim: true }
   },
   
+  // Cost & Notes
+  costPerPerson: { type: Number, default: 0, min: 0 },
+  notes: { type: String, trim: true },
+
   // Dietary info
   isVegetarian: { type: Boolean, default: false },
   allergens: [{ 
     type: String,
-    enum: ['dairy', 'eggs', 'nuts', 'peanuts', 'sesame', 'soy', 'gluten', 'fish', 'shellfish']
+    trim: true
   }],
   specialNotes: { type: String, trim: true },
   

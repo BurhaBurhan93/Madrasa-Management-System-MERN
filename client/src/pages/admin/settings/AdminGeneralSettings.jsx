@@ -1,422 +1,264 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
+import { readStoredLanguage } from '../../../lib/languageStorage';
+import api from "../../../lib/api";
 import Card from '../../../components/UIHelper/Card';
 import { FiSettings, FiSave, FiGlobe, FiCalendar, FiClock, FiDollarSign, FiBell, FiShield, FiDatabase } from 'react-icons/fi';
-import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 
 const AdminGeneralSettings = () => {
-  const [settings, setSettings] = useState({
-    // Institution Settings
-    institutionName: 'Madrasa Education System',
-    institutionCode: 'MES-2024',
-    address: 'Islamabad, Pakistan',
-    phone: '+92 51 1234567',
-    email: 'info@madrasa.edu',
-    website: 'www.madrasa.edu',
-    
-    // Academic Settings
-    academicYear: '2024-2025',
-    semesterStart: '2024-09-01',
-    semesterEnd: '2025-06-30',
-    classDuration: '45', // minutes
-    maxStudentsPerClass: '30',
-    
-    // Financial Settings
-    currency: 'PKR',
-    currencySymbol: 'Rs.',
-    taxRate: '0',
-    lateFeePercentage: '5',
-    gracePeriodDays: '7',
-    
-    // System Settings
-    timezone: 'Asia/Karachi',
-    dateFormat: 'DD/MM/YYYY',
-    language: 'en',
-    maintenanceMode: false,
-    
-    // Notification Settings
-    emailNotifications: true,
-    smsNotifications: true,
-    pushNotifications: true,
-    notificationSound: true,
-  });
-
-  const [isSaving, setIsSaving] = useState(false);
+  const { t } = useTranslation('admin');
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
   const [activeTab, setActiveTab] = useState('institution');
 
-  const handleInputChange = (e) => {
+  useEffect(() => {
+    const syncLang = () => {
+      const lang = readStoredLanguage('adminLang', 'en');
+      if (i18n.language !== lang) i18n.changeLanguage(lang);
+    };
+    syncLang();
+    window.addEventListener('storage', syncLang);
+    return () => window.removeEventListener('storage', syncLang);
+  }, []);
+
+  const fetchSettings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/admin/madrasa-info");
+      const data = res.data?.data || res.data || {};
+      setSettings({
+        institutionName: data.institutionName || 'Madrasa Education System',
+        institutionCode: data.institutionCode || 'MES-2024',
+        address: data.address || '',
+        phone: data.phone || '',
+        email: data.email || '',
+        website: data.website || '',
+        academicYear: data.academicYear || new Date().getFullYear() + '-' + (new Date().getFullYear() + 1),
+        semesterStart: data.semesterStart || '',
+        semesterEnd: data.semesterEnd || '',
+        classDuration: data.classDuration || '45',
+        maxStudentsPerClass: data.maxStudentsPerClass || '30',
+        currency: data.currency || 'PKR',
+        currencySymbol: data.currencySymbol || 'Rs.',
+        taxRate: data.taxRate || '0',
+        lateFeePercentage: data.lateFeePercentage || '5',
+        gracePeriodDays: data.gracePeriodDays || '7',
+        timezone: data.timezone || 'Asia/Karachi',
+        dateFormat: data.dateFormat || 'DD/MM/YYYY',
+        language: data.language || 'en',
+        maintenanceMode: data.maintenanceMode || false,
+        emailNotifications: data.emailNotifications ?? true,
+        smsNotifications: data.smsNotifications ?? true,
+        pushNotifications: data.pushNotifications ?? true,
+        notificationSound: data.notificationSound ?? true,
+        minPasswordLength: data.minPasswordLength || '8',
+        passwordExpiryDays: data.passwordExpiryDays || '90',
+        sessionTimeout: data.sessionTimeout || '30',
+        maxLoginAttempts: data.maxLoginAttempts || '5',
+      });
+    } catch (e) {
+      console.error('Failed to load settings', e);
+      setMessage({ type: 'error', text: t('common.failedToLoad') });
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
+
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setSettings(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setSettings(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const handleSaveSettings = async () => {
-    setIsSaving(true);
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage(null);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      alert('Settings saved successfully!');
-    } catch (error) {
-      alert('Error saving settings');
+      await api.put("/admin/madrasa-info", settings);
+      setMessage({ type: 'success', text: t('settings.settingsSaved') });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (e) {
+      setMessage({ type: 'error', text: t('settings.errorSavingSettings') });
     } finally {
-      setIsSaving(false);
+      setSaving(false);
     }
   };
 
   const SettingSection = ({ title, icon, children }) => (
     <div className="mb-6">
       <div className="flex items-center gap-3 mb-4">
-        <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
-          {icon}
-        </div>
+        <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">{icon}</div>
         <h3 className="text-lg font-bold text-gray-900">{title}</h3>
       </div>
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        {children}
-      </div>
+      <div className="bg-white rounded-xl border border-gray-200 p-6">{children}</div>
     </div>
   );
 
-  const SettingField = ({ label, name, type = 'text', placeholder, options, note }) => (
+  const Field = ({ label, name, type = 'text', placeholder, options, note }) => (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-      </label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
       {type === 'select' ? (
-        <select
-          name={name}
-          value={settings[name]}
-          onChange={handleInputChange}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-        >
-          {options.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+        <select name={name} value={settings?.[name] || ''} onChange={handleChange} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+          {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       ) : type === 'checkbox' ? (
         <div className="flex items-center">
-          <input
-            type="checkbox"
-            name={name}
-            checked={settings[name]}
-            onChange={handleInputChange}
-            className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-          />
-          <span className="ml-2 text-sm text-gray-700">Enable {label}</span>
+          <input type="checkbox" name={name} checked={!!settings?.[name]} onChange={handleChange} className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
+          <span className="ml-2 text-sm text-gray-700">{t('settings.enableLabel', { label })}</span>
         </div>
       ) : (
-        <input
-          type={type}
-          name={name}
-          value={settings[name]}
-          onChange={handleInputChange}
-          placeholder={placeholder}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-        />
+        <input type={type} name={name} value={settings?.[name] || ''} onChange={handleChange} placeholder={placeholder} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
       )}
       {note && <p className="mt-1 text-sm text-gray-500">{note}</p>}
     </div>
   );
 
   const tabs = [
-    { id: 'institution', label: 'Institution', icon: <FiGlobe size={18} /> },
-    { id: 'academic', label: 'Academic', icon: <FiCalendar size={18} /> },
-    { id: 'financial', label: 'Financial', icon: <FiDollarSign size={18} /> },
-    { id: 'system', label: 'System', icon: <FiSettings size={18} /> },
-    { id: 'notifications', label: 'Notifications', icon: <FiBell size={18} /> },
-    { id: 'security', label: 'Security', icon: <FiShield size={18} /> },
+    { id: 'institution', label: t('settings.institution'), icon: <FiGlobe size={18} /> },
+    { id: 'academic', label: t('settings.academic'), icon: <FiCalendar size={18} /> },
+    { id: 'financial', label: t('settings.financial'), icon: <FiDollarSign size={18} /> },
+    { id: 'system', label: t('settings.system'), icon: <FiSettings size={18} /> },
+    { id: 'notifications', label: t('settings.notificationSettings'), icon: <FiBell size={18} /> },
+    { id: 'security', label: t('settings.securitySettings'), icon: <FiShield size={18} /> },
   ];
+
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><p className="text-slate-400">{t('common.loading')}</p></div>;
 
   return (
     <div className="w-full bg-gray-50 min-h-screen p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">⚙️ System Settings</h1>
-          <p className="text-gray-600 mt-1">Configure all system settings and preferences</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('settings.systemSettings')}</h1>
+          <p className="text-gray-600 mt-1">{t('settings.configureAllSettings')}</p>
         </div>
-        <button
-          onClick={handleSaveSettings}
-          disabled={isSaving}
-          className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg disabled:opacity-50"
-        >
-          <FiSave size={18} /> {isSaving ? 'Saving...' : 'Save Settings'}
-        </button>
+        <div className="flex items-center gap-3">
+          {message && (
+            <span className={`text-sm font-medium ${message.type === 'success' ? 'text-emerald-600' : 'text-red-600'}`}>
+              {message.text}
+            </span>
+          )}
+          <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg disabled:opacity-50">
+            <FiSave size={18} /> {saving ? t('common.saving') : t('common.saveSettings')}
+          </button>
+        </div>
       </div>
 
       <Card className="mb-6">
-        {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-6">
           {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors ${
-                activeTab === tab.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors ${activeTab === tab.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+              {tab.icon} {tab.label}
             </button>
           ))}
         </div>
 
-        {/* Tab Content */}
         <div className="p-4">
           {activeTab === 'institution' && (
-            <SettingSection title="Institution Settings" icon={<FiGlobe size={20} />}>
+            <SettingSection title={t('settings.institutionSettings')} icon={<FiGlobe size={20} />}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <SettingField
-                  label="Institution Name"
-                  name="institutionName"
-                  placeholder="Enter institution name"
-                />
-                <SettingField
-                  label="Institution Code"
-                  name="institutionCode"
-                  placeholder="Enter institution code"
-                />
-                <SettingField
-                  label="Address"
-                  name="address"
-                  placeholder="Enter full address"
-                />
-                <SettingField
-                  label="Phone Number"
-                  name="phone"
-                  type="tel"
-                  placeholder="Enter phone number"
-                />
-                <SettingField
-                  label="Email Address"
-                  name="email"
-                  type="email"
-                  placeholder="Enter email address"
-                />
-                <SettingField
-                  label="Website"
-                  name="website"
-                  type="url"
-                  placeholder="Enter website URL"
-                />
+                <Field label={t('settings.institutionName')} name="institutionName" />
+                <Field label={t('settings.institutionCode')} name="institutionCode" />
+                <Field label={t('common.address')} name="address" />
+                <Field label={t('common.phoneNumber')} name="phone" type="tel" />
+                <Field label={t('common.emailAddress')} name="email" type="email" />
+                <Field label={t('common.website')} name="website" type="url" />
               </div>
             </SettingSection>
           )}
 
           {activeTab === 'academic' && (
-            <SettingSection title="Academic Settings" icon={<FiCalendar size={20} />}>
+            <SettingSection title={t('settings.academicSettings')} icon={<FiCalendar size={20} />}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <SettingField
-                  label="Academic Year"
-                  name="academicYear"
-                  placeholder="e.g., 2024-2025"
-                />
-                <SettingField
-                  label="Semester Start Date"
-                  name="semesterStart"
-                  type="date"
-                />
-                <SettingField
-                  label="Semester End Date"
-                  name="semesterEnd"
-                  type="date"
-                />
-                <SettingField
-                  label="Class Duration (minutes)"
-                  name="classDuration"
-                  type="number"
-                  placeholder="Enter duration in minutes"
-                />
-                <SettingField
-                  label="Maximum Students per Class"
-                  name="maxStudentsPerClass"
-                  type="number"
-                  placeholder="Enter maximum students"
-                />
+                <Field label={t('settings.academicYear')} name="academicYear" />
+                <Field label={t('settings.semesterStartDate')} name="semesterStart" type="date" />
+                <Field label={t('settings.semesterEndDate')} name="semesterEnd" type="date" />
+                <Field label={t('settings.classDuration')} name="classDuration" type="number" />
+                <Field label={t('settings.maxStudentsPerClass')} name="maxStudentsPerClass" type="number" />
               </div>
             </SettingSection>
           )}
 
           {activeTab === 'financial' && (
-            <SettingSection title="Financial Settings" icon={<FiDollarSign size={20} />}>
+            <SettingSection title={t('settings.financialSettings')} icon={<FiDollarSign size={20} />}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <SettingField
-                  label="Currency"
-                  name="currency"
-                  type="select"
-                  options={[
-                    { value: 'PKR', label: 'Pakistani Rupee (PKR)' },
-                    { value: 'USD', label: 'US Dollar (USD)' },
-                    { value: 'EUR', label: 'Euro (EUR)' },
-                  ]}
-                />
-                <SettingField
-                  label="Currency Symbol"
-                  name="currencySymbol"
-                  placeholder="e.g., Rs., $, €"
-                />
-                <SettingField
-                  label="Tax Rate (%)"
-                  name="taxRate"
-                  type="number"
-                  placeholder="Enter tax rate percentage"
-                  note="Set to 0 for no tax"
-                />
-                <SettingField
-                  label="Late Fee Percentage"
-                  name="lateFeePercentage"
-                  type="number"
-                  placeholder="Enter late fee percentage"
-                />
-                <SettingField
-                  label="Grace Period (days)"
-                  name="gracePeriodDays"
-                  type="number"
-                  placeholder="Enter grace period in days"
-                />
+                <Field label={t('settings.currency')} name="currency" type="select" options={[
+                  { value: 'PKR', label: 'Pakistani Rupee (PKR)' },
+                  { value: 'USD', label: 'US Dollar (USD)' },
+                  { value: 'EUR', label: 'Euro (EUR)' },
+                ]} />
+                <Field label={t('settings.currencySymbol')} name="currencySymbol" />
+                <Field label={t('settings.taxRate')} name="taxRate" type="number" note={t('common.setToZeroNoTax')} />
+                <Field label={t('settings.lateFeePercentage')} name="lateFeePercentage" type="number" />
+                <Field label={t('settings.gracePeriod')} name="gracePeriodDays" type="number" />
               </div>
             </SettingSection>
           )}
 
           {activeTab === 'system' && (
-            <SettingSection title="System Settings" icon={<FiSettings size={20} />}>
+            <SettingSection title={t('settings.systemSettingsSection')} icon={<FiSettings size={20} />}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <SettingField
-                  label="Timezone"
-                  name="timezone"
-                  type="select"
-                  options={[
-                    { value: 'Asia/Karachi', label: 'Asia/Karachi (Pakistan)' },
-                    { value: 'UTC', label: 'UTC' },
-                    { value: 'America/New_York', label: 'America/New_York' },
-                    { value: 'Europe/London', label: 'Europe/London' },
-                  ]}
-                />
-                <SettingField
-                  label="Date Format"
-                  name="dateFormat"
-                  type="select"
-                  options={[
-                    { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
-                    { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
-                    { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD' },
-                  ]}
-                />
-                <SettingField
-                  label="Language"
-                  name="language"
-                  type="select"
-                  options={[
-                    { value: 'en', label: 'English' },
-                    { value: 'ur', label: 'Urdu' },
-                    { value: 'ar', label: 'Arabic' },
-                  ]}
-                />
-                <SettingField
-                  label="Maintenance Mode"
-                  name="maintenanceMode"
-                  type="checkbox"
-                />
+                <Field label={t('settings.timezone')} name="timezone" type="select" options={[
+                  { value: 'Asia/Karachi', label: 'Asia/Karachi (Pakistan)' },
+                  { value: 'UTC', label: 'UTC' },
+                  { value: 'America/New_York', label: 'America/New_York' },
+                  { value: 'Europe/London', label: 'Europe/London' },
+                ]} />
+                <Field label={t('settings.dateFormat')} name="dateFormat" type="select" options={[
+                  { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
+                  { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
+                  { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD' },
+                ]} />
+                <Field label={t('settings.language')} name="language" type="select" options={[
+                  { value: 'en', label: 'English' },
+                  { value: 'ur', label: 'Urdu' },
+                  { value: 'ar', label: 'Arabic' },
+                ]} />
+                <Field label={t('settings.maintenanceMode')} name="maintenanceMode" type="checkbox" />
               </div>
             </SettingSection>
           )}
 
           {activeTab === 'notifications' && (
-            <SettingSection title="Notification Settings" icon={<FiBell size={20} />}>
+            <SettingSection title={t('settings.notificationSettings')} icon={<FiBell size={20} />}>
               <div className="space-y-4">
-                <SettingField
-                  label="Email Notifications"
-                  name="emailNotifications"
-                  type="checkbox"
-                  note="Send notifications via email"
-                />
-                <SettingField
-                  label="SMS Notifications"
-                  name="smsNotifications"
-                  type="checkbox"
-                  note="Send notifications via SMS"
-                />
-                <SettingField
-                  label="Push Notifications"
-                  name="pushNotifications"
-                  type="checkbox"
-                  note="Send push notifications to mobile app"
-                />
-                <SettingField
-                  label="Notification Sound"
-                  name="notificationSound"
-                  type="checkbox"
-                  note="Play sound for new notifications"
-                />
+                <Field label={t('settings.emailNotifications')} name="emailNotifications" type="checkbox" note={t('settings.sendEmailNotifications')} />
+                <Field label={t('settings.smsNotifications')} name="smsNotifications" type="checkbox" note={t('settings.sendSmsNotifications')} />
+                <Field label={t('settings.pushNotifications')} name="pushNotifications" type="checkbox" note={t('settings.sendPushNotifications')} />
+                <Field label={t('common.notificationSound')} name="notificationSound" type="checkbox" note={t('common.playSoundNotifications')} />
               </div>
             </SettingSection>
           )}
 
           {activeTab === 'security' && (
-            <SettingSection title="Security Settings" icon={<FiShield size={20} />}>
+            <SettingSection title={t('settings.securitySettings')} icon={<FiShield size={20} />}>
               <div className="space-y-6">
                 <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <h4 className="font-semibold text-yellow-800 mb-2">Security Recommendations</h4>
+                  <h4 className="font-semibold text-yellow-800 mb-2">{t('settings.securityRecommendations')}</h4>
                   <ul className="text-sm text-yellow-700 space-y-1">
-                    <li>• Enable two-factor authentication for all admin accounts</li>
-                    <li>• Regularly update passwords and use strong passwords</li>
-                    <li>• Review user permissions and access logs regularly</li>
-                    <li>• Keep system software updated to latest versions</li>
+                    <li>{t('settings.recTwoFactorAuth')}</li>
+                    <li>{t('settings.recUpdatePasswords')}</li>
+                    <li>{t('settings.recReviewPermissions')}</li>
+                    <li>{t('settings.recUpdateSoftware')}</li>
                   </ul>
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Password Policy</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">{t('settings.passwordPolicy')}</h4>
                     <div className="space-y-3">
-                      <SettingField
-                        label="Minimum Password Length"
-                        name="minPasswordLength"
-                        type="number"
-                        placeholder="8"
-                      />
-                      <SettingField
-                        label="Password Expiry (days)"
-                        name="passwordExpiryDays"
-                        type="number"
-                        placeholder="90"
-                      />
+                      <Field label={t('settings.minPasswordLength')} name="minPasswordLength" type="number" />
+                      <Field label={t('settings.passwordExpiryDays')} name="passwordExpiryDays" type="number" />
                     </div>
                   </div>
-
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Session Management</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">{t('settings.sessionManagement')}</h4>
                     <div className="space-y-3">
-                      <SettingField
-                        label="Session Timeout (minutes)"
-                        name="sessionTimeout"
-                        type="number"
-                        placeholder="30"
-                      />
-                      <SettingField
-                        label="Max Login Attempts"
-                        name="maxLoginAttempts"
-                        type="number"
-                        placeholder="5"
-                      />
+                      <Field label={t('settings.sessionTimeout')} name="sessionTimeout" type="number" />
+                      <Field label={t('settings.maxLoginAttempts')} name="maxLoginAttempts" type="number" />
                     </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-gray-200">
-                  <h4 className="font-semibold text-gray-900 mb-3">Data Protection</h4>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-gray-900">Automatic Backup</p>
-                      <p className="text-sm text-gray-600">Last backup: 2 hours ago</p>
-                    </div>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                      Run Backup Now
-                    </button>
                   </div>
                 </div>
               </div>
@@ -425,43 +267,10 @@ const AdminGeneralSettings = () => {
         </div>
       </Card>
 
-      {/* System Status */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
-              <FiDatabase size={20} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Database Status</p>
-              <p className="font-semibold text-gray-900">Connected</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
-              <FiSettings size={20} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">System Version</p>
-              <p className="font-semibold text-gray-900">v2.1.0</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600">
-              <FiClock size={20} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Uptime</p>
-              <p className="font-semibold text-gray-900">99.8%</p>
-            </div>
-          </div>
-        </Card>
+        <Card><div className="flex items-center gap-3"><div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600"><FiDatabase size={20} /></div><div><p className="text-sm text-gray-500">{t('settings.databaseStatus')}</p><p className="font-semibold text-gray-900">{t('common.connected')}</p></div></div></Card>
+        <Card><div className="flex items-center gap-3"><div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600"><FiSettings size={20} /></div><div><p className="text-sm text-gray-500">{t('settings.systemVersion')}</p><p className="font-semibold text-gray-900">v2.1.0</p></div></div></Card>
+        <Card><div className="flex items-center gap-3"><div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600"><FiClock size={20} /></div><div><p className="text-sm text-gray-500">{t('common.uptime')}</p><p className="font-semibold text-gray-900">99.8%</p></div></div></Card>
       </div>
     </div>
   );

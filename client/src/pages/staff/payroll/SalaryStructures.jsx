@@ -22,12 +22,7 @@ export const salaryStructuresConfig = {
     { key: 'status', header: 'Status' }
   ],
   formFields: [
-    { name: 'employeeType', label: 'Employee Type', type: 'select', options: [
-      { value: 'teacher', label: 'Teacher' },
-      { value: 'staff', label: 'Staff' },
-      { value: 'admin', label: 'Admin' },
-      { value: 'support', label: 'Support' }
-    ]},
+    { name: 'employeeType', label: 'Employee Type', type: 'relation', relationEndpoint: '/payroll/employee-types', relationValue: (r) => r.value, relationLabel: (r) => r.label },
     { name: 'basicSalary', label: 'Basic Salary', type: 'number' },
     { name: 'allowanceAmount', label: 'Allowance Amount', type: 'number' },
     { name: 'housingAllowance', label: 'Housing Allowance', type: 'number' },
@@ -133,13 +128,13 @@ const SalaryStructures = () => {
           { label: 'Salary Range', value: insights.salaryRange, icon: FiTrendingUp, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700' },
           { label: 'Employee Types Covered', value: insights.typeCoverage, icon: FiActivity, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700' }
         ].map((item) => (
-          <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none`}>
+          <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none dark:border-slate-700 dark:bg-none dark:bg-slate-800/50`}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{item.label}</p>
-                <p className="mt-3 text-2xl font-bold text-slate-900">{item.value}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-300">{item.label}</p>
+                <p className="mt-3 text-2xl font-bold text-slate-900 dark:text-slate-100">{item.value}</p>
               </div>
-              <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.chip}`}>
+              <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.chip} dark:bg-slate-700 dark:text-slate-200`}>
                 <item.icon size={22} />
               </span>
             </div>

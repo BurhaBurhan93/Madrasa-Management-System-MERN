@@ -196,13 +196,13 @@ const renderPrimitiveBlock = (value) => (
   </p>
 );
 
-const renderKeyValueBlock = (data) => {
+const renderKeyValueBlock = (data, t) => {
   const entries = Object.entries(data || {}).filter(
     ([, value]) => value !== undefined,
   );
 
   if (!entries.length) {
-    return <p className="text-sm text-gray-500">No details available.</p>;
+    return <p className="text-sm text-gray-500">{t("noDetails")}</p>;
   }
 
   return (
@@ -228,15 +228,15 @@ const renderKeyValueBlock = (data) => {
   );
 };
 
-const renderTableBlock = (rows = [], columns = []) => {
+const renderTableBlock = (rows = [], columns = [], t) => {
   if (!rows.length) {
-    return <p className="text-sm text-gray-500">No rows available.</p>;
+    return <p className="text-sm text-gray-500">{t("noRows")}</p>;
   }
 
   const resolvedColumns = getTableColumns(rows, columns);
 
   if (!resolvedColumns.length) {
-    return <p className="text-sm text-gray-500">No columns available.</p>;
+    return <p className="text-sm text-gray-500">{t("noColumns")}</p>;
   }
 
   return (
@@ -284,9 +284,9 @@ const renderTableBlock = (rows = [], columns = []) => {
   );
 };
 
-const renderListBlock = (items = [], ordered = false) => {
+const renderListBlock = (items = [], ordered = false, t) => {
   if (!items.length) {
-    return <p className="text-sm text-gray-500">No items available.</p>;
+    return <p className="text-sm text-gray-500">{t("noItems")}</p>;
   }
 
   const ListTag = ordered ? "ol" : "ul";
@@ -313,9 +313,9 @@ const renderListBlock = (items = [], ordered = false) => {
   );
 };
 
-const renderImageBlock = ({ src, alt, caption, className = "" }) => {
+const renderImageBlock = ({ src, alt, caption, className = "" }, t) => {
   if (!src || !isImageSource(src)) {
-    return <p className="text-sm text-gray-500">Image not available.</p>;
+    return <p className="text-sm text-gray-500">{t("imageNotAvailable")}</p>;
   }
 
   return (
@@ -332,9 +332,9 @@ const renderImageBlock = ({ src, alt, caption, className = "" }) => {
   );
 };
 
-const renderPdfBlock = ({ src, title }) => {
+const renderPdfBlock = ({ src, title }, t) => {
   if (!src || !isPdfSource(src)) {
-    return <p className="text-sm text-gray-500">PDF preview not available.</p>;
+    return <p className="text-sm text-gray-500">{t("pdfNotAvailable")}</p>;
   }
 
   return (
@@ -345,8 +345,7 @@ const renderPdfBlock = ({ src, title }) => {
         className="h-[720px] w-full rounded-lg border border-gray-200"
       >
         <div className="rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500">
-          PDF preview is not available in this browser. The file name will still
-          be included in the print page.
+          {t("pdfBrowserNotAvailable")}
         </div>
       </object>
       {title && <p className="text-sm text-gray-500">{title}</p>}
@@ -354,9 +353,9 @@ const renderPdfBlock = ({ src, title }) => {
   );
 };
 
-const renderChartBlock = (items = []) => {
+const renderChartBlock = (items = [], t) => {
   if (!items.length) {
-    return <p className="text-sm text-gray-500">No chart data available.</p>;
+    return <p className="text-sm text-gray-500">{t("noChartData")}</p>;
   }
 
   const maxValue = Math.max(...items.map((item) => Number(item.value) || 0), 1);
@@ -385,28 +384,28 @@ const renderChartBlock = (items = []) => {
   );
 };
 
-const renderAttachmentBlock = (file) => {
+const renderAttachmentBlock = (file, t) => {
   if (file.kind === "image") {
     return renderImageBlock({
       src: file.preview,
       alt: file.name,
       caption: file.name,
-    });
+    }, t);
   }
 
   if (file.kind === "pdf") {
-    return renderPdfBlock({ src: file.preview, title: file.name });
+    return renderPdfBlock({ src: file.preview, title: file.name }, t);
   }
 
   if (file.kind === "text") {
     return (
       <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
         <div className="flex items-center justify-between gap-3 text-sm text-gray-600">
-          <span>{file.type || "Text file"}</span>
+          <span>{file.type || t("textFile")}</span>
           <span>{formatFileSize(file.size)}</span>
         </div>
         <pre className="whitespace-pre-wrap break-all rounded-lg bg-white p-4 text-sm text-gray-800">
-          {file.textContent || "No text content available."}
+          {file.textContent || t("noTextContent")}
         </pre>
       </div>
     );
@@ -419,19 +418,18 @@ const renderAttachmentBlock = (file) => {
         <div>
           <p className="break-all text-sm font-medium">{file.name}</p>
           <p className="text-xs text-gray-500">
-            {file.type || "Unknown type"} • {formatFileSize(file.size)}
+            {file.type || t("unknownType")} • {formatFileSize(file.size)}
           </p>
         </div>
       </div>
       <p className="mt-3 text-sm text-gray-500">
-        This file type does not have an inline preview, but it is attached to
-        this print layout.
+        {t("noPreviewAvailable")}
       </p>
     </div>
   );
 };
 
-const renderSection = (section, index) => {
+const renderSection = (section, index, t) => {
   if (section == null) return null;
 
   const normalizedSection = isPlainObject(section)
@@ -467,25 +465,25 @@ const renderSection = (section, index) => {
     case "keyValue":
     case "summary":
     case "details":
-      body = renderKeyValueBlock(data || content || {});
+      body = renderKeyValueBlock(data || content || {}, t);
       break;
     case "table":
-      body = renderTableBlock(rows || data || [], columns || []);
+      body = renderTableBlock(rows || data || [], columns || [], t);
       break;
     case "list":
-      body = renderListBlock(items || data || [], ordered);
+      body = renderListBlock(items || data || [], ordered, t);
       break;
     case "chart":
       body =
         src || image
-          ? renderImageBlock({ src: src || image, alt: title, caption })
-          : renderChartBlock(dataPoints || items || data || []);
+          ? renderImageBlock({ src: src || image, alt: title, caption }, t)
+          : renderChartBlock(dataPoints || items || data || [], t);
       break;
     case "pdf":
-      body = renderPdfBlock({ src: src || content, title: title || caption });
+      body = renderPdfBlock({ src: src || content, title: title || caption }, t);
       break;
     case "file":
-      body = renderAttachmentBlock(file || data || {});
+      body = renderAttachmentBlock(file || data || {}, t);
       break;
     case "html":
       body = (
@@ -510,7 +508,7 @@ const renderSection = (section, index) => {
                     alt: item.alt || item.title,
                     caption: item.caption || item.title,
                   },
-              imageIndex,
+              t,
             ),
           )}
         </div>
@@ -522,10 +520,10 @@ const renderSection = (section, index) => {
       } else if (Array.isArray(content ?? data)) {
         const arrayValue = content ?? data;
         body = arrayValue.every((item) => isPlainObject(item))
-          ? renderTableBlock(arrayValue, columns || [])
-          : renderListBlock(arrayValue, ordered);
+          ? renderTableBlock(arrayValue, columns || [], t)
+          : renderListBlock(arrayValue, ordered, t);
       } else if (isPlainObject(content ?? data)) {
-        body = renderKeyValueBlock(content ?? data);
+        body = renderKeyValueBlock(content ?? data, t);
       }
   }
 
@@ -545,25 +543,25 @@ const renderSection = (section, index) => {
   );
 };
 
-const buildGenericSections = (printData) => {
+const buildGenericSections = (printData, t) => {
   const sections = [];
 
   if (printData.summary && isPlainObject(printData.summary)) {
     sections.push({
       type: "summary",
-      title: "Summary",
+      title: t("summary"),
       data: printData.summary,
     });
   }
 
   if (printData.meta && isPlainObject(printData.meta)) {
-    sections.push({ type: "details", title: "Details", data: printData.meta });
+    sections.push({ type: "details", title: t("details"), data: printData.meta });
   }
 
   if (printData.contentHtml) {
     sections.push({
       type: "html",
-      title: printData.contentTitle || "Content",
+      title: printData.contentTitle || t("contentSection"),
       content: printData.contentHtml,
     });
   } else if (printData.content) {
@@ -572,7 +570,7 @@ const buildGenericSections = (printData) => {
         ? printData.content
         : {
             type: isPlainObject(printData.content) ? "details" : "text",
-            title: "Content",
+            title: t("contentSection"),
             data: printData.content,
             content: printData.content,
           },
@@ -582,7 +580,7 @@ const buildGenericSections = (printData) => {
   if (printData.chartImage) {
     sections.push({
       type: "chart",
-      title: "Chart",
+      title: t("chart"),
       image: printData.chartImage,
       caption: printData.chartCaption,
     });
@@ -591,7 +589,7 @@ const buildGenericSections = (printData) => {
   if (Array.isArray(printData.chartImages) && printData.chartImages.length) {
     sections.push({
       type: "gallery",
-      title: "Charts",
+      title: t("charts"),
       images: printData.chartImages,
     });
   }
@@ -599,7 +597,7 @@ const buildGenericSections = (printData) => {
   if (Array.isArray(printData.images) && printData.images.length) {
     sections.push({
       type: "gallery",
-      title: "Images",
+      title: t("images"),
       images: printData.images,
     });
   }
@@ -633,11 +631,11 @@ const buildGenericSections = (printData) => {
   });
 
   if (printData.notes) {
-    sections.push({ type: "text", title: "Notes", content: printData.notes });
+    sections.push({ type: "text", title: t("notes"), content: printData.notes });
   }
 
   if (printData.footer) {
-    sections.push({ type: "text", title: "Footer", content: printData.footer });
+    sections.push({ type: "text", title: t("footer"), content: printData.footer });
   }
 
   return sections;
@@ -654,7 +652,7 @@ const defaultLayoutForm = {
 };
 
 const PrintPage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('print');
   const navigate = useNavigate();
   const params = useParams();
   const location = useLocation();
@@ -850,7 +848,7 @@ const PrintPage = () => {
       case "fee":
       case "fee-receipt":
         return {
-          title: t("print.typeFeeReceipt"),
+          title: t("typeFeeReceipt"),
           sections: [
             {
               type: "details",
@@ -868,7 +866,7 @@ const PrintPage = () => {
         };
       case "attendance-report":
         return {
-          title: t("print.typeAttendanceReport"),
+          title: t("typeAttendanceReport"),
           sections: [
             {
               type: "details",
@@ -879,19 +877,19 @@ const PrintPage = () => {
             },
             {
               type: "table",
-              title: "Attendance Records",
+              title: t("attendanceRecords"),
               rows: printData.records || [],
               columns: [
-                { key: "studentName", label: t("print.studentName") },
-                { key: "className", label: t("print.class") },
-                { key: "status", label: t("print.status") },
+                { key: "studentName", label: t("studentName") },
+                { key: "className", label: t("class") },
+                { key: "status", label: t("status") },
               ],
             },
           ],
         };
       case "certificate":
         return {
-          title: `${t("print.certificateOf")} ${printData.certificateType || "Achievement"}`,
+          title: `${t("certificateOf")} ${printData.certificateType || "Achievement"}`,
           sections: [
             {
               type: "text",
@@ -910,7 +908,7 @@ const PrintPage = () => {
         };
       case "exam-result":
         return {
-          title: t("print.typeExamResult"),
+          title: t("typeExamResult"),
           sections: [
             {
               type: "details",
@@ -926,10 +924,10 @@ const PrintPage = () => {
               title: "Subjects",
               rows: printData.subjects || [],
               columns: [
-                { key: "name", label: t("print.subject") },
-                { key: "marks", label: t("print.marks") },
-                { key: "totalMarks", label: t("print.totalMarks") },
-                { key: "grade", label: t("print.grade") },
+                { key: "name", label: t("subject") },
+                { key: "marks", label: t("marks") },
+                { key: "totalMarks", label: t("totalMarks") },
+                { key: "grade", label: t("grade") },
               ],
             },
           ],
@@ -953,7 +951,7 @@ const PrintPage = () => {
         title: printData.title || formatLabel(type || "Print Document"),
         subtitle: printData.subtitle,
         description: printData.description,
-        sections: printData.sections || buildGenericSections(printData),
+        sections: printData.sections || buildGenericSections(printData, t),
       };
     }
 
@@ -965,7 +963,7 @@ const PrintPage = () => {
       description: printData?.rawData
         ? "The print payload could not be parsed."
         : "",
-      sections: buildGenericSections(printData),
+      sections: buildGenericSections(printData, t),
     };
   })();
 
@@ -992,11 +990,11 @@ const PrintPage = () => {
             className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 hover:bg-gray-50"
           >
             <FiX />
-            {t("print.closeButton")}
+            {t("closeButton")}
           </button>
 
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-xl font-semibold">{t("print.title")}</h1>
+            <h1 className="text-xl font-semibold">{t("title")}</h1>
 
             <input
               ref={fileInputRef}
@@ -1011,7 +1009,7 @@ const PrintPage = () => {
               className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
             >
               <FiPlus />
-              Create Layout
+              {t("createLayout")}
             </button>
 
             <button
@@ -1019,7 +1017,7 @@ const PrintPage = () => {
               className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
             >
               <FiPaperclip />
-              Add Files
+              {t("addFiles")}
             </button>
 
             <button
@@ -1027,7 +1025,7 @@ const PrintPage = () => {
               className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
             >
               <FiPrinter />
-              {t("print.printButton")}
+              {t("printButton")}
             </button>
           </div>
         </div>
@@ -1039,7 +1037,7 @@ const PrintPage = () => {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Section Type
+                      {t("sectionType")}
                     </label>
                     <select
                       value={layoutForm.type}
@@ -1048,15 +1046,15 @@ const PrintPage = () => {
                       }
                       className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                     >
-                      <option value="text">Content</option>
-                      <option value="table">Table</option>
-                      <option value="chart">Chart</option>
+                      <option value="text">{t("sectionTypeContent")}</option>
+                      <option value="table">{t("sectionTypeTable")}</option>
+                      <option value="chart">{t("sectionTypeChart")}</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Title
+                      {t("titleLabel")}
                     </label>
                     <input
                       type="text"
@@ -1065,13 +1063,13 @@ const PrintPage = () => {
                         handleLayoutFieldChange("title", event.target.value)
                       }
                       className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                      placeholder="Section title"
+                      placeholder={t("sectionTitlePlaceholder")}
                     />
                   </div>
 
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Subtitle
+                      {t("subtitleLabel")}
                     </label>
                     <input
                       type="text"
@@ -1080,7 +1078,7 @@ const PrintPage = () => {
                         handleLayoutFieldChange("subtitle", event.target.value)
                       }
                       className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                      placeholder="Optional subtitle"
+                      placeholder={t("subtitlePlaceholder")}
                     />
                   </div>
                 </div>
@@ -1088,7 +1086,7 @@ const PrintPage = () => {
                 {layoutForm.type === "text" && (
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Content
+                      {t("contentLabel")}
                     </label>
                     <textarea
                       rows={8}
@@ -1097,7 +1095,7 @@ const PrintPage = () => {
                         handleLayoutFieldChange("content", event.target.value)
                       }
                       className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                      placeholder="Write the content to print"
+                      placeholder={t("contentPlaceholder")}
                     />
                   </div>
                 )}
@@ -1106,7 +1104,7 @@ const PrintPage = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="mb-1 block text-sm font-medium text-gray-700">
-                        Columns
+                        {t("columns")}
                       </label>
                       <input
                         type="text"
@@ -1118,12 +1116,12 @@ const PrintPage = () => {
                           )
                         }
                         className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                        placeholder="Name, Age, Class"
+                        placeholder={t("columnsPlaceholder")}
                       />
                     </div>
                     <div>
                       <label className="mb-1 block text-sm font-medium text-gray-700">
-                        Rows
+                        {t("rows")}
                       </label>
                       <textarea
                         rows={8}
@@ -1135,11 +1133,10 @@ const PrintPage = () => {
                           )
                         }
                         className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                        placeholder={"Ahmad|12|Class 6\nFatima|11|Class 5"}
+                        placeholder={t("rowsPlaceholder")}
                       />
                       <p className="mt-1 text-xs text-gray-500">
-                        Use one row per line and separate cells with{" "}
-                        <code>|</code>
+                        {t("rowsHint")}
                       </p>
                     </div>
                   </div>
@@ -1148,7 +1145,7 @@ const PrintPage = () => {
                 {layoutForm.type === "chart" && (
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Chart Data
+                      {t("chartData")}
                     </label>
                     <textarea
                       rows={8}
@@ -1157,11 +1154,10 @@ const PrintPage = () => {
                         handleLayoutFieldChange("chartRows", event.target.value)
                       }
                       className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                      placeholder={"January|40\nFebruary|65\nMarch|50"}
+                      placeholder={t("chartDataPlaceholder")}
                     />
                     <p className="mt-1 text-xs text-gray-500">
-                      Use one data point per line in <code>Label|Value</code>{" "}
-                      format
+                      {t("chartDataHint")}
                     </p>
                   </div>
                 )}
@@ -1171,20 +1167,20 @@ const PrintPage = () => {
                     onClick={handleAddLayoutSection}
                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
                   >
-                    Add To Print Page
+                    {t("addToPrintPage")}
                   </button>
                   <button
                     onClick={() => setLayoutForm(defaultLayoutForm)}
                     className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-white"
                   >
-                    Reset Form
+                    {t("resetForm")}
                   </button>
                 </div>
               </div>
 
               <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4">
                 <h2 className="text-base font-semibold text-gray-800">
-                  Created Layout Sections
+                  {t("createdLayoutSections")}
                 </h2>
                 {layoutSections.length ? (
                   layoutSections.map((section) => (
@@ -1203,7 +1199,7 @@ const PrintPage = () => {
                       <button
                         onClick={() => handleRemoveLayoutSection(section.id)}
                         className="rounded-md p-2 text-gray-500 hover:bg-white hover:text-red-600"
-                        title="Remove section"
+                        title={t("removeSection")}
                       >
                         <FiTrash2 />
                       </button>
@@ -1211,7 +1207,7 @@ const PrintPage = () => {
                   ))
                 ) : (
                   <p className="text-sm text-gray-500">
-                    No custom layout sections added yet.
+                    {t("noLayoutSections")}
                   </p>
                 )}
               </div>
@@ -1248,13 +1244,13 @@ const PrintPage = () => {
           )}
 
           {resolvedSections.map((section, index) =>
-            renderSection(section, index),
+            renderSection(section, index, t),
           )}
 
           {attachedFiles.length > 0 && (
             <section className="space-y-4">
               <h2 className="text-xl font-semibold text-gray-800">
-                Added Files ({attachedFiles.length})
+                {t("addedFiles", { count: attachedFiles.length })}
               </h2>
               <div className="no-print grid grid-cols-1 gap-3 md:grid-cols-2">
                 {attachedFiles.map((file) => (
@@ -1267,14 +1263,14 @@ const PrintPage = () => {
                         {file.name}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {file.type || "Unknown type"} •{" "}
+                        {file.type || t("unknownType")} •{" "}
                         {formatFileSize(file.size)}
                       </p>
                     </div>
                     <button
                       onClick={() => handleRemoveFile(file.id)}
                       className="rounded-md p-2 text-gray-500 hover:bg-white hover:text-red-600"
-                      title="Remove file"
+                      title={t("removeFile")}
                     >
                       <FiTrash2 />
                     </button>

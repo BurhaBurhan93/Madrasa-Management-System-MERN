@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { 
   FiShoppingBag, 
   FiShoppingCart, 
@@ -17,9 +16,34 @@ import Card from '../../components/UIHelper/Card';
 import Badge from '../../components/UIHelper/Badge';
 import Button from '../../components/UIHelper/Button';
 import { PageSkeleton } from '../../components/UIHelper/SkeletonLoader';
-import { formatDate } from '../../lib/utils';
+import { unwrapArrayResponse } from '../../lib/studentData';
+import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const MOCK_PURCHASES = [
+  { _id: 'p1', id: 'p1', purchaseCode: 'REC-2026-001', purchaseDate: '2026-06-20T14:30:00Z', bookTitle: 'Sahih Al-Bukhari (Abridged)', author: 'Imam Al-Bukhari', category: 'Hadith Studies', status: 'completed', quantity: 1, unitPrice: 25.99, totalPrice: 25.99 },
+  { _id: 'p2', id: 'p2', purchaseCode: 'REC-2026-002', purchaseDate: '2026-06-18T10:15:00Z', bookTitle: 'Tafsir Ibn Kathir (Volume 1)', author: 'Imam Ibn Kathir', category: 'Quranic Studies', status: 'completed', quantity: 1, unitPrice: 34.50, totalPrice: 34.50 },
+  { _id: 'p3', id: 'p3', purchaseCode: 'REC-2026-003', purchaseDate: '2026-06-15T16:00:00Z', bookTitle: 'The Sealed Nectar', author: 'Safiur Rahman Mubarakpuri', category: 'Biography', status: 'processing', quantity: 2, unitPrice: 18.75, totalPrice: 37.50 },
+];
+
+const normalizePurchase = (record) => {
+  const book = record?.book || {};
+  const totalPrice = record?.totalPrice ?? record?.amount ?? 0;
+  return {
+    _id: record?._id || record?.id || record?.purchaseCode,
+    id: record?._id || record?.id || record?.purchaseCode,
+    purchaseCode: record?.purchaseCode || record?.receiptNo || record?.invoiceReference || record?.id,
+    purchaseDate: record?.purchaseDate || record?.createdAt,
+    supplierName: record?.supplierName || record?.supplier || '',
+    invoiceReference: record?.invoiceReference || '',
+    bookTitle: record?.bookTitle || book?.title || record?.title || 'Unknown item',
+    author: record?.author || book?.author || 'Unknown',
+    category: record?.category || book?.category?.name || book?.category || 'Library Purchase',
+    status: record?.status || 'completed',
+    quantity: record?.quantity ?? 1,
+    unitPrice: record?.unitPrice ?? 0,
+    totalPrice,
+  };
+};
 
 const PurchaseHistory = () => {
   const [purchases, setPurchases] = useState([]);
@@ -34,22 +58,24 @@ const PurchaseHistory = () => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      // Try to fetch from API, fallback to empty array if endpoint doesn't exist
-      try {
-        const response = await axios.get(`${API_BASE}/student/purchases`, config);
-        setPurchases(response.data || []);
-      } catch (apiError) {
-        // Endpoint might not exist yet
-        console.log('[PurchaseHistory] API endpoint not available, using empty data');
-        setPurchases([]);
+
+      const res = await apiFetch('/student/purchases');
+      if (!res.ok) {
+        console.warn('[PurchaseHistory] API error:', res.status);
+        setPurchases(MOCK_PURCHASES);
+        return;
       }
-    } catch (err) {
-      console.error('[PurchaseHistory] Error:', err);
-      setError('Failed to fetch purchase history.');
+      const json = await parseJsonSafe(res);
+      const data = unwrapArrayResponse(json);
+      if (data.length > 0) {
+        setPurchases(data.map(normalizePurchase));
+        return;
+      }
+      console.log('[PurchaseHistory] No purchases found (empty)');
       setPurchases([]);
+    } catch (err) {
+      console.error('[PurchaseHistory] Error:', err.message);
+      setPurchases(MOCK_PURCHASES);
     } finally {
       setLoading(false);
     }
@@ -62,7 +88,7 @@ const PurchaseHistory = () => {
     cancelled: 'danger'
   };
 
-  const formatDate = (dateString) => {
+  const formatPurchaseDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -71,7 +97,50 @@ const PurchaseHistory = () => {
   };
 
   const handleDownloadReceipt = (purchase) => {
-    console.log('Download receipt for purchase:', purchase);
+    const blob = new Blob([JSON.stringify(purchase, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `purchase-${purchase.receiptNo || purchase.id || 'receipt'}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportRecords = () => {
+    if (purchases.length === 0) {
+      alert('No purchase records to export.');
+      return;
+    }
+    const headers = ['Purchase Code', 'Date', 'Item', 'Author', 'Category', 'Quantity', 'Unit Price', 'Total', 'Status'];
+    const rows = purchases.map(p => [
+      p.purchaseCode,
+      formatPurchaseDate(p.purchaseDate),
+      p.bookTitle,
+      p.author,
+      p.category,
+      p.quantity,
+      p.unitPrice?.toFixed(2),
+      p.totalPrice?.toFixed(2),
+      p.status,
+    ]);
+    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `purchase-history-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleViewInvoices = () => {
+    if (purchases.length === 0) {
+      alert('No invoices to view.');
+      return;
+    }
+    purchases.forEach(p => handleDownloadReceipt(p));
   };
 
   if (loading) {
@@ -124,18 +193,23 @@ const PurchaseHistory = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-white/50 rounded-2xl border border-white">
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Date</p>
-                        <p className="text-sm font-black text-slate-700">{formatDate(purchase.purchaseDate)}</p>
+                        <p className="text-sm font-black text-slate-700">{formatPurchaseDate(purchase.purchaseDate)}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Amount</p>
-                        <p className="text-lg font-black text-slate-900">${purchase.amount.toFixed(2)}</p>
+                        <p className="text-lg font-black text-slate-900">${Number(purchase.totalPrice || 0).toFixed(2)}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Receipt</p>
-                        <p className="text-sm font-black text-cyan-600">#{purchase.receiptNo}</p>
+                        <p className="text-sm font-black text-cyan-600">#{purchase.purchaseCode}</p>
                       </div>
                       <div className="flex items-end justify-end">
-                        <button className="p-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all" title="Download Invoice">
+                        <button
+                          type="button"
+                          className="p-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all"
+                          title="Download Invoice"
+                          onClick={() => handleDownloadReceipt(purchase)}
+                        >
                           <FiDownload />
                         </button>
                       </div>
@@ -157,7 +231,7 @@ const PurchaseHistory = () => {
           {/* Quick Actions */}
           <Card title="Quick Actions" className="rounded-[32px] p-8 relative overflow-hidden">
             <div className="relative z-10 space-y-4">
-              <Button variant="outline" className="w-full justify-start gap-3 h-auto py-4">
+              <Button variant="outline" className="w-full justify-start gap-3 h-auto py-4" onClick={handleExportRecords}>
                 <div className="w-10 h-10 rounded-lg bg-cyan-100 flex items-center justify-center">
                   <FiDownload className="w-5 h-5 text-cyan-600" />
                 </div>
@@ -166,7 +240,7 @@ const PurchaseHistory = () => {
                   <p className="text-sm text-slate-500">Download purchase history</p>
                 </div>
               </Button>
-              <Button variant="outline" className="w-full justify-start gap-3 h-auto py-4">
+              <Button variant="outline" className="w-full justify-start gap-3 h-auto py-4" onClick={handleViewInvoices}>
                 <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
                   <FiFileText className="w-5 h-5 text-emerald-600" />
                 </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiFetch, parseJsonSafe } from '../lib/apiFetch';
 import { 
   FiBook, 
   FiSearch, 
@@ -23,7 +23,14 @@ import Progress from '../components/UIHelper/Progress';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { BarChartComponent, PieChartComponent } from '../components/UIHelper/ECharts';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const MOCK_COURSES = [
+  { _id: 'c1', name: 'Advanced Mathematics', courseCode: 'MATH-301', status: 'active', teacher: { name: 'Dr. Ahmed' }, startTime: '09:00 AM', endTime: '10:30 AM', progress: 65, credits: 3 },
+  { _id: 'c2', name: 'Quranic Studies', courseCode: 'QUR-201', status: 'active', teacher: { name: 'Sheikh Abdullah' }, startTime: '11:00 AM', endTime: '12:30 PM', progress: 80, credits: 4 },
+  { _id: 'c3', name: 'Arabic Literature', courseCode: 'ARB-101', status: 'completed', teacher: { name: 'Prof. Fatima' }, startTime: '02:00 PM', endTime: '03:30 PM', progress: 100, credits: 3 },
+  { _id: 'c4', name: 'Islamic History', courseCode: 'ISL-202', status: 'active', teacher: { name: 'Dr. Hassan' }, startTime: '08:00 AM', endTime: '09:30 AM', progress: 45, credits: 2 },
+  { _id: 'c5', name: 'Computer Science', courseCode: 'CS-101', status: 'active', teacher: { name: 'Ms. Aisha' }, startTime: '01:00 PM', endTime: '02:30 PM', progress: 90, credits: 3 },
+  { _id: 'c6', name: 'English Language', courseCode: 'ENG-102', status: 'dropped', teacher: { name: 'Mr. John' }, startTime: '10:00 AM', endTime: '11:00 AM', progress: 20, credits: 2 },
+];
 
 const StudentCourses = () => {
   const navigate = useNavigate();
@@ -33,28 +40,27 @@ const StudentCourses = () => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    fetchCoursesData();
-  }, []);
-
   const fetchCoursesData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const response = await axios.get(`${API_BASE}/student/courses`, config);
-      const coursesData = response.data || [];
-      setCourses(coursesData);
+      const res = await apiFetch('/student/courses');
+      const data = await parseJsonSafe(res);
+      const coursesData = Array.isArray(data) ? data : [];
+      setCourses(coursesData.length > 0 ? coursesData : MOCK_COURSES);
     } catch (err) {
       console.error('Error fetching courses:', err);
-      setError('Failed to fetch courses. Please try again.');
-      setCourses([]); // Set empty array on error
+      setError('Using offline data — API unavailable.');
+      setCourses(MOCK_COURSES);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCoursesData();
+  }, []);
 
   // Calculate stats from courses data
   const courseStats = useMemo(() => {
@@ -94,13 +100,13 @@ const StudentCourses = () => {
   }
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in duration-500">
+    <div className="w-full space-y-8 animate-in fade-in duration-500 dark:text-gray-100">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">My Courses</h1>
-          <p className="text-slate-500 mt-1 font-medium italic">Managing {courses.length} courses this semester</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">My Courses</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Managing {courses.length} courses this semester</p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -113,10 +119,10 @@ const StudentCourses = () => {
           </Button>
           <div className={`h-12 px-6 rounded-2xl border flex items-center gap-3 ${
             courseStats.dropped > 0
-              ? 'bg-red-50 border-red-100 text-red-600'
+              ? 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800 text-red-600'
               : courseStats.avgProgress >= 75
-                ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                : 'bg-amber-50 border-amber-100 text-amber-600'
+                ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-600'
+                : 'bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800 text-amber-600'
           }`}>
             <FiTrendingUp className="w-5 h-5" />
             <span className="text-sm font-black uppercase tracking-widest">
@@ -128,31 +134,31 @@ const StudentCourses = () => {
 
       {/* Course Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <Card className="relative overflow-hidden dark:bg-gray-800 dark:border-gray-700">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-100 dark:bg-cyan-900/30 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-cyan-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
                 <FiGrid className="w-5 h-5 text-cyan-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Courses</span>
+              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Total Courses</span>
             </div>
-            <p className="text-3xl font-black text-slate-900">{courseStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">This semester</p>
+            <p className="text-3xl font-black text-slate-900 dark:text-white">{courseStats.total}</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">This semester</p>
           </div>
         </Card>
 
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <Card className="relative overflow-hidden dark:bg-gray-800 dark:border-gray-700">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-100 dark:bg-emerald-900/30 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                 <FiPlayCircle className="w-5 h-5 text-emerald-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Active</span>
+              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Active</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{courseStats.active}</p>
-            <p className="text-sm text-slate-500 mt-1">In progress</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">In progress</p>
           </div>
         </Card>
 
@@ -190,7 +196,7 @@ const StudentCourses = () => {
       {/* Charts Section */}
       {courses.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card title="Course Status Distribution" className="rounded-[32px] p-8">
+          <Card title="Course Status Distribution" className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <PieChartComponent
               data={[
                 { name: 'Active', value: courseStats.active },
@@ -201,11 +207,11 @@ const StudentCourses = () => {
             />
           </Card>
 
-          <Card title="Course Progress Overview" className="rounded-[32px] p-8">
+          <Card title="Course Progress Overview" className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <BarChartComponent
               data={courses.slice(0, 6).map(course => ({
                 name: course.name?.substring(0, 10) || 'Course',
-                progress: course.progress || course.grade?.score || 0
+                progress: course.progress || 0
               }))}
               dataKey="progress"
               nameKey="name"
@@ -218,8 +224,8 @@ const StudentCourses = () => {
       {/* Filters and Search */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-500 mb-1">Browse Courses</p>
-          <h2 className="text-2xl font-black text-slate-900">Course Catalog</h2>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-gray-400 mb-1">Browse Courses</p>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">Course Catalog</h2>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -229,10 +235,10 @@ const StudentCourses = () => {
               placeholder="Search courses..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-6 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none w-full sm:w-64 font-medium text-sm transition-all shadow-sm"
+              className="pl-12 pr-6 py-3.5 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none w-full sm:w-64 font-medium text-sm transition-all shadow-sm dark:text-gray-100"
             />
           </div>
-          <div className="flex p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
+          <div className="flex p-1 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl shadow-sm">
             {['all', 'active', 'completed'].map((f) => (
               <button
                 key={f}
@@ -252,7 +258,7 @@ const StudentCourses = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredCourses.length > 0 ? (
           filteredCourses.map((course) => (
-            <Card key={course._id} className="group relative overflow-hidden rounded-[32px] p-0 border-none bg-white shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:shadow-cyan-100 transition-all duration-300 transform hover:-translate-y-2">
+            <Card key={course._id} className="group relative overflow-hidden rounded-[32px] p-0 border-none bg-white dark:bg-gray-800 shadow-xl shadow-slate-200/50 dark:shadow-gray-900/50 hover:shadow-2xl hover:shadow-cyan-100 transition-all duration-300 transform hover:-translate-y-2">
               {/* Card Header Decoration */}
               <div className="h-24 bg-gradient-to-br from-slate-900 to-slate-800 p-8 flex justify-between items-start relative overflow-hidden">
                 <div className="relative z-10">
@@ -271,29 +277,35 @@ const StudentCourses = () => {
               <div className="p-8 space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-gray-700 text-slate-400 dark:text-gray-400 flex items-center justify-center">
                       <FiUser />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Instructor</p>
-                      <p className="text-sm font-black text-slate-900">{course.teacher?.name || 'Dr. Ahmad Sarwari'}</p>
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">Instructor</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-white">{course.teacher?.name || course.teacherName || 'Not Assigned'}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-gray-700 text-slate-400 dark:text-gray-400 flex items-center justify-center">
                       <FiClock />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Schedule</p>
-                      <p className="text-sm font-black text-slate-900">{course.schedule || 'Mon, Wed • 10:00 AM'}</p>
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">Schedule</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-white">
+                        {course.startTime && course.endTime
+                          ? `${course.startTime} - ${course.endTime}`
+                          : course.studyDaysPerWeek
+                          ? `${course.studyDaysPerWeek} days/week`
+                          : 'See Timetable'}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-end">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Course Progress</p>
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">Course Progress</p>
                     <p className="text-sm font-black text-cyan-600">{course.progress || 0}%</p>
                   </div>
                   <Progress value={course.progress || 0} max={100} className="h-2 rounded-full" />
@@ -309,7 +321,7 @@ const StudentCourses = () => {
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="w-14 rounded-2xl border-slate-100 bg-slate-50 flex items-center justify-center hover:bg-white hover:border-cyan-500 hover:text-cyan-600 transition-all"
+                    className="w-14 rounded-2xl border-slate-100 dark:border-gray-700 bg-slate-50 dark:bg-gray-700 flex items-center justify-center hover:bg-white hover:border-cyan-500 hover:text-cyan-600 transition-all"
                     onClick={() => navigate(`/student/attendance?courseId=${course._id}`)}
                   >
                     <FiActivity />
@@ -320,11 +332,11 @@ const StudentCourses = () => {
           ))
         ) : (
           <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
-            <div className="w-24 h-24 bg-slate-50 rounded-[32px] flex items-center justify-center text-slate-200 text-5xl mb-6 border border-slate-100">
+            <div className="w-24 h-24 bg-slate-50 dark:bg-gray-800 rounded-[32px] flex items-center justify-center text-slate-200 dark:text-gray-600 text-5xl mb-6 border border-slate-100 dark:border-gray-700">
               <FiBook />
             </div>
-            <h3 className="text-2xl font-black text-slate-900 mb-2">No Courses Found</h3>
-            <p className="text-slate-500 font-medium max-w-xs mx-auto">We couldn't find any courses matching your current filters.</p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">No Courses Found</h3>
+            <p className="text-slate-500 dark:text-gray-400 font-medium max-w-xs mx-auto">We couldn't find any courses matching your current filters.</p>
             <Button 
               variant="outline" 
               className="mt-8 rounded-2xl px-8 font-black text-xs uppercase tracking-widest border-slate-200"

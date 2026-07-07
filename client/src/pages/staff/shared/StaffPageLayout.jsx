@@ -2,12 +2,13 @@ import React from 'react';
 import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { getStaffShellClasses, getStaffToneStyles } from './staffTheme';
 import { localizeAdminText } from '../../../lib/adminLocalization';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 
 const StaffPageLayout = ({ eyebrow, title, subtitle, actions, children, tone }) => {
   const { theme } = useTheme();
   const toneStyles = getStaffToneStyles(tone || eyebrow || title);
   const isDark = theme === 'dark';
-  const adminLang = localStorage.getItem('adminLang') || 'en';
+  const adminLang = readStoredLanguage('adminLang', 'en');
 
   return (
     <div className={`min-h-screen w-full transition-colors duration-200 ${getStaffShellClasses(theme)}`}>

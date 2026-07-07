@@ -4,6 +4,10 @@ const { Schema } = mongoose;
 const LeaveSchema = new Schema({
   employee: { type: Schema.Types.ObjectId, ref: 'Employee', required: true },
   leaveType: { type: Schema.Types.ObjectId, ref: 'LeaveType', required: true },
+  startDate: { type: Date },
+  endDate: { type: Date },
+  leaveDays: { type: Number },
+  reason: { type: String },
   leaveReason: { type: String },
   attachments: [{
     fileId: String,
@@ -14,7 +18,6 @@ const LeaveSchema = new Schema({
   rejectionReason: { type: String },
   requestDate: { type: Date, default: Date.now },
   status: { type: String, enum: ['pending','approved','rejected'], default: 'pending' },
-  leaveDays: { type: Number },
   approvedBy: { type: Schema.Types.ObjectId, ref: 'Employee' }
 }, { timestamps: true });
 

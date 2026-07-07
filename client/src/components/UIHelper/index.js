@@ -44,6 +44,7 @@ export { default as AgGridTable } from './AgGridTable';
 
 // Layout Components
 export { default as Container } from './Container';
+export { default as Pagination } from './Pagination';
 export { default as Grid } from './Grid';
 
 // Shared Components

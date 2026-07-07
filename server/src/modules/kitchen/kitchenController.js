@@ -17,12 +17,18 @@ const { getDateRangeFromQuery } = require("../../utils/reportDateRange");
 
 exports.getInventory = async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
     const { status, search } = req.query;
     let query = {};
     if (status) query.status = status;
     if (search) query.itemName = { $regex: search, $options: "i" };
-    const items = await KitchenInventory.find(query).sort({ itemName: 1 });
-    res.json({ success: true, count: items.length, data: items });
+    const [items, total] = await Promise.all([
+      KitchenInventory.find(query).sort({ itemName: 1 }).skip(skip).limit(limit),
+      KitchenInventory.countDocuments(query),
+    ]);
+    res.json({ success: true, count: items.length, total, totalPages: Math.ceil(total / limit), currentPage: page, data: items });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -131,6 +137,9 @@ exports.deletePurchase = async (req, res) => {
 
 exports.getDailyConsumption = async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
     const { date, month, year } = req.query;
     let query = {};
     if (date) {
@@ -145,10 +154,11 @@ exports.getDailyConsumption = async (req, res) => {
         $lte: new Date(year, month, 0, 23, 59, 59),
       };
     }
-    const records = await DailyFoodConsumption.find(query).sort({
-      consumptionDate: -1,
-    });
-    res.json({ success: true, count: records.length, data: records });
+    const [records, total] = await Promise.all([
+      DailyFoodConsumption.find(query).sort({ consumptionDate: -1 }).skip(skip).limit(limit),
+      DailyFoodConsumption.countDocuments(query),
+    ]);
+    res.json({ success: true, count: records.length, total, totalPages: Math.ceil(total / limit), currentPage: page, data: records });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -265,7 +275,10 @@ exports.updateBudget = async (req, res) => {
 
 exports.getWeeklyMenu = async (req, res) => {
   try {
-    const { weekStart } = req.query;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
+    const { weekStart, day } = req.query;
     let query = {};
     if (weekStart) {
       const start = new Date(weekStart);
@@ -275,8 +288,12 @@ exports.getWeeklyMenu = async (req, res) => {
       end.setHours(23, 59, 59, 999);
       query.weekStartDate = { $gte: start, $lte: end };
     }
-    const menu = await WeeklyMenu.find(query).sort({ day: 1, mealType: 1 });
-    res.json({ success: true, count: menu.length, data: menu });
+    if (day) query.day = day;
+    const [menu, total] = await Promise.all([
+      WeeklyMenu.find(query).sort({ day: 1, mealType: 1 }).skip(skip).limit(limit),
+      WeeklyMenu.countDocuments(query),
+    ]);
+    res.json({ success: true, count: menu.length, total, totalPages: Math.ceil(total / limit), currentPage: page, data: menu });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -324,11 +341,18 @@ exports.deleteWeeklyMenu = async (req, res) => {
 
 exports.getSuppliers = async (req, res) => {
   try {
-    const { status } = req.query;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
+    const { status, search } = req.query;
     let query = {};
     if (status) query.status = status;
-    const suppliers = await Supplier.find(query).sort({ name: 1 });
-    res.json({ success: true, count: suppliers.length, data: suppliers });
+    if (search) query.name = { $regex: search, $options: "i" };
+    const [suppliers, total] = await Promise.all([
+      Supplier.find(query).sort({ name: 1 }).skip(skip).limit(limit),
+      Supplier.countDocuments(query),
+    ]);
+    res.json({ success: true, count: suppliers.length, total, totalPages: Math.ceil(total / limit), currentPage: page, data: suppliers });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -390,6 +414,9 @@ exports.getSupplierHistory = async (req, res) => {
 
 exports.getWaste = async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
     const { month, year } = req.query;
     let query = {};
     if (month && year) {
@@ -398,8 +425,11 @@ exports.getWaste = async (req, res) => {
         $lte: new Date(year, month, 0, 23, 59, 59),
       };
     }
-    const waste = await KitchenWaste.find(query).sort({ wasteDate: -1 });
-    res.json({ success: true, count: waste.length, data: waste });
+    const [waste, total] = await Promise.all([
+      KitchenWaste.find(query).sort({ wasteDate: -1 }).skip(skip).limit(limit),
+      KitchenWaste.countDocuments(query),
+    ]);
+    res.json({ success: true, count: waste.length, total, totalPages: Math.ceil(total / limit), currentPage: page, data: waste });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -418,6 +448,16 @@ exports.createWaste = async (req, res) => {
     res
       .status(201)
       .json({ success: true, message: "Waste recorded", data: waste });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateWaste = async (req, res) => {
+  try {
+    const waste = await KitchenWaste.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!waste) return res.status(404).json({ success: false, message: "Waste record not found" });
+    res.json({ success: true, message: "Waste record updated", data: waste });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

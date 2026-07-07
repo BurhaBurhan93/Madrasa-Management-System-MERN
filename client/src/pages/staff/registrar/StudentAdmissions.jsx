@@ -22,7 +22,7 @@ export const studentAdmissionsConfig = {
     { key: 'phone', header: 'Phone' },
     { key: 'email', header: 'Email' },
     { key: 'degree', header: 'Degree', render: (value) => value?.degreeName || '-' },
-    { key: 'currentClass', header: 'Class', render: (value) => value?.className || '-' },
+    { key: 'currentClass', header: 'Class', render: (value) => value?.name || value?.className || '-' },
     { key: 'status', header: 'Status', render: (value) => (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
         value === 'accepted' ? 'bg-green-100 text-green-800' :
@@ -76,7 +76,7 @@ export const studentAdmissionsConfig = {
       
     // ===== ACADEMIC INFORMATION =====
     { name: 'degree', label: 'Enrolled Degree', type: 'relation', relationEndpoint: '/academic/degrees', relationLabel: (row) => row.degreeName || row.name, required: true, group: 'Academic Information' },
-    { name: 'currentClass', label: 'Assigned Class', type: 'relation', relationEndpoint: '/academic/classes', relationLabel: (row) => row.className || row.name, group: 'Academic Information' },
+    { name: 'currentClass', label: 'Assigned Class', type: 'relation', relationEndpoint: '/academic/classes', relationLabel: (row) => row.name, group: 'Academic Information' },
     { name: 'currentLevel', label: 'Academic Level', group: 'Academic Information', placeholder: 'e.g., Level 1, Beginner' },
     { name: 'admissionDate', label: 'Admission Date', type: 'date', required: true, group: 'Academic Information' },
     { name: 'status', label: 'Admission Status', type: 'select', options: [

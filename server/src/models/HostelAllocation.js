@@ -23,9 +23,9 @@ const HostelAllocationSchema = new Schema({
   
   // Guardian/Parent contact for hostel residents
   emergencyContact: {
-    name: { type: String, trim: true, required: true },
-    relationship: { type: String, trim: true, required: true },
-    phone: { type: String, trim: true, required: true },
+    name: { type: String, trim: true },
+    relationship: { type: String, trim: true },
+    phone: { type: String, trim: true },
     email: { type: String, trim: true, lowercase: true }
   },
   

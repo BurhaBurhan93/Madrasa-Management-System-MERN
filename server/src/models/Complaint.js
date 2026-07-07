@@ -19,7 +19,8 @@ const ComplaintSchema = new Schema({
     mimetype: String,
     url: String
   }],
-  closedAt: { type: Date }
+  closedAt: { type: Date },
+  adminNotes: { type: String }
 }, { timestamps: true });
 
 ComplaintSchema.index({ complaintCode: 1 }, { unique: true });

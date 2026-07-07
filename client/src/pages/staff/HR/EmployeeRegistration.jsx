@@ -374,7 +374,7 @@ const EmployeeRegistration = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Positions Selection */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="px-6 py-4 bg-gradient-to-r from-cyan-50 to-sky-50 border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiBriefcase className="text-cyan-600" />
@@ -450,7 +450,7 @@ const EmployeeRegistration = () => {
         </div>
 
         {/* Account Information */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="px-6 py-4 bg-gradient-to-r from-cyan-50 to-sky-50 border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiUser className="text-cyan-600" />
@@ -485,7 +485,7 @@ const EmployeeRegistration = () => {
         </div>
 
         {/* Personal Information */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiUser className="text-slate-600" />
@@ -537,7 +537,7 @@ const EmployeeRegistration = () => {
         </div>
 
         {/* Contact Information */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiPhone className="text-slate-600" />
@@ -556,7 +556,7 @@ const EmployeeRegistration = () => {
         </div>
 
         {/* Emergency Contact */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
             <h2 className="text-lg font-semibold text-slate-900">Emergency Contact</h2>
           </div>
@@ -570,7 +570,7 @@ const EmployeeRegistration = () => {
         </div>
 
         {/* Employment Details */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiBriefcase className="text-slate-600" />
@@ -595,7 +595,7 @@ const EmployeeRegistration = () => {
         </div>
 
         {/* Qualifications */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
             <h2 className="text-lg font-semibold text-slate-900">Qualifications & Experience</h2>
           </div>
@@ -609,7 +609,7 @@ const EmployeeRegistration = () => {
         </div>
 
         {/* Salary & Bank Details */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiDollarSign className="text-slate-600" />
@@ -633,7 +633,7 @@ const EmployeeRegistration = () => {
         </div>
 
         {/* Status */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           {renderField('Status', 'status', 'select', [
             { value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }
           ])}

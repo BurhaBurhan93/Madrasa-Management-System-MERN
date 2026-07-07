@@ -20,7 +20,6 @@ import {
   FiCalendar,
   FiSun,
   FiMoon,
-  FiGlobe,
   FiPrinter,
 } from "react-icons/fi";
 import useLocalStorage from "../hooks/useLocalStorage";
@@ -39,254 +38,10 @@ import useMadrasaInfo from "../hooks/useMadrasaInfo";
 import { getMadrasaDisplayName, getMadrasaLogo } from "../lib/madrasaInfo";
 import i18n from "../i18n";
 import ConfirmDialog from "../components/ConfirmDialog";
+import LanguageSwitcher from "../components/LanguageSwitcher";
+import { useTranslation } from 'react-i18next';
 
-// ── Localization strings ──
-const translations = {
-  en: {
-    console: "Staff Console",
-    workspace: "Staff Workspace",
-    welcome: "Welcome back,",
-    subtitle:
-      "Manage operations with a cleaner workspace and faster navigation.",
-    search: "Search modules, tables...",
-    overview: "Overview",
-    operations: "Operations",
-    dashboard: "Dashboard",
-    registrar: "Registrar / Student Affairs",
-    admissions: "Student Admissions",
-    studentReg: "Student Registration",
-    allStudents: "All Students",
-    profiles: "Student Profiles",
-    classAssign: "Class Assignment",
-    classMgmt: "Manage Classes",
-    dataCorrection: "Data Correction",
-    guardians: "Guardian Management",
-    eduHistory: "Education History",
-    documents: "Documents Management",
-    hostelMgmt: "Hostel Management",
-    hostelRooms: "Hostel Rooms",
-    roomAlloc: "Room Allocations",
-    mealMgmt: "Meal Management",
-    reportsExport: "Reports & Export",
-    students: "Students",
-    inventory: "Inventory",
-    library: "Library",
-    categories: "Categories",
-    books: "Books",
-    borrowed: "Borrowed",
-    purchases: "Purchases",
-    sales: "Sales",
-    reports: "Reports",
-    complaints: "Complaints",
-    compList: "Complaints List",
-    actions: "Actions",
-    feedback: "Feedback",
-    finance: "Finance",
-    transactions: "Transactions",
-    accounts: "Accounts",
-    feeStructures: "Fee Structures",
-    studentFees: "Student Fees",
-    feePayments: "Fee Payments",
-    expenses: "Expenses",
-    finReports: "Financial Reports",
-    payroll: "Payroll",
-    salaryStructures: "Salary Structures",
-    salaryPayments: "Salary Payments",
-    salaryDeductions: "Salary Deductions",
-    salaryAdvances: "Salary Advances",
-    kitchen: "Kitchen",
-    kitInventory: "Inventory",
-    mealPlan: "Meal Planning",
-    dailyPurchases: "Daily Purchases",
-    weeklyMenu: "Weekly Menu",
-    suppliers: "Suppliers",
-    waste: "Waste Tracking",
-    budgetReq: "Budget Requests",
-    hr: "HR",
-    departments: "Departments",
-    designations: "Designations",
-    leaveTypes: "Leave Types",
-    empReg: "Employee Registration",
-    employees: "Employees",
-    attendance: "Attendance",
-    leave: "Leave Management",
-    hrPayroll: "Payroll",
-    hrReports: "Reports",
-    profile: "Profile",
-    profileSub: "Account and identity",
-    logout: "Logout",
-    logoutSub: "Exit this workspace",
-    theme: "Toggle theme",
-    language: "Language",
-    collapseSidebar: "Collapse sidebar",
-    expandSidebar: "Expand sidebar",
-    print: "Print",
-    accessDenied: "Access restricted",
-    accessMsg: "This staff account does not have permission for this module.",
-  },
-  dari: {
-    console: "کنسول کارمندان",
-    workspace: "فضای کاری کارمندان",
-    welcome: "خوش آمدید،",
-    subtitle: "مدیریت عملیات با فضای کاری تمیز و ناوبری سریع.",
-    search: "جستجوی ماژول‌ها، جدول‌ها...",
-    overview: "مرور کلی",
-    operations: "عملیات",
-    dashboard: "داشبورد",
-    registrar: "ثبت‌کننده / امور شاگردان",
-    admissions: "پذیرش شاگردان",
-    studentReg: "ثبت‌نام شاگردان",
-    allStudents: "همه شاگردان",
-    profiles: "پروفایل‌های شاگردان",
-    classAssign: "تخصیص صنف",
-    classMgmt: "مدیریت صنف‌ها",
-    dataCorrection: "اصلاح داده‌ها",
-    guardians: "مدیریت سرپرستان",
-    eduHistory: "تاریخچه تعلیمی",
-    documents: "مدیریت اسناد",
-    hostelMgmt: "مدیریت هوستل",
-    hostelRooms: "اتاق‌های هوستل",
-    roomAlloc: "تخصیص اتاق",
-    mealMgmt: "مدیریت وعده‌ها",
-    reportsExport: "گزارش‌ها و صدور",
-    students: "شاگردان",
-    inventory: "موجودی",
-    library: "کتابخانه",
-    categories: "دسته‌بندی‌ها",
-    books: "کتاب‌ها",
-    borrowed: "مستعار",
-    purchases: "خریداری",
-    sales: "فروش",
-    reports: "گزارش‌ها",
-    complaints: "شکایات",
-    compList: "لیست شکایات",
-    actions: "اقدامات",
-    feedback: "بازخورد",
-    finance: "مالیه",
-    transactions: "معاملات",
-    accounts: "حساب‌ها",
-    feeStructures: "ساختار فیس",
-    studentFees: "فیس شاگردان",
-    feePayments: "پرداخت‌های فیس",
-    expenses: "مصارف",
-    finReports: "گزارش‌های مالی",
-    payroll: "معاش‌پردازی",
-    salaryStructures: "ساختار معاش",
-    salaryPayments: "پرداخت‌های معاش",
-    salaryDeductions: "کسرات معاش",
-    salaryAdvances: "پیش‌پرداخت معاش",
-    kitchen: "آشپزخانه",
-    kitInventory: "موجودی",
-    mealPlan: "برنامه‌ریزی غذا",
-    dailyPurchases: "خریداری روزانه",
-    weeklyMenu: "مینوی هفتگی",
-    suppliers: "عرضه‌کنندگان",
-    waste: "ردیابی ضایعات",
-    budgetReq: "درخواست‌های بودجه",
-    hr: "منابع بشری",
-    departments: "دیپارتمنت‌ها",
-    designations: "رتبه‌ها",
-    leaveTypes: "انواع رخصتی",
-    empReg: "ثبت‌نام کارمند",
-    employees: "کارمندان",
-    attendance: "حاضری",
-    leave: "مدیریت رخصتی",
-    hrPayroll: "معاش‌پردازی",
-    hrReports: "گزارش‌ها",
-    profile: "پروفایل",
-    profileSub: "حساب و هویت",
-    logout: "خروج",
-    logoutSub: "خروج از فضای کاری",
-    theme: "تغییر تم",
-    language: "زبان",
-    collapseSidebar: "جمع کردن نوار کناری",
-    expandSidebar: "باز کردن نوار کناری",
-    print: "چاپ",
-    accessDenied: "دسترسی محدود",
-    accessMsg: "این حساب کارمند مجوز دسترسی به این ماژول را ندارد.",
-  },
-  ps: {
-    console: "د کارکوونکو کنسول",
-    workspace: "د کارکوونکو کاري فضا",
-    welcome: "ښه راغلاست،",
-    subtitle: "د پاکې کاري فضا او چټکې پلټنې سره عملیات اداره کړئ.",
-    search: "موډلونه، جدولونه ولټوئ...",
-    overview: "لنډه کتنه",
-    operations: "عملیات",
-    dashboard: "ډشبورډ",
-    registrar: "ثبتونکی / د زده‌کوونکو چارې",
-    admissions: "د زده‌کوونکو منل",
-    studentReg: "د زده‌کوونکو ثبت",
-    allStudents: "ټول زده‌کوونکي",
-    profiles: "د زده‌کوونکو پروفایلونه",
-    classAssign: "د ټولګي ټاکنه",
-    classMgmt: "د ټولګو اداره",
-    dataCorrection: "د معلوماتو سمون",
-    guardians: "د سرپرستانو اداره",
-    eduHistory: "تعلیمي تاریخچه",
-    documents: "د اسنادو اداره",
-    hostelMgmt: "د هاسټل اداره",
-    hostelRooms: "د هاسټل خونې",
-    roomAlloc: "د خونې تخصیص",
-    mealMgmt: "د ډوډۍ اداره",
-    reportsExport: "راپورونه او صادرول",
-    students: "زده‌کوونکي",
-    inventory: "موجودي",
-    library: "کتابتون",
-    categories: "کټګورۍ",
-    books: "کتابونه",
-    borrowed: "پور اخیستي",
-    purchases: "اخیستنې",
-    sales: "پلورنې",
-    reports: "راپورونه",
-    complaints: "شکایتونه",
-    compList: "د شکایتونو لیست",
-    actions: "اقدامات",
-    feedback: "نظرونه",
-    finance: "مالي",
-    transactions: "معاملې",
-    accounts: "حسابونه",
-    feeStructures: "د فیس جوړښت",
-    studentFees: "د زده‌کوونکو فیس",
-    feePayments: "د فیس تادیات",
-    expenses: "مصارف",
-    finReports: "مالي راپورونه",
-    payroll: "معاش ورکول",
-    salaryStructures: "د معاش جوړښت",
-    salaryPayments: "د معاش تادیات",
-    salaryDeductions: "د معاش کسرات",
-    salaryAdvances: "د معاش مخکینۍ تادیه",
-    kitchen: "پخلنځی",
-    kitInventory: "موجودي",
-    mealPlan: "د ډوډۍ پلان",
-    dailyPurchases: "ورځنۍ اخیستنې",
-    weeklyMenu: "اونیزه مینو",
-    suppliers: "عرضه کوونکي",
-    waste: "د ضایعاتو تعقیب",
-    budgetReq: "د بودجې غوښتنې",
-    hr: "بشري سرچینې",
-    departments: "څانګې",
-    designations: "رتبې",
-    leaveTypes: "د رخصتۍ ډولونه",
-    empReg: "د کارکوونکي ثبت",
-    employees: "کارکوونکي",
-    attendance: "حاضرري",
-    leave: "د رخصتۍ اداره",
-    hrPayroll: "معاش ورکول",
-    hrReports: "راپورونه",
-    profile: "پروفایل",
-    profileSub: "حساب او هویت",
-    logout: "وتل",
-    logoutSub: "له کاري فضا څخه وتل",
-    theme: "تیم بدل کړئ",
-    language: "ژبه",
-    collapseSidebar: "د اړخ پټۍ ټولول",
-    expandSidebar: "د اړخ پټۍ خلاصول",
-    print: "چاپ",
-    accessDenied: "لاسرسی محدود",
-    accessMsg: "د دې کارکوونکي حساب د دې ماژول لپاره اجازه نلري.",
-  },
-};
+
 
 const StaffPanelContent = () => {
   const navigate = useNavigate();
@@ -303,14 +58,21 @@ const StaffPanelContent = () => {
   const { calSys, setCalSys } = useCalendar();
   const [madrasaInfo] = useMadrasaInfo({ fetchRemote: true });
   const isRTL = lang === "dari" || lang === "ps";
-  const t = translations[lang] || translations.en;
+    const { t, i18n: i18nHook } = useTranslation(['staff', 'common', 'nav', 'app']);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [, forceReRender] = useState(0);
+
+  useEffect(() => {
+    const handler = () => forceReRender(v => v + 1);
+    i18nHook.on('languageChanged', handler);
+    return () => i18nHook.off('languageChanged', handler);
+  }, [i18nHook]);
 
   useEffect(() => {
     document.documentElement.dir = isRTL ? "rtl" : "ltr";
     document.documentElement.lang = lang;
-    localStorage.setItem("lang", lang);
-    i18n.changeLanguage(lang);
+    localStorage.setItem("lang", lang === 'dari' ? 'prs' : lang);
+    i18n.changeLanguage(lang === 'dari' ? 'prs' : lang);
     return () => {
       document.documentElement.dir = "ltr";
     };
@@ -350,166 +112,159 @@ const StaffPanelContent = () => {
       id: "dashboard",
       icon: <FiHome size={19} />,
       path: "dashboard",
-      label: t.dashboard,
+      label: t('dashboard'),
       type: "link",
     },
     {
       id: "print",
       icon: <FiPrinter size={19} />,
       path: "print/home",
-      label: t.print,
+      label: t('print'),
       type: "link",
     },
     {
       id: "registrar",
       icon: <FiAward size={19} />,
-      label: t.registrar,
+      label: t('registrar'),
       type: "dropdown",
       items: [
-        { id: "admissions", label: t.admissions, path: "registrar/admissions" },
+        { id: "admissions", label: t('admissions'), path: "registrar/admissions" },
         {
           id: "student-registration",
-          label: t.studentReg,
+          label: t('studentReg'),
           path: "registrar/student-registration",
         },
-        { id: "students", label: t.allStudents, path: "registrar/students" },
-        { id: "profiles", label: t.profiles, path: "registrar/profiles" },
+        { id: "students", label: t('allStudents'), path: "registrar/students" },
+        { id: "profiles", label: t('profiles'), path: "registrar/profiles" },
         {
           id: "class-assignment",
-          label: t.classAssign,
+          label: t('classAssign'),
           path: "registrar/class-assignment",
         },
         {
           id: "classes",
-          label: t.classMgmt,
+          label: t('classMgmt'),
           path: "registrar/classes",
         },
         {
           id: "data-correction",
-          label: t.dataCorrection,
+          label: t('dataCorrection'),
           path: "registrar/data-correction",
         },
-        { id: "guardians", label: t.guardians, path: "registrar/guardians" },
+        { id: "guardians", label: t('guardians'), path: "registrar/guardians" },
         {
           id: "education-history",
-          label: t.eduHistory,
+          label: t('eduHistory'),
           path: "registrar/education-history",
         },
-        { id: "documents", label: t.documents, path: "registrar/documents" },
-        { id: "hostel", label: t.hostelMgmt, path: "registrar/hostel" },
-        {
-          id: "hostel-rooms",
-          label: t.hostelRooms,
-          path: "registrar/hostel-rooms",
-        },
-        {
-          id: "hostel-allocations",
-          label: t.roomAlloc,
-          path: "registrar/hostel-allocations",
-        },
-        {
-          id: "hostel-meals",
-          label: t.mealMgmt,
-          path: "registrar/hostel-meals",
-        },
-        { id: "reports", label: t.reportsExport, path: "registrar/reports" },
+        { id: "documents", label: t('documents'), path: "registrar/documents" },
+        { id: "reports", label: t('reportsExport'), path: "registrar/reports" },
       ],
     },
     {
       id: "students",
       icon: <FiUsers size={19} />,
       path: "students",
-      label: t.students,
+      label: t('students'),
       type: "link",
     },
     {
       id: "inventory",
       icon: <FiPackage size={19} />,
       path: "inventory",
-      label: t.inventory,
+      label: t('inventory'),
       type: "link",
     },
     {
       id: "library",
       icon: <FiBookOpen size={19} />,
-      label: t.library,
+      label: t('library'),
       type: "dropdown",
       items: [
-        { id: "categories", label: t.categories, path: "library/categories" },
-        { id: "books", label: t.books, path: "library/books" },
-        { id: "borrowed", label: t.borrowed, path: "library/borrowed" },
-        { id: "purchases", label: t.purchases, path: "library/purchases" },
-        { id: "sales", label: t.sales, path: "library/sales" },
-        { id: "reports", label: t.reports, path: "library/reports" },
+        { id: "categories", label: t('categories'), path: "library/categories" },
+        { id: "books", label: t('books'), path: "library/books" },
+        { id: "borrowed", label: t('borrowed'), path: "library/borrowed" },
+        { id: "purchases", label: t('purchases'), path: "library/purchases" },
+        { id: "sales", label: t('sales'), path: "library/sales" },
+        { id: "reports", label: t('reports'), path: "library/reports" },
       ],
     },
     {
       id: "complaints",
       icon: <FiInbox size={19} />,
-      label: t.complaints,
+      label: t('complaints'),
       type: "dropdown",
       items: [
-        { id: "list", label: t.compList, path: "complaints" },
-        { id: "actions", label: t.actions, path: "complaints/actions" },
-        { id: "feedback", label: t.feedback, path: "complaints/feedback" },
-        { id: "reports", label: t.reports, path: "complaints/reports" },
+        { id: "list", label: t('compList'), path: "complaints" },
+        { id: "actions", label: t('actions'), path: "complaints/actions" },
+        { id: "feedback", label: t('feedback'), path: "complaints/feedback" },
+        { id: "reports", label: t('reports'), path: "complaints/reports" },
+      ],
+    },
+    {
+      id: "support",
+      icon: <FiInbox size={19} />,
+      label: t('support'),
+      type: "dropdown",
+      items: [
+        { id: "tickets", label: t('supportTickets'), path: "support/tickets" },
       ],
     },
     {
       id: "finance",
       icon: <FiBookOpen size={19} />,
-      label: t.finance,
+      label: t('finance'),
       type: "dropdown",
       items: [
         {
           id: "transactions",
-          label: t.transactions,
+          label: t('transactions'),
           path: "finance/transactions",
         },
-        { id: "accounts", label: t.accounts, path: "finance/accounts" },
+        { id: "accounts", label: t('accounts'), path: "finance/accounts" },
         {
           id: "fee-structures",
-          label: t.feeStructures,
+          label: t('feeStructures'),
           path: "finance/fee-structures",
         },
         {
           id: "student-fees",
-          label: t.studentFees,
+          label: t('studentFees'),
           path: "finance/student-fees",
         },
         {
           id: "fee-payments",
-          label: t.feePayments,
+          label: t('feePayments'),
           path: "finance/fee-payments",
         },
-        { id: "expenses", label: t.expenses, path: "finance/expenses" },
-        { id: "reports", label: t.finReports, path: "finance/reports" },
+        { id: "expenses", label: t('expenses'), path: "finance/expenses" },
+        { id: "reports", label: t('finReports'), path: "finance/reports" },
       ],
     },
     {
       id: "payroll",
       icon: <FiDollarSign size={19} />,
-      label: t.payroll,
+      label: t('payroll'),
       type: "dropdown",
       items: [
         {
           id: "salary-structures",
-          label: t.salaryStructures,
+          label: t('salaryStructures'),
           path: "payroll/salary-structures",
         },
         {
           id: "salary-payments",
-          label: t.salaryPayments,
+          label: t('salaryPayments'),
           path: "payroll/salary-payments",
         },
         {
           id: "salary-deductions",
-          label: t.salaryDeductions,
+          label: t('salaryDeductions'),
           path: "payroll/salary-deductions",
         },
         {
           id: "salary-advances",
-          label: t.salaryAdvances,
+          label: t('salaryAdvances'),
           path: "payroll/salary-advances",
         },
       ],
@@ -517,38 +272,38 @@ const StaffPanelContent = () => {
     {
       id: "kitchen",
       icon: <FiCoffee size={19} />,
-      label: t.kitchen,
+      label: t('kitchen'),
       type: "dropdown",
       items: [
-        { id: "inventory", label: t.kitInventory, path: "kitchen/inventory" },
-        { id: "meals", label: t.mealPlan, path: "kitchen/meals" },
-        { id: "dailyMenu", label: t.dailyPurchases, path: "kitchen/menu" },
-        { id: "weekly-menu", label: t.weeklyMenu, path: "kitchen/weekly-menu" },
-        { id: "suppliers", label: t.suppliers, path: "kitchen/suppliers" },
-        { id: "waste", label: t.waste, path: "kitchen/waste" },
-        { id: "requests", label: t.budgetReq, path: "kitchen/requests" },
-        { id: "reports", label: t.reports, path: "kitchen/reports" },
+        { id: "inventory", label: t('kitInventory'), path: "kitchen/inventory" },
+        { id: "meals", label: t('mealPlan'), path: "kitchen/meals" },
+        { id: "dailyMenu", label: t('dailyPurchases'), path: "kitchen/menu" },
+        { id: "weekly-menu", label: t('weeklyMenu'), path: "kitchen/weekly-menu" },
+        { id: "suppliers", label: t('suppliers'), path: "kitchen/suppliers" },
+        { id: "waste", label: t('waste'), path: "kitchen/waste" },
+        { id: "requests", label: t('budgetReq'), path: "kitchen/requests" },
+        { id: "reports", label: t('reports'), path: "kitchen/reports" },
       ],
     },
     {
       id: "hr",
       icon: <FiUsers size={19} />,
-      label: t.hr,
+      label: t('hr'),
       type: "dropdown",
       items: [
-        { id: "departments", label: t.departments, path: "hr/departments" },
-        { id: "designations", label: t.designations, path: "hr/designations" },
-        { id: "leave-types", label: t.leaveTypes, path: "hr/leave-types" },
+        { id: "departments", label: t('departments'), path: "hr/departments" },
+        { id: "designations", label: t('designations'), path: "hr/designations" },
+        { id: "leave-types", label: t('leaveTypes'), path: "hr/leave-types" },
         {
           id: "employee-registration",
-          label: t.empReg,
+          label: t('empReg'),
           path: "hr/employee-registration",
         },
-        { id: "employees", label: t.employees, path: "hr/employees" },
-        { id: "attendance", label: t.attendance, path: "hr/attendance" },
-        { id: "leave", label: t.leave, path: "hr/leave" },
-        { id: "payroll", label: t.hrPayroll, path: "hr/payroll" },
-        { id: "reports", label: t.hrReports, path: "hr/reports" },
+        { id: "employees", label: t('employees'), path: "hr/employees" },
+        { id: "attendance", label: t('attendance'), path: "hr/attendance" },
+        { id: "leave", label: t('leave'), path: "hr/leave" },
+        { id: "payroll", label: t('hrPayroll'), path: "hr/payroll" },
+        { id: "reports", label: t('hrReports'), path: "hr/reports" },
       ],
     },
   ];
@@ -578,7 +333,7 @@ const StaffPanelContent = () => {
 
     const heading = contentNode.querySelector("h1, h2, h3");
     return {
-      title: heading?.textContent?.trim() || t.print,
+      title: heading?.textContent?.trim() || t('print'),
       subtitle: "Current page capture",
       sections: [
         {
@@ -653,7 +408,7 @@ const StaffPanelContent = () => {
     });
 
     return () => window.cancelAnimationFrame(frameId);
-  }, [location.pathname, t.print]);
+  }, [location.pathname, t('print')]);
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
@@ -664,13 +419,31 @@ const StaffPanelContent = () => {
     navigate("/login");
   };
 
-  const groupedMenu = useMemo(
-    () => [
-      { title: t.overview, items: menuItems.slice(0, 5) },
-      { title: t.operations, items: menuItems.slice(5) },
-    ],
-    [menuItems, lang],
-  );
+  const currentSection = useMemo(() => {
+    const path = location.pathname.replace('/staff/', '');
+    if (!path || path === 'dashboard' || path.startsWith('print/')) return 'overview';
+    const sections = ['registrar', 'students', 'inventory', 'library', 'complaints', 'finance', 'payroll', 'kitchen', 'hr'];
+    return sections.find(s => path === s || path.startsWith(s + '/')) || 'overview';
+  }, [location.pathname]);
+
+  const groupedMenu = useMemo(() => {
+    const overviewItems = menuItems.slice(0, 5);
+    const operationItems = menuItems.slice(5);
+    if (currentSection === 'overview') {
+      return [
+        { title: t('overview'), items: overviewItems },
+        { title: t('operations'), items: operationItems },
+      ];
+    }
+    const sectionItem = operationItems.find(i => i.id === currentSection) || overviewItems.find(i => i.id === currentSection);
+    const isDropdown = sectionItem?.type === 'dropdown';
+    const baseItems = overviewItems.filter(i => i.id === 'dashboard' || i.id === 'print' || (!isDropdown && i.id === currentSection));
+    const groups = [{ title: t('overview'), items: baseItems }];
+    if (isDropdown && sectionItem) {
+      groups.push({ title: sectionItem.label, items: [sectionItem] });
+    }
+    return groups;
+  }, [menuItems, currentSection, lang]);
 
   const hasRouteAccess = !user || canAccessStaffPath(location.pathname, user);
 
@@ -690,9 +463,14 @@ const StaffPanelContent = () => {
               <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-500 via-sky-500 to-blue-600 text-lg font-bold text-white shadow-[0_12px_30px_-18px_rgba(14,165,233,0.9)]">
                 {getMadrasaLogo(madrasaInfo) ? (
                   <img
+                    key={getMadrasaLogo(madrasaInfo)}
                     src={getMadrasaLogo(madrasaInfo)}
                     alt={`${getMadrasaDisplayName(madrasaInfo)} logo`}
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.target.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="%2306b6d4"/><text x="24" y="30" text-anchor="middle" fill="white" font-size="20" font-weight="bold">' + (getMadrasaDisplayName(madrasaInfo)[0]?.toUpperCase() || 'M') + '</text></svg>');
+                      e.target.onerror = null;
+                    }}
                   />
                 ) : (
                   <span>
@@ -709,7 +487,7 @@ const StaffPanelContent = () => {
                   <div
                     className={`mt-1 text-lg font-semibold ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}
                   >
-                    {t.workspace}
+                    {t('workspace')}
                   </div>
                 </div>
               )}
@@ -834,10 +612,10 @@ const StaffPanelContent = () => {
               <button
                 onClick={() => setSidebarOpen(false)}
                 className={`group flex w-full items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition-all duration-200 ${theme === "dark" ? "border-slate-700/60 text-slate-400 hover:bg-slate-800 hover:text-slate-200" : "border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
-                title={t.collapseSidebar}
+                title={t('collapseSidebar')}
               >
                 <FiChevronLeft size={18} />
-                <span className="text-xs font-medium">{t.collapseSidebar}</span>
+                <span className="text-xs font-medium">{t('collapseSidebar')}</span>
               </button>
             </div>
           )}
@@ -846,7 +624,7 @@ const StaffPanelContent = () => {
               <button
                 onClick={() => setSidebarOpen(true)}
                 className={`flex h-10 w-10 items-center justify-center rounded-2xl border transition-all duration-200 ${theme === "dark" ? "border-slate-700/60 text-slate-400 hover:bg-slate-800 hover:text-slate-200" : "border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`}
-                title={t.expandSidebar}
+                title={t('expandSidebar')}
               >
                 <FiChevronRight size={18} />
               </button>
@@ -857,12 +635,12 @@ const StaffPanelContent = () => {
             className={`border-t p-3 ${theme === "dark" ? "border-slate-700/60" : "border-slate-200/80"}`}
           >
             <div
-              className={`rounded-3xl border bg-white/95 p-2 ${theme === "dark" ? "border-slate-700 bg-slate-800/95" : "border-slate-200"} ${sidebarOpen ? "" : "space-y-2"}`}
+              className={`rounded-3xl p-2 ${sidebarOpen ? "" : "space-y-2"}`}
             >
               <button
                 onClick={() => handleNavigation("profile")}
                 className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all duration-200 ${isActive("profile") ? (theme === "dark" ? "bg-gradient-to-r from-cyan-900/30 to-sky-900/30 text-cyan-300" : "bg-gradient-to-r from-cyan-50 to-sky-50 text-cyan-700") : theme === "dark" ? "text-slate-400 hover:bg-slate-700 hover:text-slate-200" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
-                title={!sidebarOpen ? "Profile" : ""}
+                title={!sidebarOpen ? t('profile') : ""}
               >
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${isActive("profile") ? "bg-cyan-600 text-white" : theme === "dark" ? "bg-slate-700 text-slate-400 group-hover:bg-cyan-900/50 group-hover:text-cyan-400" : "bg-slate-100 text-slate-500 group-hover:bg-cyan-100 group-hover:text-cyan-700"}`}
@@ -871,15 +649,15 @@ const StaffPanelContent = () => {
                 </span>
                 {sidebarOpen && (
                   <div>
-                    <p className="text-[13px] font-medium">{t.profile}</p>
-                    <p className="text-xs text-slate-400">{t.profileSub}</p>
+                    <p className="text-[13px] font-medium">{t('profile')}</p>
+                    <p className="text-xs text-slate-400">{t('profileSub')}</p>
                   </div>
                 )}
               </button>
               <button
                 onClick={handleLogout}
                 className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all duration-200 ${theme === "dark" ? "text-rose-400 hover:bg-rose-900/20 hover:text-rose-300" : "text-rose-600 hover:bg-rose-50 hover:text-rose-700"}`}
-                title={!sidebarOpen ? t.logout : ""}
+                title={!sidebarOpen ? t('logout') : ""}
               >
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all duration-200 ${theme === "dark" ? "bg-rose-900/30 text-rose-400 group-hover:bg-rose-900/50 group-hover:text-rose-300" : "bg-rose-50 text-rose-500 group-hover:bg-rose-100 group-hover:text-rose-600"}`}
@@ -888,8 +666,8 @@ const StaffPanelContent = () => {
                 </span>
                 {sidebarOpen && (
                   <div>
-                    <p className="text-[13px] font-medium">{t.logout}</p>
-                    <p className="text-xs text-rose-300">{t.logoutSub}</p>
+                    <p className="text-[13px] font-medium">{t('logout')}</p>
+                    <p className="text-xs text-rose-300">{t('logoutSub')}</p>
                   </div>
                 )}
               </button>
@@ -923,12 +701,12 @@ const StaffPanelContent = () => {
                 <p
                   className={`text-xs font-semibold uppercase tracking-[0.24em] ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`}
                 >
-                  {t.console}
+                  {t('console')}
                 </p>
                 <h1
                   className={`mt-1 text-lg font-semibold lg:text-xl ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}
                 >
-                  {t.welcome}{" "}
+                  {t('welcome')}{" "}
                   <span className="bg-gradient-to-r from-cyan-600 to-sky-600 bg-clip-text text-transparent">
                     {user?.name || "Staff"}
                   </span>
@@ -936,7 +714,7 @@ const StaffPanelContent = () => {
                 <p
                   className={`mt-1 text-xs lg:text-sm ${theme === "dark" ? "text-slate-500" : "text-slate-500"}`}
                 >
-                  {t.subtitle}
+                  {t('subtitle')}
                 </p>
               </div>
             </div>
@@ -948,14 +726,14 @@ const StaffPanelContent = () => {
                 <FiSearch className="mr-2 text-slate-400" size={18} />
                 <input
                   type="text"
-                  placeholder={t.search}
+                  placeholder={t('search')}
                   className={`w-48 bg-transparent text-sm outline-none ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}
                 />
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={toggleTheme}
-                  title={t.theme}
+                  title={t('theme')}
                   className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
                 >
                   {theme === "dark" ? (
@@ -964,19 +742,7 @@ const StaffPanelContent = () => {
                     <FiMoon size={19} />
                   )}
                 </button>
-                <button
-                  onClick={() => {
-                    const langs = ["en", "dari", "ps"];
-                    setLang(langs[(langs.indexOf(lang) + 1) % langs.length]);
-                  }}
-                  title={t.language}
-                  className={`flex h-11 items-center gap-1 rounded-2xl border px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
-                >
-                  <FiGlobe size={17} />
-                  <span className="text-xs font-semibold">
-                    {lang === "en" ? "EN" : lang === "dari" ? "دری" : "پښتو"}
-                  </span>
-                </button>
+                <LanguageSwitcher onChange={(code) => setLang(code === 'prs' ? 'dari' : code)} dark={theme === 'dark'} />
                 <button
                   onClick={() => {
                     const sys = [
@@ -1019,9 +785,9 @@ const StaffPanelContent = () => {
         isOpen={showLogoutConfirm}
         onClose={() => setShowLogoutConfirm(false)}
         onConfirm={confirmLogout}
-        title="Logout"
+        title={t('logout')}
         message="Are you sure you want to logout?"
-        confirmText="Logout"
+        confirmText={t('logout')}
         cancelText="Cancel"
       />
     </div>
