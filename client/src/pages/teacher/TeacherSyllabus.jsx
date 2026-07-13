@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
@@ -14,6 +15,7 @@ const MOCK = [
 ];
 
 const TeacherSyllabus = () => {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [classFilter, setClassFilter] = useState('');
@@ -59,18 +61,18 @@ const TeacherSyllabus = () => {
     <div className={PANEL_PAGE_BG}>
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Syllabus</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">View course syllabus and topics</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.syllabus.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.syllabus.subtitle')}</p>
         </div>
 
         <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           <div className="flex flex-wrap gap-4">
             <select value={classFilter} onChange={(e) => setClassFilter(e.target.value)} className={fieldCls}>
-              <option value="">All Classes</option>
+              <option value="">{t('teacher.syllabus.allClasses')}</option>
               {classes.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
             <select value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)} className={fieldCls}>
-              <option value="">All Subjects</option>
+              <option value="">{t('teacher.syllabus.allSubjects')}</option>
               {subjects.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
@@ -81,12 +83,12 @@ const TeacherSyllabus = () => {
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-700">
-                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Class</th>
-                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Subject</th>
-                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Topic</th>
-                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Description</th>
-                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Semester</th>
-                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Order</th>
+                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.syllabus.class')}</th>
+                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.syllabus.subject')}</th>
+                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.syllabus.topic')}</th>
+                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.syllabus.description')}</th>
+                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.syllabus.semester')}</th>
+                  <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.syllabus.order')}</th>
                 </tr>
               </thead>
               <tbody>

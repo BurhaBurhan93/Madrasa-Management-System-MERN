@@ -22,7 +22,7 @@ const AdminComplaintsResolved = () => {
   const [page, setPage] = useState(1);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
-  const categories = ['all', 'Academic', 'Discipline', 'Facilities', 'Hostel', 'Kitchen', 'Finance', 'Library', 'Other'];
+  const categories = ['all', 'catAcademic', 'catDiscipline', 'catFacilities', 'catHostel', 'catKitchen', 'catFinance', 'catLibrary', 'catOther'];
 
   useEffect(() => { const lang = readStoredLanguage('adminLang', 'en'); if (i18n.language !== lang) i18n.changeLanguage(lang); }, []);
 
@@ -80,15 +80,15 @@ const AdminComplaintsResolved = () => {
           <FiCheckCircle className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 p-5 text-white shadow-lg">
-          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.priority')} High</p><p className="mt-1 text-2xl font-bold">{highCount}</p></div>
+          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.priority')}: {t('common.high')}</p><p className="mt-1 text-2xl font-bold">{highCount}</p></div>
           <FiStar className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 p-5 text-white shadow-lg">
-          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.priority')} Medium</p><p className="mt-1 text-2xl font-bold">{mediumCount}</p></div>
+          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.priority')}: {t('common.medium')}</p><p className="mt-1 text-2xl font-bold">{mediumCount}</p></div>
           <FiStar className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-500 to-slate-600 p-5 text-white shadow-lg">
-          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.priority')} Low</p><p className="mt-1 text-2xl font-bold">{lowCount}</p></div>
+          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.priority')}: {t('common.low')}</p><p className="mt-1 text-2xl font-bold">{lowCount}</p></div>
           <FiMessageSquare className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
       </div>
@@ -98,7 +98,7 @@ const AdminComplaintsResolved = () => {
           <div className="flex-1"><Search value={searchTerm} onChange={setSearchTerm} placeholder={t('complaints.searchComplaints')} /></div>
           <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 shadow-sm">
             <option value="all">{t('complaints.allCategories')}</option>
-            {categories.filter(c => c !== 'all').map(cat => (<option key={cat} value={cat.toLowerCase()}>{t('complaints.' + cat.toLowerCase())}</option>))}
+            {categories.filter(c => c !== 'all').map(cat => (<option key={cat} value={cat.replace('cat', '').toLowerCase()}>{t('complaints.' + cat)}</option>))}
           </select>
         </div>
       </div>

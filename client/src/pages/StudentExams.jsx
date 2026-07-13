@@ -21,6 +21,7 @@ import Button from '../components/UIHelper/Button';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { BarChartComponent, PieChartComponent } from '../components/UIHelper/ECharts';
 import { formatDate } from '../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -42,6 +43,7 @@ const MOCK_RESULTS = [
 
 const StudentExams = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['student', 'common']);
   
   const [exams, setExams] = useState([]);
   const [examResults, setExamResults] = useState([]);
@@ -76,7 +78,7 @@ const StudentExams = () => {
       setSubmissions(submissionsData);
     } catch (err) {
       console.error('Error fetching exams:', err);
-      setError('Using offline data — API unavailable.');
+      setError(t('student.exams.offlineError'));
       setExams(MOCK_EXAMS);
     }
   };
@@ -89,7 +91,7 @@ const StudentExams = () => {
       setExamResults(resultsData.length > 0 ? resultsData : MOCK_RESULTS);
     } catch (err) {
       console.error('Error fetching exam results:', err);
-      setError('Using offline data — API unavailable.');
+      setError(t('student.exams.offlineError'));
       setExamResults(MOCK_RESULTS);
     } finally {
       setLoading(false);
@@ -134,14 +136,14 @@ const StudentExams = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Examinations</h1>
-          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Track upcoming tests and review your performance</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('student.academic')}</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('student.exams.title')}</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('student.exams.subtitle')}</p>
         </div>
         <div className="flex p-1 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl shadow-sm">
           {[
-            { id: 'upcoming', label: 'Upcoming', icon: <FiClock /> },
-            { id: 'past', label: 'Results', icon: <FiAward /> }
+            { id: 'upcoming', label: t('student.exams.upcoming'), icon: <FiClock /> },
+            { id: 'past', label: t('student.exams.results'), icon: <FiAward /> }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -166,10 +168,10 @@ const StudentExams = () => {
               <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
                 <FiClipboard className="w-5 h-5 text-cyan-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Total Exams</span>
+              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">{t('student.exams.totalExams')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900 dark:text-white">{examStats.totalExams}</p>
-            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Published exams</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{t('student.exams.publishedExams')}</p>
           </div>
         </Card>
 
@@ -180,10 +182,10 @@ const StudentExams = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                 <FiCheckCircle className="w-5 h-5 text-emerald-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Completed</span>
+              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">{t('common.completed')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{examStats.completed}</p>
-            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Exams taken</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{t('student.exams.examsTaken')}</p>
           </div>
         </Card>
 
@@ -194,10 +196,10 @@ const StudentExams = () => {
               <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <FiClock className="w-5 h-5 text-amber-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Upcoming</span>
+              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">{t('student.exams.upcoming')}</span>
             </div>
             <p className="text-3xl font-black text-amber-600">{examStats.upcoming}</p>
-            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Not yet attempted</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{t('student.exams.notAttempted')}</p>
           </div>
         </Card>
 
@@ -208,10 +210,10 @@ const StudentExams = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                 <FiTrendingUp className="w-5 h-5 text-purple-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Avg Score</span>
+              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">{t('student.exams.avgScore')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{examStats.avgScore}%</p>
-            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{examStats.passed} exams passed</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{t('student.exams.examsPassed', { count: examStats.passed })}</p>
           </div>
         </Card>
       </div>
@@ -219,18 +221,18 @@ const StudentExams = () => {
       {/* Charts Section */}
       {exams.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card title="Exam Status Distribution" className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('student.exams.statusDistribution')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <PieChartComponent
               data={[
-                { name: 'Upcoming', value: examStats.upcoming },
-                { name: 'Completed', value: examStats.completed },
-                { name: 'Missed', value: examStats.missed || 0 }
+                { name: t('student.exams.upcoming'), value: examStats.upcoming },
+                { name: t('common.completed'), value: examStats.completed },
+                { name: t('student.exams.missed'), value: examStats.missed || 0 }
               ].filter(item => item.value > 0)}
               height={300}
             />
           </Card>
 
-          <Card title="Exam Performance Overview" className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('student.exams.performanceOverview')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             {examResults.length > 0 ? (
               <BarChartComponent
                 data={examResults.slice(0, 6).map(result => ({
@@ -243,7 +245,7 @@ const StudentExams = () => {
               />
             ) : (
               <div className="h-[300px] flex items-center justify-center text-slate-400">
-                <p className="font-bold">No exam results yet</p>
+                <p className="font-bold">{t('student.exams.noResults')}</p>
               </div>
             )}
           </Card>
@@ -254,7 +256,7 @@ const StudentExams = () => {
         <div className="p-6 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 rounded-[32px] flex items-center gap-4 text-rose-600">
           <FiAlertCircle className="w-6 h-6 shrink-0" />
           <p className="font-bold">{error}</p>
-          <Button variant="outline" size="sm" className="ml-auto rounded-xl border-rose-200 text-rose-600" onClick={fetchExamResults}>Retry</Button>
+          <Button variant="outline" size="sm" className="ml-auto rounded-xl border-rose-200 text-rose-600" onClick={fetchExamResults}>{t('common.retry')}</Button>
         </div>
       )}
 
@@ -267,32 +269,32 @@ const StudentExams = () => {
                 <div className="p-8">
                   <div className="flex justify-between items-start mb-6">
                     <div>
-                      <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.2em] mb-1">{exam.course || exam.subject?.name || 'GENERAL'}</p>
+                      <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.2em] mb-1">{exam.course || exam.subject?.name || t('common.general')}</p>
                       <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{exam.title}</h3>
                     </div>
-                    <Badge variant="primary" className="px-3 py-1 font-black text-[10px] uppercase tracking-widest">LIVE</Badge>
+                    <Badge variant="primary" className="px-3 py-1 font-black text-[10px] uppercase tracking-widest">{t('student.exams.live')}</Badge>
                   </div>
 
                   <div className="grid grid-cols-2 gap-6 mb-8">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">Date & Time</p>
+                      <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('student.exams.dateTime')}</p>
                       <div className="flex items-center gap-2 text-sm font-black text-slate-700 dark:text-gray-300">
                         <FiCalendar className="text-cyan-500" />
-                        {exam.publishDate || exam.startDate ? formatDate(exam.publishDate || exam.startDate) : 'TBD'}
+                        {exam.publishDate || exam.startDate ? formatDate(exam.publishDate || exam.startDate) : t('student.exams.tbd')}
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">Duration</p>
+                      <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('student.exams.duration')}</p>
                       <div className="flex items-center gap-2 text-sm font-black text-slate-700 dark:text-gray-300">
                         <FiClock className="text-cyan-500" />
-                        {exam.duration} mins
+                        {exam.duration} {t('student.exams.minutes')}
                       </div>
                     </div>
                   </div>
 
                   <div className="p-4 bg-slate-50 dark:bg-gray-700/50 rounded-2xl border border-slate-100 dark:border-gray-700 mb-8">
                     <p className="text-xs font-medium text-slate-500 dark:text-gray-400 leading-relaxed italic line-clamp-2">
-                      {exam.description || "Comprehensive assessment covering current module objectives."}
+                      {      exam.description || t('student.exams.defaultDescription')}
                     </p>
                   </div>
 
@@ -303,11 +305,11 @@ const StudentExams = () => {
                         className="flex-1 rounded-2xl py-4 font-black text-xs uppercase tracking-widest bg-slate-900 hover:bg-slate-800 shadow-xl shadow-slate-200 dark:shadow-gray-900 flex items-center justify-center gap-2"
                         onClick={() => navigate(`/student/exams/${exam._id || exam.id}/attempt`)}
                       >
-                        Start Exam <FiArrowRight />
+                        {t('student.exams.startExam')} <FiArrowRight />
                       </Button>
                     ) : (
                       <div className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-emerald-50 text-emerald-600 font-black text-xs uppercase tracking-widest border border-emerald-100">
-                        <FiCheckCircle /> Already Submitted
+                        <FiCheckCircle /> {t('student.exams.alreadySubmitted')}
                       </div>
                     )}
                   </div>
@@ -319,8 +321,8 @@ const StudentExams = () => {
                 <div className="w-24 h-24 bg-slate-50 dark:bg-gray-800 rounded-[32px] flex items-center justify-center text-slate-200 dark:text-gray-600 text-5xl mx-auto mb-6 border border-slate-100 dark:border-gray-700">
                   <FiFileText />
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">No Upcoming Exams</h3>
-              <p className="text-slate-500 font-medium">Your examination schedule is currently clear.</p>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{t('student.exams.noUpcoming')}</h3>
+              <p className="text-slate-500 font-medium">{t('student.exams.noUpcomingDesc')}</p>
             </div>
           )}
         </div>
@@ -328,7 +330,7 @@ const StudentExams = () => {
 
       {activeTab === 'past' && (
         <div className="space-y-6">
-          <Card title="Academic Results" className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('student.exams.academicResults')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <div className="space-y-4">
               {examResults.length > 0 ? (
                 examResults.map((result, i) => (
@@ -338,16 +340,16 @@ const StudentExams = () => {
                         <FiAward />
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.2em] mb-1">{result.course?.name || 'Academic'}</p>
-                        <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{result.exam?.title || 'Examination'}</h4>
+                        <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.2em] mb-1">{result.course?.name || t('student.academic')}</p>
+                        <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{result.exam?.title || t('student.exams.fallbackTitle')}</h4>
                         <p className="text-xs font-bold text-slate-400 dark:text-gray-500">{formatDate(result.createdAt)}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-1">Score</p>
+                      <p className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-1">{t('student.exams.score')}</p>
                       <p className="text-2xl font-black text-slate-900 dark:text-white">{result.totalMarks > 0 ? Math.round((result.score / result.totalMarks) * 100) : 0}%</p>
                       <Badge variant={result.totalMarks > 0 && (result.score / result.totalMarks) >= 0.5 ? 'success' : 'danger'} className="mt-1">
-                        {result.totalMarks > 0 && (result.score / result.totalMarks) >= 0.5 ? 'PASSED' : 'FAILED'}
+                        {result.totalMarks > 0 && (result.score / result.totalMarks) >= 0.5 ? t('student.exams.passed') : t('student.exams.failed')}
                       </Badge>
                     </div>
                   </div>
@@ -355,7 +357,7 @@ const StudentExams = () => {
               ) : (
                 <div className="text-center py-20">
                   <FiAward className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No results published yet</p>
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('student.exams.noPublishedResults')}</p>
                 </div>
               )}
             </div>

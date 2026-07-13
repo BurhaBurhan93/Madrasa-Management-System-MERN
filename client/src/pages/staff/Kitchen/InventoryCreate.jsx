@@ -1,7 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import FormPage from '../shared/FormPage';
-import { inventoryConfig } from './Inventory';
+import { getInventoryConfig } from './Inventory';
 
-const InventoryCreate = () => <FormPage titleCreate="Create Inventory Item" titleEdit="Edit Inventory Item" endpoint={inventoryConfig.endpoint} formFields={inventoryConfig.formFields} initialForm={inventoryConfig.initialForm} mapRowToForm={inventoryConfig.mapRowToForm} mapFormToPayload={inventoryConfig.mapFormToPayload} mode="create" onSavedPath="/staff/kitchen/inventory" />;
+const InventoryCreate = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  const config = getInventoryConfig(t);
+  return <FormPage titleCreate={t('staff.kitchen.inventory.titleCreate', 'Create Inventory Item')} titleEdit={t('staff.kitchen.inventory.titleEdit', 'Edit Inventory Item')} endpoint={config.endpoint} formFields={config.formFields} initialForm={config.initialForm} mapRowToForm={config.mapRowToForm} mapFormToPayload={config.mapFormToPayload} mode="create" onSavedPath="/staff/kitchen/inventory" />;
+};
 
 export default InventoryCreate;

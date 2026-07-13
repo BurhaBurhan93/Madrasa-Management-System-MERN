@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import Card from '../../../components/UIHelper/Card';
 import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
@@ -50,6 +51,7 @@ export const complaintFeedbackConfig = {
 };
 
 const StaffComplaintFeedback = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [stats, setStats] = useState({
     totalFeedback: 0,
     averageSatisfaction: 0,
@@ -131,7 +133,7 @@ const StaffComplaintFeedback = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total Feedback</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.complaints.feedback.totalFeedback')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalFeedback}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -143,7 +145,7 @@ const StaffComplaintFeedback = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Avg Satisfaction</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.complaints.feedback.avgSatisfaction')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.averageSatisfaction}/5</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -155,7 +157,7 @@ const StaffComplaintFeedback = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">High Satisfaction</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.complaints.feedback.highSatisfaction')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.highSatisfaction}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
@@ -167,7 +169,7 @@ const StaffComplaintFeedback = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Needs Improvement</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.complaints.feedback.needsImprovement')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.lowSatisfaction}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -179,20 +181,20 @@ const StaffComplaintFeedback = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
-          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Satisfaction Distribution</h3>
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('staff.complaints.feedback.satisfactionDistribution')}</h3>
           {stats.bySatisfaction.length > 0 ? (
             <PieChartComponent data={stats.bySatisfaction} height={250} />
           ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
+            <p className="text-sm text-gray-500 text-center py-8">{t('common.noData')}</p>
           )}
         </Card>
         
         <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
-          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Monthly Feedback Trend</h3>
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('staff.complaints.feedback.monthlyTrend')}</h3>
           {stats.monthlyFeedback.length > 0 ? (
             <BarChartComponent data={stats.monthlyFeedback} dataKey="value" nameKey="name" height={250} />
           ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
+            <p className="text-sm text-gray-500 text-center py-8">{t('common.noData')}</p>
           )}
         </Card>
       </div>
@@ -202,12 +204,12 @@ const StaffComplaintFeedback = () => {
   if (loading) {
     return (
       <ListPage
-        eyebrow="Complaints" title="Complaint Feedback" subtitle="Manage feedback records with the same reusable complaints table and form system."
+        eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.feedback.title')} subtitle={t('staff.complaints.feedback.subtitle')}
         endpoint={complaintFeedbackConfig.endpoint} columns={complaintFeedbackConfig.columns}
         createPath="/staff/complaints/feedback/create"
         editPathForRow={(row) => `/staff/complaints/feedback/edit/${getId(row)}`}
         viewPathForRow={(row) => `/staff/complaints/feedback/view/${getId(row)}`}
-        searchPlaceholder="Search complaint feedback..." clientSidePagination={true}
+        searchPlaceholder={t('common.search', 'Search complaint feedback...')} clientSidePagination={true}
         headerContent={<PageSkeleton type="dashboard" />}
       />
     );
@@ -215,12 +217,12 @@ const StaffComplaintFeedback = () => {
 
   return (
     <ListPage
-      eyebrow="Complaints" title="Complaint Feedback" subtitle="Manage feedback records with the same reusable complaints table and form system."
+      eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.feedback.title')} subtitle={t('staff.complaints.feedback.subtitle')}
       endpoint={complaintFeedbackConfig.endpoint} columns={complaintFeedbackConfig.columns}
       createPath="/staff/complaints/feedback/create"
       editPathForRow={(row) => `/staff/complaints/feedback/edit/${getId(row)}`}
       viewPathForRow={(row) => `/staff/complaints/feedback/view/${getId(row)}`}
-      searchPlaceholder="Search complaint feedback..." clientSidePagination={true}
+      searchPlaceholder={t('common.search', 'Search complaint feedback...')} clientSidePagination={true}
       headerContent={headerContent}
     />
   );

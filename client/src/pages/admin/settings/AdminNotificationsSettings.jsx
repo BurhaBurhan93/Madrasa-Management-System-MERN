@@ -105,28 +105,28 @@ const AdminNotificationsSettings = () => {
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('settings.emailNotifications')}</h2>
           <Field label={t('settings.enableEmailNotifications')} name="enableEmail" type="checkbox" />
-          <Field label="SMTP Host" name="smtpHost" />
-          <Field label="SMTP Port" name="smtpPort" />
-          <Field label="SMTP User" name="smtpUser" />
-          <Field label="SMTP Password" name="smtpPass" type="password" />
+          <Field label={t('settings.smtpHost')} name="smtpHost" />
+          <Field label={t('settings.smtpPort')} name="smtpPort" />
+          <Field label={t('settings.smtpUser')} name="smtpUser" />
+          <Field label={t('settings.smtpPassword')} name="smtpPass" type="password" />
           <Field label={t('common.emailAddress')} name="fromEmail" type="email" />
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('settings.smsNotifications')}</h2>
           <Field label={t('settings.enableSmsNotifications')} name="enableSms" type="checkbox" />
-          <Field label={t('settings.smsProvider')} name="smsProvider" type="select" options={[{ value: 'twilio', label: 'Twilio' }, { value: 'nexmo', label: 'Vonage (Nexmo)' }, { value: 'plivo', label: 'Plivo' }]} />
-          <Field label="API Key" name="smsApiKey" />
+          <Field label={t('settings.smsProvider')} name="smsProvider" type="select" options={[{ value: 'twilio', label: t('settings.smsTwilio') }, { value: 'nexmo', label: t('settings.smsVonage') }, { value: 'plivo', label: t('settings.smsPlivo') }]} />
+          <Field label={t('settings.apiKey')} name="smsApiKey" />
           <Field label={t('settings.smsSenderId')} name="smsSenderId" />
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('settings.pushNotifications')}</h2>
           <Field label={t('settings.enablePushNotifications')} name="enablePush" type="checkbox" />
-          <Field label={t('settings.pushProvider')} name="pushProvider" type="select" options={[{ value: 'firebase', label: 'Firebase Cloud Messaging' }, { value: 'onesignal', label: 'OneSignal' }]} />
-          <Field label="API Key" name="pushApiKey" />
+          <Field label={t('settings.pushProvider')} name="pushProvider" type="select" options={[{ value: 'firebase', label: t('settings.pushFcm') }, { value: 'onesignal', label: t('settings.pushOneSignal') }]} />
+          <Field label={t('settings.apiKey')} name="pushApiKey" />
           <Field label={t('settings.enableWhatsApp')} name="enableWhatsApp" type="checkbox" />
-          <Field label="WhatsApp Business ID" name="whatsAppBusinessId" />
+          <Field label={t('settings.whatsappBusinessId')} name="whatsAppBusinessId" />
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

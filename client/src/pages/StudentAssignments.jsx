@@ -82,11 +82,11 @@ const StudentAssignments = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'submitted':
-        return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">Submitted</Badge>;
+        return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('student.assignments.statusSubmitted')}</Badge>;
       case 'pending':
-        return <Badge variant="primary" className="font-black uppercase tracking-widest text-[10px]">Pending</Badge>;
+        return <Badge variant="primary" className="font-black uppercase tracking-widest text-[10px]">{t('student.assignments.statusPending')}</Badge>;
       case 'overdue':
-        return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">Overdue</Badge>;
+        return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">{t('student.assignments.statusOverdue')}</Badge>;
       default:
         return <Badge className="font-black uppercase tracking-widest text-[10px]">{status}</Badge>;
     }
@@ -261,16 +261,16 @@ const StudentAssignments = () => {
                   <div className="flex-1 text-center md:text-left">
                     <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-2">{assignment.title}</h3>
                     <p className="text-slate-500 dark:text-gray-400 text-sm font-medium line-clamp-2 italic mb-4">
-                      {assignment.description || "Complete the exercises from chapter 4 and submit your reflections on the core concepts discussed in class."}
+                      {assignment.description || t('student.assignments.defaultDescription')}
                     </p>
                     <div className="flex flex-wrap justify-center md:justify-start gap-6">
                       <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
                         <FiCalendar className="text-cyan-500" />
-                        Due: {formatDate(assignment.dueDate)}
+                        {t('student.assignments.dueLabel')} {formatDate(assignment.dueDate)}
                       </div>
                       <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
                         <FiClock className="text-cyan-500" />
-                        Time: 11:59 PM
+                        {t('student.assignments.timeLabel')}
                       </div>
                     </div>
                   </div>

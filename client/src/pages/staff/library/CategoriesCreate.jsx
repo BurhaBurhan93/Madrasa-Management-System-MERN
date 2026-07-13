@@ -1,7 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import FormPage from '../shared/FormPage';
 import { libraryCategoriesConfig } from './Categories';
 
-const CategoriesCreate = () => <FormPage titleCreate="Create Category" titleEdit="Edit Category" endpoint={libraryCategoriesConfig.endpoint} formFields={libraryCategoriesConfig.formFields} initialForm={libraryCategoriesConfig.initialForm} mapRowToForm={libraryCategoriesConfig.mapRowToForm} mode="create" onSavedPath="/staff/library/categories" />;
+const CategoriesCreate = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  return <FormPage titleCreate={t('staff.library.categories.titleCreate')} titleEdit={t('staff.library.categories.titleEdit')} endpoint={libraryCategoriesConfig.endpoint} formFields={libraryCategoriesConfig.formFields} initialForm={libraryCategoriesConfig.initialForm} mapRowToForm={libraryCategoriesConfig.mapRowToForm} mode="create" onSavedPath="/staff/library/categories" />;
+};
 
 export default CategoriesCreate;

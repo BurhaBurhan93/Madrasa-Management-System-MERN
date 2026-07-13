@@ -8,6 +8,7 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { theme } from '../../theme';
+import { useTranslation } from 'react-i18next';
 
 // Default column definitions
 const defaultColDef = {
@@ -58,6 +59,7 @@ export const AgGridTable = ({
   emptyText = 'No data available',
   title,
 }) => {
+  const { t } = useTranslation();
   // Build column definitions
   const columnDefs = useMemo(() => {
     return columns.map(col => ({
@@ -116,10 +118,10 @@ export const AgGridTable = ({
     return () => (
       <div className="flex items-center justify-center h-full">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600">Loading...</span>
+        <span className="ml-3 text-gray-600">{t('common.loading')}</span>
       </div>
     );
-  }, []);
+  }, [t]);
 
   // No rows overlay
   const noRowsOverlayComponent = useMemo(() => {
@@ -140,17 +142,17 @@ export const AgGridTable = ({
   return (
     <div className={`bg-white/40 backdrop-blur-xl rounded-2xl shadow-md border border-white/60 overflow-hidden ${className}`}>
       {title && (
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-          {enableExport && (
+      <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+        {enableExport && (
             <button
-              onClick={() => onExportClick(gridRef.current?.api)}
-              className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            >
-              Export CSV
-            </button>
-          )}
-        </div>
+            onClick={() => onExportClick(gridRef.current?.api)}
+            className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          >
+            {t('common.exportCsv', { defaultValue: 'Export CSV' })}
+          </button>
+        )}
+      </div>
       )}
       <div
         className="ag-theme-alpine"
@@ -173,8 +175,8 @@ export const AgGridTable = ({
           onSelectionChanged={onSelectionChanged}
           loadingOverlayComponent={loadingOverlayComponent}
           noRowsOverlayComponent={noRowsOverlayComponent}
-          overlayLoadingTemplate={'<span class="ag-overlay-loading-center">Loading...</span>'}
-          overlayNoRowsTemplate={'<span class="ag-overlay-no-rows-center">No data</span>'}
+          overlayLoadingTemplate={`<span class="ag-overlay-loading-center">${t('common.loading')}</span>`}
+          overlayNoRowsTemplate={`<span class="ag-overlay-no-rows-center">${t('common.noData')}</span>`}
           animateRows={true}
           suppressCellFocus={false}
           enableCellTextSelection={true}

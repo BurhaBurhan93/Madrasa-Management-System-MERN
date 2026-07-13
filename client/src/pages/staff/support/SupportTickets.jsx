@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import Card from '../../../components/UIHelper/Card';
 import StaffPageLayout from '../shared/StaffPageLayout';
@@ -45,6 +46,7 @@ export const supportTicketsConfig = {
 };
 
 const SupportTickets = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +56,7 @@ const SupportTickets = () => {
         setLoading(true);
         const res = await apiFetch(`${supportTicketsConfig.endpoint}?limit=500`);
         const data = await parseJsonSafe(res);
-        if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load tickets');
+        if (!res.ok || !data.success) throw new Error(data.message || t('staff.support.tickets.loadError', 'Failed to load tickets'));
         setTickets(Array.isArray(data.data) ? data.data : []);
       } catch (e) { console.error(e); } finally { setLoading(false); }
     };
@@ -69,9 +71,17 @@ const SupportTickets = () => {
     return { openTickets, inProgress, resolved, highUrgent };
   }, [tickets]);
 
+  const translatedColumns = useMemo(() =>
+    supportTicketsConfig.columns.map(col => ({
+      ...col,
+      header: t(`staff.support.tickets.columns.${col.key}`, col.header),
+    })),
+    [t]
+  );
+
   if (loading) {
     return (
-      <StaffPageLayout eyebrow="Support" title="Support Tickets" subtitle="Manage student support tickets.">
+      <StaffPageLayout eyebrow={t('staff.support.tickets.eyebrow', 'Support')} title={t('staff.support.tickets.title', 'Support Tickets')} subtitle={t('staff.support.tickets.subtitle', 'Manage student support tickets.')}>
         <PageSkeleton type="dashboard" />
       </StaffPageLayout>
     );
@@ -81,10 +91,10 @@ const SupportTickets = () => {
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: 'Open Tickets', value: insights.openTickets, icon: FiClock, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700 dark:bg-slate-700 dark:text-slate-200' },
-          { label: 'In Progress', value: insights.inProgress, icon: FiTrendingUp, tone: 'from-blue-50 to-cyan-50', chip: 'bg-blue-100 text-blue-700 dark:bg-slate-700 dark:text-slate-200' },
-          { label: 'Resolved', value: insights.resolved, icon: FiCheckCircle, tone: 'from-green-50 to-emerald-50', chip: 'bg-green-100 text-green-700 dark:bg-slate-700 dark:text-slate-200' },
-          { label: 'High / Urgent', value: insights.highUrgent, icon: FiAlertCircle, tone: 'from-red-50 to-rose-50', chip: 'bg-red-100 text-red-700 dark:bg-slate-700 dark:text-slate-200' },
+          { label: t('staff.support.tickets.statOpen', 'Open Tickets'), value: insights.openTickets, icon: FiClock, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700 dark:bg-slate-700 dark:text-slate-200' },
+          { label: t('staff.support.tickets.statInProgress', 'In Progress'), value: insights.inProgress, icon: FiTrendingUp, tone: 'from-blue-50 to-cyan-50', chip: 'bg-blue-100 text-blue-700 dark:bg-slate-700 dark:text-slate-200' },
+          { label: t('staff.support.tickets.statResolved', 'Resolved'), value: insights.resolved, icon: FiCheckCircle, tone: 'from-green-50 to-emerald-50', chip: 'bg-green-100 text-green-700 dark:bg-slate-700 dark:text-slate-200' },
+          { label: t('staff.support.tickets.statHighUrgent', 'High / Urgent'), value: insights.highUrgent, icon: FiAlertCircle, tone: 'from-red-50 to-rose-50', chip: 'bg-red-100 text-red-700 dark:bg-slate-700 dark:text-slate-200' },
         ].map((item) => (
           <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none dark:border-slate-700 dark:bg-none dark:bg-slate-800/50`}>
             <div className="flex items-start justify-between gap-4">
@@ -102,15 +112,15 @@ const SupportTickets = () => {
 
   return (
     <ListPage
-      title={supportTicketsConfig.title}
-      subtitle={supportTicketsConfig.subtitle}
+      title={t('staff.support.tickets.title', supportTicketsConfig.title)}
+      subtitle={t('staff.support.tickets.subtitle', supportTicketsConfig.subtitle)}
       endpoint={supportTicketsConfig.endpoint}
-      columns={supportTicketsConfig.columns}
+      columns={translatedColumns}
       createPath="/staff/support/tickets/create"
       editPathForRow={(row) => `/staff/support/tickets/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/support/tickets/view/${row._id}`}
-      searchPlaceholder="Search tickets..."
-      eyebrow="Support"
+      searchPlaceholder={t('staff.support.tickets.searchPlaceholder', 'Search tickets...')}
+      eyebrow={t('staff.support.tickets.eyebrow', 'Support')}
       headerContent={headerContent}
       enableExport={true}
     />

@@ -23,11 +23,13 @@ import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { formatDate } from '../lib/utils';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { useTranslation } from 'react-i18next';
 
 
 
 const StudentSchedule = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['student', 'common']);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState('weekly');
   const [scheduleData, setScheduleData] = useState({
@@ -62,12 +64,12 @@ const StudentSchedule = () => {
         
         formattedSchedule[day].push({
           id: course._id || index,
-          course: course.name || course.subjectName || 'Academic Subject',
+          course: course.name || course.subjectName || t('student.academic'),
           time: course.startTime && course.endTime
             ? `${course.startTime} - ${course.endTime}`
-            : '09:00 AM - 10:30 AM',
-          room: 'Lecture Hall A',
-          instructor: course.teacher?.name || course.teacherName || 'Instructor',
+            : t('student.schedule.defaultTime'),
+          room: t('common.na'),
+          instructor: course.teacher?.name || course.teacherName || t('student.instructor'),
           type: index % 2 === 0 ? 'lecture' : 'tutorial'
         });
       });
@@ -76,11 +78,11 @@ const StudentSchedule = () => {
         // Use mock schedule data when API returns empty
         const mockDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
         const mockSchedule = {
-          monday: [{ id: 'm1', course: 'Advanced Mathematics', time: '09:00 AM - 10:30 AM', room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'lecture' }, { id: 'm2', course: 'Quranic Studies', time: '11:00 AM - 12:30 PM', room: 'Room 203', instructor: 'Sheikh Abdullah', type: 'tutorial' }],
-          tuesday: [{ id: 't1', course: 'Arabic Literature', time: '09:00 AM - 10:30 AM', room: 'Lecture Hall B', instructor: 'Prof. Fatima', type: 'lecture' }],
-          wednesday: [{ id: 'w1', course: 'Islamic History', time: '10:00 AM - 11:30 AM', room: 'Room 105', instructor: 'Dr. Hassan', type: 'lecture' }, { id: 'w2', course: 'Computer Science', time: '01:00 PM - 02:30 PM', room: 'Lab 3', instructor: 'Ms. Aisha', type: 'tutorial' }],
-          thursday: [{ id: 'th1', course: 'English Language', time: '08:00 AM - 09:30 AM', room: 'Lecture Hall C', instructor: 'Mr. John', type: 'lecture' }],
-          friday: [{ id: 'f1', course: 'Advanced Mathematics', time: '09:00 AM - 10:00 AM', room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'tutorial' }]
+          monday: [{ id: 'm1', course: 'Advanced Mathematics', time: t('student.schedule.mockTime1'), room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'lecture' }, { id: 'm2', course: 'Quranic Studies', time: t('student.schedule.mockTime2'), room: 'Room 203', instructor: 'Sheikh Abdullah', type: 'tutorial' }],
+          tuesday: [{ id: 't1', course: 'Arabic Literature', time: t('student.schedule.mockTime3'), room: 'Lecture Hall B', instructor: 'Prof. Fatima', type: 'lecture' }],
+          wednesday: [{ id: 'w1', course: 'Islamic History', time: t('student.schedule.mockTime4'), room: 'Room 105', instructor: 'Dr. Hassan', type: 'lecture' }, { id: 'w2', course: 'Computer Science', time: t('student.schedule.mockTime5'), room: 'Lab 3', instructor: 'Ms. Aisha', type: 'tutorial' }],
+          thursday: [{ id: 'th1', course: 'English Language', time: t('student.schedule.mockTime6'), room: 'Lecture Hall C', instructor: 'Mr. John', type: 'lecture' }],
+          friday: [{ id: 'f1', course: 'Advanced Mathematics', time: t('student.schedule.mockTime7'), room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'tutorial' }]
         };
         setScheduleData(mockSchedule);
       } else {
@@ -88,8 +90,8 @@ const StudentSchedule = () => {
       }
     } catch (err) {
       console.error('[StudentSchedule] Error fetching schedule:', err);
-      setError('Using offline data — API unavailable.');
-      setScheduleData({ monday: [{ id: 'm1', course: 'Advanced Mathematics', time: '09:00 AM - 10:30 AM', room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'lecture' }], tuesday: [], wednesday: [], thursday: [], friday: [] });
+      setError(t('student.schedule.offlineError'));
+      setScheduleData({ monday: [{ id: 'm1', course: 'Advanced Mathematics', time: t('student.schedule.defaultTime'), room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'lecture' }], tuesday: [], wednesday: [], thursday: [], friday: [] });
     } finally {
       setLoading(false);
     }
@@ -124,29 +126,28 @@ const StudentSchedule = () => {
   };
 
   const handleExport = () => {
-    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
     const tableData = [];
 
     days.forEach((day, i) => {
       (scheduleData[day] || []).forEach(item => {
-        tableData.push([dayNames[i], item.course, item.time, item.room, item.instructor, item.type]);
+        tableData.push([t('common.' + day), item.course, item.time, item.room, item.instructor, t('student.schedule.' + item.type, item.type)]);
       });
     });
 
     const doc = new jsPDF({ orientation: 'landscape' });
     doc.setFontSize(18);
-    doc.text('Class Schedule', 14, 20);
+    doc.text(t('student.schedule.pdfTitle'), 14, 20);
     doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
+    doc.text(`${t('student.schedule.pdfGenerated')}: ${new Date().toLocaleDateString()}`, 14, 28);
     autoTable(doc, {
       startY: 34,
-      head: [['Day', 'Course', 'Time', 'Room', 'Instructor', 'Type']],
+      head: [[t('common.day'), t('common.course'), t('common.time'), t('student.schedule.pdfRoom'), t('student.instructor'), t('student.schedule.pdfType')]],
       body: tableData,
       styles: { fontSize: 9 },
       headStyles: { fillColor: [14, 165, 233] },
     });
-    doc.save('class-schedule.pdf');
+    doc.save(t('student.schedule.pdfFileName'));
   };
 
   if (loading) {
@@ -154,20 +155,20 @@ const StudentSchedule = () => {
   }
 
   const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const dayNames = [t('common.monday'), t('common.tuesday'), t('common.wednesday'), t('common.thursday'), t('common.friday')];
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500 dark:text-gray-100">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Class Schedule</h1>
-          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Manage and view your academic commitments</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('student.academic')}</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('student.schedule.title')}</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('student.schedule.subtitle')}</p>
         </div>
         <div className="flex gap-3">
           <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2" onClick={handleExport}>
-            <FiDownload /> Export Schedule
+            <FiDownload /> {t('student.exportSchedule')}
           </Button>
         </div>
       </div>
@@ -181,7 +182,7 @@ const StudentSchedule = () => {
               viewMode === 'weekly' ? 'bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-lg' : 'text-slate-400 dark:text-gray-500 hover:text-slate-600'
             }`}
           >
-            <FiGrid /> Weekly
+            <FiGrid /> {t('student.schedule.weekly')}
           </button>
           <button
             onClick={() => setViewMode('daily')}
@@ -189,7 +190,7 @@ const StudentSchedule = () => {
               viewMode === 'daily' ? 'bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-lg' : 'text-slate-400 dark:text-gray-500 hover:text-slate-600'
             }`}
           >
-            <FiList /> Daily
+            <FiList /> {t('student.schedule.daily')}
           </button>
         </div>
 
@@ -199,7 +200,7 @@ const StudentSchedule = () => {
           </button>
           <div className="text-center min-w-[240px]">
             <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.3em] mb-1">
-              {viewMode === 'weekly' ? 'Selected Week' : 'Selected Day'}
+              {viewMode === 'weekly' ? t('student.schedule.selectedWeek') : t('student.schedule.selectedDay')}
             </p>
               <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
               {viewMode === 'weekly' 
@@ -214,7 +215,7 @@ const StudentSchedule = () => {
         </div>
 
         <div className="hidden lg:flex items-center gap-2 pr-4">
-          <Badge variant="success" className="font-black px-4 py-2">Normal Schedule</Badge>
+          <Badge variant="success" className="font-black px-4 py-2">{t('student.schedule.normalSchedule')}</Badge>
         </div>
       </div>
 
@@ -223,7 +224,7 @@ const StudentSchedule = () => {
         {daysOfWeek.map((day, index) => (
           <div key={day} className={`space-y-6 ${viewMode === 'daily' && dayNames[index] !== selectedDate.toLocaleDateString('en-US', { weekday: 'long' }) ? 'hidden' : ''} ${viewMode === 'daily' ? 'lg:col-span-5' : ''}`}>
             <div className="text-center lg:text-left px-2">
-              <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{dayNames[index]}</h3>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('common.' + daysOfWeek[index])}</h3>
               <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mt-1">
                 {getCurrentWeekDates()[index].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </p>
@@ -237,7 +238,7 @@ const StudentSchedule = () => {
                       <div className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest ${
                         item.type === 'lecture' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
                       }`}>
-                        {item.type}
+                        {t('student.schedule.' + item.type, item.type)}
                       </div>
                       <FiClock className="text-slate-200 group-hover:text-cyan-500 transition-colors" />
                     </div>
@@ -260,7 +261,7 @@ const StudentSchedule = () => {
               ) : (
                 <div className="py-12 flex flex-col items-center justify-center text-center bg-slate-50/50 dark:bg-gray-800/50 rounded-[32px] border border-dashed border-slate-200 dark:border-gray-700 opacity-60">
                   <FiActivity className="w-10 h-10 text-slate-200 dark:text-gray-600 mb-2" />
-                  <p className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">Free Day</p>
+                  <p className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('student.schedule.freeDay')}</p>
                 </div>
               )}
             </div>
@@ -275,8 +276,8 @@ const StudentSchedule = () => {
             <FiInfo />
           </div>
           <div>
-            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1">Room Changes</h4>
-            <p className="text-slate-500 dark:text-gray-400 font-medium">Any sudden room or schedule changes will be highlighted in orange. Stay alert for push notifications.</p>
+            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1">{t('student.schedule.roomChanges')}</h4>
+            <p className="text-slate-500 dark:text-gray-400 font-medium">{t('student.schedule.roomChangesDesc')}</p>
           </div>
         </Card>
 
@@ -285,8 +286,8 @@ const StudentSchedule = () => {
             <FiCheckCircle />
           </div>
           <div>
-            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1">Academic Support</h4>
-            <p className="text-slate-500 dark:text-gray-400 font-medium">Missing a class? You can find lecture recordings and materials in the Learning Resources section.</p>
+            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1">{t('student.schedule.academicSupport')}</h4>
+            <p className="text-slate-500 dark:text-gray-400 font-medium">{t('student.schedule.academicSupportDesc')}</p>
           </div>
         </Card>
       </div>

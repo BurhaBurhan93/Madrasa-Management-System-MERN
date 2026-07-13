@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ListPage from '../shared/ListPage';
@@ -74,6 +75,7 @@ export const studentsConfig = {
 };
 
 const StudentsList = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const navigate = useNavigate();
   const [studentStats, setStudentStats] = useState({
     total: 0,
@@ -113,9 +115,13 @@ const StudentsList = () => {
     return <PageSkeleton variant="dashboard" />;
   }
 
+  const columns = studentsConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.registrar.studentsList.columns.${col.key}`)
+  }));
+
   return (
     <div className="space-y-6">
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
@@ -124,10 +130,10 @@ const StudentsList = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-xl">👥</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Students</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentsList.stats.totalStudents')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">{studentStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">All students</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentsList.stats.allStudents')}</p>
           </div>
         </Card>
 
@@ -138,10 +144,10 @@ const StudentsList = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <span className="text-xl">✅</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Active</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentsList.stats.active')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{studentStats.active}</p>
-            <p className="text-sm text-slate-500 mt-1">Currently active</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentsList.stats.currentlyActive')}</p>
           </div>
         </Card>
 
@@ -152,10 +158,10 @@ const StudentsList = () => {
               <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
                 <span className="text-xl">⏸️</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Inactive</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentsList.stats.inactive')}</span>
             </div>
             <p className="text-3xl font-black text-gray-600">{studentStats.inactive}</p>
-            <p className="text-sm text-slate-500 mt-1">Not active</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentsList.stats.notActive')}</p>
           </div>
         </Card>
 
@@ -166,33 +172,29 @@ const StudentsList = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <span className="text-xl">🏠</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Hostel Residents</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentsList.stats.hostelResidents')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{studentStats.hostelResidents}</p>
-            <p className="text-sm text-slate-500 mt-1">Living in hostel</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentsList.stats.livingInHostel')}</p>
           </div>
         </Card>
       </div>
 
-      {/* Status Distribution Chart */}
-      <Card title="Student Status Distribution" className="max-w-2xl">
-        <PieChartComponent
-          data={[
-            { name: 'Active', value: studentStats.active },
-            { name: 'Inactive', value: studentStats.inactive }
-          ].filter(item => item.value > 0)}
-          height={250}
-        />
+      <Card title={t('staff.registrar.studentsList.charts.studentStatusDistribution')} className="max-w-2xl">
+        <PieChartComponent data={[
+          { name: t('staff.registrar.studentsList.charts.active'), value: studentStats.active },
+          { name: t('staff.registrar.studentsList.charts.inactive'), value: studentStats.inactive }
+        ].filter(item => item.value > 0)} height={250} />
       </Card>
 
-      {/* Students List */}
       <ListPage 
         {...studentsConfig} 
+        columns={columns}
         createPath="/staff/registrar/student-registration"
         editPathForRow={(row) => `/staff/registrar/students/edit/${row._id}`}
         viewPathForRow={(row) => `/staff/registrar/students/view/${row._id}`}
         deleteEnabled={true}
-        eyebrow="Registrar"
+        eyebrow={t('staff.registrar.studentsList.eyebrow')}
         enableExport={true}
       />
     </div>

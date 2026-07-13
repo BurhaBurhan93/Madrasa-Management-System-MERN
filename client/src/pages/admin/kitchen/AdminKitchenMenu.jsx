@@ -102,7 +102,7 @@ const AdminKitchenMenu = () => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.weekStart')}</label><CalendarDatePicker value={form.weekStartDate} onChange={(date) => setForm({ ...form, weekStartDate: date })} required /></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.weekEnd')}</label><CalendarDatePicker value={form.weekEndDate} onChange={(date) => setForm({ ...form, weekEndDate: date })} required /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.day')}</label><select value={form.day} onChange={e => setForm({ ...form, day: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">{DAYS.map(d => <option key={d} value={d}>{d}</option>)}</select></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.day')}</label><select value={form.day} onChange={e => setForm({ ...form, day: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">{DAYS.map(d => <option key={d} value={d}>{t('common.' + d.toLowerCase()) || d}</option>)}</select></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.mealType')}</label><select value={form.mealType} onChange={e => setForm({ ...form, mealType: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">{MEAL_TYPES.map(m => <option key={m} value={m}>{t(`kitchen.${m}`)}</option>)}</select></div>
             <div className="md:col-span-2"><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.menuItems')}</label><input value={form.menuItems} onChange={e => setForm({ ...form, menuItems: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder={t('kitchen.menuItemsHint')} /></div>
             <div className="md:col-span-3"><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.notes')}</label><textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" rows={2} /></div>
@@ -115,7 +115,7 @@ const AdminKitchenMenu = () => {
         <div className="flex items-center gap-2">
           <select value={dayFilter} onChange={e => setDayFilter(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
             <option value="">{t('kitchen.allDays')}</option>
-            {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
+            {DAYS.map(d => <option key={d} value={d}>{t('common.' + d.toLowerCase()) || d}</option>)}
           </select>
         </div>
         <div className="flex gap-2 items-center">
@@ -133,7 +133,7 @@ const AdminKitchenMenu = () => {
             <div key={item._id} className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg transition-shadow min-w-0">
               <div className="flex justify-between items-start mb-3 gap-2">
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-slate-900">{item.day || '-'} - {t(`kitchen.${item.mealType}`) || item.mealType}</h3>
+                  <h3 className="font-semibold text-slate-900">{item.day || '-'} - {t(`kitchen.${item.mealType}`) || item.mealType || t('common.na')}</h3>
                   <p className="text-xs text-slate-400">{item.weekStartDate ? new Date(item.weekStartDate).toLocaleDateString() : ''} - {item.weekEndDate ? new Date(item.weekEndDate).toLocaleDateString() : ''}</p>
                 </div>
               </div>
@@ -165,7 +165,7 @@ const AdminKitchenMenu = () => {
                 {items.map(item => (
                   <tr key={item._id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="px-5 py-3 font-medium text-slate-800">{item.day || '-'}</td>
-                    <td className="px-5 py-3 text-slate-600">{t(`kitchen.${item.mealType}`) || item.mealType}</td>
+                    <td className="px-5 py-3 text-slate-600">{t(`kitchen.${item.mealType}`) || item.mealType || t('common.na')}</td>
                     <td className="px-5 py-3 text-slate-600 truncate max-w-[200px]" title={Array.isArray(item.menuItems) ? item.menuItems.join(', ') : item.menuItems}>{Array.isArray(item.menuItems) ? item.menuItems.join(', ') : item.menuItems || '-'}</td>
                     <td className="px-5 py-3 text-slate-600 whitespace-nowrap">{item.weekStartDate ? new Date(item.weekStartDate).toLocaleDateString() : '-'}</td>
                     <td className="px-5 py-3"><div className="flex gap-1">

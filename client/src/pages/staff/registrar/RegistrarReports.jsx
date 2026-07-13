@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import api from "../../../lib/api";
@@ -14,6 +15,7 @@ import {
 const defaultPeriodFilters = getDefaultPeriodFilters();
 
 const RegistrarReports = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [filters, setFilters] = useState({
     status: "",
     period: "monthly",
@@ -53,7 +55,7 @@ const RegistrarReports = () => {
       const res = await api.get(`/student/reports?${params}`);
       setReport(res.data.data);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to generate report");
+      setError(err.response?.data?.message || t('staff.registrar.registrarReports.errors.generateFailed'));
     } finally {
       setLoading(false);
     }
@@ -63,32 +65,32 @@ const RegistrarReports = () => {
     if (!report?.students?.length) return;
     const doc = new jsPDF({ orientation: "landscape" });
     doc.setFontSize(18);
-    doc.text("Registrar Report", 14, 20);
+    doc.text(t('staff.registrar.registrarReports.pdf.title'), 14, 20);
     doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
+    doc.text(`${t('staff.registrar.registrarReports.pdf.generated')}: ${new Date().toLocaleDateString()}`, 14, 28);
 
     let y = 38;
     doc.setFontSize(12);
-    doc.text("Summary", 14, y);
+    doc.text(t('staff.registrar.registrarReports.pdf.summary'), 14, y);
     y += 8;
     doc.setFontSize(10);
-    doc.text(`Total Students: ${report.stats?.totalStudents || 0}`, 14, y);
+    doc.text(`${t('staff.registrar.registrarReports.pdf.totalStudents')}: ${report.stats?.totalStudents || 0}`, 14, y);
     y += 7;
-    doc.text(`Active: ${report.stats?.activeStudents || 0}`, 14, y);
+    doc.text(`${t('staff.registrar.registrarReports.pdf.active')}: ${report.stats?.activeStudents || 0}`, 14, y);
     y += 7;
-    doc.text(`Inactive: ${report.stats?.inactiveStudents || 0}`, 14, y);
+    doc.text(`${t('staff.registrar.registrarReports.pdf.inactive')}: ${report.stats?.inactiveStudents || 0}`, 14, y);
     y += 7;
-    doc.text(`Classes: ${Object.keys(report.stats?.byClass || {}).length}`, 14, y);
+    doc.text(`${t('staff.registrar.registrarReports.pdf.classes')}: ${Object.keys(report.stats?.byClass || {}).length}`, 14, y);
     y += 12;
 
     const classEntries = Object.entries(report.stats?.byClass || {});
     if (classEntries.length > 0) {
       doc.setFontSize(12);
-      doc.text("Class Distribution", 14, y);
+      doc.text(t('staff.registrar.registrarReports.pdf.classDistribution'), 14, y);
       y += 8;
       autoTable(doc, {
         startY: y,
-        head: [["Class", "Count"]],
+        head: [[t('staff.registrar.registrarReports.pdf.class'), t('staff.registrar.registrarReports.pdf.count')]],
         body: classEntries.map(([cls, count]) => [cls, String(count)]),
         styles: { fontSize: 8 },
         headStyles: { fillColor: [6, 182, 212] },
@@ -112,7 +114,7 @@ const RegistrarReports = () => {
     autoTable(doc, {
       startY: y,
       head: [
-        ["#", "Code", "Name", "Father Name", "Class", "Status", "Admission Date"],
+        [t('staff.registrar.registrarReports.pdf.hash'), t('staff.registrar.registrarReports.pdf.code'), t('staff.registrar.registrarReports.pdf.name'), t('staff.registrar.registrarReports.pdf.fatherName'), t('staff.registrar.registrarReports.pdf.class'), t('staff.registrar.registrarReports.pdf.status'), t('staff.registrar.registrarReports.pdf.admissionDate')],
       ],
       body: tableData,
       styles: { fontSize: 7 },
@@ -136,7 +138,7 @@ const RegistrarReports = () => {
         : "",
     ]);
     const csv = [
-      ["Code", "Name", "Father Name", "Class", "Status", "Admission Date"],
+      [t('staff.registrar.registrarReports.csv.code'), t('staff.registrar.registrarReports.csv.name'), t('staff.registrar.registrarReports.csv.fatherName'), t('staff.registrar.registrarReports.csv.class'), t('staff.registrar.registrarReports.csv.status'), t('staff.registrar.registrarReports.csv.admissionDate')],
       ...rows,
     ]
       .map((row) => row.join(","))
@@ -153,22 +155,22 @@ const RegistrarReports = () => {
   const statCards = report
     ? [
         {
-          label: "Total Students",
+          label: t('staff.registrar.registrarReports.statCards.totalStudents'),
           value: report.stats?.totalStudents || 0,
           color: "from-cyan-500 to-sky-500",
         },
         {
-          label: "Active",
+          label: t('staff.registrar.registrarReports.statCards.active'),
           value: report.stats?.activeStudents || 0,
           color: "from-emerald-500 to-emerald-600",
         },
         {
-          label: "Inactive",
+          label: t('staff.registrar.registrarReports.statCards.inactive'),
           value: report.stats?.inactiveStudents || 0,
           color: "from-amber-500 to-amber-600",
         },
         {
-          label: "Classes",
+          label: t('staff.registrar.registrarReports.statCards.classes'),
           value: Object.keys(report.stats?.byClass || {}).length,
           color: "from-violet-500 to-violet-600",
         },
@@ -177,8 +179,8 @@ const RegistrarReports = () => {
 
   return (
     <StaffPageLayout
-      title="Registrar Reports"
-      subtitle="Generate and export student reports with daily, weekly, monthly, or custom date filters."
+      title={t('staff.registrar.registrarReports.title')}
+      subtitle={t('staff.registrar.registrarReports.subtitle')}
       actions={
         report && (
           <div className="flex gap-2">
@@ -200,7 +202,7 @@ const RegistrarReports = () => {
                 <polyline points="4 7 7.5 10 11 7" />
                 <path d="M2 13h11" />
               </svg>
-              Export PDF
+              {t('staff.registrar.registrarReports.exportPdf')}
             </button>
             <button
               onClick={exportCSV}
@@ -220,7 +222,7 @@ const RegistrarReports = () => {
                 <polyline points="4 7 7.5 10 11 7" />
                 <path d="M2 13h11" />
               </svg>
-              Export CSV
+              {t('staff.registrar.registrarReports.exportCsv')}
             </button>
           </div>
         )
@@ -230,49 +232,49 @@ const RegistrarReports = () => {
         <div className="h-1 w-full rounded-t-2xl bg-gradient-to-r from-cyan-500 to-sky-500" />
         <div className="p-6">
           <h2 className="mb-4 text-base font-semibold text-slate-900">
-            Report Filters
+            {t('staff.registrar.registrarReports.filters.title')}
           </h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Status
+                {t('staff.registrar.registrarReports.filters.status')}
               </label>
               <select
                 value={filters.status}
                 onChange={(e) => set("status", e.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
               >
-                <option value="">All</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="">{t('staff.registrar.registrarReports.filters.all')}</option>
+                <option value="active">{t('staff.registrar.registrarReports.filters.active')}</option>
+                <option value="inactive">{t('staff.registrar.registrarReports.filters.inactive')}</option>
               </select>
             </div>
 
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Period
+                {t('staff.registrar.registrarReports.filters.period')}
               </label>
               <select
                 value={filters.period}
                 onChange={(e) => set("period", e.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
               >
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="custom">Custom Range</option>
+                <option value="daily">{t('staff.registrar.registrarReports.filters.daily')}</option>
+                <option value="weekly">{t('staff.registrar.registrarReports.filters.weekly')}</option>
+                <option value="monthly">{t('staff.registrar.registrarReports.filters.monthly')}</option>
+                <option value="custom">{t('staff.registrar.registrarReports.filters.customRange')}</option>
               </select>
             </div>
 
             {filters.period === "daily" && (
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Date
+                  {t('staff.registrar.registrarReports.filters.date')}
                 </label>
                 <CalendarDatePicker
                   value={filters.date}
                   onChange={(date) => set("date", date)}
-                  placeholder="Select date"
+                  placeholder={t('staff.registrar.registrarReports.filters.selectDate')}
                 />
               </div>
             )}
@@ -280,7 +282,7 @@ const RegistrarReports = () => {
             {filters.period === "weekly" && (
               <div className="space-y-1.5 md:col-span-2">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Week
+                  {t('staff.registrar.registrarReports.filters.week')}
                 </label>
                 <input
                   type="week"
@@ -294,7 +296,7 @@ const RegistrarReports = () => {
             {filters.period === "monthly" && (
               <div className="space-y-1.5 md:col-span-2">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Month
+                  {t('staff.registrar.registrarReports.filters.month')}
                 </label>
                 <input
                   type="month"
@@ -309,22 +311,22 @@ const RegistrarReports = () => {
               <>
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Start Date
+                    {t('staff.registrar.registrarReports.filters.startDate')}
                   </label>
                   <CalendarDatePicker
                     value={filters.startDate}
                     onChange={(date) => set("startDate", date)}
-                    placeholder="Select date"
+                    placeholder={t('staff.registrar.registrarReports.filters.selectDate')}
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    End Date
+                    {t('staff.registrar.registrarReports.filters.endDate')}
                   </label>
                   <CalendarDatePicker
                     value={filters.endDate}
                     onChange={(date) => set("endDate", date)}
-                    placeholder="Select date"
+                    placeholder={t('staff.registrar.registrarReports.filters.selectDate')}
                   />
                 </div>
               </>
@@ -351,7 +353,7 @@ const RegistrarReports = () => {
                   <path d="M7 2a5 5 0 0 1 5 5" strokeLinecap="round" />
                 </svg>
               )}
-              {loading ? "Generating..." : "Generate Report"}
+              {loading ? t('staff.registrar.registrarReports.generating') : t('staff.registrar.registrarReports.generateReport')}
             </button>
           </div>
         </div>
@@ -375,7 +377,7 @@ const RegistrarReports = () => {
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="border-b border-slate-100 px-5 py-4">
                 <h2 className="text-base font-semibold text-slate-900">
-                  Class Distribution
+                  {t('staff.registrar.registrarReports.classDistribution')}
                 </h2>
               </div>
               <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-3 lg:grid-cols-4">
@@ -399,10 +401,10 @@ const RegistrarReports = () => {
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="border-b border-slate-100 px-5 py-4">
               <h2 className="text-base font-semibold text-slate-900">
-                Student List
+                {t('staff.registrar.registrarReports.studentList')}
               </h2>
               <p className="mt-0.5 text-xs text-slate-500">
-                {report.students?.length || 0} records
+                {report.students?.length || 0} {t('staff.registrar.registrarReports.records')}
               </p>
             </div>
             <div className="overflow-x-auto">
@@ -410,13 +412,13 @@ const RegistrarReports = () => {
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50">
                     {[
-                      "#",
-                      "Code",
-                      "Name",
-                      "Father Name",
-                      "Class",
-                      "Status",
-                      "Admission Date",
+                      t('staff.registrar.registrarReports.table.hash'),
+                      t('staff.registrar.registrarReports.table.code'),
+                      t('staff.registrar.registrarReports.table.name'),
+                      t('staff.registrar.registrarReports.table.fatherName'),
+                      t('staff.registrar.registrarReports.table.class'),
+                      t('staff.registrar.registrarReports.table.status'),
+                      t('staff.registrar.registrarReports.table.admissionDate'),
                     ].map((heading) => (
                       <th
                         key={heading}
@@ -448,13 +450,13 @@ const RegistrarReports = () => {
                         {student.fatherName || "—"}
                       </td>
                       <td className="px-4 py-3 text-slate-700">
-                        {student.currentClass?.name || student.currentClass?.className || "Not Assigned"}
+                        {student.currentClass?.name || student.currentClass?.className || t('staff.registrar.registrarReports.notAssigned')}
                       </td>
                       <td className="px-4 py-3">
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${student.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}
                         >
-                          {student.status || "N/A"}
+                          {student.status || t('staff.registrar.registrarReports.na')}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-slate-700">
@@ -486,9 +488,9 @@ const RegistrarReports = () => {
             <line x1="14" y1="20" x2="26" y2="20" />
             <line x1="14" y1="26" x2="20" y2="26" />
           </svg>
-          <p className="mt-3 text-sm font-medium">No report generated yet</p>
+          <p className="mt-3 text-sm font-medium">{t('staff.registrar.registrarReports.noReport')}</p>
           <p className="mt-1 text-xs">
-            Set your filters and click Generate Report
+            {t('staff.registrar.registrarReports.noReportHint')}
           </p>
         </div>
       )}

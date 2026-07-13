@@ -69,7 +69,7 @@ const TeacherView = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-900">{teacher.fullName}</h1>
-              <p className="text-slate-500">{t('users.teacher')} · {teacher.employeeCode || t('common.na')} · <span className={teacher.status === 'active' ? 'text-green-600' : 'text-red-600'}>{teacher.status}</span></p>
+              <p className="text-slate-500">{t('users.teacher')} <span className="mx-1 text-slate-300">·</span> {teacher.employeeCode || t('common.na')} <span className="mx-1 text-slate-300">·</span> <span className={teacher.status === 'active' ? 'text-green-600' : 'text-red-600'}>{t('common.' + teacher.status) || teacher.status}</span></p>
             </div>
           </div>
         </div>
@@ -83,7 +83,7 @@ const TeacherView = () => {
           <DetailRow label={t('users.employmentType')} value={teacher.employmentType} />
           <DetailRow label={t('users.shiftTiming')} value={teacher.shiftTiming} />
           <DetailRow label={t('users.reportingManager')} value={teacher.reportingManager?.fullName || t('common.na')} />
-          <DetailRow label={t('users.status')} value={teacher.status} />
+          <DetailRow label={t('users.status')} value={t('common.' + teacher.status) || teacher.status} />
           <DetailRow label={t('users.previousExperience')} value={teacher.previousExperience ? t('users.years', { value: teacher.previousExperience }) : t('common.na')} />
         </Section>
 

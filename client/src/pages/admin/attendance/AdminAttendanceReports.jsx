@@ -111,7 +111,7 @@ const AdminAttendanceReports = () => {
   const exportPDF = () => {
     try {
       const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-      const pageTitle = `${t('attendance.reports')} - ${filter.period.toUpperCase()}`;
+      const pageTitle = `${t('attendance.reports')} - ${t('attendance.' + filter.period)}`;
       doc.setFontSize(16);
       doc.text(pageTitle, 14, 20);
       doc.setFontSize(10);
@@ -129,7 +129,7 @@ const AdminAttendanceReports = () => {
             const rate = total > 0 ? Math.round((present / total) * 100) : 0;
             return [row.employee?.fullName || '-', row.employee?.employeeCode || '-', present, absent, late, `${rate}%`];
           })
-        : [['-', '-', '0', '0', '0', '0%']];
+        : [[t('common.na'), t('common.na'), '0', '0', '0', '0%']];
       autoTable(doc, {
         startY: 35,
         head: [headRow],
@@ -138,7 +138,7 @@ const AdminAttendanceReports = () => {
         headStyles: { fillColor: [79, 70, 229], textColor: 255, fontStyle: 'bold' },
         alternateRowStyles: { fillColor: [245, 247, 250] },
       });
-      doc.save(`Attendance_Report_${filter.period}.pdf`);
+      doc.save(`${t('attendance.reportFilename').replace('{date}', filter.period)}.pdf`);
     } catch (err) {
       console.error('PDF Export Error:', err);
       alert(`Export failed: ${err.message}`);
@@ -272,7 +272,7 @@ const AdminAttendanceReports = () => {
               const excused = getCount(row.statuses, "excused");
               const total = present + absent + late + excused;
               const rowRate = total > 0 ? Math.round((present / total) * 100) : 0;
-              const initial = row.employee?.fullName?.charAt(0) || '?';
+              const initial = row.employee?.fullName?.charAt(0) || t('common.na') || '?';
               return (
                 <tr key={row._id || index} className="border-t border-gray-100 transition-colors hover:bg-indigo-50/40">
                   <td className="px-5 py-4">

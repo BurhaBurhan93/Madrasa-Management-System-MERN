@@ -1,11 +1,14 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import RecordViewPage from '../shared/RecordViewPage';
-import { wasteConfig } from './WasteTracking';
+import { getWasteConfig } from './WasteTracking';
 
 const WasteTrackingView = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title="Waste Record Details" subtitle={wasteConfig.subtitle} endpoint={wasteConfig.endpoint} id={id} fields={wasteConfig.formFields} listPath="/staff/kitchen/waste" editPath={`/staff/kitchen/waste/edit/${id}`} readMode="collection" readEndpoint={wasteConfig.endpoint} />;
+  const config = getWasteConfig(t);
+  return <RecordViewPage title={t('staff.kitchen.wasteTracking.viewTitle', 'Waste Record Details')} subtitle={config.subtitle} endpoint={config.endpoint} id={id} fields={config.formFields} listPath="/staff/kitchen/waste" editPath={`/staff/kitchen/waste/edit/${id}`} readMode="collection" readEndpoint={config.endpoint} />;
 };
 
 export default WasteTrackingView;

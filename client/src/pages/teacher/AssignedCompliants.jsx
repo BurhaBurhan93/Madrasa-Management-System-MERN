@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FiEye, FiCheck, FiPlus, FiEdit2, FiTrash2, FiMessageSquare } from 'react-icons/fi';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
@@ -13,7 +14,6 @@ const priorityColors = {
   medium: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   low: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
 };
-const categories = ['Academic', 'Facilities', 'Student Behavior', 'Staff', 'Safety', 'Other'];
 const fieldCls = 'w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200';
 const labelCls = 'mb-1.5 block text-xs font-semibold text-slate-500 dark:text-slate-400';
 
@@ -24,6 +24,7 @@ const MOCK = [
 ];
 
 const AssignedComplaints = () => {
+  const { t } = useTranslation();
   const [complaints, setComplaints] = useState([]);
   const [selected, setSelected] = useState(null);
   const [filterStatus, setFilterStatus] = useState('');
@@ -36,6 +37,10 @@ const AssignedComplaints = () => {
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackRating, setFeedbackRating] = useState(3);
   const [form, setForm] = useState({ subject: '', description: '', complaintCategory: 'Academic', priorityLevel: 'medium' });
+  const catLabels = { Academic: t('teacher.assignedComplaints.catAcademic'), Facilities: t('teacher.assignedComplaints.catFacilities'), 'Student Behavior': t('teacher.assignedComplaints.catStudentBehavior'), Staff: t('teacher.assignedComplaints.catStaff'), Safety: t('teacher.assignedComplaints.catSafety'), Other: t('teacher.assignedComplaints.catOther') };
+  const categories = [catLabels.Academic, catLabels.Facilities, catLabels['Student Behavior'], catLabels.Staff, catLabels.Safety, catLabels.Other];
+  const priorityLabels = { high: t('teacher.assignedComplaints.priorityHigh'), medium: t('teacher.assignedComplaints.priorityMedium'), low: t('teacher.assignedComplaints.priorityLow') };
+  const statusLabels = { open: t('teacher.assignedComplaints.open'), in_progress: t('teacher.assignedComplaints.inProgress'), closed: t('teacher.assignedComplaints.closed') };
 
   useEffect(() => { fetchComplaints(); }, []);
 
@@ -50,7 +55,7 @@ const AssignedComplaints = () => {
   };
 
   const handleCreate = async () => {
-    if (!form.subject.trim()) { alert('Subject is required'); return; }
+    if (!form.subject.trim()) {       alert(t('teacher.assignedComplaints.subjectRequired')); return; }
     try {
       const res = await apiFetch('/teacher/complaints', {
         method: 'POST',
@@ -59,8 +64,8 @@ const AssignedComplaints = () => {
       });
       const data = await parseJsonSafe(res);
       if (data.success) { setShowForm(false); setForm({ subject: '', description: '', complaintCategory: 'Academic', priorityLevel: 'medium' }); fetchComplaints(); }
-      else alert(data.message || 'Failed to create');
-    } catch { alert('Failed to create complaint'); }
+      else alert(data.message || t('teacher.assignedComplaints.createFailed'));
+    } catch { alert(t('teacher.assignedComplaints.createFailed')); }
   };
 
   const handleEdit = async () => {
@@ -73,18 +78,18 @@ const AssignedComplaints = () => {
       });
       const data = await parseJsonSafe(res);
       if (data.success) { setEditingComplaint(null); setShowForm(false); fetchComplaints(); }
-      else alert(data.message || 'Failed to update');
-    } catch { alert('Failed to update complaint'); }
+      else alert(data.message || t('teacher.assignedComplaints.updateFailed'));
+    } catch { alert(t('teacher.assignedComplaints.updateFailed')); }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this complaint?')) return;
+    if (!confirm(t('teacher.assignedComplaints.deleteConfirm'))) return;
     try {
       const res = await apiFetch('/teacher/complaints/' + id, { method: 'DELETE' });
       const data = await parseJsonSafe(res);
       if (data.success) fetchComplaints();
-      else alert(data.message || 'Failed to delete');
-    } catch { alert('Failed to delete complaint'); }
+      else alert(data.message || t('teacher.assignedComplaints.deleteFailed'));
+    } catch { alert(t('teacher.assignedComplaints.deleteFailed')); }
   };
 
   const updateStatus = async (id, status) => {
@@ -96,7 +101,7 @@ const AssignedComplaints = () => {
       });
       const data = await parseJsonSafe(res);
       if (data.success) { fetchComplaints(); setSelected(null); }
-    } catch { alert('Failed to update status'); }
+    } catch { alert(t('teacher.assignedComplaints.updateStatusFailed')); }
   };
 
   const openFeedback = async (complaint) => {
@@ -122,16 +127,16 @@ const AssignedComplaints = () => {
         setFeedbackRating(3);
         openFeedback(feedbackModal);
       }
-    } catch { alert('Failed to submit feedback'); }
+    } catch { alert(t('teacher.assignedComplaints.feedbackFailed')); }
   };
 
   const deleteFeedback = async (id) => {
-    if (!confirm('Delete this feedback?')) return;
+    if (!confirm(t('teacher.assignedComplaints.deleteFeedbackConfirm'))) return;
     try {
       const res = await apiFetch('/teacher/complaint-feedback/' + id, { method: 'DELETE' });
       const data = await parseJsonSafe(res);
       if (data.success && feedbackModal) openFeedback(feedbackModal);
-    } catch { alert('Failed to delete feedback'); }
+    } catch { alert(t('teacher.assignedComplaints.deleteFeedbackFailed')); }
   };
 
   const openEditForm = (c) => {
@@ -166,21 +171,21 @@ const AssignedComplaints = () => {
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Assigned Complaints</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage and respond to assigned complaints</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.assignedComplaints.title')}</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.assignedComplaints.subtitle')}</p>
           </div>
           <button onClick={openCreateForm} className="flex items-center gap-2 rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-cyan-700">
-            <FiPlus size={16} /> Add Complaint
+            <FiPlus size={16} /> {t('teacher.assignedComplaints.addComplaint')}
           </button>
         </div>
 
         {/* Stats */}
         <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
-            { label: 'Total', value: stats.total, accent: 'bg-cyan-500' },
-            { label: 'Open', value: stats.open, accent: 'bg-rose-500' },
-            { label: 'In Progress', value: stats.inProgress, accent: 'bg-amber-500' },
-            { label: 'Closed', value: stats.closed, accent: 'bg-emerald-500' },
+            { label: t('common.total'), value: stats.total, accent: 'bg-cyan-500' },
+            { label: t('teacher.assignedComplaints.open'), value: stats.open, accent: 'bg-rose-500' },
+            { label: t('teacher.assignedComplaints.inProgress'), value: stats.inProgress, accent: 'bg-amber-500' },
+            { label: t('teacher.assignedComplaints.closed'), value: stats.closed, accent: 'bg-emerald-500' },
           ].map(c => (
             <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
               <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
@@ -193,12 +198,12 @@ const AssignedComplaints = () => {
         {/* Filters */}
         <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           <div className="flex flex-wrap gap-3">
-            <input type="text" placeholder="Search complaints..." value={search} onChange={e => setSearch(e.target.value)} className="flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" />
+            <input type="text" placeholder={t('teacher.assignedComplaints.searchPlaceholder')} value={search} onChange={e => setSearch(e.target.value)} className="flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" />
             <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-cyan-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
-              <option value="">All Status</option>
-              <option value="open">Open</option>
-              <option value="in_progress">In Progress</option>
-              <option value="closed">Closed</option>
+              <option value="">{t('teacher.assignedComplaints.allStatus')}</option>
+              <option value="open">{t('teacher.assignedComplaints.open')}</option>
+              <option value="in_progress">{t('teacher.assignedComplaints.inProgress')}</option>
+              <option value="closed">{t('teacher.assignedComplaints.closed')}</option>
             </select>
           </div>
         </div>
@@ -209,14 +214,14 @@ const AssignedComplaints = () => {
             <div className="flex h-32 items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-500 dark:border-slate-700 dark:border-t-cyan-400" /></div>
           ) : filtered.length === 0 ? (
             <div className="px-4 py-12 text-center text-sm text-slate-500 dark:text-slate-400">
-              <div className="mx-auto w-fit rounded-2xl border border-dashed border-slate-200 px-6 py-4 dark:border-slate-700">No complaints found</div>
+              <div className="mx-auto w-fit rounded-2xl border border-dashed border-slate-200 px-6 py-4 dark:border-slate-700">{t('teacher.assignedComplaints.noComplaints')}</div>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-700/50">
-                    {['Code', 'Subject', 'Category', 'Priority', 'Status', 'Date', 'Actions'].map(h => (
+                    {[t('teacher.assignedComplaints.code'), t('teacher.assignedComplaints.subject'), t('teacher.assignedComplaints.category'), t('teacher.assignedComplaints.priority'), t('common.status'), t('common.date'), t('common.actions')].map(h => (
                       <th key={h} className="whitespace-nowrap px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{h}</th>
                     ))}
                   </tr>
@@ -226,18 +231,18 @@ const AssignedComplaints = () => {
                     <tr key={c._id} className="transition hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
                       <td className="px-4 py-3 font-medium text-cyan-600 dark:text-cyan-400">{c.complaintCode}</td>
                       <td className="px-4 py-3 text-slate-700 dark:text-slate-100">{c.subject}</td>
-                      <td className="px-4 py-3"><span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">{c.complaintCategory || '-'}</span></td>
-                      <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityColors[c.priorityLevel]}`}>{c.priorityLevel}</span></td>
-                      <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[c.complaintStatus]}`}>{c.complaintStatus?.replace('_', ' ')}</span></td>
+                      <td className="px-4 py-3"><span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">{catLabels[c.complaintCategory] || c.complaintCategory || '-'}</span></td>
+                      <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityColors[c.priorityLevel]}`}>{priorityLabels[c.priorityLevel] || c.priorityLevel}</span></td>
+                      <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[c.complaintStatus]}`}>{statusLabels[c.complaintStatus] || c.complaintStatus}</span></td>
                       <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">{formatDate(c.submittedDate)}</td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1.5">
-                          <button onClick={() => setSelected(c)} title="View" className="flex h-8 w-8 items-center justify-center rounded-xl border border-sky-200 bg-sky-50 text-sky-600 transition hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-400"><FiEye size={14} /></button>
-                          <button onClick={() => openFeedback(c)} title="Feedback" className="flex h-8 w-8 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 text-violet-600 transition hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-900/30 dark:text-violet-400"><FiMessageSquare size={14} /></button>
-                          <button onClick={() => openEditForm(c)} title="Edit" className="flex h-8 w-8 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600 transition hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400"><FiEdit2 size={14} /></button>
-                          <button onClick={() => handleDelete(c._id)} title="Delete" className="flex h-8 w-8 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600 transition hover:bg-rose-100 dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-400"><FiTrash2 size={14} /></button>
+                          <button onClick={() => setSelected(c)} title={t('teacher.assignedComplaints.view')} className="flex h-8 w-8 items-center justify-center rounded-xl border border-sky-200 bg-sky-50 text-sky-600 transition hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-400"><FiEye size={14} /></button>
+                          <button onClick={() => openFeedback(c)} title={t('teacher.assignedComplaints.feedback')} className="flex h-8 w-8 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 text-violet-600 transition hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-900/30 dark:text-violet-400"><FiMessageSquare size={14} /></button>
+                          <button onClick={() => openEditForm(c)} title={t('teacher.assignedComplaints.edit')} className="flex h-8 w-8 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600 transition hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400"><FiEdit2 size={14} /></button>
+                          <button onClick={() => handleDelete(c._id)} title={t('teacher.assignedComplaints.delete')} className="flex h-8 w-8 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600 transition hover:bg-rose-100 dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-400"><FiTrash2 size={14} /></button>
                           {c.complaintStatus !== 'closed' && (
-                            <button onClick={() => updateStatus(c._id, 'closed')} title="Resolve" className="flex h-8 w-8 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-600 transition hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"><FiCheck size={14} /></button>
+                            <button onClick={() => updateStatus(c._id, 'closed')} title={t('teacher.assignedComplaints.resolve')} className="flex h-8 w-8 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-600 transition hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"><FiCheck size={14} /></button>
                           )}
                         </div>
                       </td>
@@ -259,23 +264,23 @@ const AssignedComplaints = () => {
               <button onClick={() => setSelected(null)} className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700">×</button>
             </div>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between"><span className="text-slate-400">Code:</span><span className="font-medium text-slate-700 dark:text-slate-100">{selected.complaintCode}</span></div>
-              <div className="flex justify-between"><span className="text-slate-400">Category:</span><span className="font-medium text-slate-700 dark:text-slate-100">{selected.complaintCategory || '-'}</span></div>
-              <div className="flex justify-between"><span className="text-slate-400">Priority:</span><span className={`rounded-full px-3 py-0.5 text-xs font-medium ${priorityColors[selected.priorityLevel]}`}>{selected.priorityLevel}</span></div>
-              <div className="flex justify-between"><span className="text-slate-400">Status:</span><span className={`rounded-full px-3 py-0.5 text-xs font-medium ${statusColors[selected.complaintStatus]}`}>{selected.complaintStatus?.replace('_', ' ')}</span></div>
-              <div className="flex justify-between"><span className="text-slate-400">Date:</span><span className="font-medium text-slate-700 dark:text-slate-100">{formatDate(selected.submittedDate)}</span></div>
-              {selected.closedAt && <div className="flex justify-between"><span className="text-slate-400">Closed:</span><span className="font-medium text-slate-700 dark:text-slate-100">{formatDate(selected.closedAt)}</span></div>}
+              <div className="flex justify-between"><span className="text-slate-400">{t('teacher.assignedComplaints.code')}:</span><span className="font-medium text-slate-700 dark:text-slate-100">{selected.complaintCode}</span></div>
+              <div className="flex justify-between"><span className="text-slate-400">{t('teacher.assignedComplaints.category')}:</span><span className="font-medium text-slate-700 dark:text-slate-100">{catLabels[selected.complaintCategory] || selected.complaintCategory || '-'}</span></div>
+              <div className="flex justify-between"><span className="text-slate-400">{t('teacher.assignedComplaints.priority')}:</span><span className={`rounded-full px-3 py-0.5 text-xs font-medium ${priorityColors[selected.priorityLevel]}`}>{priorityLabels[selected.priorityLevel] || selected.priorityLevel}</span></div>
+              <div className="flex justify-between"><span className="text-slate-400">{t('common.status')}:</span><span className={`rounded-full px-3 py-0.5 text-xs font-medium ${statusColors[selected.complaintStatus]}`}>{statusLabels[selected.complaintStatus] || selected.complaintStatus}</span></div>
+              <div className="flex justify-between"><span className="text-slate-400">{t('common.date')}:</span><span className="font-medium text-slate-700 dark:text-slate-100">{formatDate(selected.submittedDate)}</span></div>
+              {selected.closedAt && <div className="flex justify-between"><span className="text-slate-400">{t('teacher.assignedComplaints.closed')}:</span><span className="font-medium text-slate-700 dark:text-slate-100">{formatDate(selected.closedAt)}</span></div>}
               <div>
-                <p className="mb-2 text-slate-400">Description:</p>
-                <p className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-slate-600 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-300">{selected.description || 'No description'}</p>
+                <p className="mb-2 text-slate-400">{t('teacher.assignedComplaints.description')}:</p>
+                <p className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-slate-600 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-300">{selected.description || t('teacher.assignedComplaints.noDescription')}</p>
               </div>
             </div>
             {selected.complaintStatus !== 'closed' && (
               <div className="mt-5 flex justify-end gap-3">
                 {selected.complaintStatus === 'open' && (
-                  <button onClick={() => updateStatus(selected._id, 'in_progress')} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">Mark In Progress</button>
+                  <button onClick={() => updateStatus(selected._id, 'in_progress')} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">{t('teacher.assignedComplaints.markInProgress')}</button>
                 )}
-                <button onClick={() => updateStatus(selected._id, 'closed')} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700">Mark Resolved</button>
+                <button onClick={() => updateStatus(selected._id, 'closed')} className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700">{t('teacher.assignedComplaints.markResolved')}</button>
               </div>
             )}
           </div>
@@ -287,36 +292,36 @@ const AssignedComplaints = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm">
           <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-800">
             <div className="mb-5 flex items-start justify-between">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{editingComplaint ? 'Edit Complaint' : 'New Complaint'}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{editingComplaint ? t('teacher.assignedComplaints.editComplaint') : t('teacher.assignedComplaints.newComplaint')}</h2>
               <button onClick={() => { setShowForm(false); setEditingComplaint(null); }} className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700">×</button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className={labelCls}>Subject *</label>
-                <input value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} className={fieldCls} placeholder="Complaint subject" />
+                <label className={labelCls}>{t('teacher.assignedComplaints.subject')} *</label>
+                <input value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} className={fieldCls} placeholder={t('teacher.assignedComplaints.subjectPlaceholder')} />
               </div>
               <div>
-                <label className={labelCls}>Category</label>
+                <label className={labelCls}>{t('teacher.assignedComplaints.category')}</label>
                 <select value={form.complaintCategory} onChange={e => setForm({ ...form, complaintCategory: e.target.value })} className={fieldCls}>
                   {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Priority</label>
+                <label className={labelCls}>{t('teacher.assignedComplaints.priority')}</label>
                 <select value={form.priorityLevel} onChange={e => setForm({ ...form, priorityLevel: e.target.value })} className={fieldCls}>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
+                  <option value="low">{t('teacher.assignedComplaints.priorityLow')}</option>
+                  <option value="medium">{t('teacher.assignedComplaints.priorityMedium')}</option>
+                  <option value="high">{t('teacher.assignedComplaints.priorityHigh')}</option>
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Description</label>
-                <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className={fieldCls} rows={3} placeholder="Describe the complaint..." />
+                <label className={labelCls}>{t('teacher.assignedComplaints.description')}</label>
+                <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className={fieldCls} rows={3} placeholder={t('teacher.assignedComplaints.descriptionPlaceholder')} />
               </div>
             </div>
             <div className="mt-5 flex justify-end gap-3">
-              <button onClick={() => { setShowForm(false); setEditingComplaint(null); }} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">Cancel</button>
-              <button onClick={editingComplaint ? handleEdit : handleCreate} className="rounded-2xl bg-cyan-600 px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700">{editingComplaint ? 'Update' : 'Create'}</button>
+              <button onClick={() => { setShowForm(false); setEditingComplaint(null); }} className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">{t('common.cancel')}</button>
+              <button onClick={editingComplaint ? handleEdit : handleCreate} className="rounded-2xl bg-cyan-600 px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700">{editingComplaint ? t('common.update') : t('common.create')}</button>
             </div>
           </div>
         </div>
@@ -328,7 +333,7 @@ const AssignedComplaints = () => {
           <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-800">
             <div className="mb-5 flex items-start justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Feedback</h2>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{t('teacher.assignedComplaints.feedback')}</h2>
                 <p className="text-xs text-slate-400 dark:text-slate-500">{feedbackModal.complaintCode} - {feedbackModal.subject}</p>
               </div>
               <button onClick={() => setFeedbackModal(null)} className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700">×</button>
@@ -337,12 +342,12 @@ const AssignedComplaints = () => {
             {/* Existing Feedback */}
             <div className="mb-4 max-h-48 space-y-2 overflow-y-auto">
               {feedbacks.length === 0 ? (
-                <p className="text-center text-xs text-slate-400 py-4">No feedback yet</p>
+                <p className="text-center text-xs text-slate-400 py-4">{t('teacher.assignedComplaints.noFeedback')}</p>
               ) : feedbacks.map(f => (
                 <div key={f._id} className="rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-700/50">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{f.feedbackBy?.name || 'Teacher'}</span>
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{f.feedbackBy?.name || t('teacher.assignedComplaints.teacher')}</span>
                       <div className="flex gap-0.5">
                         {[1,2,3,4,5].map(n => (
                           <span key={n} className={`text-xs ${n <= (f.satisfactionLevel || 0) ? 'text-amber-400' : 'text-slate-300 dark:text-slate-600'}`}>★</span>
@@ -362,7 +367,7 @@ const AssignedComplaints = () => {
             {/* Add Feedback */}
             <div className="border-t border-slate-100 pt-4 dark:border-slate-700">
               <div className="mb-3">
-                <label className={labelCls}>Rating</label>
+                <label className={labelCls}>{t('teacher.assignedComplaints.rating')}</label>
                 <div className="flex gap-1">
                   {[1,2,3,4,5].map(n => (
                     <button key={n} onClick={() => setFeedbackRating(n)} className={`text-xl transition ${n <= feedbackRating ? 'text-amber-400' : 'text-slate-300 dark:text-slate-600'}`}>★</button>
@@ -370,11 +375,11 @@ const AssignedComplaints = () => {
                 </div>
               </div>
               <div>
-                <label className={labelCls}>Comment</label>
-                <textarea value={feedbackText} onChange={e => setFeedbackText(e.target.value)} className={fieldCls} rows={2} placeholder="Write your feedback..." />
+                <label className={labelCls}>{t('teacher.assignedComplaints.comment')}</label>
+                <textarea value={feedbackText} onChange={e => setFeedbackText(e.target.value)} className={fieldCls} rows={2} placeholder={t('teacher.assignedComplaints.writeFeedback')} />
               </div>
               <div className="mt-3 flex justify-end">
-                <button onClick={submitFeedback} className="rounded-2xl bg-cyan-600 px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700">Submit Feedback</button>
+                <button onClick={submitFeedback} className="rounded-2xl bg-cyan-600 px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700">{t('teacher.assignedComplaints.submitFeedback')}</button>
               </div>
             </div>
           </div>

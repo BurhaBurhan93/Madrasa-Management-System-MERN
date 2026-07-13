@@ -88,15 +88,15 @@ const AdminComplaintFeedback = () => {
           <FiMessageSquare className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 p-5 text-white shadow-lg">
-          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.satisfaction')} Avg</p><p className="mt-1 text-2xl font-bold">{stats.avg}</p></div>
+          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.satisfaction')} {t('common.avg')}</p><p className="mt-1 text-2xl font-bold">{stats.avg}</p></div>
           <FiStar className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-green-600 p-5 text-white shadow-lg">
-          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('common.pending')} (4-5)</p><p className="mt-1 text-2xl font-bold">{stats.satisfied}</p></div>
+          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('common.pending')} {t('complaints.satisfiedRange')}</p><p className="mt-1 text-2xl font-bold">{stats.satisfied}</p></div>
           <FiSmile className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 p-5 text-white shadow-lg">
-          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('common.resolved')} (1-2)</p><p className="mt-1 text-2xl font-bold">{stats.unsatisfied}</p></div>
+          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('common.resolved')} {t('complaints.unsatisfiedRange')}</p><p className="mt-1 text-2xl font-bold">{stats.unsatisfied}</p></div>
           <FiFrown className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
       </div>

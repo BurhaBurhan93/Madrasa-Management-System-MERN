@@ -165,7 +165,7 @@ const AdminSubjects = () => {
             <div className="pt-4 border-t border-gray-100">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <FiBook size={16} />
-                <span>{t('common.createdAt')}: {s.createdAt ? new Date(s.createdAt).toLocaleDateString() : '-'}</span>
+                <span>{t('common.createdAt')}: {s.createdAt ? new Date(s.createdAt).toLocaleDateString() : t('common.na') || '-'}</span>
               </div>
             </div>
           </div>

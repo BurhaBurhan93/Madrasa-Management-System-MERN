@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n';
-import { readStoredLanguage } from '../../lib/languageStorage';
 import {
   FiEdit2, FiSave, FiX, FiMapPin, FiPhone, FiMail, FiGlobe,
   FiUser, FiCalendar, FiHash, FiUsers, FiInfo, FiUpload
@@ -14,15 +13,12 @@ const getToken = () => localStorage.getItem('token');
 
 const AdminMadrasaInfo = () => {
   const { t } = useTranslation('admin');
+  const [, forceUpdate] = useState(0);
 
   useEffect(() => {
-    const syncLang = () => {
-      const lang = readStoredLanguage('adminLang', 'en');
-      if (i18n.language !== lang) i18n.changeLanguage(lang);
-    };
-    syncLang();
-    window.addEventListener('storage', syncLang);
-    return () => window.removeEventListener('storage', syncLang);
+    const onLanguageChanged = () => forceUpdate(n => n + 1);
+    i18n.on('languageChanged', onLanguageChanged);
+    return () => i18n.off('languageChanged', onLanguageChanged);
   }, []);
 
   const FileField = ({ label, icon, value, name, type = 'text', options, editing, form, handleChange }) => (
@@ -280,19 +276,19 @@ const Section = ({ title, icon, children }) => (
               <img
                 key={normalizeLogoUrl(editing ? (logoPreview || form.logo) : info.logo)}
                 src={normalizeLogoUrl(editing ? (logoPreview || form.logo) : info.logo)}
-                alt="Madrasa Logo"
+                alt={t('madrasaInfo.madrasaLogo')}
                 className="h-24 w-24 rounded-2xl object-cover border-2 border-white/40 bg-white/20"
                 onError={() => setLogoErrored(true)}
               />
             ) : (
               <div className="h-24 w-24 rounded-2xl bg-white/20 flex items-center justify-center text-3xl font-bold border-2 border-white/40">
-                {(form.name || info?.name || 'M')[0].toUpperCase()}
+                {(form.name || info?.name || t('common.shortNameFallback') || 'M')[0].toUpperCase()}
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold uppercase tracking-widest text-cyan-200 mb-1">
-              {info?.code || form.code || 'EMIS'}
+              {info?.code || form.code || t('madrasaInfo.emisShortName')}
             </p>
             <h2 className="text-2xl font-bold truncate">{info?.name || t('madrasaInfo.madrasaName')}</h2>
             {info?.nameArabic && <p className="text-lg text-cyan-100 mt-0.5 font-arabic">{info.nameArabic}</p>}
@@ -314,7 +310,7 @@ const Section = ({ title, icon, children }) => (
         {editing && (
           <div className="mt-4 pt-4 border-t border-white/20">
             <label className="block text-xs font-semibold text-cyan-100 mb-1.5 uppercase tracking-wide">
-              <FiUpload className="inline mr-1" size={12} />{t('madrasaInfo.uploadLogo')}
+              <FiUpload className="inline mr-1" size={12} />{t('madrasaInfo.uploadLogoUrl')}
             </label>
             <input
               type="url"
@@ -325,6 +321,9 @@ const Section = ({ title, icon, children }) => (
               className="w-full rounded-xl border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/50 focus:border-white/60 focus:outline-none"
             />
             <div className="mt-3">
+              <label className="block text-xs font-semibold text-cyan-100 mb-1.5 uppercase tracking-wide">
+                {t('madrasaInfo.uploadLogoFile')}
+              </label>
               <input
                 type="file"
                 accept="image/*"

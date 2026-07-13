@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import ListPage from '../shared/ListPage';
 import Card from '../../../components/UIHelper/Card';
@@ -80,6 +81,7 @@ export const documentsManagementConfig = {
 };
 
 const DocumentsManagement = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [docStats, setDocStats] = useState({
     total: 0,
     byType: [],
@@ -105,7 +107,6 @@ const DocumentsManagement = () => {
       const active = documents.filter(d => d.status === 'active').length;
       const archived = documents.filter(d => d.status === 'archived').length;
       
-      // Group by type
       const typeMap = {};
       documents.forEach(d => {
         const type = d.type || 'Other';
@@ -125,9 +126,13 @@ const DocumentsManagement = () => {
     return <PageSkeleton variant="dashboard" />;
   }
 
+  const columns = documentsManagementConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.registrar.documentsManagement.columns.${col.key}`)
+  }));
+
   return (
     <div className="space-y-6">
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
@@ -136,10 +141,10 @@ const DocumentsManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-xl">📄</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Documents</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.documentsManagement.stats.totalDocuments')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">{docStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">All uploaded files</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.documentsManagement.stats.allUploadedFiles')}</p>
           </div>
         </Card>
 
@@ -150,10 +155,10 @@ const DocumentsManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <span className="text-xl">✅</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Active</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.documentsManagement.stats.active')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{docStats.active}</p>
-            <p className="text-sm text-slate-500 mt-1">Current documents</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.documentsManagement.stats.currentDocuments')}</p>
           </div>
         </Card>
 
@@ -164,10 +169,10 @@ const DocumentsManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
                 <span className="text-xl">📦</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Archived</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.documentsManagement.stats.archived')}</span>
             </div>
             <p className="text-3xl font-black text-gray-600">{docStats.archived}</p>
-            <p className="text-sm text-slate-500 mt-1">Stored documents</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.documentsManagement.stats.storedDocuments')}</p>
           </div>
         </Card>
 
@@ -178,37 +183,26 @@ const DocumentsManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <span className="text-xl">📊</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Document Types</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.documentsManagement.stats.documentTypes')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{docStats.byType.length}</p>
-            <p className="text-sm text-slate-500 mt-1">Different categories</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.documentsManagement.stats.differentCategories')}</p>
           </div>
         </Card>
       </div>
 
-      {/* Charts */}
       {docStats.byType.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card title="Documents by Type">
-            <PieChartComponent
-              data={docStats.byType}
-              height={300}
-            />
+          <Card title={t('staff.registrar.documentsManagement.charts.documentsByType')}>
+            <PieChartComponent data={docStats.byType} height={300} />
           </Card>
-
-          <Card title="Document Distribution">
-            <BarChartComponent
-              data={docStats.byType}
-              dataKey="value"
-              nameKey="name"
-              height={300}
-            />
+          <Card title={t('staff.registrar.documentsManagement.charts.documentDistribution')}>
+            <BarChartComponent data={docStats.byType} dataKey="value" nameKey="name" height={300} />
           </Card>
         </div>
       )}
 
-      {/* Documents List */}
-      <ListPage {...documentsManagementConfig} />
+      <ListPage {...documentsManagementConfig} columns={columns} />
     </div>
   );
 };

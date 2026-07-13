@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import Card from '../../../components/UIHelper/Card';
 import StaffPageLayout from '../shared/StaffPageLayout';
@@ -68,6 +69,7 @@ export const salaryPaymentsConfig = {
 };
 
 const SalaryPayments = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -77,17 +79,17 @@ const SalaryPayments = () => {
         setLoading(true);
         const res = await apiFetch(`${staffApi.payroll.salaryPayments}?limit=200`);
         const data = await parseJsonSafe(res);
-        if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load payroll payments');
+        if (!res.ok || !data.success) throw new Error(data.message || t('staff.payroll.salaryPayments.errors.loadFailed'));
         setPayments(Array.isArray(data.data) ? data.data : []);
       } catch (error) {
-        console.error('Failed to load salary payment insights:', error);
+        console.error(t('staff.payroll.salaryPayments.errors.loadError'), error);
       } finally {
         setLoading(false);
       }
     };
 
     loadPayments();
-  }, []);
+  }, [t]);
 
   const insights = useMemo(() => {
     const paidThisMonth = payments.filter((payment) => {
@@ -109,16 +111,16 @@ const SalaryPayments = () => {
       totalAmountDisbursed,
       pendingPayments,
       failedPayments,
-      nextPayrollDate: nextPending?.paymentDate ? new Date(nextPending.paymentDate).toLocaleDateString('en-US') : 'No pending payroll',
+      nextPayrollDate: nextPending?.paymentDate ? new Date(nextPending.paymentDate).toLocaleDateString('en-US') : t('staff.payroll.salaryPayments.insights.noPending'),
       byMethod: groupCountBy(payments, (payment) => payment.paymentMethod || 'unknown'),
       byStatus: groupCountBy(payments, (payment) => payment.paymentStatus || 'unknown'),
       monthlyPayroll: getLastMonths(payments, (payment) => payment.paymentDate || payment.createdAt, (payment) => payment.netSalary)
     };
-  }, [payments]);
+  }, [payments, t]);
 
   if (loading) {
     return (
-      <StaffPageLayout eyebrow="Payroll" title="Salary Payments" subtitle="Disbursement totals, payroll cadence, and payment status monitoring in one place.">
+      <StaffPageLayout eyebrow={t('staff.payroll.salaryPayments.eyebrow')} title={t('staff.payroll.salaryPayments.title')} subtitle={t('staff.payroll.salaryPayments.loadingSubtitle')}>
         <PageSkeleton type="dashboard" />
       </StaffPageLayout>
     );
@@ -128,11 +130,11 @@ const SalaryPayments = () => {
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[
-          { label: 'Paid This Month', value: insights.paidThisMonth, icon: FiCheckCircle, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700' },
-          { label: 'Amount Disbursed', value: formatCurrency(insights.totalAmountDisbursed), icon: FiDollarSign, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700' },
-          { label: 'Pending Payments', value: insights.pendingPayments, icon: FiCreditCard, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700' },
-          { label: 'Failed Payments', value: insights.failedPayments, icon: FiAlertTriangle, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700' },
-          { label: 'Next Payroll Date', value: insights.nextPayrollDate, icon: FiCalendar, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700' }
+          { label: t('staff.payroll.salaryPayments.cards.paidThisMonth'), value: insights.paidThisMonth, icon: FiCheckCircle, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700' },
+          { label: t('staff.payroll.salaryPayments.cards.amountDisbursed'), value: formatCurrency(insights.totalAmountDisbursed), icon: FiDollarSign, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700' },
+          { label: t('staff.payroll.salaryPayments.cards.pendingPayments'), value: insights.pendingPayments, icon: FiCreditCard, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700' },
+          { label: t('staff.payroll.salaryPayments.cards.failedPayments'), value: insights.failedPayments, icon: FiAlertTriangle, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700' },
+          { label: t('staff.payroll.salaryPayments.cards.nextPayrollDate'), value: insights.nextPayrollDate, icon: FiCalendar, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700' }
         ].map((item) => (
           <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none dark:border-slate-700 dark:bg-none dark:bg-slate-800/50`}>
             <div className="flex items-start justify-between gap-4">
@@ -149,24 +151,29 @@ const SalaryPayments = () => {
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <BarChartComponent title="Monthly Payroll" data={insights.monthlyPayroll} dataKey="value" nameKey="name" height={320} />
-        <PieChartComponent title="Payment Method Distribution" data={insights.byMethod} height={320} donut />
-        <PieChartComponent title="Payment Status Breakdown" data={insights.byStatus} height={320} />
+        <BarChartComponent title={t('staff.payroll.salaryPayments.charts.monthlyPayroll')} data={insights.monthlyPayroll} dataKey="value" nameKey="name" height={320} />
+        <PieChartComponent title={t('staff.payroll.salaryPayments.charts.paymentMethodDistribution')} data={insights.byMethod} height={320} donut />
+        <PieChartComponent title={t('staff.payroll.salaryPayments.charts.paymentStatusBreakdown')} data={insights.byStatus} height={320} />
       </div>
     </>
   );
 
+  const columns = salaryPaymentsConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.payroll.salaryPayments.columns.${col.key}`)
+  }));
+
   return (
     <ListPage
-      title={salaryPaymentsConfig.title}
-      subtitle={salaryPaymentsConfig.subtitle}
+      title={t('staff.payroll.salaryPayments.title')}
+      subtitle={t('staff.payroll.salaryPayments.subtitle')}
       endpoint={salaryPaymentsConfig.endpoint}
-      columns={salaryPaymentsConfig.columns}
+      columns={columns}
       createPath="/staff/payroll/salary-payments/create"
       editPathForRow={(row) => `/staff/payroll/salary-payments/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/payroll/salary-payments/view/${row._id}`}
-      searchPlaceholder="Search salary payments..."
-      eyebrow="Payroll"
+      searchPlaceholder={t('staff.payroll.salaryPayments.searchPlaceholder')}
+      eyebrow={t('staff.payroll.salaryPayments.eyebrow')}
       headerContent={headerContent}
       enableExport={true}
     />
@@ -174,4 +181,3 @@ const SalaryPayments = () => {
 };
 
 export default SalaryPayments;
-

@@ -21,6 +21,7 @@ import Badge from '../components/UIHelper/Badge';
 import Button from '../components/UIHelper/Button';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { formatDate } from '../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const MOCK_TIMETABLE = [
   { _id: 'm1', subject: 'Advanced Mathematics', teacher: 'Dr. Ahmed', day: 'Monday', time: '09:00 AM - 10:30 AM', room: 'Lecture Hall A', credits: 3, type: 'Core' },
@@ -33,13 +34,14 @@ const MOCK_TIMETABLE = [
 
 const StudentTimetable = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['student', 'common']);
   const [timetable, setTimetable] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [studentInfo, setStudentInfo] = useState({
     name: '',
     class: '',
-    semester: 'Current Semester'
+    semester: t('student.timetable.currentSemester')
   });
 
   const getDayForCourse = (course, index) => {
@@ -58,8 +60,8 @@ const StudentTimetable = () => {
       if (profile) {
         setStudentInfo({
           name: profile.name || '',
-          class: profile.currentClass?.name || 'Level 1',
-          semester: profile.currentSemester || 'Academic Year 2024-25'
+          class: profile.currentClass?.name || t('student.timetable.defaultLevel'),
+          semester: profile.currentSemester || t('student.timetable.defaultAcademicYear')
         });
       }
 
@@ -75,21 +77,21 @@ const StudentTimetable = () => {
 
       const scheduleData = courses.map((course, index) => ({
         _id: course._id,
-        subject: course.name || course.subjectName || 'Subject',
-        teacher: course.teacher?.name || course.teacherName || 'Instructor',
+        subject: course.name || course.subjectName || t('common.subject'),
+        teacher: course.teacher?.name || course.teacherName || t('student.instructor'),
         day: getDayForCourse(course, index),
         time: course.startTime && course.endTime
           ? `${course.startTime} - ${course.endTime}`
-          : '09:00 AM - 10:30 AM',
-        room: 'Lecture Hall A',
+          : t('student.timetable.defaultTime'),
+        room: t('common.na'),
         credits: course.credits || 3,
-        type: course.type || 'Core'
+        type: course.type || t('student.timetable.defaultType')
       }));
 
       setTimetable(scheduleData.length > 0 ? scheduleData : MOCK_TIMETABLE);
     } catch (err) {
       console.error('[StudentTimetable] Error:', err);
-      setError('Using offline data — API unavailable.');
+      setError(t('student.timetable.offlineError'));
       setTimetable(MOCK_TIMETABLE);
     } finally {
       setLoading(false);
@@ -114,25 +116,25 @@ const StudentTimetable = () => {
     const rows = [];
     days.forEach(day => {
       (groupedTimetable[day] || []).forEach(slot => {
-        rows.push([day, slot.subject, slot.teacher, slot.time, slot.room, `${slot.credits} Cr`, slot.type]);
+        rows.push([t('common.' + day.toLowerCase()), slot.subject, slot.teacher, slot.time, slot.room, `${slot.credits} ${t('student.timetable.pdfCr')}`, slot.type]);
       });
     });
     const doc = new jsPDF({ orientation: 'landscape' });
     doc.setFontSize(18);
-    doc.text('Weekly Timetable', 14, 20);
+    doc.text(t('student.timetable.pdfTitle'), 14, 20);
     doc.setFontSize(10);
-    doc.text(`Student: ${studentInfo.name} | ${studentInfo.semester}`, 14, 28);
+    doc.text(`${t('student.timetable.pdfStudent')}: ${studentInfo.name} | ${studentInfo.semester}`, 14, 28);
     doc.setFontSize(8);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 34);
+    doc.text(`${t('student.timetable.pdfGenerated')}: ${new Date().toLocaleDateString()}`, 14, 34);
     autoTable(doc, {
       startY: 40,
-      head: [['Day', 'Subject', 'Instructor', 'Time', 'Room', 'Credits', 'Type']],
+      head: [[t('common.day'), t('common.subject'), t('student.instructor'), t('common.time'), t('student.timetable.pdfRoom'), t('student.timetable.pdfCredits'), t('student.timetable.pdfType')]],
       body: rows,
       styles: { fontSize: 9, cellPadding: 4 },
       headStyles: { fillColor: [30, 41, 59], fontSize: 9, fontStyle: 'bold' },
       alternateRowStyles: { fillColor: [248, 250, 252] },
     });
-    doc.save('Weekly_Timetable.pdf');
+    doc.save(t('student.timetable.pdfFileName'));
   }, [timetable, groupedTimetable, studentInfo]);
 
   if (loading) {
@@ -144,13 +146,13 @@ const StudentTimetable = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Weekly Timetable</h1>
-          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Comprehensive schedule for {studentInfo.semester}</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('student.academic')}</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('student.myTimetable')}</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('student.timetable.subtitle', { semester: studentInfo.semester })}</p>
         </div>
         <div className="flex gap-3">
           <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2" onClick={handleExport}>
-            <FiDownload /> Export Schedule
+            <FiDownload /> {t('student.exportSchedule')}
           </Button>
         </div>
       </div>
@@ -164,10 +166,10 @@ const StudentTimetable = () => {
       {/* Stats Summary Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Total Classes', value: timetable.length, icon: <FiBookOpen />, color: 'blue' },
-          { label: 'Current Class', value: studentInfo.class, icon: <FiTrendingUp />, color: 'emerald' },
-          { label: 'Academic Year', value: '2023-24', icon: <FiCalendar />, color: 'purple' },
-          { label: 'Active Days', value: '5 Days', icon: <FiActivity />, color: 'cyan' }
+          { label: t('student.timetable.totalClasses'), value: timetable.length, icon: <FiBookOpen />, color: 'blue' },
+          { label: t('student.timetable.currentClass'), value: studentInfo.class, icon: <FiTrendingUp />, color: 'emerald' },
+          { label: t('student.academicYear'), value: t('student.timetable.academicYearValue'), icon: <FiCalendar />, color: 'purple' },
+          { label: t('student.timetable.activeDays'), value: t('student.timetable.activeDaysValue'), icon: <FiActivity />, color: 'cyan' }
         ].map((stat, i) => (
           <div key={i} className="p-6 bg-white dark:bg-gray-800 rounded-[32px] border border-slate-100 dark:border-gray-700 shadow-xl shadow-slate-200/50">
             <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
@@ -182,13 +184,13 @@ const StudentTimetable = () => {
       {/* Main Timetable View */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <Card title="Weekly Master Schedule" className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('student.timetable.masterSchedule')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <div className="space-y-10">
               {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
                 <div key={day} className="relative">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="h-px flex-1 bg-slate-100 dark:bg-gray-700"></div>
-                    <h3 className="text-xs font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.3em]">{day}</h3>
+                    <h3 className="text-xs font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.3em]">{t('common.' + day.toLowerCase())}</h3>
                     <div className="h-px flex-1 bg-slate-100 dark:bg-gray-700"></div>
                   </div>
 
@@ -202,9 +204,9 @@ const StudentTimetable = () => {
                             </div>
                             <div>
                               <div className="flex items-center gap-2 mb-1">
-                                <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.2em]">{slot.type}</p>
+                                <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.2em]">{t('student.timetable.' + slot.type?.toLowerCase(), slot.type)}</p>
                                 <span className="text-slate-300">•</span>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{slot.credits} Credits</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('student.timetable.slotCredits', { credits: slot.credits })}</p>
                               </div>
                               <h4 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{slot.subject}</h4>
                               <p className="text-sm font-bold text-slate-500 dark:text-gray-400 flex items-center gap-2 mt-1">
@@ -224,7 +226,7 @@ const StudentTimetable = () => {
                       ))
                     ) : (
                       <div className="py-8 text-center bg-slate-50/50 dark:bg-gray-800/50 rounded-3xl border border-dashed border-slate-200 dark:border-gray-700">
-                          <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest italic">No classes scheduled</p>
+                          <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest italic">{t('student.timetable.noClasses')}</p>
                       </div>
                     )}
                   </div>
@@ -236,13 +238,13 @@ const StudentTimetable = () => {
 
         {/* Sidebar Info */}
         <div className="space-y-8">
-          <Card title="Attendance Policy" className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20">
+          <Card title={t('student.timetable.attendancePolicy')} className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20">
             <div className="space-y-4">
               {[
-                { icon: <FiClock />, text: 'Classes begin promptly at 08:30 AM.' },
-                { icon: <FiInfo />, text: 'Minimum 75% attendance required for exams.' },
-                { icon: <FiActivity />, text: 'Late entry (15m+) marked as half-day.' },
-                { icon: <FiCheckCircle />, text: 'Notify teachers via portal for absences.' }
+                { icon: <FiClock />, text: t('student.timetable.policy1') },
+                { icon: <FiInfo />, text: t('student.timetable.policy2') },
+                { icon: <FiActivity />, text: t('student.timetable.policy3') },
+                { icon: <FiCheckCircle />, text: t('student.timetable.policy4') }
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
                   <div className="text-cyan-400 text-lg mt-0.5">{item.icon}</div>
@@ -254,10 +256,10 @@ const StudentTimetable = () => {
 
           <div className="p-8 bg-gradient-to-br from-cyan-600 to-blue-700 rounded-[32px] text-white shadow-2xl shadow-cyan-200/50 relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="text-xl font-black mb-2">Academic Calendar</h4>
-              <p className="text-cyan-100 text-sm font-medium mb-6">View upcoming holidays, exams, and institutional events.</p>
+              <h4 className="text-xl font-black mb-2">{t('student.timetable.academicCalendar')}</h4>
+              <p className="text-cyan-100 text-sm font-medium mb-6">{t('student.timetable.calendarDesc')}</p>
               <Button variant="outline" className="w-full rounded-2xl py-4 border-white/20 bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-widest transition-all" onClick={() => navigate('/student/events')}>
-                Open Calendar
+                {t('student.timetable.openCalendar')}
               </Button>
             </div>
             <FiCalendar className="absolute -right-6 -bottom-6 w-32 h-32 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />

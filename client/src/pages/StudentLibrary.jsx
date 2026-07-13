@@ -96,7 +96,7 @@ const StudentLibrary = () => {
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('library', { ns: 'student' })}</p>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('resources', { ns: 'student' })}</h1>
-          <p className="text-slate-500 mt-1 font-medium italic">{t('librarySubtitle', 'Explore our collection of academic and spiritual literature')}</p>
+          <p className="text-slate-500 mt-1 font-medium italic">{t('student.library.subtitle')}</p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -109,7 +109,7 @@ const StudentLibrary = () => {
           </Button>
           <div className="h-12 px-6 rounded-2xl bg-blue-50 border border-blue-100 flex items-center gap-3 text-blue-600">
             <FiBookOpen className="w-5 h-5" />
-            <span className="text-sm font-black uppercase tracking-widest">{t('digitalAccess', 'Digital Access')}</span>
+            <span className="text-sm font-black uppercase tracking-widest">{t('student.library.digitalAccess')}</span>
           </div>
         </div>
       </div>
@@ -123,12 +123,12 @@ const StudentLibrary = () => {
               <div className="w-10 h-10 rounded-xl bg-cyan-100 flex items-center justify-center">
                 <FiBook className="w-5 h-5 text-cyan-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('currentlyBorrowed', 'Currently Borrowed')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('student.library.currentlyBorrowed')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">
               {libraryStats.currentlyBorrowed}
             </p>
-            <p className="text-sm text-slate-500 mt-1">{t('activeLoans', 'Active loans')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('student.library.activeLoans')}</p>
           </div>
         </Card>
 
@@ -139,12 +139,12 @@ const StudentLibrary = () => {
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
                 <FiClock className="w-5 h-5 text-amber-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('dueSoon', 'Due Soon')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('student.library.dueSoon')}</span>
             </div>
             <p className="text-3xl font-black text-amber-600">
               {libraryStats.dueSoon}
             </p>
-            <p className="text-sm text-slate-500 mt-1">{t('dueWithinThreeDays', 'Due within 3 days')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('student.library.dueWithinThreeDays')}</p>
           </div>
         </Card>
 
@@ -160,7 +160,7 @@ const StudentLibrary = () => {
             <p className="text-3xl font-black text-red-600">
               {libraryStats.overdueBooks}
             </p>
-            <p className="text-sm text-slate-500 mt-1">{t('pleaseReturnSoon', 'Please return soon')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('student.library.pleaseReturnSoon')}</p>
           </div>
         </Card>
 
@@ -171,12 +171,12 @@ const StudentLibrary = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <FiCheckCircle className="w-5 h-5 text-emerald-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('totalRead', 'Total Read')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('student.library.totalRead')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">
               {libraryStats.totalBooksRead}
             </p>
-            <p className="text-sm text-slate-500 mt-1">{t('booksReturned', 'Books returned')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('student.library.booksReturned')}</p>
           </div>
         </Card>
       </div>
@@ -184,24 +184,24 @@ const StudentLibrary = () => {
       {/* Charts Section */}
       {libraryStats.currentlyBorrowed > 0 || libraryStats.totalBooksRead > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card title={t('bookStatusDistribution', 'Book Status Distribution')} className="rounded-[32px] p-8">
+          <Card title={t('student.library.bookStatusDistribution')} className="rounded-[32px] p-8">
             <PieChartComponent
               data={[
-                { name: 'Borrowed', value: libraryStats.currentlyBorrowed },
-                { name: 'Returned', value: libraryStats.totalBooksRead },
-                { name: 'Overdue', value: libraryStats.overdueBooks },
-                { name: 'Due Soon', value: libraryStats.dueSoon }
+                { name: t('student.library.borrowed'), value: libraryStats.currentlyBorrowed },
+                { name: t('student.library.returned'), value: libraryStats.totalBooksRead },
+                { name: t('common.overdue'), value: libraryStats.overdueBooks },
+                { name: t('student.library.dueSoon'), value: libraryStats.dueSoon }
               ].filter(item => item.value > 0)}
               height={300}
             />
           </Card>
 
-          <Card title={t('libraryActivity', 'Library Activity')} className="rounded-[32px] p-8">
+          <Card title={t('student.library.libraryActivity')} className="rounded-[32px] p-8">
             <BarChartComponent
               data={[
-                { name: 'Currently Borrowed', value: libraryStats.currentlyBorrowed },
-                { name: 'Total Read', value: libraryStats.totalBooksRead },
-                { name: 'Overdue', value: libraryStats.overdueBooks }
+                { name: t('student.library.currentlyBorrowed'), value: libraryStats.currentlyBorrowed },
+                { name: t('student.library.totalRead'), value: libraryStats.totalBooksRead },
+                { name: t('common.overdue'), value: libraryStats.overdueBooks }
               ]}
               dataKey="value"
               nameKey="name"
@@ -212,8 +212,8 @@ const StudentLibrary = () => {
       ) : (
         <div className="text-center py-12 bg-white rounded-[32px] border border-slate-200">
           <FiBook className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500 font-bold">{t('noLibraryActivityYet', 'No library activity yet')}</p>
-          <p className="text-sm text-slate-400 mt-1">{t('borrowBooksToSeeActivity', 'Borrow books to see your activity here')}</p>
+          <p className="text-slate-500 font-bold">{t('student.library.noLibraryActivityYet')}</p>
+          <p className="text-sm text-slate-400 mt-1">{t('student.library.borrowBooksToSeeActivity')}</p>
         </div>
       )}
 
@@ -222,7 +222,7 @@ const StudentLibrary = () => {
         {/* Recent Activity */}
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-slate-900">{t('recentLibraryActivity', 'Recent Library Activity')}</h3>
+            <h3 className="text-lg font-bold text-slate-900">{t('student.library.recentLibraryActivity')}</h3>
             <Button variant="outline" size="sm" onClick={() => navigate('/student/borrowed')}>
               {t('viewAll', { ns: 'common' })} <FiArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -244,7 +244,7 @@ const StudentLibrary = () => {
                     <div>
                       <p className="font-bold text-slate-900">{activity.title}</p>
                       <p className="text-sm text-slate-500">
-                      {activity.type === 'borrowed' ? t('borrowedOn', 'Borrowed') : t('returnedOn', 'Returned')} on {new Date(activity.date).toLocaleDateString()}
+                      {activity.type === 'borrowed' ? t('student.library.borrowedOn') : t('student.library.returnedOn')} {new Date(activity.date).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -254,7 +254,7 @@ const StudentLibrary = () => {
                         variant={new Date(activity.dueDate) < new Date() ? 'danger' : 'warning'}
                         className="font-black uppercase tracking-widest text-[10px]"
                       >
-                        Due {new Date(activity.dueDate).toLocaleDateString()}
+                        {t('student.library.dueDate', {date: new Date(activity.dueDate).toLocaleDateString()})}
                       </Badge>
                     )}
                   </div>
@@ -263,7 +263,7 @@ const StudentLibrary = () => {
             ) : (
               <div className="text-center py-8 text-slate-400">
                 <FiBook className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>{t('noRecentLibraryActivity', 'No recent library activity')}</p>
+                  <p>{t('student.library.noRecentLibraryActivity')}</p>
               </div>
             )}
           </div>
@@ -271,7 +271,7 @@ const StudentLibrary = () => {
 
         {/* Quick Actions */}
         <Card>
-          <h3 className="text-lg font-bold text-slate-900 mb-4">{t('quickActions', 'Quick Actions')}</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-4">{t('student.library.quickActions')}</h3>
           <div className="space-y-3">
             <Button
               variant="outline"
@@ -282,8 +282,8 @@ const StudentLibrary = () => {
                 <FiSearch className="w-5 h-5 text-cyan-600" />
               </div>
               <div className="text-left">
-                <p className="font-bold text-slate-900">{t('browseCatalog', 'Browse Catalog')}</p>
-                <p className="text-sm text-slate-500">{t('searchAvailableBooks', 'Search available books')}</p>
+                <p className="font-bold text-slate-900">{t('student.library.browseCatalog')}</p>
+                <p className="text-sm text-slate-500">{t('student.library.searchAvailableBooks')}</p>
               </div>
             </Button>
 
@@ -297,7 +297,7 @@ const StudentLibrary = () => {
               </div>
               <div className="text-left">
                 <p className="font-bold text-slate-900">{t('borrowed', { ns: 'student' })}</p>
-                <p className="text-sm text-slate-500">{t('manageLoans', 'View and manage loans')}</p>
+                <p className="text-sm text-slate-500">{t('student.library.manageLoans')}</p>
               </div>
             </Button>
 
@@ -310,8 +310,8 @@ const StudentLibrary = () => {
                 <FiDownload className="w-5 h-5 text-purple-600" />
               </div>
               <div className="text-left">
-                <p className="font-bold text-slate-900">{t('downloadHistory', 'Download History')}</p>
-                <p className="text-sm text-slate-500">{t('getBorrowingRecords', 'Get borrowing records')}</p>
+                <p className="font-bold text-slate-900">{t('student.library.downloadHistory')}</p>
+                <p className="text-sm text-slate-500">{t('student.library.getBorrowingRecords')}</p>
               </div>
             </Button>
           </div>

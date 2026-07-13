@@ -28,11 +28,13 @@ import Progress from '../components/UIHelper/Progress';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import { formatDate } from '../lib/utils';
 import { useTheme } from '../contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { t } = useTranslation(['student', 'common']);
   const isDark = theme === 'dark';
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -129,7 +131,7 @@ const StudentDashboard = () => {
       const feeRecords = feesRaw.length > 0 ? feesRaw : MOCK_FEES;
       const resultsData = resultsRaw.length > 0 ? resultsRaw : MOCK_RESULTS;
 
-      const profileData = profile || { name: 'Student', studentCode: 'STU-001', status: 'Active', currentClass: 'Class 7', image: null };
+      const profileData = profile || { name: t('student.dashboard.defaultStudentName'), studentCode: t('student.dashboard.defaultStudentCode'), status: t('student.dashboard.defaultStatus'), currentClass: t('student.dashboard.defaultClass'), image: null };
       setStudentProfile(profileData);
       setUser({ name: profileData.name, image: profileData.image });
 
@@ -202,7 +204,7 @@ const StudentDashboard = () => {
         })),
         ...attendanceRecords.slice(-2).map(r => ({
           id: r._id,
-          title: `Attendance: ${r.status?.charAt(0).toUpperCase() + r.status?.slice(1) || 'Recorded'}`,
+          title: `${t('student.dashboard.attendancePrefix')} ${r.status?.charAt(0).toUpperCase() + r.status?.slice(1) || t('common.recorded')}`,
           date: r.date || r.createdAt, type: 'attendance'
         }))
       ].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -249,7 +251,7 @@ const StudentDashboard = () => {
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      setStudentProfile({ name: 'Student', studentCode: 'STU-001', status: 'Active', currentClass: 'Class 7' });
+      setStudentProfile({ name: t('student.dashboard.defaultStudentName'), studentCode: t('student.dashboard.defaultStudentCode'), status: t('student.dashboard.defaultStatus'), currentClass: t('student.dashboard.defaultClass') });
       setUser({ name: 'Student' });
       setQuickStats({ totalCourses: 6, attendanceRate: 87, assignmentsPending: 2, upcomingExams: 2, gpa: 82, totalFees: 8500, paidFees: 7000, pendingFees: 1500 });
       setAttendanceData([{ month: 'Jan', rate: 92 }, { month: 'Feb', rate: 88 }, { month: 'Mar', rate: 95 }, { month: 'Apr', rate: 85 }, { month: 'May', rate: 90 }, { month: 'Jun', rate: 87 }]);
@@ -272,14 +274,14 @@ const StudentDashboard = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Overview</p>
-          <h1 className={`text-4xl font-black tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Student Dashboard</h1>
-          <p className={`mt-1 font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Welcome back, {user?.name || 'Student'}!</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('student.overview')}</p>
+          <h1 className={`text-4xl font-black tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{t('student.dashboard')}</h1>
+          <p className={`mt-1 font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{t('student.welcome')} {user?.name || t('common.student')}!</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex flex-col items-end mr-2">
-            <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Current Session</p>
-            <p className={`text-sm font-black ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>2023-2024 Academic Year</p>
+            <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('student.currentSession')}</p>
+            <p className={`text-sm font-black ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{t('student.academicYear')}</p>
           </div>
           <div className={`h-12 w-12 rounded-2xl shadow-sm border flex items-center justify-center ${isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-slate-200 text-slate-600'}`}>
             <FiCalendar className="w-6 h-6" />
@@ -294,7 +296,7 @@ const StudentDashboard = () => {
             <div className="relative">
               <div className="h-24 w-24 rounded-[32px] bg-gradient-to-tr from-cyan-400 to-blue-500 p-1 shadow-xl">
                 <div className="h-full w-full rounded-[30px] bg-slate-900 flex items-center justify-center text-3xl font-black text-white">
-                  {user.name?.split(' ').map(n => n[0]).join('') || 'S'}
+                  {user.name?.split(' ').map(n => n[0]).join('') || t('student.dashboard.fallbackInitial')}
                 </div>
               </div>
               <div className="absolute -bottom-2 -right-2 h-8 w-8 rounded-xl bg-emerald-500 border-4 border-slate-900 flex items-center justify-center">
@@ -305,9 +307,9 @@ const StudentDashboard = () => {
             <div className="text-center md:text-left flex-1">
               <h2 className="text-3xl font-black tracking-tight mb-2">{user.name}</h2>
               <div className="flex flex-wrap justify-center md:justify-start gap-4 text-slate-400 font-bold text-xs uppercase tracking-widest">
-                <span className="flex items-center gap-2"><FiUser className="text-cyan-400" /> Student ID: {studentProfile.studentCode || 'N/A'}</span>
-                <span className="flex items-center gap-2"><FiActivity className="text-cyan-400" /> Status: Active</span>
-                <span className="flex items-center gap-2"><FiAward className="text-cyan-400" /> Class: {studentProfile?.class?.name || 'Assigned'}</span>
+                <span className="flex items-center gap-2"><FiUser className="text-cyan-400" />{t('common.studentId')}: {studentProfile.studentCode || t('common.na')}</span>
+                <span className="flex items-center gap-2"><FiActivity className="text-cyan-400" />{t('common.status')}: {t('common.active')}</span>
+                <span className="flex items-center gap-2"><FiAward className="text-cyan-400" />{t('common.class')}: {studentProfile?.class?.name || t('common.assigned')}</span>
               </div>
             </div>
 
@@ -316,7 +318,7 @@ const StudentDashboard = () => {
                 onClick={() => navigate('/student/profile')}
                 className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 font-black text-sm transition-all"
               >
-                View Profile
+                {t('student.viewProfile')}
               </button>
             </div>
           </div>
@@ -330,10 +332,10 @@ const StudentDashboard = () => {
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Total Courses', value: quickStats.totalCourses, icon: <FiBookOpen />, color: 'blue', path: '/student/courses' },
-          { label: 'Attendance Rate', value: `${quickStats.attendanceRate}%`, icon: <FiCheckCircle />, color: 'emerald', path: '/student/attendance' },
-          { label: 'Pending Tasks', value: quickStats.assignmentsPending, icon: <FiEdit />, color: 'amber', path: '/student/assignments' },
-          { label: 'Upcoming Exams', value: quickStats.upcomingExams, icon: <FiTrendingUp />, color: 'rose', path: '/student/exams' }
+          { label: t('student.dash.totalCourses'), value: quickStats.totalCourses, icon: <FiBookOpen />, color: 'blue', path: '/student/courses' },
+          { label: t('student.dash.attendanceRate'), value: `${quickStats.attendanceRate}%`, icon: <FiCheckCircle />, color: 'emerald', path: '/student/attendance' },
+          { label: t('student.dash.pendingTasks'), value: quickStats.assignmentsPending, icon: <FiEdit />, color: 'amber', path: '/student/assignments' },
+          { label: t('student.dash.upcomingExams'), value: quickStats.upcomingExams, icon: <FiTrendingUp />, color: 'rose', path: '/student/exams' }
         ].map((stat, i) => (
           <button 
             key={i} 
@@ -364,7 +366,7 @@ const StudentDashboard = () => {
       {/* Fee Summary Section */}
       {(quickStats.totalFees > 0 || quickStats.paidFees > 0 || quickStats.pendingFees > 0) && (
         <div className="space-y-6">
-          <h2 className={`text-2xl font-black tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Fee Summary</h2>
+          <h2 className={`text-2xl font-black tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{t('student.dash.feeSummary')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className={`rounded-[32px] p-6 border ${isDark ? 'bg-blue-900/20 border-blue-500/30' : 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200'}`}>
               <div className="flex items-center gap-4 mb-4">
@@ -372,8 +374,8 @@ const StudentDashboard = () => {
                   <FiDollarSign />
                 </div>
                 <div>
-                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>Total Fees</p>
-                  <p className={`text-2xl font-black ${isDark ? 'text-blue-200' : 'text-blue-900'}`}>${quickStats.totalFees.toLocaleString()}</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{t('student.dash.totalFees')}</p>
+                  <p className={`text-2xl font-black ${isDark ? 'text-blue-200' : 'text-blue-900'}`}>{t('common.currency')}{quickStats.totalFees.toLocaleString()}</p>
                 </div>
               </div>
             </div>
@@ -384,8 +386,8 @@ const StudentDashboard = () => {
                   <FiCheckCircle />
                 </div>
                 <div>
-                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>Paid</p>
-                  <p className={`text-2xl font-black ${isDark ? 'text-emerald-200' : 'text-emerald-900'}`}>${quickStats.paidFees.toLocaleString()}</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>{t('common.paid')}</p>
+                  <p className={`text-2xl font-black ${isDark ? 'text-emerald-200' : 'text-emerald-900'}`}>{t('common.currency')}{quickStats.paidFees.toLocaleString()}</p>
                 </div>
               </div>
               <div className={`w-full rounded-full h-2 ${isDark ? 'bg-emerald-500/20' : 'bg-white/50'}`}>
@@ -402,8 +404,8 @@ const StudentDashboard = () => {
                   <FiAlertCircle />
                 </div>
                 <div>
-                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>Pending</p>
-                  <p className={`text-2xl font-black ${isDark ? 'text-amber-200' : 'text-amber-900'}`}>${quickStats.pendingFees.toLocaleString()}</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>{t('common.pending')}</p>
+                  <p className={`text-2xl font-black ${isDark ? 'text-amber-200' : 'text-amber-900'}`}>{t('common.currency')}{quickStats.pendingFees.toLocaleString()}</p>
                 </div>
               </div>
             </div>
@@ -411,14 +413,14 @@ const StudentDashboard = () => {
 
           {/* Fee Payment Chart */}
           {feeData.length > 0 && (
-            <Card title="Fee Payment Breakdown" className="rounded-[32px] p-8">
+            <Card title={t('student.dash.feeBreakdown')} className="rounded-[32px] p-8">
               <BarChartComponent 
                 data={feeData} 
                 dataKey="paid" 
                 nameKey="name" 
                 height={300}
                 colors={['#10b981', '#f59e0b']}
-                series={[{ dataKey: 'paid', name: 'Paid' }, { dataKey: 'pending', name: 'Pending' }]}
+                series={[{ dataKey: 'paid', name: t('common.paid') }, { dataKey: 'pending', name: t('common.pending') }]}
               />
             </Card>
           )}
@@ -430,7 +432,7 @@ const StudentDashboard = () => {
         {/* Left Column - Charts */}
         <div className="lg:col-span-2 space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card title="Attendance Trend" className="rounded-[32px] p-8">
+            <Card title={t('student.dash.attendanceTrend')} className="rounded-[32px] p-8">
               {attendanceData.length > 0 ? (
                 <BarChartComponent 
                   data={attendanceData} 
@@ -441,12 +443,12 @@ const StudentDashboard = () => {
               ) : (
                 <div className={`h-[250px] flex flex-col items-center justify-center ${isDark ? 'text-slate-500' : 'text-slate-300'}`}>
                   <FiActivity className="w-12 h-12 mb-4" />
-                  <p className="font-bold text-sm">No attendance records yet</p>
+                  <p className="font-bold text-sm">{t('student.dash.noAttendanceData')}</p>
                 </div>
               )}
             </Card>
 
-            <Card title="Academic Performance" className="rounded-[32px] p-8">
+            <Card title={t('student.dash.academicPerformance')} className="rounded-[32px] p-8">
               {performanceData.length > 0 ? (
                 <LineChartComponent 
                   data={performanceData} 
@@ -457,13 +459,13 @@ const StudentDashboard = () => {
               ) : (
                 <div className={`h-[250px] flex flex-col items-center justify-center ${isDark ? 'text-slate-500' : 'text-slate-300'}`}>
                   <FiTrendingUp className="w-12 h-12 mb-4" />
-                  <p className="font-bold text-sm">No performance data yet</p>
+                  <p className="font-bold text-sm">{t('student.dash.noPerformanceData')}</p>
                 </div>
               )}
             </Card>
           </div>
 
-          <Card title="Recent Activity" className="rounded-[32px] p-8">
+          <Card title={t('student.dash.recentActivity')} className="rounded-[32px] p-8">
             <div className="space-y-6">
               {recentActivity.length > 0 ? (
                 recentActivity.map((activity, i) => (
@@ -483,7 +485,7 @@ const StudentDashboard = () => {
                       <div>
                         <p className={`font-black ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{activity.title}</p>
                         <p className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                          {activity.course || 'General'} • {formatDate(activity.date)}
+                          {activity.course || t('common.general')} • {formatDate(activity.date)}
                         </p>
                       </div>
                     </div>
@@ -491,7 +493,7 @@ const StudentDashboard = () => {
                   </div>
                 ))
               ) : (
-                <p className={`text-center py-8 font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>No recent activity to show</p>
+                <p className={`text-center py-8 font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('student.dash.noRecentActivity')}</p>
               )}
             </div>
           </Card>
@@ -499,7 +501,7 @@ const StudentDashboard = () => {
 
         {/* Right Column - Side Panels */}
         <div className="space-y-8">
-          <Card title="Upcoming Events" className="rounded-[32px] p-8">
+          <Card title={t('student.dash.upcomingEvents')} className="rounded-[32px] p-8">
             <div className="space-y-6">
               {upcomingEvents.length > 0 ? (
                 upcomingEvents.map((event, i) => (
@@ -513,7 +515,7 @@ const StudentDashboard = () => {
                         ? 'bg-slate-600 group-hover:bg-cyan-500' 
                         : 'bg-slate-200 group-hover:bg-cyan-500'
                     }`}></div>
-                    <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.2em] mb-1">{event.type}</p>
+                    <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.2em] mb-1">{t('student.event.' + event.type, event.type)}</p>
                     <p className={`font-black leading-tight mb-1 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{event.title}</p>
                     <p className={`text-xs font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{formatDate(event.date)} • {event.time}</p>
                   </div>
@@ -521,7 +523,7 @@ const StudentDashboard = () => {
               ) : (
                 <div className="text-center py-12">
                   <FiClock className={`w-10 h-10 mx-auto mb-4 ${isDark ? 'text-slate-700' : 'text-slate-200'}`} />
-                  <p className={`font-bold text-xs uppercase tracking-widest ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>No upcoming events</p>
+                  <p className={`font-bold text-xs uppercase tracking-widest ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>{t('student.dash.noUpcomingEvents')}</p>
                 </div>
               )}
               <button 
@@ -532,19 +534,19 @@ const StudentDashboard = () => {
                     : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-200'
                 }`}
               >
-                View Full Schedule
+                {t('student.dash.viewFullSchedule')}
               </button>
             </div>
           </Card>
 
-          <Card title="Course Progress" className="rounded-[32px] p-8">
+          <Card title={t('student.dash.courseProgress')} className="rounded-[32px] p-8">
             <div className="space-y-6">
               {courseDistribution.length > 0 ? (
                 courseDistribution.map((item, i) => (
                   <div key={i} className="space-y-2">
                     <div className="flex justify-between items-end">
                       <p className={`text-sm font-black ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{item.name}</p>
-                      <p className={`text-xs font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{item.value} Courses</p>
+                      <p className={`text-xs font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{item.value} {t('student.dash.courses')}</p>
                     </div>
                     <div className={`h-2 w-full rounded-full overflow-hidden ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}>
                       <div 
@@ -555,7 +557,7 @@ const StudentDashboard = () => {
                   </div>
                 ))
               ) : (
-                <p className={`text-center py-4 font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>No course data available</p>
+                <p className={`text-center py-4 font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('student.dash.noCourseData')}</p>
               )}
             </div>
           </Card>
@@ -565,14 +567,14 @@ const StudentDashboard = () => {
       {/* Data Tables Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Courses Table */}
-        <Card title="Enrolled Courses" className="rounded-[32px] p-8">
+        <Card title={t('student.dash.enrolledCourses')} className="rounded-[32px] p-8">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className={`border-b ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
-                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Course</th>
-                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Progress</th>
-                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Status</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('common.course')}</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('common.progress')}</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('common.status')}</th>
                 </tr>
               </thead>
               <tbody className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
@@ -589,17 +591,17 @@ const StudentDashboard = () => {
                             style={{ width: `${Math.min(course.value * 20, 100)}%` }}
                           ></div>
                         </div>
-                        <p className={`text-xs font-bold mt-1 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>{course.value} courses</p>
+                        <p className={`text-xs font-bold mt-1 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>{course.value} {t('student.dash.courses')}</p>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">Active</span>
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">{t('common.active')}</span>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan="3" className={`py-8 text-center font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                      No courses enrolled yet
+                      {t('student.dash.noCourses')}
                     </td>
                   </tr>
                 )}
@@ -614,19 +616,19 @@ const StudentDashboard = () => {
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
-            View All Courses
+            {t('student.dash.viewAllCourses')}
           </button>
         </Card>
 
         {/* Recent Attendance Table */}
-        <Card title="Recent Attendance" className="rounded-[32px] p-8">
+        <Card title={t('student.dash.recentAttendance')} className="rounded-[32px] p-8">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className={`border-b ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
-                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Date</th>
-                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Status</th>
-                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Time</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('common.date')}</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('common.status')}</th>
+                  <th className={`text-left py-3 px-4 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t('common.time')}</th>
                 </tr>
               </thead>
               <tbody className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
@@ -634,7 +636,7 @@ const StudentDashboard = () => {
                   attendanceData.slice(0, 5).map((record, i) => (
                     <tr key={i} className={`transition-colors ${isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50'}`}>
                       <td className="py-3 px-4">
-                        <p className={`font-bold text-sm ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{record.month || 'N/A'}</p>
+                        <p className={`font-bold text-sm ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{record.month || t('common.na')}</p>
                       </td>
                       <td className="py-3 px-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
@@ -644,18 +646,18 @@ const StudentDashboard = () => {
                             ? 'bg-amber-100 text-amber-700' 
                             : 'bg-rose-100 text-rose-700'
                         }`}>
-                          {record.rate}% Present
+                          {record.rate}% {t('common.present')}
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <p className={`text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{record.rate >= 75 ? 'On Time' : 'Late'}</p>
+                        <p className={`text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{record.rate >= 75 ? t('common.onTime') : t('common.late')}</p>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan="3" className={`py-8 text-center font-medium italic ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                      No attendance records yet
+                      {t('student.dash.noAttendanceData')}
                     </td>
                   </tr>
                 )}
@@ -670,7 +672,7 @@ const StudentDashboard = () => {
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
-            View Full Attendance
+            {t('student.dash.viewFullAttendance')}
           </button>
         </Card>
       </div>

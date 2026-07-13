@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../../i18n';
 import { readStoredLanguage } from '../../../lib/languageStorage';
@@ -8,8 +8,6 @@ import { FiCalendar, FiUsers, FiCheckCircle, FiXCircle, FiClock, FiSearch, FiFil
 import CalendarDatePicker from "../../../components/UIHelper/CalendarDatePicker";
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
-const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const STATUS_COLORS = {
   present: 'bg-green-500',
   absent: 'bg-red-500',
@@ -35,6 +33,17 @@ const AdminAttendanceDaily = () => {
   const [empRecordsLoading, setEmpRecordsLoading] = useState(false);
   const [empViewMode, setEmpViewMode] = useState('calendar');
   const { t } = useTranslation('admin');
+
+  const dayLabels = useMemo(() => {
+    const baseDate = new Date(2024, 0, 1);
+    const localeMap = { en: 'en', prs: 'fa', ps: 'ps', dari: 'fa' };
+    const loc = localeMap[i18n.language] || 'en';
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(baseDate);
+      d.setDate(d.getDate() + i);
+      return d.toLocaleDateString(loc, { weekday: 'short' });
+    });
+  }, [i18n.language]);
 
   useEffect(() => { const lang = readStoredLanguage(); if (lang) i18n.changeLanguage(lang); }, []);
 
@@ -382,7 +391,7 @@ const AdminAttendanceDaily = () => {
             ) : empViewMode === 'calendar' ? (
               <div>
                 <div className="mb-3 grid grid-cols-7 gap-2">
-                  {DAYS_OF_WEEK.map(d => <div key={d} className="py-2 text-center text-sm font-bold text-gray-500 uppercase tracking-wider">{d}</div>)}
+                  {dayLabels.map((d, i) => <div key={i} className="py-2 text-center text-sm font-bold text-gray-500 uppercase tracking-wider">{d}</div>)}
                 </div>
                 {buildCalendar().map((week, wi) => (
                   <div key={wi} className="mb-2 grid grid-cols-7 gap-2">

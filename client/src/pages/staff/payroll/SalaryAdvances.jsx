@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 
 export const salaryAdvancesConfig = {
@@ -47,18 +48,24 @@ export const salaryAdvancesConfig = {
   })
 };
 
-const SalaryAdvances = () => (
-  <ListPage
-    title={salaryAdvancesConfig.title}
-    subtitle={salaryAdvancesConfig.subtitle}
-    endpoint={salaryAdvancesConfig.endpoint}
-    columns={salaryAdvancesConfig.columns}
-    createPath="/staff/payroll/salary-advances/create"
-    editPathForRow={(row) => `/staff/payroll/salary-advances/edit/${row._id}`}
-    viewPathForRow={(row) => '/staff/payroll/salary-advances/view/' + row._id}
-    searchPlaceholder="Search salary advances..."
-  />
-);
+const SalaryAdvances = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  const columns = salaryAdvancesConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.payroll.salaryAdvances.columns.${col.key}`)
+  }));
+  return (
+    <ListPage
+      title={t('staff.payroll.salaryAdvances.title')}
+      subtitle={t('staff.payroll.salaryAdvances.subtitle')}
+      endpoint={salaryAdvancesConfig.endpoint}
+      columns={columns}
+      createPath="/staff/payroll/salary-advances/create"
+      editPathForRow={(row) => `/staff/payroll/salary-advances/edit/${row._id}`}
+      viewPathForRow={(row) => '/staff/payroll/salary-advances/view/' + row._id}
+      searchPlaceholder={t('staff.payroll.salaryAdvances.searchPlaceholder')}
+    />
+  );
+};
 
 export default SalaryAdvances;
-

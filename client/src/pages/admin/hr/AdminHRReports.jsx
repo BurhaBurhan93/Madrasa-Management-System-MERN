@@ -75,28 +75,28 @@ const HRReports = () => {
 
     const byDept = {};
     activeEmp.forEach(e => {
-      const dept = typeof e.department === 'object' && e.department ? (e.department.departmentName || 'Unknown') : (e.department || 'Unknown');
+      const dept = typeof e.department === 'object' && e.department ? (e.department.departmentName || t('common.unknown')) : (e.department || t('common.unknown'));
       byDept[dept] = (byDept[dept] || 0) + 1;
     });
     const deptData = Object.entries(byDept).sort((a, b) => b[1] - a[1]);
 
     const byGender = {};
     activeEmp.forEach(e => {
-      const g = e.gender || 'Unknown';
+      const g = e.gender || t('common.unknown');
       byGender[g] = (byGender[g] || 0) + 1;
     });
     const genderData = Object.entries(byGender);
 
     const byEmpType = {};
     activeEmp.forEach(e => {
-      const et = e.employeeType || 'Unknown';
+      const et = e.employeeType || t('common.unknown');
       byEmpType[et] = (byEmpType[et] || 0) + 1;
     });
     const empTypeData = Object.entries(byEmpType);
 
     const byDesignation = {};
     activeEmp.forEach(e => {
-      const des = typeof e.designation === 'object' && e.designation ? (e.designation.designationTitle || 'Unknown') : (e.designation || 'Unknown');
+      const des = typeof e.designation === 'object' && e.designation ? (e.designation.designationTitle || t('common.unknown')) : (e.designation || t('common.unknown'));
       byDesignation[des] = (byDesignation[des] || 0) + 1;
     });
     const desData = Object.entries(byDesignation).sort((a, b) => b[1] - a[1]);
@@ -220,7 +220,7 @@ const HRReports = () => {
                 <div key={i} className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: name === 'male' ? '#0ea5e9' : name === 'female' ? '#ec4899' : '#94a3b8' }} />
-                    <span className="text-sm text-slate-700">{name.charAt(0).toUpperCase() + name.slice(1)}</span>
+                    <span className="text-sm text-slate-700">{t('common.' + name.toLowerCase())}</span>
                   </div>
                   <span className="text-sm font-semibold text-slate-800">{count}</span>
                 </div>
@@ -236,7 +236,7 @@ const HRReports = () => {
                 <div key={i} className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
-                    <span className="text-sm text-slate-700">{name.charAt(0).toUpperCase() + name.slice(1)}</span>
+                    <span className="text-sm text-slate-700">{t('users.employeeTypes.' + name.toLowerCase()) || t('common.unknown')}</span>
                   </div>
                   <span className="text-sm font-semibold text-slate-800">{count}</span>
                 </div>

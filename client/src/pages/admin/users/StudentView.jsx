@@ -69,7 +69,7 @@ const StudentView = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-900">{student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim() || t('users.unknown')}</h1>
-              <p className="text-slate-500">{t('users.student')} · {student.studentCode || t('common.na')} · <span className={student.status === 'active' ? 'text-green-600' : 'text-red-600'}>{student.status}</span></p>
+              <p className="text-slate-500">{t('users.student')} <span className="mx-1 text-slate-300">·</span> {student.studentCode || t('common.na')} <span className="mx-1 text-slate-300">·</span> <span className={student.status === 'active' ? 'text-green-600' : 'text-red-600'}>{t('common.' + student.status) || student.status}</span></p>
             </div>
           </div>
         </div>
@@ -81,7 +81,7 @@ const StudentView = () => {
           <DetailRow label={t('users.section')} value={student.section || t('users.sectionADefault')} />
           <DetailRow label={t('users.currentLevel')} value={student.currentLevel} />
           <DetailRow label={t('users.admissionDate')} value={student.admissionDate ? new Date(student.admissionDate).toLocaleDateString() : t('common.na')} />
-          <DetailRow label={t('users.status')} value={student.status} />
+          <DetailRow label={t('users.status')} value={t('common.' + student.status) || student.status} />
           <DetailRow label={t('users.hostelResident')} value={student.isHostelResident ? t('users.yes') : t('users.no')} />
           <DetailRow label={t('users.createdAt')} value={student.createdAt ? new Date(student.createdAt).toLocaleDateString() : t('common.na')} />
         </Section>

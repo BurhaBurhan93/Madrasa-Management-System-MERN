@@ -260,7 +260,7 @@ const StudentPanelContent = () => {
                   <img
                     key={madrasaLogo}
                     src={madrasaLogo}
-                    alt={`${madrasaDisplayName} logo`}
+                    alt={`${madrasaDisplayName} ${t('logo')}`}
                     className="h-full w-full object-cover"
                     onError={() => setLogoErrored(true)}
                   />
@@ -421,7 +421,7 @@ const StudentPanelContent = () => {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                aria-label="Toggle sidebar"
+                aria-label={t('toggleSidebar')}
                 className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700'}`}
               >
                 <FiMenu size={20} />
@@ -429,7 +429,7 @@ const StudentPanelContent = () => {
               <div>
                 <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>{t('console')}</p>
                 <h1 className={`mt-1 text-lg font-semibold lg:text-xl ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>
-                  {t('welcome')} <span className="bg-gradient-to-r from-cyan-600 to-sky-600 bg-clip-text text-transparent">{user?.name || 'Student'}</span>
+                  {t('welcome')} <span className="bg-gradient-to-r from-cyan-600 to-sky-600 bg-clip-text text-transparent">{user?.name || t('dashboard.defaultStudentName')}</span>
                 </h1>
                 <p className={`mt-1 text-xs lg:text-sm ${theme === 'dark' ? 'text-slate-500' : 'text-slate-500'}`}>{t('subtitle')}</p>
               </div>
@@ -467,9 +467,9 @@ const StudentPanelContent = () => {
         onClose={() => setShowLogoutConfirm(false)}
         onConfirm={confirmLogout}
         title={t('logout')}
-        message="Are you sure you want to logout?"
+        message={t('logoutConfirm')}
         confirmText={t('logout')}
-        cancelText="Cancel"
+        cancelText={t('cancel')}
       />
     </div>
   );

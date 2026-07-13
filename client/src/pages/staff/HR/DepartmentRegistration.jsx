@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 
 export const departmentsConfig = {
@@ -44,18 +45,21 @@ export const departmentsConfig = {
   })
 };
 
-const DepartmentRegistration = () => (
-  <ListPage
-    title={departmentsConfig.title}
-    subtitle={departmentsConfig.subtitle}
-    endpoint={departmentsConfig.endpoint}
-    columns={departmentsConfig.columns}
-    createPath="/staff/hr/departments/create"
-    editPathForRow={(row) => `/staff/hr/departments/edit/${row._id}`}
-    viewPathForRow={(row) => `/staff/hr/departments/view/${row._id}`}
-    searchPlaceholder="Search departments..."
-    clientSidePagination={true}
-  />
-);
+const DepartmentRegistration = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  return (
+    <ListPage
+      title={t('staff.hr.departments.title')}
+      subtitle={t('staff.hr.departments.subtitle')}
+      endpoint={departmentsConfig.endpoint}
+      columns={departmentsConfig.columns.map(col => ({ ...col, header: t(`staff.hr.departments.col${col.key}`) }))}
+      createPath="/staff/hr/departments/create"
+      editPathForRow={(row) => `/staff/hr/departments/edit/${row._id}`}
+      viewPathForRow={(row) => `/staff/hr/departments/view/${row._id}`}
+      searchPlaceholder={t('staff.hr.departments.searchPlaceholder')}
+      clientSidePagination={true}
+    />
+  );
+};
 
 export default DepartmentRegistration;

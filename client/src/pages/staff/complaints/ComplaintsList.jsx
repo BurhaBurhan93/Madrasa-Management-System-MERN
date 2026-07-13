@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import Card from '../../../components/UIHelper/Card';
 import { PageSkeleton } from '../../../components/UIHelper/SkeletonLoader';
@@ -63,6 +64,7 @@ export const complaintsConfig = {
 };
 
 const StaffComplaintsList = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [stats, setStats] = useState({
     totalComplaints: 0,
     openComplaints: 0,
@@ -150,7 +152,7 @@ const StaffComplaintsList = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Total</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.complaints.list.total')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalComplaints}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -162,7 +164,7 @@ const StaffComplaintsList = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-gray-50 to-slate-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Open</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.complaints.list.open')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.openComplaints}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-900/30 flex items-center justify-center">
@@ -174,7 +176,7 @@ const StaffComplaintsList = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">In Progress</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.complaints.list.inProgress')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.inProgressComplaints}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -186,7 +188,7 @@ const StaffComplaintsList = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Closed</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.complaints.list.closed')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.closedComplaints}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -198,7 +200,7 @@ const StaffComplaintsList = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-rose-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">High Priority</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.complaints.list.highPriority')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.highPriority}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -210,20 +212,20 @@ const StaffComplaintsList = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
-          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Complaints by Category</h3>
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('staff.complaints.list.byCategory')}</h3>
           {stats.byCategory.length > 0 ? (
             <PieChartComponent data={stats.byCategory} height={250} />
           ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
+            <p className="text-sm text-gray-500 text-center py-8">{t('common.noData')}</p>
           )}
         </Card>
         
         <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
-          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">Complaints by Priority</h3>
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('staff.complaints.list.byPriority')}</h3>
           {stats.byPriority.length > 0 ? (
             <BarChartComponent data={stats.byPriority} dataKey="value" nameKey="name" height={250} />
           ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No data available</p>
+            <p className="text-sm text-gray-500 text-center py-8">{t('common.noData')}</p>
           )}
         </Card>
       </div>
@@ -233,16 +235,16 @@ const StaffComplaintsList = () => {
   if (loading) {
     return (
       <ListPage
-        eyebrow="Complaints" title="Complaints"
+        eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.list.title')}
         endpoint={complaintsConfig.endpoint} columns={complaintsConfig.columns}
         viewPathForRow={(row) => `/staff/complaints/view/${getId(row)}`}
         editPathForRow={(row) => `/staff/complaints/edit/${getId(row)}`}
-        searchPlaceholder="Search complaints..."
+        searchPlaceholder={t('common.search', 'Search complaints...')}
         clientSidePagination={true}
         deleteEnabled={false}
         extraActionItemsForRow={(row, refetch) => [
-          row.status !== 'in_progress' && row.status !== 'in-progress' ? { label: 'Mark In Progress', className: 'text-amber-700 hover:bg-amber-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'in_progress' }) }); refetch(); } } : null,
-          row.status !== 'closed' && row.status !== 'resolved' ? { label: 'Close Complaint', className: 'text-rose-700 hover:bg-rose-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'resolved' }) }); refetch(); } } : null
+          row.status !== 'in_progress' && row.status !== 'in-progress' ? { label: t('staff.complaints.list.markInProgress'), className: 'text-amber-700 hover:bg-amber-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'in_progress' }) }); refetch(); } } : null,
+          row.status !== 'closed' && row.status !== 'resolved' ? { label: t('staff.complaints.list.closeComplaint'), className: 'text-rose-700 hover:bg-rose-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'resolved' }) }); refetch(); } } : null
         ].filter(Boolean)}
         headerContent={<PageSkeleton type="dashboard" />}
       />
@@ -251,16 +253,16 @@ const StaffComplaintsList = () => {
 
   return (
     <ListPage
-      eyebrow="Complaints" title="Complaints" subtitle="Track complaint records with the same clean table, filters, and status workflow."
+      eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.list.title')} subtitle={t('staff.complaints.list.subtitle')}
       endpoint={complaintsConfig.endpoint} columns={complaintsConfig.columns}
       viewPathForRow={(row) => `/staff/complaints/view/${getId(row)}`}
       editPathForRow={(row) => `/staff/complaints/edit/${getId(row)}`}
-      searchPlaceholder="Search complaints..."
+      searchPlaceholder={t('common.search', 'Search complaints...')}
       clientSidePagination={true}
       deleteEnabled={false}
       extraActionItemsForRow={(row, refetch) => [
-        row.status !== 'in_progress' && row.status !== 'in-progress' ? { label: 'Mark In Progress', className: 'text-amber-700 hover:bg-amber-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'in_progress' }) }); refetch(); } } : null,
-        row.status !== 'closed' && row.status !== 'resolved' ? { label: 'Close Complaint', className: 'text-rose-700 hover:bg-rose-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'resolved' }) }); refetch(); } } : null
+        row.status !== 'in_progress' && row.status !== 'in-progress' ? { label: t('staff.complaints.list.markInProgress'), className: 'text-amber-700 hover:bg-amber-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'in_progress' }) }); refetch(); } } : null,
+        row.status !== 'closed' && row.status !== 'resolved' ? { label: t('staff.complaints.list.closeComplaint'), className: 'text-rose-700 hover:bg-rose-50', onClick: async () => { await fetch(`${apiBase}/staff/complaints/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'resolved' }) }); refetch(); } } : null
       ].filter(Boolean)}
       headerContent={headerContent}
     />

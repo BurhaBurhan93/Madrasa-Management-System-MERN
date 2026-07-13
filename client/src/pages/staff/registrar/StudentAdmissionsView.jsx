@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import RecordViewPage from '../shared/RecordViewPage';
 import { studentAdmissionsConfig } from './StudentAdmissions';
@@ -16,13 +17,14 @@ const mapRowToView = (row) => ({
 });
 
 const StudentAdmissionsView = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  const fields = studentAdmissionsConfig.formFields.map((field) => ({ name: field.name, label: field.label }));
+  const fields = studentAdmissionsConfig.formFields.map((field) => ({ name: field.name, label: t(`staff.registrar.studentAdmissions.fields.${field.name}`) }));
 
   return (
     <RecordViewPage
-      title="Student Admission"
-      subtitle="Review admission details"
+      title={t('staff.registrar.studentAdmissions.view.title')}
+      subtitle={t('staff.registrar.studentAdmissions.view.subtitle')}
       endpoint={studentAdmissionsConfig.endpoint}
       id={id}
       fields={fields}

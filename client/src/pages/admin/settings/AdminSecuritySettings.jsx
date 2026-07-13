@@ -116,7 +116,7 @@ const AdminSecuritySettings = () => {
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('settings.twoFactorAuth')}</h2>
           <Field label={t('settings.enableTwoFactorAuth')} name="enable2FA" type="checkbox" />
-          <Field label={t('settings.twoFAMethod')} name="twoFAMethod" type="select" options={[{ value: 'email', label: 'Email OTP' }, { value: 'sms', label: 'SMS OTP' }, { value: 'app', label: 'Authenticator App' }]} />
+          <Field label={t('settings.twoFAMethod')} name="twoFAMethod" type="select" options={[{ value: 'email', label: t('settings.otpEmail') }, { value: 'sms', label: t('settings.otpSms') }, { value: 'app', label: t('settings.otpApp') }]} />
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -143,7 +143,7 @@ const AdminSecuritySettings = () => {
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('settings.dataEncryption')}</h2>
           <Field label={t('settings.enableDataEncryption')} name="enableDataEncryption" type="checkbox" />
-          <Field label={t('settings.encryptionMethod')} name="encryptionMethod" type="select" options={[{ value: 'aes-256', label: 'AES-256' }, { value: 'aes-128', label: 'AES-128' }, { value: 'rsa-2048', label: 'RSA-2048' }]} />
+          <Field label={t('settings.encryptionMethod')} name="encryptionMethod" type="select" options={[{ value: 'aes-256', label: t('settings.encAes256') }, { value: 'aes-128', label: t('settings.encAes128') }, { value: 'rsa-2048', label: t('settings.encRsa2048') }]} />
         </div>
       </div>
     </div>

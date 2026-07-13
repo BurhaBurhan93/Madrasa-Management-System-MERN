@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
 const TeacherLeaveApply = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [leaveTypes, setLeaveTypes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -38,11 +40,11 @@ const TeacherLeaveApply = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.leaveType || !form.startDate || !form.endDate) {
-      alert('Please fill all required fields');
+      alert(t('teacher.leaveApply.requiredFields'));
       return;
     }
     if (new Date(form.endDate) < new Date(form.startDate)) {
-      alert('End date must be after start date');
+      alert(t('teacher.leaveApply.endDateAfterStart'));
       return;
     }
     setSubmitting(true);
@@ -59,13 +61,13 @@ const TeacherLeaveApply = () => {
       });
       const data = await parseJsonSafe(res);
       if (data.success) {
-        alert('Leave application submitted successfully');
+        alert(t('teacher.leaveApply.success'));
         navigate('/teacher/leaves');
       } else {
-        alert(data.message || 'Failed to submit leave application');
+        alert(data.message || t('teacher.leaveApply.failed'));
       }
     } catch (e) {
-      alert('Failed to submit leave application');
+      alert(t('teacher.leaveApply.failed'));
     } finally {
       setSubmitting(false);
     }
@@ -76,28 +78,28 @@ const TeacherLeaveApply = () => {
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Apply for Leave</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Submit a new leave application</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.leaveApply.title')}</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.leaveApply.subtitle')}</p>
           </div>
           <button
             onClick={() => navigate('/teacher/leaves')}
             className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
           >
-            Back to Leaves
+            {t('teacher.leaveApply.backToLeaves')}
           </button>
         </div>
 
         <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Leave Type *</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">{t('teacher.leaveApply.leaveType')}</label>
               <select
                 name="leaveType"
                 value={form.leaveType}
                 onChange={handleChange}
                 className={fieldCls}
               >
-                <option value="">Select leave type</option>
+                <option value="">{t('teacher.leaveApply.selectLeaveType')}</option>
                 {leaveTypes.map((lt) => (
                   <option key={lt._id} value={lt._id}>
                     {lt.leaveTypeName} {lt.leaveCode ? `(${lt.leaveCode})` : ''}
@@ -108,7 +110,7 @@ const TeacherLeaveApply = () => {
 
             <div className="grid gap-6 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Start Date *</label>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">{t('teacher.leaveApply.startDate')}</label>
                 <input
                   type="date"
                   name="startDate"
@@ -118,7 +120,7 @@ const TeacherLeaveApply = () => {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">End Date *</label>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">{t('teacher.leaveApply.endDate')}</label>
                 <input
                   type="date"
                   name="endDate"
@@ -130,14 +132,14 @@ const TeacherLeaveApply = () => {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">Reason</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">{t('teacher.leaveApply.reason')}</label>
               <textarea
                 name="reason"
                 value={form.reason}
                 onChange={handleChange}
                 rows={4}
                 className={fieldCls}
-                placeholder="Describe the reason for your leave..."
+                placeholder={t('teacher.leaveApply.reasonPlaceholder')}
               />
             </div>
 
@@ -147,14 +149,14 @@ const TeacherLeaveApply = () => {
                 onClick={() => navigate('/teacher/leaves')}
                 className="rounded-2xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
                 disabled={submitting}
                 className="rounded-2xl bg-cyan-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-md disabled:opacity-50 disabled:hover:translate-y-0"
               >
-                {submitting ? 'Submitting...' : 'Submit Application'}
+                {submitting ? t('common.saving') : t('teacher.leaveApply.submit')}
               </button>
             </div>
           </form>

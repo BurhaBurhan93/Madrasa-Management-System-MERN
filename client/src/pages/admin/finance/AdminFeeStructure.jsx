@@ -108,19 +108,19 @@ const AdminFeeStructure = () => {
     const { default: autoTable } = await import('jspdf-autotable');
     const doc = new jsPDF('l', 'mm', 'a4');
     doc.setFontSize(16);
-    doc.text('Fee Structures Report', 14, 20);
+    doc.text(t('finance.feeStructure'), 14, 20);
     doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
+    doc.text(new Date().toLocaleDateString(), 14, 28);
     autoTable(doc, {
       startY: 34,
-      head: [['Code', 'Name', 'Type', 'Amount', 'Frequency', 'From', 'To', 'Mandatory', 'Status']],
+      head: [[t('finance.feeCode'), t('finance.feeName'), t('finance.feeType'), t('finance.amount'), t('finance.frequency'), t('finance.applicableFrom'), t('finance.applicableTo'), t('finance.mandatory'), t('finance.status')]],
       body: feeStructures.map(f => [
         f.feeCode || '-', f.feeName || '-', f.feeType || '-',
         `Rs.${(f.amount || 0).toLocaleString()}`,
         f.frequency || '-',
         f.applicableFrom ? new Date(f.applicableFrom).toLocaleDateString() : '-',
         f.applicableTo ? new Date(f.applicableTo).toLocaleDateString() : '-',
-        f.isMandatory ? 'Yes' : 'No',
+        f.isMandatory ? t('common.yes') : t('common.no'),
         f.status || '-',
       ]),
       styles: { fontSize: 9 },
@@ -286,7 +286,7 @@ const AdminFeeStructure = () => {
               disabled={page === 1}
               onClick={() => setPage(p => Math.max(1, p - 1))}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >Prev</button>
+            >{t('common.previous')}</button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
               <button
                 key={p}
@@ -300,7 +300,7 @@ const AdminFeeStructure = () => {
               disabled={page === totalPages}
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >Next</button>
+            >{t('common.next')}</button>
           </div>
         </div>
       )}
@@ -315,7 +315,7 @@ const AdminFeeStructure = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.feeCode')}</label>
-                  <input type="text" value={form.feeCode} onChange={e => setForm({...form, feeCode: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder="e.g., FEE-001" />
+                  <input type="text" value={form.feeCode} onChange={e => setForm({...form, feeCode: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder={t('finance.feeCode')} />
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.feeName')} *</label>

@@ -53,7 +53,7 @@ const TeacherExamDetails = () => {
   };
 
   if (loading) return <div className="flex h-64 items-center justify-center"><div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-600" /></div>;
-  if (!exam) return <div className="p-6 text-rose-500">{t('examDetails.examNotFound')}</div>;
+  if (!exam) return <div className="p-6 text-rose-500">{t('teacher.examDetails.examNotFound')}</div>;
 
   return (
     <div className={PANEL_PAGE_BG}>
@@ -130,7 +130,7 @@ const TeacherExamDetails = () => {
                     <ul className="mt-3 ml-4 space-y-1">
                       {q.options.map((opt, j) => (
                         <li key={j} className={`text-sm ${opt === q.correctAnswer ? 'font-medium text-emerald-600' : 'text-slate-600'}`}>
-                          {String.fromCharCode(65 + j)}. {opt} {opt === q.correctAnswer && '✓'}
+                          {String.fromCharCode(65 + j)}. {opt} {opt === q.correctAnswer && <span title={t('common.correct')}>✓</span>}
                         </li>
                       ))}
                     </ul>

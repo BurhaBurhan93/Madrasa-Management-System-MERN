@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
@@ -47,6 +48,7 @@ const StudentAvatar = ({ src, name, size = 'h-9 w-9' }) => {
 };
 
 const TeacherEnterMarks = () => {
+  const { t } = useTranslation();
   const [exams, setExams] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
@@ -74,9 +76,9 @@ const TeacherEnterMarks = () => {
   }, []);
 
   const loadStudents = async () => {
-    if (!classId) { alert('Please select a class'); return; }
-    if (!examId) { alert('Please select an exam'); return; }
-    if (!subjectId) { alert('Please select a subject'); return; }
+    if (!classId) { alert(t('teacher.enterMarks.selectClassFirst')); return; }
+    if (!examId) { alert(t('teacher.enterMarks.selectExamFirst')); return; }
+    if (!subjectId) { alert(t('teacher.enterMarks.selectSubjectFirst')); return; }
     setLoading(true);
     try {
       const [studentsRes, resultsRes] = await Promise.all([
@@ -104,8 +106,8 @@ const TeacherEnterMarks = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!examId || !subjectId || !classId) { alert('Please select exam, subject and class'); return; }
-    if (!students.length) { alert('No students loaded'); return; }
+    if (!examId || !subjectId || !classId) { alert(t('teacher.enterMarks.selectExamFirst')); return; }
+    if (!students.length) { alert(t('teacher.enterMarks.noStudents')); return; }
     setSaving(true);
     try {
       const marksArr = students.map(s => ({
@@ -119,9 +121,9 @@ const TeacherEnterMarks = () => {
         body: JSON.stringify({ examId, subjectId, classId, marks: marksArr }),
       });
       const data = await parseJsonSafe(res);
-      if (data.success) alert('All marks saved successfully');
-      else alert(data.message || 'Failed to save marks');
-    } catch { alert('Failed to save marks'); } finally { setSaving(false); }
+      if (data.success) alert(t('teacher.enterMarks.savedSuccessfully'));
+      else alert(data.message || t('teacher.enterMarks.saveFailed'));
+    } catch { alert(t('teacher.enterMarks.saveFailed')); } finally { setSaving(false); }
   };
 
   const summary = useMemo(() => {
@@ -143,8 +145,8 @@ const TeacherEnterMarks = () => {
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Enter Marks</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Select exam, subject, class and enter student marks</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.enterMarks.title')}</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.enterMarks.subtitle')}</p>
           </div>
           <div className="text-right">
             <p className="text-xs font-medium text-slate-400 dark:text-slate-500">{today}</p>
@@ -157,45 +159,45 @@ const TeacherEnterMarks = () => {
           <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
             <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-              Exam Information
+              {t('teacher.enterMarks.examInfo')}
             </h2>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
               <div>
-                <label className={labelCls}>Exam *</label>
+                <label className={labelCls}>{t('teacher.enterMarks.exam')} *</label>
                 <select value={examId} onChange={e => setExamId(e.target.value)} className={fieldCls} required>
-                  <option value="">-- Select Exam --</option>
+                  <option value="">{t('teacher.enterMarks.selectExam')}</option>
                   {exams.map(e => <option key={e._id} value={e._id}>{e.title}</option>)}
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Subject *</label>
+                <label className={labelCls}>{t('teacher.enterMarks.subject')} *</label>
                 <select value={subjectId} onChange={e => setSubjectId(e.target.value)} className={fieldCls} required>
-                  <option value="">-- Select Subject --</option>
+                  <option value="">{t('teacher.enterMarks.selectSubject')}</option>
                   {subjects.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Class *</label>
+                <label className={labelCls}>{t('teacher.enterMarks.class')} *</label>
                 <select value={classId} onChange={e => setClassId(e.target.value)} className={fieldCls} required>
-                  <option value="">-- Select Class --</option>
-                  {classes.map(c => <option key={c._id} value={c._id}>{c.name} - Section {c.section || ''}</option>)}
+                  <option value="">{t('teacher.enterMarks.selectClass')}</option>
+                  {classes.map(c => <option key={c._id} value={c._id}>{c.name} {t('teacher.enterMarks.section')} {c.section || ''}</option>)}
                 </select>
               </div>
               <div>
-                <label className={labelCls}>Default Total Marks</label>
+                <label className={labelCls}>{t('teacher.enterMarks.defaultTotalMarks')}</label>
                 <input type="number" min="1" value={defaultTotal} onChange={e => setDefaultTotal(Math.max(1, Number(e.target.value)))} className={fieldCls} />
               </div>
             </div>
             <div className="mt-5 flex items-center justify-between">
               <div className="flex gap-2 flex-wrap">
-                {selectedExamName && <span className="inline-flex items-center gap-1 rounded-full bg-cyan-50 px-3 py-1 text-xs font-medium text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400">Exam: {selectedExamName}</span>}
-                {selectedSubjectName && <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">Subject: {selectedSubjectName}</span>}
-                {selectedClassName.name && <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Class: {selectedClassName.name} {selectedClassName.section || ''}</span>}
+                {selectedExamName && <span className="inline-flex items-center gap-1 rounded-full bg-cyan-50 px-3 py-1 text-xs font-medium text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400">{t('teacher.enterMarks.examLabel')}{selectedExamName}</span>}
+                {selectedSubjectName && <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">{t('teacher.enterMarks.subjectLabel')}{selectedSubjectName}</span>}
+                {selectedClassName.name && <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">{t('teacher.enterMarks.classLabel')}{selectedClassName.name} {selectedClassName.section || ''}</span>}
               </div>
               <button type="button" onClick={loadStudents} disabled={loading} className="rounded-2xl bg-cyan-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-cyan-700 disabled:opacity-60">
                 {loading ? (
-                  <span className="flex items-center gap-2"><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> Loading...</span>
-                ) : 'Load Students'}
+                  <span className="flex items-center gap-2"><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> {t('common.loading')}</span>
+                ) : t('teacher.enterMarks.loadStudents')}
               </button>
             </div>
           </div>
@@ -206,11 +208,11 @@ const TeacherEnterMarks = () => {
               {/* Summary */}
               <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-5">
                 {[
-                  { label: 'Total Students', value: students.length, accent: 'bg-cyan-500', icon: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2' },
-                  { label: 'Marks Entered', value: summary.entered, accent: 'bg-blue-500', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4' },
-                  { label: 'Class Average', value: summary.avg + '%', accent: 'bg-violet-500', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
-                  { label: 'Pass', value: summary.pass, accent: 'bg-emerald-500', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
-                  { label: 'Fail', value: summary.fail, accent: 'bg-rose-500', icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z' },
+                  { label: t('teacher.enterMarks.totalStudents'), value: students.length, accent: 'bg-cyan-500', icon: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2' },
+                  { label: t('teacher.enterMarks.marksEntered'), value: summary.entered, accent: 'bg-blue-500', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4' },
+                  { label: t('teacher.enterMarks.classAverage'), value: summary.avg + '%', accent: 'bg-violet-500', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+                  { label: t('teacher.enterMarks.pass'), value: summary.pass, accent: 'bg-emerald-500', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+                  { label: t('teacher.enterMarks.fail'), value: summary.fail, accent: 'bg-rose-500', icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z' },
                 ].map(c => (
                   <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
                     <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
@@ -232,16 +234,16 @@ const TeacherEnterMarks = () => {
                 <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-700">
                   <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                    Student Marks Entry
+                    {t('teacher.enterMarks.studentMarksEntry')}
                   </h2>
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">{students.length} students</span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">{students.length} {t('common.records')}</span>
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-700/50">
-                        {['#', 'Photo', 'Student ID', 'Student Name', 'Father Name', 'Guardian', 'Phone', 'Class', 'Level', 'DOB', 'Blood', 'Admission', 'Total', 'Obtained', '%', 'Grade', 'Status'].map(h => (
+                        {[t('common.hash'), t('teacher.enterMarks.photo'), t('teacher.enterMarks.studentId'), t('teacher.enterMarks.studentName'), t('teacher.enterMarks.fatherName'), t('teacher.enterMarks.guardian'), t('common.phone'), t('common.class'), t('teacher.enterMarks.level'), t('teacher.enterMarks.dob'), t('teacher.enterMarks.blood'), t('teacher.enterMarks.admission'), t('common.total'), t('teacher.enterMarks.obtained'), t('teacher.enterMarks.percent'), t('common.grade'), t('common.status')].map(h => (
                           <th key={h} className="whitespace-nowrap px-3 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{h}</th>
                         ))}
                       </tr>
@@ -300,7 +302,7 @@ const TeacherEnterMarks = () => {
                             <td className="px-3 py-3">
                               {hasMark && (
                                 <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${pass ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
-                                  {pass ? 'Pass' : 'Fail'}
+                                  {pass ? t('teacher.enterMarks.pass') : t('teacher.enterMarks.fail')}
                                 </span>
                               )}
                             </td>
@@ -314,7 +316,7 @@ const TeacherEnterMarks = () => {
                 {/* Footer */}
                 <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4 dark:border-slate-700">
                   <div className="text-xs text-slate-400 dark:text-slate-500">
-                    <p className="font-medium text-slate-500 dark:text-slate-400">Grade Scale:</p>
+                    <p className="font-medium text-slate-500 dark:text-slate-400">{t('teacher.enterMarks.gradeScale')}</p>
                     <div className="mt-1 flex flex-wrap gap-2">
                       {Object.entries(gradeColors).map(([g, cls]) => (
                         <span key={g} className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${cls}`}>
@@ -325,8 +327,8 @@ const TeacherEnterMarks = () => {
                   </div>
                   <button type="submit" disabled={saving} className="rounded-2xl bg-cyan-600 px-8 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-cyan-700 disabled:opacity-60">
                     {saving ? (
-                      <span className="flex items-center gap-2"><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> Saving...</span>
-                    ) : 'Save All Marks'}
+                      <span className="flex items-center gap-2"><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> {t('common.saving')}</span>
+                    ) : t('teacher.enterMarks.saveAllMarks')}
                   </button>
                 </div>
               </div>
@@ -339,8 +341,8 @@ const TeacherEnterMarks = () => {
               <div className="mb-4 rounded-2xl bg-slate-100 p-5 dark:bg-slate-700/50">
                 <svg className="h-12 w-12 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
               </div>
-              <p className="text-base font-medium text-slate-600 dark:text-slate-300">No students loaded</p>
-              <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">Select exam, subject and class above, then click "Load Students"</p>
+              <p className="text-base font-medium text-slate-600 dark:text-slate-300">{t('teacher.enterMarks.noStudents')}</p>
+              <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">{t('teacher.enterMarks.noStudentsHint')}</p>
             </div>
           )}
         </form>

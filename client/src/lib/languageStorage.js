@@ -9,7 +9,7 @@ const normalizeLanguage = (value, fallback = 'en') => {
       ? trimmed.slice(1, -1)
       : trimmed;
 
-  if (unquoted === 'dari') return 'dari';
+  if (unquoted === 'dari') return 'prs';
   if (unquoted === 'prs' || unquoted === 'ps' || unquoted === 'en') {
     return unquoted;
   }
@@ -38,8 +38,6 @@ export const writeStoredLanguage = (key, value) => {
   return normalized;
 };
 
-export const toI18nLanguage = (value, fallback = 'en') => {
-  const normalized = normalizeLanguage(value, fallback);
-  return normalized === 'dari' ? 'prs' : normalized;
-};
+export const toI18nLanguage = (value, fallback = 'en') =>
+  normalizeLanguage(value, fallback);
 

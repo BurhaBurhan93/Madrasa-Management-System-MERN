@@ -59,7 +59,7 @@ const AdminAttendanceWarnings = () => {
   const warningTypeLabel = (type) => {
     if (type === 'low_attendance') return t('attendance.warningLowAttendance');
     if (type === 'excessive_late') return t('attendance.warningExcessiveLate');
-    return type;
+    return t('attendance.' + type) || type;
   };
 
   if (loading) {
@@ -182,7 +182,7 @@ const AdminAttendanceWarnings = () => {
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
                         }`}>
-                        <FiBell size={12} /> {actionLoading === w._id ? '...' : t('attendance.notify')}
+                        <FiBell size={12} /> {actionLoading === w._id ? <span className="loading-dots">{t('common.loading')}</span> : t('attendance.notify')}
                       </button>
                       <button onClick={() => handleDismiss(w._id)} disabled={actionLoading === w._id || w.status === 'dismissed'}
                         className={`flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${
@@ -190,7 +190,7 @@ const AdminAttendanceWarnings = () => {
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}>
-                        <FiCheckCircle size={12} /> {actionLoading === w._id ? '...' : t('attendance.dismiss')}
+                        <FiCheckCircle size={12} /> {actionLoading === w._id ? <span className="loading-dots">{t('common.loading')}</span> : t('attendance.dismiss')}
                       </button>
                     </div>
                   </td>

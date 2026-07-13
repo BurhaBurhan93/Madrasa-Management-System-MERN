@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../lib/apiFetch';
 import { 
   FiBook, 
@@ -28,6 +29,7 @@ const MOCK_EDUCATION = [
 ];
 
 const StudentEducation = () => {
+  const { t } = useTranslation(['student', 'common']);
   const navigate = useNavigate();
   const [educationHistory, setEducationHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +45,7 @@ const StudentEducation = () => {
       setEducationHistory(records.length > 0 ? records : MOCK_EDUCATION);
     } catch (err) {
       console.error('Error fetching education data:', err);
-      setError('Using offline data — API unavailable.');
+      setError(t('student.education.offlineData'));
       setEducationHistory(MOCK_EDUCATION);
     } finally {
       setLoading(false);
@@ -66,7 +68,7 @@ const StudentEducation = () => {
   if (error) return (
     <div className="py-20 text-center">
       <p className="text-red-500 mb-4">{error}</p>
-      <button onClick={fetchEducationData} className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm">Retry</button>
+      <button onClick={fetchEducationData} className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm">{t('common.retry')}</button>
     </div>
   );
 
@@ -75,16 +77,16 @@ const StudentEducation = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Academic</p>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Education History</h1>
-          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">Your verified academic background and qualifications</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('student.education.academic')}</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('student.education.title')}</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('student.education.subtitle')}</p>
         </div>
         <Button 
           variant="outline" 
           className="rounded-2xl border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-2 font-black text-xs uppercase tracking-widest"
           onClick={() => navigate('/student/communications')}
         >
-          <FiMessageSquare /> Contact Registrar
+          <FiMessageSquare /> {t('student.education.contactRegistrar')}
         </Button>
       </div>
 
@@ -95,10 +97,9 @@ const StudentEducation = () => {
             <FiAlertCircle />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-black text-amber-900 mb-2">Read-Only Verification</h3>
+            <h3 className="text-xl font-black text-amber-900 mb-2">{t('student.education.readOnlyVerification')}</h3>
             <p className="text-amber-800/80 font-medium leading-relaxed max-w-2xl">
-              Your academic background is verified and managed by the Registrar's office. 
-              To update your records or add new certifications, please submit a formal request with supporting documentation.
+              {t('student.education.verificationBanner')}
             </p>
           </div>
         </div>
@@ -108,10 +109,10 @@ const StudentEducation = () => {
       {/* Stats Summary Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Total Records', value: educationHistory.length, icon: <FiBook />, color: 'blue' },
-          { label: 'Certifications', value: certificationsCount, icon: <FiAward />, color: 'emerald' },
-          { label: 'Institutions', value: institutionsCount, icon: <FiTrendingUp />, color: 'purple' },
-          { label: 'Verified Status', value: '100%', icon: <FiCheckCircle />, color: 'cyan' }
+          { label: t('student.education.totalRecords'), value: educationHistory.length, icon: <FiBook />, color: 'blue' },
+          { label: t('student.education.certifications'), value: certificationsCount, icon: <FiAward />, color: 'emerald' },
+          { label: t('student.education.institutions'), value: institutionsCount, icon: <FiTrendingUp />, color: 'purple' },
+          { label: t('student.education.verifiedStatus'), value: '100%', icon: <FiCheckCircle />, color: 'cyan' }
         ].map((stat, i) => (
           <div key={i} className="p-6 bg-white dark:bg-gray-800 rounded-[32px] border border-slate-100 dark:border-gray-700 shadow-xl shadow-slate-200/50">
             <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
@@ -126,7 +127,7 @@ const StudentEducation = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Education Records List */}
         <div className="lg:col-span-2">
-          <Card title="Verified Academic Records" className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('student.education.verifiedRecords')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <div className="space-y-6">
               {educationHistory.length > 0 ? (
                 educationHistory.map((edu, i) => (
@@ -143,7 +144,7 @@ const StudentEducation = () => {
                           </p>
                         </div>
                       </div>
-                      <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">Verified</Badge>
+                      <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('common.verified')}</Badge>
                     </div>
                     
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
@@ -152,8 +153,8 @@ const StudentEducation = () => {
                           <FiMapPin />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Location</p>
-                          <p className="text-sm font-black text-slate-700 dark:text-gray-300">{edu.location || 'Not Specified'}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('student.education.location')}</p>
+                          <p className="text-sm font-black text-slate-700 dark:text-gray-300">{edu.location || t('student.education.notSpecified')}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
@@ -161,7 +162,7 @@ const StudentEducation = () => {
                           <FiCalendar />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Added On</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('student.education.addedOn')}</p>
                           <p className="text-sm font-black text-slate-700 dark:text-gray-300">{formatDate(edu.createdAt)}</p>
                         </div>
                       </div>
@@ -170,8 +171,8 @@ const StudentEducation = () => {
                           <FiCheckCircle />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                          <p className="text-sm font-black text-emerald-600">Document Verified</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('common.status')}</p>
+                          <p className="text-sm font-black text-emerald-600">{t('student.education.documentVerified')}</p>
                         </div>
                       </div>
                     </div>
@@ -180,7 +181,7 @@ const StudentEducation = () => {
               ) : (
                 <div className="text-center py-20">
                   <FiAward className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No education history found</p>
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('student.education.noHistory')}</p>
                 </div>
               )}
             </div>
@@ -189,10 +190,10 @@ const StudentEducation = () => {
 
         {/* Sidebar Analytics */}
         <div className="space-y-8">
-          <Card title="Institution Distribution" className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('student.education.institutionDistribution')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <BarChartComponent 
               data={Array.from(new Set(educationHistory.map(e => e.previousInstitution))).map(inst => ({
-                name: inst?.substring(0, 15) || 'Unknown',
+                name: inst?.substring(0, 15) || t('common.unknown'),
                 value: educationHistory.filter(e => e.previousInstitution === inst).length
               }))}
               dataKey="value"
@@ -203,14 +204,14 @@ const StudentEducation = () => {
 
           <div className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 rounded-[32px] text-white shadow-2xl shadow-slate-200/50 relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="text-xl font-black mb-2">Academic Support</h4>
-              <p className="text-slate-400 text-sm font-medium mb-6">Need help with document verification or credit transfers?</p>
+              <h4 className="text-xl font-black mb-2">{t('student.education.academicSupport')}</h4>
+              <p className="text-slate-400 text-sm font-medium mb-6">{t('student.education.academicSupportDesc')}</p>
               <Button 
                 variant="primary" 
                 className="w-full rounded-2xl py-4 bg-cyan-600 hover:bg-cyan-700 font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-cyan-900/20"
                 onClick={() => navigate('/student/communications')}
               >
-                Get Support
+                {t('student.education.getSupport')}
               </Button>
             </div>
             <FiBook className="absolute -right-6 -bottom-6 w-32 h-32 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />

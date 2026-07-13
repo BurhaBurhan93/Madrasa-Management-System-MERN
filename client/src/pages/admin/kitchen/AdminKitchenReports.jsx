@@ -50,11 +50,11 @@ const AdminKitchenReports = () => {
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">{t('kitchen.totalMeals')}</p>
           <p className="mt-2 text-3xl font-bold text-slate-900">{report?.totalMeals || 0}</p>
-          <p className="mt-1 text-xs text-slate-400">{report?.totalStudentMeals || 0} {t('kitchen.students')} / {report?.totalStaffMeals || 0} {t('kitchen.staff')}</p>
+          <p className="mt-1 text-xs text-slate-400">{t('kitchen.students')}: {report?.totalStudentMeals || 0} | {t('kitchen.staff')}: {report?.totalStaffMeals || 0}</p>
         </div>
         <div className="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-medium text-emerald-600 uppercase tracking-wider">{t('kitchen.totalPurchases')}</p>
-          <p className="mt-2 text-3xl font-bold text-emerald-700">{(report?.totalPurchases || 0).toLocaleString()} AFN</p>
+          <p className="mt-2 text-3xl font-bold text-emerald-700">{(report?.totalPurchases || 0).toLocaleString()} {t('common.currencyAfn')}</p>
           <p className="mt-1 text-xs text-emerald-500">{report?.purchaseCount || 0} {t('kitchen.transactions')}</p>
         </div>
         <div className="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm">
@@ -82,7 +82,7 @@ const AdminKitchenReports = () => {
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-base font-semibold text-slate-800 mb-4">{t('kitchen.financialSummary')}</h2>
           <div className="space-y-3">
-            <div className="flex items-center justify-between"><span className="text-sm text-slate-600">{t('kitchen.totalPurchases')}</span><span className="text-sm font-semibold text-slate-800">{(report?.totalPurchases || 0).toLocaleString()} AFN</span></div>
+            <div className="flex items-center justify-between"><span className="text-sm text-slate-600">{t('kitchen.totalPurchases')}</span><span className="text-sm font-semibold text-slate-800">{(report?.totalPurchases || 0).toLocaleString()} {t('common.currencyAfn')}</span></div>
             <div className="flex items-center justify-between"><span className="text-sm text-slate-600">{t('kitchen.purchaseCount')}</span><span className="text-sm font-semibold text-slate-800">{report?.purchaseCount || 0}</span></div>
             <div className="border-t border-slate-100 pt-2 mt-2 flex items-center justify-between"><span className="text-sm font-medium text-slate-700">{t('kitchen.inventoryItems')}</span><span className="text-sm font-semibold text-slate-800">{report?.totalInventoryItems || 0}</span></div>
             <div className="flex items-center justify-between"><span className="text-sm text-slate-600">{t('kitchen.lowStockItems')}</span><span className={`text-sm font-semibold ${report?.lowStockItems > 0 ? 'text-amber-600' : 'text-green-600'}`}>{report?.lowStockItems || 0}</span></div>

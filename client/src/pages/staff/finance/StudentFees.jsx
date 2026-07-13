@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiAlertCircle, FiCalendar, FiCheckCircle, FiCreditCard, FiUsers } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupCountByKey } from '../shared/StaffAnalyticsContent';
 import { staffApi } from '../../../api/staffApi';
@@ -88,6 +89,7 @@ export const studentFeesConfig = {
 };
 
 const StudentFees = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [analytics, setAnalytics] = useState({ loading: true, stats: [], charts: [], insight: null });
 
   useEffect(() => {
@@ -107,25 +109,25 @@ const StudentFees = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: 'Students With Fees', value: fees.length, helper: 'Assigned student-fee records', tone: 'blue', icon: FiUsers },
-            { label: 'Outstanding Balance', value: formatCurrency(outstandingBalance), helper: 'Uncleared payable amount', tone: 'rose', icon: FiAlertCircle },
-            { label: 'Fully Paid', value: paidCount, helper: 'Settled fee accounts', tone: 'emerald', icon: FiCheckCircle },
-            { label: 'Partially Paid', value: partialCount, helper: 'Collections in progress', tone: 'amber', icon: FiCreditCard },
-            { label: 'Overdue Accounts', value: overdueCount, helper: 'Require immediate follow-up', tone: 'violet', icon: FiCalendar }
+            { label: t('staff.finance.studentFees.statStudentsWithFees'), value: fees.length, helper: t('staff.finance.studentFees.statStudentsWithFeesHelper'), tone: 'blue', icon: FiUsers },
+            { label: t('staff.finance.studentFees.statOutstandingBalance'), value: formatCurrency(outstandingBalance), helper: t('staff.finance.studentFees.statOutstandingBalanceHelper'), tone: 'rose', icon: FiAlertCircle },
+            { label: t('staff.finance.studentFees.statFullyPaid'), value: paidCount, helper: t('staff.finance.studentFees.statFullyPaidHelper'), tone: 'emerald', icon: FiCheckCircle },
+            { label: t('staff.finance.studentFees.statPartiallyPaid'), value: partialCount, helper: t('staff.finance.studentFees.statPartiallyPaidHelper'), tone: 'amber', icon: FiCreditCard },
+            { label: t('staff.finance.studentFees.statOverdueAccounts'), value: overdueCount, helper: t('staff.finance.studentFees.statOverdueAccountsHelper'), tone: 'violet', icon: FiCalendar }
           ],
           charts: [
-            { title: 'Payment Status Distribution', type: 'pie', data: groupCountByKey(fees, 'paymentStatus') },
-            { title: 'Academic Year Assignment Mix', type: 'bar', data: groupCountByKey(fees, 'academicYear') }
+            { title: t('staff.finance.studentFees.chartPaymentStatusDistribution'), type: 'pie', data: groupCountByKey(fees, 'paymentStatus') },
+            { title: t('staff.finance.studentFees.chartAcademicYearMix'), type: 'bar', data: groupCountByKey(fees, 'academicYear') }
           ],
           insight: {
-            eyebrow: 'Collections Risk',
-            title: 'Outstanding and overdue fee exposure is now visible from the list page',
-            description: 'Because the current schema centers on payment status and academic year, the dashboard highlights those dimensions instead of guessing unsupported class-level aggregates.'
+            eyebrow: t('staff.finance.studentFees.insightEyebrow'),
+            title: t('staff.finance.studentFees.insightTitle'),
+            description: t('staff.finance.studentFees.insightDescription')
           }
         });
       } catch (error) {
         if (!active) return;
-        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: 'Student fee analytics could not be loaded', description: error.message || 'The fee assignment table is still available below.' } });
+        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('staff.finance.studentFees.errorTitle'), description: error.message || t('staff.finance.studentFees.errorDescription') } });
       }
     };
     load();
@@ -136,7 +138,7 @@ const StudentFees = () => {
 
   return (
     <ListPage
-      eyebrow="Finance"
+      eyebrow={t('staff.finance.eyebrow')}
       title={studentFeesConfig.title}
       subtitle={studentFeesConfig.subtitle}
       endpoint={studentFeesConfig.endpoint}
@@ -144,7 +146,7 @@ const StudentFees = () => {
       createPath="/staff/finance/student-fees/create"
       editPathForRow={(row) => `/staff/finance/student-fees/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/student-fees/view/${row._id}`}
-      searchPlaceholder="Search student fees..."
+      searchPlaceholder={t('staff.finance.studentFees.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

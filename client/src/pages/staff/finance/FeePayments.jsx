@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiAlertTriangle, FiCheckCircle, FiClock, FiCreditCard, FiDollarSign } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupAmountByMonth, groupCountByKey } from '../shared/StaffAnalyticsContent';
 import { staffApi } from '../../../api/staffApi';
@@ -45,6 +46,7 @@ export const feePaymentsConfig = {
 };
 
 const FeePayments = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [analytics, setAnalytics] = useState({ loading: true, stats: [], charts: [], insight: null });
 
   useEffect(() => {
@@ -62,26 +64,26 @@ const FeePayments = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: 'Total Payments', value: payments.length, helper: 'All submitted payment records', tone: 'blue', icon: FiCreditCard },
-            { label: 'Total Collected', value: formatCurrency(totalCollected), helper: 'Sum of paid amounts', tone: 'emerald', icon: FiDollarSign },
-            { label: 'Pending Payments', value: pendingCount, helper: 'Awaiting completion', tone: 'amber', icon: FiClock },
-            { label: 'Failed Payments', value: failedCount, helper: 'Need follow-up or retry', tone: 'rose', icon: FiAlertTriangle },
-            { label: 'Verification Queue', value: verificationQueue, helper: 'Pending manual review', tone: 'violet', icon: FiCheckCircle }
+            { label: t('staff.finance.feePayments.statTotalPayments'), value: payments.length, helper: t('staff.finance.feePayments.statTotalPaymentsHelper'), tone: 'blue', icon: FiCreditCard },
+            { label: t('staff.finance.feePayments.statTotalCollected'), value: formatCurrency(totalCollected), helper: t('staff.finance.feePayments.statTotalCollectedHelper'), tone: 'emerald', icon: FiDollarSign },
+            { label: t('staff.finance.feePayments.statPendingPayments'), value: pendingCount, helper: t('staff.finance.feePayments.statPendingPaymentsHelper'), tone: 'amber', icon: FiClock },
+            { label: t('staff.finance.feePayments.statFailedPayments'), value: failedCount, helper: t('staff.finance.feePayments.statFailedPaymentsHelper'), tone: 'rose', icon: FiAlertTriangle },
+            { label: t('staff.finance.feePayments.statVerificationQueue'), value: verificationQueue, helper: t('staff.finance.feePayments.statVerificationQueueHelper'), tone: 'violet', icon: FiCheckCircle }
           ],
           charts: [
-            { title: 'Payment Method Distribution', type: 'pie', data: groupCountByKey(payments, 'paymentMethod') },
-            { title: 'Payment Status Breakdown', type: 'bar', data: groupCountByKey(payments, 'paymentStatus') },
-            { title: 'Monthly Collections', type: 'line', data: groupAmountByMonth(payments, 'paymentDate', 'paidAmount') }
+            { title: t('staff.finance.feePayments.chartPaymentMethodDistribution'), type: 'pie', data: groupCountByKey(payments, 'paymentMethod') },
+            { title: t('staff.finance.feePayments.chartPaymentStatusBreakdown'), type: 'bar', data: groupCountByKey(payments, 'paymentStatus') },
+            { title: t('staff.finance.feePayments.chartMonthlyCollections'), type: 'line', data: groupAmountByMonth(payments, 'paymentDate', 'paidAmount') }
           ],
           insight: {
-            eyebrow: 'Collections',
-            title: 'Receipts, status, and verification are now visible at a glance',
-            description: 'The page now mirrors the student-facing richness with collection totals, channel mix, and monthly trend signals backed directly by the fee payment schema.'
+            eyebrow: t('staff.finance.feePayments.insightEyebrow'),
+            title: t('staff.finance.feePayments.insightTitle'),
+            description: t('staff.finance.feePayments.insightDescription')
           }
         });
       } catch (error) {
         if (!active) return;
-        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: 'Fee payment analytics could not be loaded', description: error.message || 'The payment table is still available below.' } });
+        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('staff.finance.feePayments.errorTitle'), description: error.message || t('staff.finance.feePayments.errorDescription') } });
       }
     };
     load();
@@ -92,7 +94,7 @@ const FeePayments = () => {
 
   return (
     <ListPage
-      eyebrow="Finance"
+      eyebrow={t('staff.finance.eyebrow')}
       title={feePaymentsConfig.title}
       subtitle={feePaymentsConfig.subtitle}
       endpoint={feePaymentsConfig.endpoint}
@@ -100,7 +102,7 @@ const FeePayments = () => {
       createPath="/staff/finance/fee-payments/create"
       editPathForRow={(row) => `/staff/finance/fee-payments/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/fee-payments/view/${row._id}`}
-      searchPlaceholder="Search fee payments..."
+      searchPlaceholder={t('staff.finance.feePayments.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

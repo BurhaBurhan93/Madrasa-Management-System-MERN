@@ -214,8 +214,8 @@ const AdminHREmployees = () => {
               <div className="space-y-2 mb-4 text-sm">
                 <div className="flex justify-between gap-2"><span className="text-slate-500 shrink-0">{t('common.department')}:</span><span className="font-medium text-slate-900 text-right truncate min-w-0" title={getDeptName(emp.department)}>{getDeptName(emp.department)}</span></div>
                 <div className="flex justify-between gap-2"><span className="text-slate-500 shrink-0">{t('common.joinDate')}:</span><span className="font-medium text-slate-900 text-right shrink-0">{emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString() : '-'}</span></div>
-                <div className="flex justify-between gap-2"><span className="text-slate-500 shrink-0">{t('hr.monthlySalary')}:</span><span className="font-medium text-slate-900 text-right shrink-0">{emp.baseSalary ? `Rs. ${emp.baseSalary.toLocaleString()}` : '-'}</span></div>
-                <div className="flex justify-between gap-2 items-center"><span className="text-slate-500 shrink-0">{t('common.employmentType')}:</span><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0 ${emp.employmentType === 'permanent' ? 'bg-blue-100 text-blue-700' : emp.employmentType === 'contract' ? 'bg-amber-100 text-amber-700' : 'bg-purple-100 text-purple-700'}`}>{emp.employmentType || '-'}</span></div>
+                <div className="flex justify-between gap-2"><span className="text-slate-500 shrink-0">{t('hr.monthlySalary')}:</span><span className="font-medium text-slate-900 text-right shrink-0">{emp.baseSalary ? `${t('common.currencyRs')}${emp.baseSalary.toLocaleString()}` : '-'}</span></div>
+                <div className="flex justify-between gap-2 items-center"><span className="text-slate-500 shrink-0">{t('common.employmentType')}:</span><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0 ${emp.employmentType === 'permanent' ? 'bg-blue-100 text-blue-700' : emp.employmentType === 'contract' ? 'bg-amber-100 text-amber-700' : 'bg-purple-100 text-purple-700'}`}>{t('hr.' + emp.employmentType) || emp.employmentType || '-'}</span></div>
               </div>
               <div className="flex items-center justify-between">
                 <select value={emp.status} onChange={e => handleStatusToggle(emp, e.target.value)} className={`text-xs font-semibold rounded-full px-3 py-1 border-0 focus:ring-0 cursor-pointer ${emp.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -255,7 +255,7 @@ const AdminHREmployees = () => {
                     <td className="px-5 py-3 text-slate-600 truncate max-w-[150px]" title={getDesigName(emp.designation)}>{getDesigName(emp.designation)}</td>
                     <td className="px-5 py-3 text-slate-600 truncate max-w-[120px]" title={getDeptName(emp.department)}>{getDeptName(emp.department)}</td>
                     <td className="px-5 py-3 text-slate-600 whitespace-nowrap">{emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString() : '-'}</td>
-                    <td className="px-5 py-3 text-slate-600 whitespace-nowrap">{emp.baseSalary ? `Rs. ${emp.baseSalary.toLocaleString()}` : '-'}</td>
+                    <td className="px-5 py-3 text-slate-600 whitespace-nowrap">{emp.baseSalary ? `${t('common.currencyRs')}${emp.baseSalary.toLocaleString()}` : '-'}</td>
                     <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${emp.employmentType === 'permanent' ? 'bg-blue-100 text-blue-700' : emp.employmentType === 'contract' ? 'bg-amber-100 text-amber-700' : 'bg-purple-100 text-purple-700'}`}>{emp.employmentType || '-'}</span></td>
                     <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${emp.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{emp.status === 'active' ? t('common.active') : t('common.inactive')}</span></td>
                     <td className="px-5 py-3"><div className="flex gap-2">
@@ -313,7 +313,7 @@ const AdminHREmployees = () => {
                     <option value="part-time">{t('hr.partTime')}</option>
                   </select>
                 </div>
-                <div><label className="block text-sm font-medium text-slate-700 mb-1">{t('hr.monthlySalary')} (Rs.) *</label><input type="number" value={form.baseSalary} onChange={e => setForm({...form, baseSalary: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
+                <div><label className="block text-sm font-medium text-slate-700 mb-1">{t('hr.monthlySalary')} {t('common.currencyRsLabel') || '(Rs.)'} *</label><input type="number" value={form.baseSalary} onChange={e => setForm({...form, baseSalary: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
                 <div><label className="block text-sm font-medium text-slate-700 mb-1">{t('common.joinDate')}</label><CalendarDatePicker value={form.joiningDate} onChange={(date) => setForm({...form, joiningDate: date})} placeholder={t('common.selectDate')} /></div>
                 <div className="md:col-span-2"><label className="block text-sm font-medium text-slate-700 mb-1">{t('common.currentAddress')}</label><textarea value={form.currentAddress} onChange={e => setForm({...form, currentAddress: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" rows={2} /></div>
               </div>

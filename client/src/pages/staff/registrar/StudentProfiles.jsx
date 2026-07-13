@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import ListPage from '../shared/ListPage';
 import Card from '../../../components/UIHelper/Card';
@@ -53,7 +54,6 @@ export const studentProfilesConfig = {
     { key: 'admissionDate', header: 'Admission Date', render: (value) => value ? new Date(value).toLocaleDateString() : '-' }
   ],
   formFields: [
-    // Basic Information
     { name: 'user', label: 'User Account', type: 'relation', relationEndpoint: '/users/students', relationLabel: (row) => `${row.name || row.email}`, required: true, group: 'Basic Information' },
     { name: 'image', label: 'Profile Photo', type: 'file', group: 'Basic Information' },
     { name: 'studentCode', label: 'Student Code', required: true, group: 'Basic Information' },
@@ -73,21 +73,15 @@ export const studentProfilesConfig = {
       { value: 'O+', label: 'O+' },
       { value: 'O-', label: 'O-' }
     ], group: 'Basic Information' },
-    
-    // Contact Information
     { name: 'phone', label: 'Phone Number', required: true, group: 'Contact Information' },
     { name: 'whatsapp', label: 'WhatsApp Number', group: 'Contact Information' },
     { name: 'email', label: 'Email Address', type: 'email', group: 'Contact Information' },
-    
-    // Address Information
     { name: 'permanentAddress_province', label: 'Province (Permanent)', group: 'Address Information' },
     { name: 'permanentAddress_district', label: 'District (Permanent)', group: 'Address Information' },
     { name: 'permanentAddress_village', label: 'Village (Permanent)', group: 'Address Information' },
     { name: 'currentAddress_province', label: 'Province (Current)', group: 'Address Information' },
     { name: 'currentAddress_district', label: 'District (Current)', group: 'Address Information' },
     { name: 'currentAddress_village', label: 'Village (Current)', group: 'Address Information' },
-    
-    // Academic Information
     { name: 'currentClass', label: 'Current Class', type: 'relation', relationEndpoint: '/academic/classes', relationLabel: (row) => row.name, group: 'Academic Information' },
     { name: 'currentLevel', label: 'Current Level', group: 'Academic Information' },
     { name: 'admissionDate', label: 'Admission Date', type: 'date', group: 'Academic Information' },
@@ -95,15 +89,12 @@ export const studentProfilesConfig = {
       { value: 'active', label: 'Active' },
       { value: 'inactive', label: 'Inactive' }
     ], group: 'Academic Information' },
-    
-    // Guardian Information
     { name: 'guardianName', label: 'Guardian Name', group: 'Guardian Information' },
     { name: 'guardianRelationship', label: 'Relationship with Guardian', group: 'Guardian Information' },
     { name: 'guardianPhone', label: 'Guardian Phone', group: 'Guardian Information' },
     { name: 'guardianEmail', label: 'Guardian Email', type: 'email', group: 'Guardian Information' }
   ],
   initialForm: {
-    // Basic
     user: '',
     image: '',
     studentCode: '',
@@ -113,34 +104,25 @@ export const studentProfilesConfig = {
     grandfatherName: '',
     dob: '',
     bloodType: '',
-    
-    // Contact
     phone: '',
     whatsapp: '',
     email: '',
-    
-    // Address
     permanentAddress_province: '',
     permanentAddress_district: '',
     permanentAddress_village: '',
     currentAddress_province: '',
     currentAddress_district: '',
     currentAddress_village: '',
-    
-    // Academic
     currentClass: '',
     currentLevel: '',
     admissionDate: '',
     status: 'active',
-    
-    // Guardian
     guardianName: '',
     guardianRelationship: '',
     guardianPhone: '',
     guardianEmail: ''
   },
   mapRowToForm: (row) => ({
-    // Basic
     user: row.user?._id || row.user || '',
     image: row.image || row.user?.image || '',
     studentCode: row.studentCode || '',
@@ -150,27 +132,19 @@ export const studentProfilesConfig = {
     grandfatherName: row.grandfatherName || '',
     dob: row.dob ? row.dob.split('T')[0] : '',
     bloodType: row.bloodType || '',
-    
-    // Contact
     phone: row.phone || row.user?.phone || '',
     whatsapp: row.whatsapp || '',
     email: row.email || row.user?.email || '',
-    
-    // Address
     permanentAddress_province: row.permanentAddress?.province || '',
     permanentAddress_district: row.permanentAddress?.district || '',
     permanentAddress_village: row.permanentAddress?.village || '',
     currentAddress_province: row.currentAddress?.province || '',
     currentAddress_district: row.currentAddress?.district || '',
     currentAddress_village: row.currentAddress?.village || '',
-    
-    // Academic
     currentClass: row.currentClass?._id || row.currentClass || '',
     currentLevel: row.currentLevel || '',
     admissionDate: row.admissionDate ? row.admissionDate.split('T')[0] : '',
     status: row.status || 'active',
-    
-    // Guardian
     guardianName: row.guardianName || '',
     guardianRelationship: row.guardianRelationship || '',
     guardianPhone: row.guardianPhone || '',
@@ -179,7 +153,6 @@ export const studentProfilesConfig = {
   mapFormToPayload: (form) => {
     const payload = {
       ...form,
-      // Combine address fields into objects for the server
       permanentAddress: {
         province: form.permanentAddress_province,
         district: form.permanentAddress_district,
@@ -191,27 +164,23 @@ export const studentProfilesConfig = {
         village: form.currentAddress_village
       }
     };
-    
-    // Clean up empty ObjectId fields to avoid cast errors
     ['currentClass', 'user', 'designation', 'department'].forEach(field => {
       if (payload[field] === '') {
         payload[field] = undefined;
       }
     });
-    
-    // Remove empty address objects if needed
     if (!payload.permanentAddress?.province && !payload.permanentAddress?.district && !payload.permanentAddress?.village) {
       payload.permanentAddress = undefined;
     }
     if (!payload.currentAddress?.province && !payload.currentAddress?.district && !payload.currentAddress?.village) {
       payload.currentAddress = undefined;
     }
-    
     return payload;
   }
 };
 
 const StudentProfiles = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [profileStats, setProfileStats] = useState({
     total: 0,
     active: 0,
@@ -234,12 +203,10 @@ const StudentProfiles = () => {
       const response = await axios.get(`${API_BASE}/student/all`, config);
       const students = response.data?.data || response.data || [];
       
-      // Calculate statistics
       const total = students.length;
       const active = students.filter(s => s.status === 'active').length;
       const inactive = students.filter(s => s.status === 'inactive').length;
       
-      // Group by class
       const classMap = {};
       students.forEach(s => {
         const className = s.currentClass?.name || s.currentClass?.className || 'Not Assigned';
@@ -248,9 +215,8 @@ const StudentProfiles = () => {
       const byClass = Object.entries(classMap)
         .map(([name, count]) => ({ name, value: count }))
         .sort((a, b) => b.value - a.value)
-        .slice(0, 8); // Top 8 classes
+        .slice(0, 8);
       
-      // Recent admissions (last 30 days)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const recentAdmissions = students.filter(s => {
@@ -270,9 +236,13 @@ const StudentProfiles = () => {
     return <PageSkeleton variant="dashboard" />;
   }
 
+  const columns = studentProfilesConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.registrar.studentProfiles.columns.${col.key}`)
+  }));
+
   return (
     <div className="space-y-6">
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
@@ -281,10 +251,10 @@ const StudentProfiles = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-xl">👥</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Students</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentProfiles.stats.totalStudents')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">{profileStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">All registered students</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentProfiles.stats.allRegisteredStudents')}</p>
           </div>
         </Card>
 
@@ -295,10 +265,10 @@ const StudentProfiles = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <span className="text-xl">✅</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Active Students</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentProfiles.stats.activeStudents')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{profileStats.active}</p>
-            <p className="text-sm text-slate-500 mt-1">Currently enrolled</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentProfiles.stats.currentlyEnrolled')}</p>
           </div>
         </Card>
 
@@ -309,10 +279,10 @@ const StudentProfiles = () => {
               <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
                 <span className="text-xl">⏸️</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Inactive</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentProfiles.stats.inactive')}</span>
             </div>
             <p className="text-3xl font-black text-gray-600">{profileStats.inactive}</p>
-            <p className="text-sm text-slate-500 mt-1">Not currently active</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentProfiles.stats.notCurrentlyActive')}</p>
           </div>
         </Card>
 
@@ -323,40 +293,29 @@ const StudentProfiles = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <span className="text-xl">🆕</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">New (30 Days)</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentProfiles.stats.new30Days')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{profileStats.recentAdmissions}</p>
-            <p className="text-sm text-slate-500 mt-1">Recent admissions</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentProfiles.stats.recentAdmissions')}</p>
           </div>
         </Card>
       </div>
 
-      {/* Charts Section */}
       {profileStats.byClass.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card title="Student Distribution by Class">
-            <BarChartComponent
-              data={profileStats.byClass}
-              dataKey="value"
-              nameKey="name"
-              height={300}
-            />
+          <Card title={t('staff.registrar.studentProfiles.charts.studentDistributionByClass')}>
+            <BarChartComponent data={profileStats.byClass} dataKey="value" nameKey="name" height={300} />
           </Card>
-
-          <Card title="Enrollment Status">
-            <PieChartComponent
-              data={[
-                { name: 'Active', value: profileStats.active },
-                { name: 'Inactive', value: profileStats.inactive }
-              ].filter(item => item.value > 0)}
-              height={300}
-            />
+          <Card title={t('staff.registrar.studentProfiles.charts.enrollmentStatus')}>
+            <PieChartComponent data={[
+              { name: t('staff.registrar.studentProfiles.charts.active'), value: profileStats.active },
+              { name: t('staff.registrar.studentProfiles.charts.inactive'), value: profileStats.inactive }
+            ].filter(item => item.value > 0)} height={300} />
           </Card>
         </div>
       )}
 
-      {/* Student Profiles List */}
-      <ListPage {...studentProfilesConfig} />
+      <ListPage {...studentProfilesConfig} columns={columns} />
     </div>
   );
 };

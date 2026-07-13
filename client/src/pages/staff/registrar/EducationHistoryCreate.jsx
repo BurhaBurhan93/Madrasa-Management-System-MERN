@@ -1,18 +1,25 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import FormPage from '../shared/FormPage';
 import { educationHistoryConfig } from './EducationHistory';
 
-const EducationHistoryCreate = () => (
-  <FormPage
-    titleCreate="Create Education Record"
-    titleEdit="Edit Education Record"
-    endpoint={educationHistoryConfig.endpoint}
-    formFields={educationHistoryConfig.formFields}
-    initialForm={educationHistoryConfig.initialForm}
-    mapRowToForm={educationHistoryConfig.mapRowToForm}
-    mode="create"
-    onSavedPath="/staff/registrar/education-history"
-  />
-);
+const EducationHistoryCreate = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  return (
+    <FormPage
+      titleCreate={t('staff.registrar.educationHistory.create.titleCreate')}
+      titleEdit={t('staff.registrar.educationHistory.create.titleEdit')}
+      endpoint={educationHistoryConfig.endpoint}
+      formFields={educationHistoryConfig.formFields.map(f => ({
+        ...f,
+        label: t(`staff.registrar.educationHistory.fields.${f.name}`)
+      }))}
+      initialForm={educationHistoryConfig.initialForm}
+      mapRowToForm={educationHistoryConfig.mapRowToForm}
+      mode="create"
+      onSavedPath="/staff/registrar/education-history"
+    />
+  );
+};
 
 export default EducationHistoryCreate;

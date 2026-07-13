@@ -1,14 +1,16 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import FormPage from '../shared/FormPage';
 import { feePaymentsConfig } from './FeePayments';
 
 const FeePaymentsEdit = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
   return (
     <FormPage
-      titleCreate="Create Fee Payment"
-      titleEdit="Edit Fee Payment"
+      titleCreate={t('staff.finance.feePayments.create')}
+      titleEdit={t('staff.finance.feePayments.edit')}
       endpoint={feePaymentsConfig.endpoint}
       formFields={feePaymentsConfig.formFields}
       initialForm={feePaymentsConfig.initialForm}

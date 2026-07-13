@@ -12,6 +12,9 @@ const AdminUsers = () => {
   const [editMode, setEditMode] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [filterRole, setFilterRole] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Default to 10 items per page
+  const [totalUsers, setTotalUsers] = useState(0);
   const [formData, setFormData] = useState({
     name: '', fatherName: '', grandfatherName: '', email: '', password: '', role: 'student',
     phone: '', whatsapp: '', dob: '', bloodType: '', idNumber: '',
@@ -22,13 +25,26 @@ const AdminUsers = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [filterRole]);
+  }, [filterRole, currentPage, itemsPerPage]);
 
   const fetchUsers = async () => {
     try {
-      const params = filterRole ? { role: filterRole } : {};
+      setLoading(true);
+      const params = {
+        role: filterRole,
+        page: currentPage,
+        limit: itemsPerPage,
+      };
+      // Remove undefined/empty params to avoid sending unnecessary query parameters
+      Object.keys(params).forEach(key => {
+        if (params[key] === '' || params[key] === undefined) {
+          delete params[key];
+        }
+      });
+
       const res = await api.get('/users', { params });
       setUsers(res.data.data);
+      setTotalUsers(res.data.totalCount); // Assuming API returns totalCount
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -171,13 +187,13 @@ const AdminUsers = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadge(user.role)}`}>
-                      {user.role}
+                      {t('users.' + user.role) || user.role}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.phone || t('common.na')}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                      {user.status}
+                      {t('common.' + user.status) || user.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -188,6 +204,43 @@ const AdminUsers = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="flex justify-between items-center mt-4">
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <span>{t('common.show')}</span>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1); // Reset to first page when items per page changes
+              }}
+              className="rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+            <span>{t('common.entries')}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            >
+              {t('common.previous')}
+            </button>
+            <span className="text-sm text-gray-700">{t('common.page')} {currentPage} {t('common.of')} {Math.ceil(totalUsers / itemsPerPage)}</span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalUsers / itemsPerPage), prev + 1))}
+              disabled={currentPage === Math.ceil(totalUsers / itemsPerPage)}
+              className="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            >
+              {t('common.next')}
+            </button>
+          </div>
         </div>
       </Card>
 
@@ -322,14 +375,14 @@ const AdminUsers = () => {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">{t('users.selectBlood')}</option>
-                      <option value="A+">A+</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B-">B-</option>
-                      <option value="AB+">AB+</option>
-                      <option value="AB-">AB-</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
+                      <option value="A+">{t('users.bloodTypeA+')}</option>
+                      <option value="A-">{t('users.bloodTypeA-')}</option>
+                      <option value="B+">{t('users.bloodTypeB+')}</option>
+                      <option value="B-">{t('users.bloodTypeB-')}</option>
+                      <option value="AB+">{t('users.bloodTypeAB+')}</option>
+                      <option value="AB-">{t('users.bloodTypeAB-')}</option>
+                      <option value="O+">{t('users.bloodTypeO+')}</option>
+                      <option value="O-">{t('users.bloodTypeO-')}</option>
                     </select>
                   </div>
                 </div>
@@ -346,7 +399,7 @@ const AdminUsers = () => {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="+1234567890"
+                      placeholder={t('common.phonePlaceholder') || "+1234567890"}
                     />
                   </div>
                   <div>
@@ -356,7 +409,7 @@ const AdminUsers = () => {
                       value={formData.whatsapp}
                       onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="+1234567890"
+                      placeholder={t('common.phonePlaceholder') || "+1234567890"}
                     />
                   </div>
                 </div>

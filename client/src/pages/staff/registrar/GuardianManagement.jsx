@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import ListPage from '../shared/ListPage';
 import Card from '../../../components/UIHelper/Card';
@@ -65,6 +66,7 @@ export const guardianManagementConfig = {
 };
 
 const GuardianManagement = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [guardianStats, setGuardianStats] = useState({
     total: 0,
     primary: 0,
@@ -90,7 +92,6 @@ const GuardianManagement = () => {
       const primary = guardians.filter(g => g.isPrimary).length;
       const secondary = total - primary;
       
-      // Group by relationship
       const relMap = {};
       guardians.forEach(g => {
         const rel = g.relationship || 'Other';
@@ -113,9 +114,13 @@ const GuardianManagement = () => {
     return <PageSkeleton variant="dashboard" />;
   }
 
+  const columns = guardianManagementConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.registrar.guardianManagement.columns.${col.key}`)
+  }));
+
   return (
     <div className="space-y-6">
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
@@ -124,10 +129,10 @@ const GuardianManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-xl">👨‍👩‍👧</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Guardians</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.guardianManagement.stats.totalGuardians')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">{guardianStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">All registered guardians</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.guardianManagement.stats.allRegisteredGuardians')}</p>
           </div>
         </Card>
 
@@ -138,10 +143,10 @@ const GuardianManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <span className="text-xl">⭐</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Primary Guardians</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.guardianManagement.stats.primaryGuardians')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{guardianStats.primary}</p>
-            <p className="text-sm text-slate-500 mt-1">Main contacts</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.guardianManagement.stats.mainContacts')}</p>
           </div>
         </Card>
 
@@ -152,10 +157,10 @@ const GuardianManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
                 <span className="text-xl">🤝</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Secondary</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.guardianManagement.stats.secondary')}</span>
             </div>
             <p className="text-3xl font-black text-gray-600">{guardianStats.secondary}</p>
-            <p className="text-sm text-slate-500 mt-1">Additional contacts</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.guardianManagement.stats.additionalContacts')}</p>
           </div>
         </Card>
 
@@ -166,37 +171,26 @@ const GuardianManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <span className="text-xl">📊</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Relationship Types</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.guardianManagement.stats.relationshipTypes')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{guardianStats.byRelationship.length}</p>
-            <p className="text-sm text-slate-500 mt-1">Different categories</p>
+            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.guardianManagement.stats.differentCategories')}</p>
           </div>
         </Card>
       </div>
 
-      {/* Charts */}
       {guardianStats.byRelationship.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card title="Guardians by Relationship">
-            <PieChartComponent
-              data={guardianStats.byRelationship}
-              height={300}
-            />
+          <Card title={t('staff.registrar.guardianManagement.charts.guardiansByRelationship')}>
+            <PieChartComponent data={guardianStats.byRelationship} height={300} />
           </Card>
-
-          <Card title="Relationship Distribution">
-            <BarChartComponent
-              data={guardianStats.byRelationship}
-              dataKey="value"
-              nameKey="name"
-              height={300}
-            />
+          <Card title={t('staff.registrar.guardianManagement.charts.relationshipDistribution')}>
+            <BarChartComponent data={guardianStats.byRelationship} dataKey="value" nameKey="name" height={300} />
           </Card>
         </div>
       )}
 
-      {/* Guardians List */}
-      <ListPage {...guardianManagementConfig} />
+      <ListPage {...guardianManagementConfig} columns={columns} />
     </div>
   );
 };

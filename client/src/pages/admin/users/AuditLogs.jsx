@@ -51,7 +51,7 @@ const AuditLogs = () => {
     const head = cols.map(c => c.label);
     const body = filteredLogs.map(row => cols.map(c => row[c.key]));
     autoTable(doc, { startY: 34, head: [head], body, styles: { fontSize: 8 }, headStyles: { fillColor: [79, 70, 229] } });
-    doc.save(`audit-logs-${new Date().toISOString().slice(0, 10)}.pdf`);
+    doc.save(t('users.auditLogsFilename', { date: new Date().toISOString().slice(0, 10) }) + '.pdf');
   };
 
   const exportCSV = () => {
@@ -64,7 +64,7 @@ const AuditLogs = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `audit-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = t('users.auditLogsFilename', { date: new Date().toISOString().slice(0, 10) }) + '.csv';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -97,7 +97,7 @@ const AuditLogs = () => {
         _id: l._id,
         timestamp: l.timestamp ? new Date(l.timestamp).toLocaleString(i18n.language === 'ps' ? 'ps-AF' : i18n.language === 'prs' ? 'prs-AF' : 'en-CA', { hour12: false }).replace(',', '') : t('common.na'),
         user: l.changedBy?.email || l.changedBy?.name || t('users.system'),
-        action: (l.action || '').toUpperCase(),
+        action: l.action ? (t('users.' + l.action.toLowerCase()) || l.action.toUpperCase()) : '',
         module: l.entityType || t('common.na'),
         details: `${l.field}: ${l.reason || t('users.noDetails')}`,
         ip: l.metadata?.ip || t('common.na'),
@@ -191,7 +191,7 @@ const AuditLogs = () => {
             color={value === 'SUCCESS' ? 'green' : 'red'}
             variant="subtle"
           >
-            {value}
+            {t('common.' + value?.toLowerCase()) || value}
           </Badge>
         </div>
       )

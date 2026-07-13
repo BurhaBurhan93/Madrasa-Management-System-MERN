@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
@@ -12,6 +13,7 @@ const MOCK = [
 ];
 
 const TeacherClasses = () => {
+  const { t } = useTranslation();
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -44,8 +46,8 @@ const TeacherClasses = () => {
     <div className={PANEL_PAGE_BG}>
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">My Classes</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">View all registered classes</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.classes.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.classes.subtitle')}</p>
         </div>
 
         {loading ? renderLoading() : (
@@ -53,7 +55,7 @@ const TeacherClasses = () => {
             {classes.map((cls) => (
               <div key={cls._id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/50">
                 <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-sky-600 text-xl font-bold text-white shadow-lg">
-                  {cls.name?.[0]?.toUpperCase() || 'C'}
+                  {cls.name?.[0]?.toUpperCase() || t('common.na')}
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                   {cls.name} {cls.section ? `- ${cls.section}` : ''}
@@ -63,7 +65,7 @@ const TeacherClasses = () => {
                 )}
                 {cls.classTeacher && (
                   <div className="mt-4 rounded-2xl bg-slate-50 px-4 py-2 dark:bg-slate-700/50">
-                    <p className="text-xs text-slate-400 dark:text-slate-500">Class Teacher</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">{t('teacher.classes.classTeacher')}</p>
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{cls.classTeacher}</p>
                   </div>
                 )}
@@ -71,7 +73,7 @@ const TeacherClasses = () => {
             ))}
             {!loading && classes.length === 0 && (
               <div className="col-span-full flex flex-col items-center justify-center py-20">
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No classes found</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('teacher.classes.noClasses')}</p>
               </div>
             )}
           </div>

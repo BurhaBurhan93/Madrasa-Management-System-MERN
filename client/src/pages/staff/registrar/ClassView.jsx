@@ -1,17 +1,22 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import RecordViewPage from '../shared/RecordViewPage';
 import classManagementConfig from './classManagementConfig';
 
 const ClassView = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
   return (
     <RecordViewPage
-      title="Class Details"
-      subtitle={classManagementConfig.subtitle}
+      title={t('staff.registrar.classManagement.view.title')}
+      subtitle={t('staff.registrar.classManagement.subtitle')}
       endpoint={classManagementConfig.endpoint}
       id={id}
-      fields={classManagementConfig.formFields}
+      fields={classManagementConfig.formFields.map(f => ({
+        name: f.name,
+        label: t(`staff.registrar.classManagement.fields.${f.name}`)
+      }))}
       listPath="/staff/registrar/classes"
       editPath={`/staff/registrar/classes/edit/${id}`}
     />

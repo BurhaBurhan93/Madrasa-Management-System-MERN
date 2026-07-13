@@ -186,9 +186,9 @@ const AdminGeneralSettings = () => {
             <SettingSection title={t('settings.financialSettings')} icon={<FiDollarSign size={20} />}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Field label={t('settings.currency')} name="currency" type="select" options={[
-                  { value: 'PKR', label: 'Pakistani Rupee (PKR)' },
-                  { value: 'USD', label: 'US Dollar (USD)' },
-                  { value: 'EUR', label: 'Euro (EUR)' },
+                  { value: 'PKR', label: t('settings.currencyPkr') },
+                  { value: 'USD', label: t('settings.currencyUsd') },
+                  { value: 'EUR', label: t('settings.currencyEur') },
                 ]} />
                 <Field label={t('settings.currencySymbol')} name="currencySymbol" />
                 <Field label={t('settings.taxRate')} name="taxRate" type="number" note={t('common.setToZeroNoTax')} />
@@ -202,20 +202,20 @@ const AdminGeneralSettings = () => {
             <SettingSection title={t('settings.systemSettingsSection')} icon={<FiSettings size={20} />}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Field label={t('settings.timezone')} name="timezone" type="select" options={[
-                  { value: 'Asia/Karachi', label: 'Asia/Karachi (Pakistan)' },
-                  { value: 'UTC', label: 'UTC' },
-                  { value: 'America/New_York', label: 'America/New_York' },
-                  { value: 'Europe/London', label: 'Europe/London' },
+                  { value: 'Asia/Karachi', label: t('settings.timezoneAsiaKarachi') },
+                  { value: 'UTC', label: t('settings.timezoneUtc') },
+                  { value: 'America/New_York', label: t('settings.timezoneNewYork') },
+                  { value: 'Europe/London', label: t('settings.timezoneLondon') },
                 ]} />
                 <Field label={t('settings.dateFormat')} name="dateFormat" type="select" options={[
-                  { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
-                  { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
-                  { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD' },
+                  { value: 'DD/MM/YYYY', label: t('settings.dateFormatDmy') },
+                  { value: 'MM/DD/YYYY', label: t('settings.dateFormatMdy') },
+                  { value: 'YYYY-MM-DD', label: t('settings.dateFormatYmd') },
                 ]} />
                 <Field label={t('settings.language')} name="language" type="select" options={[
-                  { value: 'en', label: 'English' },
-                  { value: 'ur', label: 'Urdu' },
-                  { value: 'ar', label: 'Arabic' },
+                  { value: 'en', label: t('settings.languageEn') },
+                  { value: 'ur', label: t('settings.languageUr') },
+                  { value: 'ar', label: t('settings.languageAr') },
                 ]} />
                 <Field label={t('settings.maintenanceMode')} name="maintenanceMode" type="checkbox" />
               </div>
@@ -269,8 +269,8 @@ const AdminGeneralSettings = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card><div className="flex items-center gap-3"><div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600"><FiDatabase size={20} /></div><div><p className="text-sm text-gray-500">{t('settings.databaseStatus')}</p><p className="font-semibold text-gray-900">{t('common.connected')}</p></div></div></Card>
-        <Card><div className="flex items-center gap-3"><div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600"><FiSettings size={20} /></div><div><p className="text-sm text-gray-500">{t('settings.systemVersion')}</p><p className="font-semibold text-gray-900">v2.1.0</p></div></div></Card>
-        <Card><div className="flex items-center gap-3"><div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600"><FiClock size={20} /></div><div><p className="text-sm text-gray-500">{t('common.uptime')}</p><p className="font-semibold text-gray-900">99.8%</p></div></div></Card>
+        <Card><div className="flex items-center gap-3"><div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600"><FiSettings size={20} /></div><div><p className="text-sm text-gray-500">{t('settings.systemVersion')}</p><p className="font-semibold text-gray-900">{t('settings.version')}</p></div></div></Card>
+        <Card><div className="flex items-center gap-3"><div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600"><FiClock size={20} /></div><div><p className="text-sm text-gray-500">{t('common.uptime')}</p><p className="font-semibold text-gray-900">{t('settings.uptime')}</p></div></div></Card>
       </div>
     </div>
   );

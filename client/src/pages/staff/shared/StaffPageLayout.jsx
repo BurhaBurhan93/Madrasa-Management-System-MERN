@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { getStaffShellClasses, getStaffToneStyles } from './staffTheme';
 import { localizeAdminText } from '../../../lib/adminLocalization';

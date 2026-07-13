@@ -85,7 +85,7 @@ const FinancialReports = () => {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
-                <th className="px-4 py-3 font-semibold text-slate-600">#</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('common.hash')}</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.reportType')}</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">{t('attendance.period')}</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.totalIncome')}</th>
@@ -113,7 +113,7 @@ const FinancialReports = () => {
                       row.approvalStatus === 'approved' ? 'bg-emerald-100 text-emerald-700' :
                       row.approvalStatus === 'rejected' ? 'bg-rose-100 text-rose-700' :
                       'bg-amber-100 text-amber-700'
-                    }`}>{row.approvalStatus || 'draft'}</span>
+                    }`}>{t('common.' + row.approvalStatus) || row.approvalStatus || 'draft'}</span>
                   </td>
                 </tr>
               ))}
@@ -126,11 +126,11 @@ const FinancialReports = () => {
         <div className="flex items-center justify-between">
           <span className="text-sm text-slate-500">{t('common.page')} {page} {t('common.of')} {totalPages}</span>
           <div className="flex gap-1.5">
-            <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Prev</button>
+            <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.previous') || 'Prev'}</button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
               <button key={p} onClick={() => setPage(p)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${page === p ? 'bg-slate-800 text-white shadow-md' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{p}</button>
             ))}
-            <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Next</button>
+            <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.next') || 'Next'}</button>
           </div>
         </div>
       )}

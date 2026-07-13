@@ -47,12 +47,12 @@ const AdminHostelReports = () => {
         setAttendance(at);
 
         const rows = [
-          { label: t('hostel.totalRooms'), value: r.length, change: `${r.filter(x => x.status === 'available').length} available` },
-          { label: t('hostel.occupancyRate'), value: r.length ? `${Math.round((r.filter(x => x.status === 'occupied').length / r.length) * 100)}%` : '-', change: `${r.filter(x => x.status === 'occupied').length} rooms occupied` },
-          { label: t('hostel.activeResidents'), value: a.filter(x => x.status === 'active').length, change: `${a.length} total allocations` },
-          { label: t('hostel.totalMeals'), value: m.length, change: `${m.filter(x => x.mealType === 'lunch').length} lunches planned` },
-          { label: `${t('hostel.present')} / ${t('hostel.absent')}`, value: `${at.filter(x => x.status === 'present').length} / ${at.filter(x => x.status === 'absent').length}`, change: `${at.length} total records` },
-          { label: t('hostel.totalAttendance'), value: at.length, change: `${at.filter(x => x.status === 'excused').length} excused` }
+          { label: t('hostel.totalRooms'), value: r.length, change: t('hostel.xAvailable', { count: r.filter(x => x.status === 'available').length }) },
+          { label: t('hostel.occupancyRate'), value: r.length ? `${Math.round((r.filter(x => x.status === 'occupied').length / r.length) * 100)}%` : '-', change: t('hostel.xOccupied', { count: r.filter(x => x.status === 'occupied').length }) },
+          { label: t('hostel.activeResidents'), value: a.filter(x => x.status === 'active').length, change: t('hostel.xAllocations', { count: a.length }) },
+          { label: t('hostel.totalMeals'), value: m.length, change: t('hostel.xLunches', { count: m.filter(x => x.mealType === 'lunch').length }) },
+          { label: `${t('hostel.present')} / ${t('hostel.absent')}`, value: `${at.filter(x => x.status === 'present').length} / ${at.filter(x => x.status === 'absent').length}`, change: t('hostel.xRecords', { count: at.length }) },
+          { label: t('hostel.totalAttendance'), value: at.length, change: t('hostel.xExcused', { count: at.filter(x => x.status === 'excused').length }) }
         ];
         setDataRows(rows);
         setTotalPages(Math.ceil(rows.length / 10));
@@ -80,24 +80,24 @@ const AdminHostelReports = () => {
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-medium text-slate-500">{t('hostel.totalRooms')}</p>
           <p className="mt-1 text-2xl font-bold text-slate-700">{rooms.length}</p>
-          <p className="mt-1 text-xs text-slate-400">{rooms.filter(r => r.status === 'available').length} available</p>
+          <p className="mt-1 text-xs text-slate-400">{t('hostel.xAvailable', { count: rooms.filter(r => r.status === 'available').length })}</p>
         </div>
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
           <p className="text-xs font-medium text-emerald-600">{t('hostel.occupancyRate')}</p>
           <p className="mt-1 text-2xl font-bold text-emerald-700">
             {rooms.length ? `${Math.round((rooms.filter(r => r.status === 'occupied').length / rooms.length) * 100)}%` : '-'}
           </p>
-          <p className="mt-1 text-xs text-emerald-500">{rooms.filter(r => r.status === 'occupied').length} rooms occupied</p>
+          <p className="mt-1 text-xs text-emerald-500">{t('hostel.xOccupied', { count: rooms.filter(r => r.status === 'occupied').length })}</p>
         </div>
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
           <p className="text-xs font-medium text-amber-600">{t('hostel.activeResidents')}</p>
           <p className="mt-1 text-2xl font-bold text-amber-700">{allocations.filter(a => a.status === 'active').length}</p>
-          <p className="mt-1 text-xs text-amber-500">{allocations.length} total allocations</p>
+          <p className="mt-1 text-xs text-amber-500">{t('hostel.xAllocations', { count: allocations.length })}</p>
         </div>
         <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
           <p className="text-xs font-medium text-cyan-600">{t('hostel.totalMeals')}</p>
           <p className="mt-1 text-2xl font-bold text-cyan-700">{meals.length}</p>
-          <p className="mt-1 text-xs text-cyan-500">{meals.filter(m => m.mealType === 'lunch').length} lunches planned</p>
+          <p className="mt-1 text-xs text-cyan-500">{t('hostel.xLunches', { count: meals.filter(m => m.mealType === 'lunch').length })}</p>
         </div>
       </div>
 

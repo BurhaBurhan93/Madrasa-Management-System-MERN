@@ -140,7 +140,7 @@ const AdminHostelMeals = () => {
 
   const mealTypeLabel = (type) => {
     const labels = { breakfast: t('kitchen.breakfast'), lunch: t('kitchen.lunch'), dinner: t('kitchen.dinner'), snack: t('kitchen.snacks') };
-    return labels[type] || type;
+    return labels[type] || type || t('common.na');
   };
 
   const formatDate = (d) => d ? new Date(d).toLocaleDateString() : '-';
@@ -229,19 +229,19 @@ const AdminHostelMeals = () => {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Main Dish</label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.mainDish')}</label>
               <input value={form.mainDish} onChange={e => setForm({ ...form, mainDish: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Side Dish</label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.sideDish')}</label>
               <input value={form.sideDish} onChange={e => setForm({ ...form, sideDish: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Dessert</label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.dessert')}</label>
               <input value={form.dessert} onChange={e => setForm({ ...form, dessert: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">Beverage</label>
+              <label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.beverage')}</label>
               <input value={form.beverage} onChange={e => setForm({ ...form, beverage: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100" />
             </div>
             <div>

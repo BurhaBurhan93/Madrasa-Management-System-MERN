@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import RecordViewPage from '../shared/RecordViewPage';
 import { guardianManagementConfig } from './GuardianManagement';
@@ -9,13 +10,14 @@ const mapRowToView = (row) => ({
 });
 
 const GuardianView = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  const fields = guardianManagementConfig.formFields.map((field) => ({ name: field.name, label: field.label }));
+  const fields = guardianManagementConfig.formFields.map((field) => ({ name: field.name, label: t(`staff.registrar.guardianManagement.fields.${field.name}`) }));
 
   return (
     <RecordViewPage
-      title="Guardian Details"
-      subtitle="View guardian and guarantor information"
+      title={t('staff.registrar.guardianManagement.view.title')}
+      subtitle={t('staff.registrar.guardianManagement.view.subtitle')}
       endpoint={guardianManagementConfig.endpoint}
       id={id}
       fields={fields}

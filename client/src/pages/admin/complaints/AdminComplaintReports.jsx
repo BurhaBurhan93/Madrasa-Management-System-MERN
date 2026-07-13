@@ -49,7 +49,7 @@ const AdminComplaintReports = () => {
     const inProgress = complaints.filter(c => c.status === 'in-progress').length;
     const resolved = complaints.filter(c => c.status === 'resolved').length;
     const byCategory = {};
-    complaints.forEach(c => { const cat = c.category || 'Other'; byCategory[cat] = (byCategory[cat] || 0) + 1; });
+    complaints.forEach(c => { const cat = c.category || t('common.other'); byCategory[cat] = (byCategory[cat] || 0) + 1; });
     const byPriority = { high: 0, medium: 0, low: 0 };
     complaints.forEach(c => { if (byPriority[c.priority] !== undefined) byPriority[c.priority]++; });
     return { pending, inProgress, resolved, total: complaints.length, byCategory, byPriority };
@@ -59,7 +59,7 @@ const AdminComplaintReports = () => {
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const exportCSV = () => {
-    const header = ['ID', 'Subject', 'Status', 'Category', 'Priority', 'Date', 'Student'].join(',');
+    const header = [t('common.id'), t('complaints.subject'), t('common.status'), t('common.category'), t('complaints.priority'), t('common.date'), t('users.student')].join(',');
     const rows = complaints.map(c => [
       c.complaintCode || c._id,
       (c.subject || '').replace(/,/g, ''),
@@ -80,9 +80,9 @@ const AdminComplaintReports = () => {
   const columns = [
     { key: 'complaintCode', label: t('common.id'), render: (val, row) => <span className="text-xs font-medium text-slate-500">#{val || row._id?.slice(-6)}</span> },
     { key: 'subject', label: t('complaints.subject'), render: (val) => <span className="font-medium text-slate-800">{val || '-'}</span> },
-    { key: 'status', label: t('common.status'), render: (val) => <Badge color={statusBadgeColor[val]}>{val}</Badge> },
-    { key: 'category', label: t('common.category'), render: (val) => <Badge color="gray">{val || '-'}</Badge> },
-    { key: 'priority', label: t('complaints.priority'), render: (val) => <Badge color={priorityBadgeColor[val]}>{val || '-'}</Badge> },
+    { key: 'status', label: t('common.status'), render: (val) => <Badge color={statusBadgeColor[val]}>{t('common.' + val?.toLowerCase()) || val || '-'}</Badge> },
+    { key: 'category', label: t('common.category'), render: (val) => <Badge color="gray">{t('complaints.' + val?.toLowerCase()) || val || '-'}</Badge> },
+    { key: 'priority', label: t('complaints.priority'), render: (val) => <Badge color={priorityBadgeColor[val]}>{t('common.' + val?.toLowerCase()) || val || '-'}</Badge> },
     { key: 'createdAt', label: t('common.date'), render: (val) => <span className="text-xs text-slate-500">{val ? new Date(val).toLocaleDateString() : '-'}</span> },
     {
       key: 'actions', label: t('common.actions'), render: (_, row) => (
@@ -132,7 +132,7 @@ const AdminComplaintReports = () => {
           {Object.entries(stats.byCategory).length === 0 && <p className="text-sm text-slate-400">{t('complaints.noData')}</p>}
           {Object.entries(stats.byCategory).map(([cat, count]) => (
             <div key={cat} className="mb-2">
-              <div className="flex justify-between text-xs text-slate-600 mb-1"><span>{cat}</span><span>{count}</span></div>
+              <div className="flex justify-between text-xs text-slate-600 mb-1"><span>{t('complaints.' + cat?.toLowerCase()) || cat}</span><span>{count}</span></div>
               <div className="h-2.5 rounded-full bg-slate-100">
                 <div className="h-2.5 rounded-full bg-gradient-to-r from-blue-400 to-blue-600" style={{ width: `${(count / (stats.total || 1)) * 100}%` }} />
               </div>
@@ -144,7 +144,7 @@ const AdminComplaintReports = () => {
           {Object.entries(stats.byPriority).filter(([, v]) => v > 0).length === 0 && <p className="text-sm text-slate-400">{t('complaints.noData')}</p>}
           {Object.entries(stats.byPriority).filter(([, v]) => v > 0).map(([pri, count]) => (
             <div key={pri} className="mb-2">
-              <div className="flex justify-between text-xs text-slate-600 mb-1"><span className="capitalize">{pri}</span><span>{count}</span></div>
+              <div className="flex justify-between text-xs text-slate-600 mb-1"><span className="capitalize">{t('common.' + pri?.toLowerCase()) || pri}</span><span>{count}</span></div>
               <div className="h-2.5 rounded-full bg-slate-100">
                 <div className={`h-2.5 rounded-full ${pri === 'high' ? 'bg-gradient-to-r from-red-400 to-red-600' : pri === 'medium' ? 'bg-gradient-to-r from-amber-400 to-amber-600' : 'bg-gradient-to-r from-emerald-400 to-emerald-600'}`} style={{ width: `${(count / (stats.total || 1)) * 100}%` }} />
               </div>

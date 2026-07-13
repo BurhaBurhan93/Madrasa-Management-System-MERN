@@ -83,10 +83,10 @@ const TeacherCreateExam = () => {
       if (json.success) {
         navigate(`/teacher/exams/${json.data._id}`);
       } else {
-        alert(json.message || 'Something went wrong');
+        alert(json.message || t('common.serverError'));
       }
     } catch (err) {
-      alert(err.message || 'Something went wrong');
+      alert(err.message || t('common.serverError'));
     } finally {
       setLoading(false);
     }
@@ -95,7 +95,7 @@ const TeacherCreateExam = () => {
   if (fetching) {
     return (
       <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
-        <p className="text-sm text-slate-500 dark:text-slate-400">Loading...</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</p>
       </div>
     );
   }
@@ -105,10 +105,10 @@ const TeacherCreateExam = () => {
       <div className="px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          {editId ? 'Edit Exam' : 'Create New Exam'}
+          {editId ? t('teacher.createExam.editExam') : t('teacher.createExam.createExam')}
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {editId ? 'Update the exam details below.' : 'Fill in the details to create a new exam.'}
+          {editId ? t('teacher.createExam.editSubtitle') : t('teacher.createExam.createSubtitle')}
         </p>
       </div>
 
@@ -116,7 +116,7 @@ const TeacherCreateExam = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-              Exam Title <span className="text-rose-500">*</span>
+              {t('teacher.createExam.assignmentTitle')} <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -124,21 +124,21 @@ const TeacherCreateExam = () => {
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               required
               className={fieldCls}
-              placeholder="e.g. Midterm Exam"
+              placeholder={t('teacher.createExam.assignmentTitlePlaceholder')}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                Subject
+                {t('teacher.createExam.subject')}
               </label>
               <select
                 value={form.subject}
                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
                 className={fieldCls}
               >
-                <option value="">Select Subject</option>
+                <option value="">{t('teacher.createExam.selectSubject')}</option>
                 {subjects.map((s) => (
                   <option key={s._id} value={s._id}>{s.name}</option>
                 ))}
@@ -147,14 +147,14 @@ const TeacherCreateExam = () => {
 
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                Class
+                {t('teacher.createExam.class')}
               </label>
               <select
                 value={form.class}
                 onChange={(e) => setForm({ ...form, class: e.target.value })}
                 className={fieldCls}
               >
-                <option value="">Select Class</option>
+                <option value="">{t('teacher.createExam.selectClass')}</option>
                 {classes.map((c) => (
                   <option key={c._id} value={c._id}>{c.name} {c.section}</option>
                 ))}
@@ -165,7 +165,7 @@ const TeacherCreateExam = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                Duration (minutes) <span className="text-rose-500">*</span>
+                {t('teacher.createExam.duration')} <span className="text-rose-500">*</span>
               </label>
               <input
                 type="number"
@@ -179,7 +179,7 @@ const TeacherCreateExam = () => {
 
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                Academic Year
+                {t('teacher.createExam.academicYear')}
               </label>
               <input
                 type="text"
@@ -193,23 +193,23 @@ const TeacherCreateExam = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                Start Date
+                {t('teacher.createExam.startDate')}
               </label>
               <CalendarDatePicker
                 value={form.startDate}
                 onChange={(date) => setForm({ ...form, startDate: date })}
-                placeholder="Select start date"
+                placeholder={t('teacher.createExam.selectStartDate')}
               />
             </div>
 
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                End Date
+                {t('teacher.createExam.endDate')}
               </label>
               <CalendarDatePicker
                 value={form.endDate}
                 onChange={(date) => setForm({ ...form, endDate: date })}
-                placeholder="Select end date"
+                placeholder={t('teacher.createExam.selectEndDate')}
               />
             </div>
           </div>
@@ -220,7 +220,7 @@ const TeacherCreateExam = () => {
               onClick={() => navigate(-1)}
               className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
 
             <button
@@ -228,7 +228,7 @@ const TeacherCreateExam = () => {
               disabled={loading}
               className="rounded-2xl bg-cyan-600 px-5 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-cyan-700 disabled:opacity-60"
             >
-              {loading ? (editId ? 'Updating...' : 'Creating...') : (editId ? 'Update Exam' : 'Create & Add Questions')}
+              {loading ? t('common.saving') : (editId ? t('common.update') : t('teacher.createExam.createAndAddQuestions'))}
             </button>
           </div>
         </form>

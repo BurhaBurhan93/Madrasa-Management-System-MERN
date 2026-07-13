@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../lib/apiFetch';
 import { 
   FiClock, 
@@ -10,7 +11,8 @@ import {
   FiArrowRight,
   FiFileText,
   FiHelpCircle,
-  FiTarget
+  FiTarget,
+  FiAward
 } from 'react-icons/fi';
 import { PageSkeleton } from '../components/UIHelper/SkeletonLoader';
 import Card from '../components/UIHelper/Card';
@@ -18,6 +20,7 @@ import Button from '../components/UIHelper/Button';
 import Badge from '../components/UIHelper/Badge';
 
 const StudentExamAttempt = () => {
+  const { t } = useTranslation(['student', 'common']);
   const { examId } = useParams();
   const navigate = useNavigate();
   const [exam, setExam] = useState(null);
@@ -59,11 +62,11 @@ const StudentExamAttempt = () => {
         setExam(normalized);
         setTimeLeft((normalized.duration || 60) * 60);
       } else {
-        setError(data.message || 'Examination details not found.');
+        setError(data.message || t('student.examAttempt.examNotFound'));
       }
     } catch (e) { 
       console.error(e);
-      setError('The examination portal is currently unavailable.');
+      setError(t('student.examAttempt.examUnavailable'));
     } finally { setLoading(false); }
   };
 
@@ -83,7 +86,7 @@ const StudentExamAttempt = () => {
   };
 
   const handleSubmit = async () => {
-    if (!window.confirm('Confirm Submission? Once submitted, you cannot modify your answers.')) return;
+    if (!window.confirm(t('student.examAttempt.confirmSubmission'))) return;
     setSubmitting(true);
     try {
       const res = await apiFetch(`/student/exams/${examId}/submit`, {
@@ -95,13 +98,13 @@ const StudentExamAttempt = () => {
       const submissionData = data.success ? data.data : (data._id || data.score ? data : null);
       if (submissionData) {
         setSubmission(submissionData);
-        alert(`Assessment completed. Your preliminary score: ${submissionData.score} / ${submissionData.totalMarks}`);
+        alert(t('student.examAttempt.submissionSuccessScore', { score: submissionData.score, total: submissionData.totalMarks }));
         navigate('/student/exams');
       } else {
-        alert(data.message || 'Submission failed.');
+        alert(data.message || t('student.examAttempt.submissionFailed'));
       }
     } catch (e) { 
-      alert('Submission failed. Check your connection.'); 
+      alert(t('student.examAttempt.submissionError')); 
     } finally { setSubmitting(false); }
   };
 
@@ -120,10 +123,10 @@ const StudentExamAttempt = () => {
       <div className="w-24 h-24 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
         <FiAlertCircle className="text-5xl text-red-400" />
       </div>
-      <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Cannot Load Exam</h2>
+      <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{t('student.examAttempt.cannotLoad')}</h2>
       <p className="text-slate-500 dark:text-gray-400 font-medium mb-8">{error}</p>
       <Button variant="outline" className="rounded-2xl px-8 font-black text-xs uppercase tracking-widest" onClick={() => navigate('/student/exams')}>
-        Back to Exams
+        {t('student.examAttempt.backToExams')}
       </Button>
     </div>
   );
@@ -135,16 +138,16 @@ const StudentExamAttempt = () => {
           <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
             <FiCheckCircle className="text-5xl text-emerald-500" />
           </div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Assessment Completed</h2>
-          <p className="text-slate-400 font-medium italic mb-10">Your submission has been securely recorded.</p>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">{t('student.examAttempt.assessmentCompleted')}</h2>
+          <p className="text-slate-400 font-medium italic mb-10">{t('student.examAttempt.submissionRecorded')}</p>
           
           <div className="grid grid-cols-2 gap-6 mb-10">
             <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Score</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('student.examAttempt.totalScore')}</p>
               <p className="text-3xl font-black text-slate-900">{submission.score} / {submission.totalMarks}</p>
             </div>
             <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Percentage</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('student.examAttempt.percentage')}</p>
               <p className="text-3xl font-black text-emerald-600">{Math.round((submission.score / submission.totalMarks) * 100)}%</p>
             </div>
           </div>
@@ -154,7 +157,7 @@ const StudentExamAttempt = () => {
             className="w-full rounded-2xl py-4 bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200"
             onClick={() => navigate('/student/exams')}
           >
-            Back to Examinations
+            {t('student.examAttempt.backToExams')}
           </Button>
         </div>
         <FiAward className="absolute -right-8 -bottom-8 w-48 h-48 text-slate-50 transform -rotate-12" />
@@ -175,13 +178,13 @@ const StudentExamAttempt = () => {
             </div>
             <div>
               <h1 className="text-lg font-black text-slate-900 leading-tight">{exam.title}</h1>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{exam.subject?.name || 'Academic Module'}</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{exam.subject?.name || t('student.academic')}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-end">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Time Remaining</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('student.examAttempt.timeRemaining')}</p>
               <p className={`text-2xl font-black tabular-nums ${timeLeft < 300 ? 'text-rose-600 animate-pulse' : 'text-cyan-600'}`}>
                 {formatTime(timeLeft)}
               </p>
@@ -193,7 +196,7 @@ const StudentExamAttempt = () => {
               onClick={handleSubmit}
               disabled={submitting}
             >
-              {submitting ? 'Processing...' : 'Final Submission'}
+              {submitting ? t('student.examAttempt.processing') : t('student.examAttempt.finalSubmission')}
             </Button>
           </div>
         </div>
@@ -203,9 +206,9 @@ const StudentExamAttempt = () => {
         {/* Exam Info Card */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { label: 'Questions', value: exam.questions?.length || 0, icon: <FiHelpCircle />, color: 'blue' },
-            { label: 'Total Marks', value: exam.totalMarks || 0, icon: <FiTarget />, color: 'purple' },
-            { label: 'Time Limit', value: `${exam.duration} Min`, icon: <FiClock />, color: 'amber' }
+            { label: t('student.examAttempt.questions'), value: exam.questions?.length || 0, icon: <FiHelpCircle />, color: 'blue' },
+            { label: t('student.examAttempt.totalMarks'), value: exam.totalMarks || 0, icon: <FiTarget />, color: 'purple' },
+            { label: t('student.examAttempt.timeLimit'), value: `${exam.duration} ${t('student.examAttempt.min')}`, icon: <FiClock />, color: 'amber' }
           ].map((stat, i) => (
             <div key={i} className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50 flex items-center gap-6">
               <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl`}>
@@ -238,7 +241,7 @@ const StudentExamAttempt = () => {
                   </div>
                 </div>
                 <div className="px-4 py-2 rounded-xl bg-cyan-50 text-cyan-600 text-xs font-black uppercase tracking-widest">
-                  {q.marks} Pts
+                  {q.marks} {t('student.examAttempt.points')}
                 </div>
               </div>
 
@@ -283,7 +286,7 @@ const StudentExamAttempt = () => {
                         }`}
                       >
                         <input type="radio" name={q._id} value={opt} checked={answers[q._id] === opt} onChange={() => handleAnswer(q._id, opt)} className="sr-only" />
-                        <span className="font-black uppercase tracking-widest text-xs">{opt}</span>
+                        <span className="font-black uppercase tracking-widest text-xs">{opt === 'True' ? t('student.examAttempt.true') : t('student.examAttempt.false')}</span>
                       </label>
                     ))}
                   </div>
@@ -294,7 +297,7 @@ const StudentExamAttempt = () => {
                     value={answers[q._id] || ''} 
                     onChange={e => handleAnswer(q._id, e.target.value)} 
                     rows={q.questionType === 'essay' ? 6 : 2} 
-                    placeholder="Type your comprehensive response here..." 
+                    placeholder={t('student.examAttempt.essayPlaceholder')} 
                     className="w-full bg-slate-50 border-2 border-slate-50 rounded-3xl px-8 py-6 outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 focus:bg-white transition-all font-medium text-slate-900 placeholder:text-slate-300" 
                   />
                 )}
@@ -310,8 +313,8 @@ const StudentExamAttempt = () => {
               <FiActivity className="text-cyan-400" />
             </div>
             <div>
-              <h4 className="text-xl font-black tracking-tight">Progress Check</h4>
-              <p className="text-slate-400 font-medium">{Object.keys(answers).length} of {exam.questions?.length} questions answered</p>
+              <h4 className="text-xl font-black tracking-tight">{t('student.examAttempt.progressCheck')}</h4>
+              <p className="text-slate-400 font-medium">{t('student.examAttempt.questionsAnswered', { answered: Object.keys(answers).length, total: exam.questions?.length })}</p>
             </div>
           </div>
           <div className="w-full md:w-auto">
@@ -321,7 +324,7 @@ const StudentExamAttempt = () => {
               onClick={handleSubmit}
               disabled={submitting}
             >
-              {submitting ? 'Finalizing...' : 'Submit Assessment'}
+              {submitting ? t('student.examAttempt.finalizing') : t('student.examAttempt.submitAssessment')}
             </Button>
           </div>
         </div>

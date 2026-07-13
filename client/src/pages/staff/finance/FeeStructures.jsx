@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiBarChart2, FiCheckSquare, FiLayers, FiPercent, FiTag } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupCountByKey } from '../shared/StaffAnalyticsContent';
 import { staffApi } from '../../../api/staffApi';
@@ -45,6 +46,7 @@ export const feeStructuresConfig = {
 };
 
 const FeeStructures = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [analytics, setAnalytics] = useState({ loading: true, stats: [], charts: [], insight: null });
 
   useEffect(() => {
@@ -62,25 +64,25 @@ const FeeStructures = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: 'Total Structures', value: structures.length, helper: 'All defined fee rows', tone: 'blue', icon: FiLayers },
-            { label: 'Active Structures', value: activeCount, helper: 'Currently assignable fee rules', tone: 'emerald', icon: FiCheckSquare },
-            { label: 'Average Fee', value: formatCurrency(averageAmount), helper: 'Mean amount across structures', tone: 'violet', icon: FiPercent },
-            { label: 'Mandatory Fees', value: mandatoryCount, helper: 'Core fees required for students', tone: 'amber', icon: FiTag },
-            { label: 'Fee Types', value: groupCountByKey(structures, 'feeType').length, helper: 'Distinct fee categories in use', tone: 'rose', icon: FiBarChart2 }
+            { label: t('staff.finance.feeStructures.statTotalStructures'), value: structures.length, helper: t('staff.finance.feeStructures.statTotalStructuresHelper'), tone: 'blue', icon: FiLayers },
+            { label: t('staff.finance.feeStructures.statActiveStructures'), value: activeCount, helper: t('staff.finance.feeStructures.statActiveStructuresHelper'), tone: 'emerald', icon: FiCheckSquare },
+            { label: t('staff.finance.feeStructures.statAverageFee'), value: formatCurrency(averageAmount), helper: t('staff.finance.feeStructures.statAverageFeeHelper'), tone: 'violet', icon: FiPercent },
+            { label: t('staff.finance.feeStructures.statMandatoryFees'), value: mandatoryCount, helper: t('staff.finance.feeStructures.statMandatoryFeesHelper'), tone: 'amber', icon: FiTag },
+            { label: t('staff.finance.feeStructures.statFeeTypes'), value: groupCountByKey(structures, 'feeType').length, helper: t('staff.finance.feeStructures.statFeeTypesHelper'), tone: 'rose', icon: FiBarChart2 }
           ],
           charts: [
-            { title: 'Fee Type Distribution', type: 'pie', data: groupCountByKey(structures, 'feeType') },
-            { title: 'Frequency Breakdown', type: 'bar', data: groupCountByKey(structures, 'frequency') }
+            { title: t('staff.finance.feeStructures.chartFeeTypeDistribution'), type: 'pie', data: groupCountByKey(structures, 'feeType') },
+            { title: t('staff.finance.feeStructures.chartFrequencyBreakdown'), type: 'bar', data: groupCountByKey(structures, 'frequency') }
           ],
           insight: {
-            eyebrow: 'Structure Matrix',
-            title: 'Fee design details now surface before table browsing',
-            description: 'Staff can quickly see how many structures are active, how much they average, and how fee types are distributed without opening each record.'
+            eyebrow: t('staff.finance.feeStructures.insightEyebrow'),
+            title: t('staff.finance.feeStructures.insightTitle'),
+            description: t('staff.finance.feeStructures.insightDescription')
           }
         });
       } catch (error) {
         if (!active) return;
-        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: 'Fee structure analytics could not be loaded', description: error.message || 'The structure table is still available below.' } });
+        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('staff.finance.feeStructures.errorTitle'), description: error.message || t('staff.finance.feeStructures.errorDescription') } });
       }
     };
     load();
@@ -91,7 +93,7 @@ const FeeStructures = () => {
 
   return (
     <ListPage
-      eyebrow="Finance"
+      eyebrow={t('staff.finance.eyebrow')}
       title={feeStructuresConfig.title}
       subtitle={feeStructuresConfig.subtitle}
       endpoint={feeStructuresConfig.endpoint}
@@ -99,7 +101,7 @@ const FeeStructures = () => {
       createPath="/staff/finance/fee-structures/create"
       editPathForRow={(row) => `/staff/finance/fee-structures/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/fee-structures/view/${row._id}`}
-      searchPlaceholder="Search fee structures..."
+      searchPlaceholder={t('staff.finance.feeStructures.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

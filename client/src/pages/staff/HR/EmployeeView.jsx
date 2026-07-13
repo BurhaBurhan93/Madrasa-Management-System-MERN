@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import RecordViewPage from '../shared/RecordViewPage';
 import { employeesConfig } from './Employees';
 
 const EmployeeView = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
   
   // Prepare view fields with custom photo render
@@ -14,7 +16,7 @@ const EmployeeView = () => {
       ? (value, item) => {
           const photo = value || item?.photo;
           return photo 
-            ? <img src={photo} alt="Profile" className="h-32 w-32 rounded-lg object-cover border border-slate-200" /> 
+            ? <img src={photo} alt={t('staff.hr.employees.profileAlt')} className="h-32 w-32 rounded-lg object-cover border border-slate-200" /> 
             : '-';
         }
       : undefined
@@ -22,8 +24,8 @@ const EmployeeView = () => {
 
   return (
     <RecordViewPage 
-      title="Employee Details" 
-      subtitle={employeesConfig.subtitle} 
+      title={t('staff.hr.employees.viewTitle')} 
+      subtitle={t('staff.hr.employees.subtitle')} 
       endpoint={employeesConfig.endpoint} 
       id={id} 
       fields={viewFields} 

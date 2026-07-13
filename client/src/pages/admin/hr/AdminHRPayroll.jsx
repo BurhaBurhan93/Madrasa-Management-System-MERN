@@ -156,7 +156,7 @@ const HRPayroll = () => {
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('hr.employeeType')}</label>
               <select value={form.employeeType} onChange={e => setForm({ ...form, employeeType: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required>
                 <option value="">{t('common.select')}</option>
-                {EMPLOYEE_TYPES.map(et => <option key={et} value={et}>{et.charAt(0).toUpperCase() + et.slice(1)}</option>)}
+                {EMPLOYEE_TYPES.map(et => <option key={et} value={et}>{t('users.employeeTypes.' + et) || (et.charAt(0).toUpperCase() + et.slice(1))}</option>)}
               </select>
             </div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('hr.basicSalary')}</label><input type="number" min="0" value={form.basicSalary} onChange={e => setForm({ ...form, basicSalary: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
@@ -185,7 +185,7 @@ const HRPayroll = () => {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('common.search')} className="w-full rounded-lg border border-slate-300 py-2 pl-10 pr-3 text-sm placeholder-slate-400 focus:border-cyan-500 focus:outline-none" />
         </div>
         <div className="flex gap-2 items-center">
-          <div className="text-sm text-slate-500">{t('common.showing')} {items.length} {t('common.of')} {totalPages > 0 ? `~${totalPages * LIMIT}` : '0'}</div>
+          <div className="text-sm text-slate-500">{t('common.showing')} {items.length} {t('common.of')} {totalPages > 0 ? `~${totalPages * LIMIT}` : (t('common.na') || '0')}</div>
           <div className="flex rounded-lg border border-slate-300 overflow-hidden">
             <button onClick={() => setViewMode('card')} className={`px-3 py-2 text-sm ${viewMode === 'card' ? 'bg-cyan-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
@@ -207,16 +207,16 @@ const HRPayroll = () => {
               <div key={item._id} className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg transition-shadow min-w-0">
                 <div className="flex justify-between items-start mb-3 gap-2">
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-slate-900">{item.employeeType ? item.employeeType.charAt(0).toUpperCase() + item.employeeType.slice(1) : '-'}</h3>
+                    <h3 className="font-semibold text-slate-900">{item.employeeType ? (t('users.employeeTypes.' + item.employeeType) || (item.employeeType.charAt(0).toUpperCase() + item.employeeType.slice(1))) : '-'}</h3>
                     <p className="text-xs text-slate-400">{t('hr.effectiveFrom')}: {item.effectiveFrom ? new Date(item.effectiveFrom).toLocaleDateString() : '-'}</p>
                   </div>
                   <span className={`shrink-0 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>{t(`common.${item.status}`)}</span>
                 </div>
                 <div className="space-y-1.5 text-sm mb-3">
-                  <div className="flex justify-between gap-2"><span className="text-slate-500 shrink-0">{t('hr.basicSalary')}:</span><span className="font-medium text-slate-900 text-right">{(item.basicSalary || 0).toLocaleString()} AFN</span></div>
-                  <div className="flex justify-between gap-2"><span className="text-slate-500 shrink-0">{t('hr.totalAllowance')}:</span><span className="font-medium text-slate-900 text-right">{totalAllowance.toLocaleString()} AFN</span></div>
+                  <div className="flex justify-between gap-2"><span className="text-slate-500 shrink-0">{t('hr.basicSalary')}:</span><span className="font-medium text-slate-900 text-right">{(item.basicSalary || 0).toLocaleString()} {t('common.currencyAfn')}</span></div>
+                  <div className="flex justify-between gap-2"><span className="text-slate-500 shrink-0">{t('hr.totalAllowance')}:</span><span className="font-medium text-slate-900 text-right">{totalAllowance.toLocaleString()} {t('common.currencyAfn')}</span></div>
                   <div className="flex justify-between gap-2"><span className="text-slate-500 shrink-0">{t('hr.taxPercentage')}:</span><span className="font-medium text-slate-900 text-right">{item.taxPercentage || 0}%</span></div>
-                  <div className="border-t border-slate-100 pt-1.5 flex justify-between gap-2"><span className="text-slate-600 shrink-0 font-medium">{t('hr.netAmount')}:</span><span className="font-bold text-slate-900 text-right">{netAmount.toLocaleString()} AFN</span></div>
+                  <div className="border-t border-slate-100 pt-1.5 flex justify-between gap-2"><span className="text-slate-600 shrink-0 font-medium">{t('hr.netAmount')}:</span><span className="font-bold text-slate-900 text-right">{netAmount.toLocaleString()} {t('common.currencyAfn')}</span></div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => handleEdit(item)} className="rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100">{t('common.edit')}</button>
@@ -246,7 +246,7 @@ const HRPayroll = () => {
                   const totalAllowance = (item.allowanceAmount || 0) + (item.housingAllowance || 0) + (item.foodAllowance || 0) + (item.transportAllowance || 0);
                   return (
                     <tr key={item._id} className="border-b border-slate-100 hover:bg-slate-50">
-                      <td className="px-5 py-3 font-medium text-slate-800">{item.employeeType ? item.employeeType.charAt(0).toUpperCase() + item.employeeType.slice(1) : '-'}</td>
+                      <td className="px-5 py-3 font-medium text-slate-800">{item.employeeType ? (t('users.employeeTypes.' + item.employeeType) || (item.employeeType.charAt(0).toUpperCase() + item.employeeType.slice(1))) : '-'}</td>
                       <td className="px-5 py-3 text-slate-600">{(item.basicSalary || 0).toLocaleString()}</td>
                       <td className="px-5 py-3 text-slate-600">{totalAllowance.toLocaleString()}</td>
                       <td className="px-5 py-3 text-slate-600">{item.taxPercentage || 0}%</td>

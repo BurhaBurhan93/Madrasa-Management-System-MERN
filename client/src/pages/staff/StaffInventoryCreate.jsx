@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FiArrowLeft, FiSave } from 'react-icons/fi';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import StaffPageLayout from '../staff/shared/StaffPageLayout';
@@ -7,13 +8,14 @@ import Card from '../../components/UIHelper/Card';
 
 const StaffInventoryCreate = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['staff', 'common']);
   const [form, setForm] = useState({ name: '', category: 'General', quantity: 0, minLevel: 5, location: 'Main Store' });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name) return setError('Name is required');
+    if (!form.name) return setError(t('staff.inventoryCreate.nameRequired'));
     setSaving(true);
     setError('');
     try {
@@ -23,7 +25,7 @@ const StaffInventoryCreate = () => {
         body: JSON.stringify(form),
       });
       const data = await parseJsonSafe(res);
-      if (!res.ok) throw new Error(data.message || 'Failed to create item');
+      if (!res.ok) throw new Error(data.message || t('staff.inventoryCreate.failedCreate'));
       navigate('/staff/inventory');
     } catch (err) {
       setError(err.message);
@@ -33,19 +35,19 @@ const StaffInventoryCreate = () => {
   };
 
   const fields = [
-    { key: 'name', label: 'Name', type: 'text', required: true, placeholder: 'e.g. Whiteboard Markers' },
-    { key: 'category', label: 'Category', type: 'text', placeholder: 'e.g. Stationery' },
-    { key: 'quantity', label: 'Quantity', type: 'number', min: 0 },
-    { key: 'available', label: 'Available', type: 'number', min: 0, note: 'Same as quantity — available stock count' },
-    { key: 'minLevel', label: 'Min Level', type: 'number', min: 0, note: 'Alert threshold for low stock' },
-    { key: 'location', label: 'Location', type: 'text', placeholder: 'e.g. Main Store, Room 5' },
+    { key: 'name', label: t('staff.inventoryCreate.name'), type: 'text', required: true, placeholder: t('staff.inventoryCreate.namePlaceholder') },
+    { key: 'category', label: t('staff.inventoryCreate.category'), type: 'text', placeholder: t('staff.inventoryCreate.categoryPlaceholder') },
+    { key: 'quantity', label: t('staff.inventoryCreate.quantity'), type: 'number', min: 0 },
+    { key: 'available', label: t('staff.inventoryCreate.available'), type: 'number', min: 0, note: t('staff.inventoryCreate.availableNote') },
+    { key: 'minLevel', label: t('staff.inventoryCreate.minLevel'), type: 'number', min: 0, note: t('staff.inventoryCreate.minLevelNote') },
+    { key: 'location', label: t('staff.inventoryCreate.location'), type: 'text', placeholder: t('staff.inventoryCreate.locationPlaceholder') },
   ];
 
   return (
     <StaffPageLayout
-      eyebrow="Inventory"
-      title="Create Inventory Item"
-      subtitle="Add a new item to the school inventory"
+      eyebrow={t('staff.inventoryCreate.eyebrow')}
+      title={t('staff.inventoryCreate.title')}
+      subtitle={t('staff.inventoryCreate.subtitle')}
     >
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -77,10 +79,10 @@ const StaffInventoryCreate = () => {
 
           <div className="flex gap-3 pt-4 border-t border-gray-100 dark:border-slate-700">
             <button type="submit" disabled={saving} className="px-6 py-3 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl font-medium hover:shadow-md disabled:opacity-50 flex items-center gap-2">
-              <FiSave size={18} /> {saving ? 'Creating...' : 'Create Item'}
+              <FiSave size={18} /> {saving ? t('staff.inventoryCreate.creating') : t('staff.inventoryCreate.createItem')}
             </button>
             <button type="button" onClick={() => navigate('/staff/inventory')} className="px-6 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-600 flex items-center gap-2">
-              <FiArrowLeft size={18} /> Cancel
+              <FiArrowLeft size={18} /> {t('staff.inventoryCreate.cancel')}
             </button>
           </div>
         </form>

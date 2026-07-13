@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
@@ -18,6 +19,7 @@ const MOCK = [
 ];
 
 const TeacherLeaveList = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -71,23 +73,23 @@ const TeacherLeaveList = () => {
   };
 
   const statCards = [
-    { label: 'Total', value: stats.total, accent: 'bg-cyan-500' },
-    { label: 'Pending', value: stats.pending, accent: 'bg-amber-500' },
-    { label: 'Approved', value: stats.approved, accent: 'bg-emerald-500' },
-    { label: 'Rejected', value: stats.rejected, accent: 'bg-rose-500' },
+    { label: t('common.total'), value: stats.total, accent: 'bg-cyan-500' },
+    { label: t('common.pending'), value: stats.pending, accent: 'bg-amber-500' },
+    { label: t('common.approved'), value: stats.approved, accent: 'bg-emerald-500' },
+    { label: t('common.rejected'), value: stats.rejected, accent: 'bg-rose-500' },
   ];
 
   const renderLoading = () => (
     <div className="flex items-center justify-center py-20">
       <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-500 dark:border-slate-700 dark:border-t-cyan-400" />
-      <span className="ml-3 text-sm text-slate-500 dark:text-slate-400">Loading...</span>
+      <span className="ml-3 text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</span>
     </div>
   );
 
   const renderEmpty = () => (
     <div className="flex flex-col items-center justify-center py-20">
       <div className="mb-4 text-5xl">📅</div>
-      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No leave applications found</p>
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('teacher.leaveList.noLeaves')}</p>
     </div>
   );
 
@@ -97,13 +99,13 @@ const TeacherLeaveList = () => {
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-700">
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Leave Type</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">From</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">To</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Days</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Reason</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Status</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Actions</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.leaveList.leaveType')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.leaveList.from')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.leaveList.to')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.leaveList.days')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.leaveList.reason')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('common.status')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('common.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -125,7 +127,7 @@ const TeacherLeaveList = () => {
                 <td className="max-w-xs truncate px-5 py-4 text-slate-600 dark:text-slate-300">{l.reason || l.leaveReason || '-'}</td>
                 <td className="px-5 py-4">
                   <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusColors[l.status] || ''}`}>
-                    {l.status}
+                    {t('common.' + l.status) || l.status}
                   </span>
                 </td>
                 <td className="px-5 py-4">
@@ -133,7 +135,7 @@ const TeacherLeaveList = () => {
                     onClick={() => setDetailModal(l)}
                     className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
                   >
-                    View
+                    {t('common.view')}
                   </button>
                 </td>
               </tr>
@@ -151,46 +153,46 @@ const TeacherLeaveList = () => {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setDetailModal(null)}>
         <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-700 dark:bg-slate-800" onClick={(e) => e.stopPropagation()}>
           <div className="mb-6 flex items-center justify-between">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Leave Details</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('teacher.leaveList.leaveDetails')}</h3>
             <button onClick={() => setDetailModal(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">✕</button>
           </div>
           <div className="space-y-4">
             <div className="flex justify-between border-b border-slate-100 pb-3 dark:border-slate-700">
-              <span className="text-sm text-slate-500 dark:text-slate-400">Leave Type</span>
-              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{l.leaveType?.leaveTypeName || '-'}</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.leaveList.leaveType')}</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{l.leaveType?.leaveTypeName || t('common.na')}</span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-3 dark:border-slate-700">
-              <span className="text-sm text-slate-500 dark:text-slate-400">Code</span>
-              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{l.leaveType?.leaveCode || '-'}</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{t('common.code')}</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{l.leaveType?.leaveCode || t('common.na')}</span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-3 dark:border-slate-700">
-              <span className="text-sm text-slate-500 dark:text-slate-400">From</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.leaveList.from')}</span>
               <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{formatDate(l.startDate)}</span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-3 dark:border-slate-700">
-              <span className="text-sm text-slate-500 dark:text-slate-400">To</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.leaveList.to')}</span>
               <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{formatDate(l.endDate)}</span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-3 dark:border-slate-700">
-              <span className="text-sm text-slate-500 dark:text-slate-400">Days</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.leaveList.days')}</span>
               <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{getDays(l)}</span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-3 dark:border-slate-700">
-              <span className="text-sm text-slate-500 dark:text-slate-400">Reason</span>
-              <span className="max-w-[60%] text-right text-sm font-medium text-slate-900 dark:text-slate-100">{l.reason || l.leaveReason || '-'}</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.leaveList.reason')}</span>
+              <span className="max-w-[60%] text-right text-sm font-medium text-slate-900 dark:text-slate-100">{l.reason || l.leaveReason || t('common.na')}</span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-3 dark:border-slate-700">
-              <span className="text-sm text-slate-500 dark:text-slate-400">Status</span>
-              <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusColors[l.status] || ''}`}>{l.status}</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{t('common.status')}</span>
+              <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusColors[l.status] || ''}`}>{t('common.' + l.status) || l.status}</span>
             </div>
             {l.rejectionReason && (
               <div className="flex justify-between border-b border-slate-100 pb-3 dark:border-slate-700">
-                <span className="text-sm text-slate-500 dark:text-slate-400">Rejection Reason</span>
+                <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.leaveList.rejectionReason')}</span>
                 <span className="max-w-[60%] text-right text-sm font-medium text-rose-600 dark:text-rose-400">{l.rejectionReason}</span>
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-sm text-slate-500 dark:text-slate-400">Applied On</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.leaveList.appliedOn')}</span>
               <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{formatDate(l.requestDate || l.createdAt)}</span>
             </div>
           </div>
@@ -199,7 +201,7 @@ const TeacherLeaveList = () => {
               onClick={() => setDetailModal(null)}
               className="rounded-2xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
             >
-              Close
+              {t('common.close')}
             </button>
           </div>
         </div>
@@ -212,14 +214,14 @@ const TeacherLeaveList = () => {
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Leave Management</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">View and manage your leave applications</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.leaveList.title')}</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.leaveList.subtitle')}</p>
           </div>
           <button
             onClick={() => navigate('/teacher/leaves/apply')}
             className="rounded-2xl bg-cyan-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-md"
           >
-            + Apply Leave
+            {t('teacher.leaveList.applyLeave')}
           </button>
         </div>
 
@@ -236,13 +238,13 @@ const TeacherLeaveList = () => {
         <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           <div className="flex items-center gap-4">
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className={fieldCls}>
-              <option value="">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
+              <option value="">{t('teacher.leaveList.allStatus')}</option>
+              <option value="pending">{t('common.pending')}</option>
+              <option value="approved">{t('common.approved')}</option>
+              <option value="rejected">{t('common.rejected')}</option>
             </select>
             {statusFilter && (
-              <button onClick={() => setStatusFilter('')} className="text-xs text-slate-500 underline dark:text-slate-400">Clear filter</button>
+              <button onClick={() => setStatusFilter('')} className="text-xs text-slate-500 underline dark:text-slate-400">{t('teacher.leaveList.clearFilter')}</button>
             )}
           </div>
         </div>

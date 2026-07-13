@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import i18n from '../../../i18n';
 import { readStoredLanguage } from '../../../lib/languageStorage';
@@ -38,7 +38,7 @@ const AdminOperationalReports = () => {
       if (libraryRes.data?.success) setLibrary(libraryRes.data.data);
     } catch (e) {
       console.error(e);
-      setError("Failed to load operational data.");
+      setError(t('common.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -47,13 +47,6 @@ const AdminOperationalReports = () => {
   useEffect(() => {
     fetchData();
   }, [filters.period, filters.date, filters.week, filters.month]);
-
-  const periodLabel = useMemo(() => {
-    if (filters.period === "daily") return "today";
-    if (filters.period === "weekly") return "this week";
-    if (filters.period === "quarterly") return "this quarter";
-    return "this month";
-  }, [filters.period]);
 
   return (
     <div className="space-y-6">
@@ -74,10 +67,10 @@ const AdminOperationalReports = () => {
             }
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm"
           >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="quarterly">Quarterly</option>
+            <option value="daily">{t('reports.periodDaily')}</option>
+            <option value="weekly">{t('reports.periodWeekly')}</option>
+            <option value="monthly">{t('reports.periodMonthly')}</option>
+            <option value="quarterly">{t('reports.periodQuarterly')}</option>
           </select>
           {filters.period === "daily" && (
             <input
@@ -135,7 +128,7 @@ const AdminOperationalReports = () => {
             {loading
               ? "…"
               : kitchen
-                ? `${(kitchen.totalPurchases || 0).toLocaleString()} AFN`
+                ? `${(kitchen.totalPurchases || 0).toLocaleString()} ${t('common.currencyAfn')}`
                 : "—"}
           </p>
         </div>
@@ -161,7 +154,7 @@ const AdminOperationalReports = () => {
               {[
                 {
                   label: t('reports.totalPurchases'),
-                  value: `${(kitchen.totalPurchases || 0).toLocaleString()} AFN`,
+                  value: `${(kitchen.totalPurchases || 0).toLocaleString()} ${t('common.currencyAfn')}`,
                 },
                 {
                   label: t('reports.studentMeals'),
@@ -238,19 +231,19 @@ const AdminOperationalReports = () => {
               {[
                 {
                   label: t('reports.allocated'),
-                  value: `${(kitchen.budget.allocatedAmount || 0).toLocaleString()} AFN`,
+                  value: `${(kitchen.budget.allocatedAmount || 0).toLocaleString()} ${t('common.currencyAfn')}`,
                 },
                 {
                   label: t('reports.allocated'),
-                  value: `${(kitchen.budget.approvedAmount || 0).toLocaleString()} AFN`,
+                  value: `${(kitchen.budget.approvedAmount || 0).toLocaleString()} ${t('common.currencyAfn')}`,
                 },
                 {
                   label: t('reports.spent'),
-                  value: `${(kitchen.budget.spentAmount || 0).toLocaleString()} AFN`,
+                  value: `${(kitchen.budget.spentAmount || 0).toLocaleString()} ${t('common.currencyAfn')}`,
                 },
                 {
                   label: t('reports.remaining'),
-                  value: `${(kitchen.budget.remainingAmount || 0).toLocaleString()} AFN`,
+                  value: `${(kitchen.budget.remainingAmount || 0).toLocaleString()} ${t('common.currencyAfn')}`,
                 },
               ].map(({ label, value }) => (
                 <div

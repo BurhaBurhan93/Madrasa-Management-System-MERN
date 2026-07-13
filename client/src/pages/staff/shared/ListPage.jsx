@@ -13,6 +13,7 @@ import { FiDownload, FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../../contexts/ThemeContext.jsx";
 import { getStaffToneStyles } from "./staffTheme";
+import { useTranslation } from 'react-i18next';
 import { localizeAdminText } from "../../../lib/adminLocalization";
 
 const getCellValue = (row, key) => {
@@ -126,7 +127,7 @@ const ListPage = ({
   editPathForRow,
   viewPathForRow,
   deleteEnabled = true,
-  searchPlaceholder = "Search...",
+              searchPlaceholder,
   clientSidePagination = false,
   extraActionItemsForRow,
   eyebrow = "Reusable Staff Table",
@@ -151,6 +152,7 @@ const ListPage = ({
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { t } = useTranslation(['staff', 'common']);
   const toneStyles = getStaffToneStyles(eyebrow || title || endpoint);
 
   const cardShellClass = isDark
@@ -188,7 +190,7 @@ const ListPage = ({
           (Array.isArray(records) ? records.length : 0),
       );
     } catch (err) {
-      setError(err.message || "Unknown error");
+      setError(err.message || t('staff.list.unknownError'));
     } finally {
       setLoading(false);
     }
@@ -213,10 +215,10 @@ const ListPage = ({
         method: "DELETE",
       });
       const data = await parseJsonSafe(res);
-      if (!res.ok) throw new Error(data.message || "Delete failed");
+      if (!res.ok) throw new Error(data.message || t('staff.list.deleteFailed'));
       await fetchItems();
     } catch (err) {
-      setError(err.message || "Delete error");
+      setError(err.message || t('staff.list.deleteError'));
     } finally {
       setDeletingId(null);
     }
@@ -361,7 +363,7 @@ const ListPage = ({
     );
     const doc = new jsPDF({ orientation: "landscape" });
     doc.setFontSize(18);
-    doc.text(title || "Report", 14, 20);
+    doc.text(title || t('staff.list.report'), 14, 20);
     doc.setFontSize(10);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
     const tableData = filteredSortedItems.map((row) =>
@@ -466,7 +468,7 @@ const ListPage = ({
                     setPage(1);
                   }}
                   className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${controlClass}`}
-                  placeholder={searchPlaceholder}
+                  placeholder={searchPlaceholder || t('staff.list.searchPlaceholder')}
                 />
               </div>
               <div>
@@ -506,7 +508,7 @@ const ListPage = ({
                     setPage(1);
                   }}
                   className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${controlClass}`}
-                  placeholder="Type to filter rows..."
+                  placeholder={t('staff.list.typeToFilter')}
                 />
               </div>
             </div>
@@ -573,7 +575,7 @@ const ListPage = ({
           </div>
           {deletingId && (
             <div className="text-sm text-rose-500">
-              Deleting selected record...
+              {t('staff.list.deletingRecord')}
             </div>
           )}
         </div>

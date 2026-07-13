@@ -164,7 +164,7 @@ const AdminAttendanceCorrections = () => {
                       className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-cyan-50 hover:text-cyan-700 text-left"
                     >
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 text-xs font-bold text-cyan-700">
-                        {emp.fullName?.charAt(0) || '?'}
+                        {emp.fullName?.charAt(0) || t('common.na') || '?'}
                       </div>
                       <div>
                         <p className="font-medium">{emp.fullName}</p>
@@ -293,7 +293,7 @@ const AdminAttendanceCorrections = () => {
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 text-sm font-bold text-cyan-700">
-                          {empName.charAt(0) || '?'}
+                          {empName.charAt(0) || t('common.na') || '?'}
                         </div>
                         <div>
                           <p className="font-medium text-slate-800">{empName}</p>
@@ -304,12 +304,12 @@ const AdminAttendanceCorrections = () => {
                     <td className="px-5 py-3 text-slate-600 whitespace-nowrap">
                       <span className="flex items-center gap-1.5">
                         <FiCalendar className="h-3.5 w-3.5 text-slate-400" />
-                        {c.date ? new Date(c.date).toLocaleDateString() : '-'}
+                        {c.date ? new Date(c.date).toLocaleDateString() : t('common.na') || '-'}
                       </span>
                     </td>
                     <td className="px-5 py-3">
                       {c.oldStatus && c.oldStatus !== 'unknown' ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 capitalize">{t(`attendance.${c.oldStatus === 'half-day' ? 'halfDay' : c.oldStatus === 'on-leave' ? 'onLeave' : c.oldStatus}`) || c.oldStatus}</span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 capitalize">{t(`attendance.${c.oldStatus === 'half-day' ? 'halfDay' : c.oldStatus === 'on-leave' ? 'onLeave' : c.oldStatus}`) || t('common.' + c.oldStatus) || c.oldStatus || '-'}</span>
                       ) : (
                         <span className="text-xs text-slate-400">-</span>
                       )}
@@ -322,7 +322,7 @@ const AdminAttendanceCorrections = () => {
                         c.newStatus === 'half-day' ? 'bg-purple-100 text-purple-700' :
                         c.newStatus === 'on-leave' ? 'bg-blue-100 text-blue-700' :
                         'bg-slate-100 text-slate-600'
-                      }`}>{t(`attendance.${c.newStatus === 'half-day' ? 'halfDay' : c.newStatus === 'on-leave' ? 'onLeave' : c.newStatus}`) || c.newStatus}</span>
+                      }`}>{t(`attendance.${c.newStatus === 'half-day' ? 'halfDay' : c.newStatus === 'on-leave' ? 'onLeave' : c.newStatus}`) || t('common.' + c.newStatus) || c.newStatus || '-'}</span>
                     </td>
                     <td className="px-5 py-3 max-w-[200px]">
                       <p className="truncate text-slate-500" title={c.correctionReason}>{c.correctionReason || '-'}</p>
@@ -334,7 +334,7 @@ const AdminAttendanceCorrections = () => {
                         'bg-amber-100 text-amber-700'
                       }`}>
                         {c.status === 'approved' ? <FiCheck className="h-3 w-3" /> : c.status === 'rejected' ? <FiX className="h-3 w-3" /> : <FiClock className="h-3 w-3" />}
-                        {t(`common.${c.status}`) || c.status}
+                        {t(`common.${c.status}`) || c.status || '-'}
                       </span>
                     </td>
                     <td className="px-5 py-3 text-xs text-slate-400 whitespace-nowrap">

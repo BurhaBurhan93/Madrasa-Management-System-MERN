@@ -148,7 +148,7 @@ const AdminSalaries = () => {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
-          { label: 'Total', value: stats.total, gradient: 'from-slate-500 to-slate-600', icon: FiUsers },
+          { label: t('common.total'), value: stats.total, gradient: 'from-slate-500 to-slate-600', icon: FiUsers },
           { label: t('finance.totalPayable'), value: `₨${stats.payable.toLocaleString()}`, gradient: 'from-amber-500 to-orange-600', icon: FiClock },
           { label: t('finance.paid'), value: `₨${stats.paid.toLocaleString()} (${stats.paidCount})`, gradient: 'from-emerald-500 to-teal-600', icon: FiCheckCircle },
           { label: t('finance.pending'), value: stats.pendingCount, gradient: 'from-rose-500 to-pink-600', icon: FiXCircle },
@@ -168,7 +168,7 @@ const AdminSalaries = () => {
           <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
             type="text"
-            placeholder={t('finance.searchSalaries') || 'Search salaries...'}
+            placeholder={t('finance.searchSalaries')}
             className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
@@ -299,7 +299,7 @@ const AdminSalaries = () => {
                       {s.paymentStatus === 'paid' ? <FiCheckCircle className="h-3 w-3" /> :
                        s.paymentStatus === 'failed' ? <FiXCircle className="h-3 w-3" /> :
                        <FiClock className="h-3 w-3" />}
-                      {t(`finance.${s.paymentStatus}`) || s.paymentStatus || 'pending'}
+                      {t(`finance.${s.paymentStatus}`) || s.paymentStatus || t('common.pending')}
                     </span>
                   </td>
                   <td className="px-5 py-3">
@@ -319,11 +319,11 @@ const AdminSalaries = () => {
         <div className="flex items-center justify-between">
           <span className="text-sm text-slate-500">{t('common.page')} {page} {t('common.of')} {totalPages}</span>
           <div className="flex gap-1.5">
-            <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Prev</button>
+            <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.previous') || 'Prev'}</button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
               <button key={p} onClick={() => setPage(p)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${page === p ? 'bg-slate-800 text-white shadow-md' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{p}</button>
             ))}
-            <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Next</button>
+            <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.next') || 'Next'}</button>
           </div>
         </div>
       )}

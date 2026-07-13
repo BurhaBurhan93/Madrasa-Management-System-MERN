@@ -112,7 +112,7 @@ const RolesPermissions = () => {
   };
 
   const groupedPermissions = permissions.reduce((acc, perm) => {
-    const category = (perm.description || 'General').split(' ')[0] || 'General';
+    const category = (perm.description || t('common.general')).split(' ')[0] || t('common.general');
     if (!acc[category]) acc[category] = [];
     acc[category].push(perm);
     return acc;

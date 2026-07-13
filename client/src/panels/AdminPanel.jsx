@@ -375,7 +375,7 @@ const AdminPanelContent = () => {
     const key = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const payload = {
       title: heading?.textContent?.trim() || t('print'),
-      subtitle: "Current page capture",
+      subtitle: t('currentPageCapture'),
       sections: [
         {
           type: "html",
@@ -462,7 +462,7 @@ const AdminPanelContent = () => {
                   <img
                     key={getMadrasaLogo(madrasaInfo)}
                     src={getMadrasaLogo(madrasaInfo)}
-                    alt="Madrasa logo"
+                    alt={`${getMadrasaDisplayName(madrasaInfo)} ${t('logo')}`}
                     className="h-full w-full object-cover"
                     onError={(e) => {
                       e.target.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="%2306b6d4"/><text x="24" y="30" text-anchor="middle" fill="white" font-size="20" font-weight="bold">' + (getMadrasaDisplayName(madrasaInfo)[0]?.toUpperCase() || 'M') + '</text></svg>');

@@ -1,43 +1,44 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 
-export const hostelRoomsConfig = {
-  title: 'Hostel Rooms',
-  subtitle: 'Manage hostel rooms, buildings, and accommodation capacity',
+export const hostelRoomsConfig = (t) => ({
+  title: t('staff.hostel.rooms.title'),
+  subtitle: t('staff.hostel.rooms.subtitle'),
   endpoint: '/hostel/rooms',
   createPath: '/staff/registrar/hostel-rooms/create',
   editPathForRow: (row) => `/staff/registrar/hostel-rooms/edit/${row._id}`,
   viewPathForRow: (row) => `/staff/registrar/hostel-rooms/view/${row._id}`,
   columns: [
-    { key: 'roomNumber', header: 'Room Number' },
-    { key: 'building', header: 'Building' },
-    { key: 'floor', header: 'Floor' },
-    { key: 'roomType', header: 'Type', render: (value) => value ? value.charAt(0).toUpperCase() + value.slice(1) : '-' },
-    { key: 'capacity', header: 'Capacity' },
-    { key: 'currentOccupancy', header: 'Occupied', render: (value, row) => `${value || 0} / ${row.capacity}` },
-    { key: 'monthlyRent', header: 'Monthly Rent', render: (value) => `$${value || 0}` },
-    { key: 'status', header: 'Status' }
+    { key: 'roomNumber', header: t('staff.hostel.rooms.columns.roomNumber') },
+    { key: 'building', header: t('common.building') },
+    { key: 'floor', header: t('common.floor') },
+    { key: 'roomType', header: t('staff.hostel.rooms.columns.type'), render: (value) => value ? value.charAt(0).toUpperCase() + value.slice(1) : '-' },
+    { key: 'capacity', header: t('common.capacity') },
+    { key: 'currentOccupancy', header: t('staff.hostel.rooms.columns.occupied'), render: (value, row) => `${value || 0} / ${row.capacity}` },
+    { key: 'monthlyRent', header: t('staff.hostel.rooms.columns.monthlyRent'), render: (value) => `$${value || 0}` },
+    { key: 'status', header: t('common.status') }
   ],
-  searchPlaceholder: 'Search by room number or building...',
+  searchPlaceholder: t('staff.hostel.rooms.searchPlaceholder'),
   formFields: [
-    { name: 'roomNumber', label: 'Room Number', type: 'text', required: true },
-    { name: 'building', label: 'Building', type: 'text', required: true },
-    { name: 'floor', label: 'Floor', type: 'number', required: true },
-    { name: 'capacity', label: 'Capacity', type: 'number', required: true },
-    { name: 'roomType', label: 'Room Type', type: 'select', options: [
-      { value: 'single', label: 'Single' },
-      { value: 'double', label: 'Double' },
-      { value: 'triple', label: 'Triple' },
-      { value: 'quad', label: 'Quad' }
+    { name: 'roomNumber', label: t('staff.hostel.rooms.form.roomNumber'), type: 'text', required: true },
+    { name: 'building', label: t('common.building'), type: 'text', required: true },
+    { name: 'floor', label: t('common.floor'), type: 'number', required: true },
+    { name: 'capacity', label: t('common.capacity'), type: 'number', required: true },
+    { name: 'roomType', label: t('staff.hostel.rooms.form.roomType'), type: 'select', options: [
+      { value: 'single', label: t('staff.hostel.rooms.roomType.single') },
+      { value: 'double', label: t('staff.hostel.rooms.roomType.double') },
+      { value: 'triple', label: t('staff.hostel.rooms.roomType.triple') },
+      { value: 'quad', label: t('staff.hostel.rooms.roomType.quad') }
     ]},
-    { name: 'monthlyRent', label: 'Monthly Rent', type: 'number' },
-    { name: 'description', label: 'Description', type: 'textarea' },
-    { name: 'notes', label: 'Notes', type: 'textarea' },
-    { name: 'status', label: 'Status', type: 'select', options: [
-      { value: 'available', label: 'Available' },
-      { value: 'occupied', label: 'Occupied' },
-      { value: 'maintenance', label: 'Maintenance' },
-      { value: 'reserved', label: 'Reserved' }
+    { name: 'monthlyRent', label: t('staff.hostel.rooms.form.monthlyRent'), type: 'number' },
+    { name: 'description', label: t('common.description'), type: 'textarea' },
+    { name: 'notes', label: t('common.notes'), type: 'textarea' },
+    { name: 'status', label: t('common.status'), type: 'select', options: [
+      { value: 'available', label: t('staff.hostel.rooms.status.available') },
+      { value: 'occupied', label: t('staff.hostel.rooms.status.occupied') },
+      { value: 'maintenance', label: t('staff.hostel.rooms.status.maintenance') },
+      { value: 'reserved', label: t('staff.hostel.rooms.status.reserved') }
     ]}
   ],
   initialForm: {
@@ -62,10 +63,11 @@ export const hostelRoomsConfig = {
     notes: row.notes || '',
     status: row.status || 'available'
   })
-};
+});
 
-const HostelRooms = () => (
-  <ListPage {...hostelRoomsConfig} />
-);
+const HostelRooms = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  return <ListPage {...hostelRoomsConfig(t)} />;
+};
 
 export default HostelRooms;

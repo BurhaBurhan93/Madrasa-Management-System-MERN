@@ -76,11 +76,11 @@ const AdminHRAttendance = () => {
     'on-leave': 'bg-purple-100 text-purple-700',
   };
   const statusIcons = {
-    present: '✓',
-    absent: '✗',
-    late: '⏰',
-    'half-day': '½',
-    'on-leave': '🏖',
+    present: <span title={t('common.present')}>✓</span>,
+    absent: <span title={t('common.absent')}>✗</span>,
+    late: <span title={t('common.late')}>⏰</span>,
+    'half-day': <span title={t('common.halfDay')}>½</span>,
+    'on-leave': <span title={t('common.onLeave')}>🏖</span>,
   };
 
   const getStatus = (empId) => {

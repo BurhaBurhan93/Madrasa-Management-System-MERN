@@ -180,9 +180,9 @@ const Designations = () => {
               <tr key={item._id} className="border-b border-slate-100 hover:bg-slate-50">
                 <td className="px-5 py-3 font-medium text-slate-800">{item.designationTitle || '-'}</td>
                 <td className="px-5 py-3 text-slate-600">{getDeptName(item.department)}</td>
-                <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${levelColors[item.jobLevel] || 'bg-slate-100 text-slate-600'}`}>{t(`hr.${item.jobLevel}`) || item.jobLevel}</span></td>
-                <td className="px-5 py-3 text-slate-600">{item.salaryRangeMin ?? item.salaryRangeMax ? `${item.salaryRangeMin ?? '?'} - ${item.salaryRangeMax ?? '?'}` : '-'}</td>
-                <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{t(`common.${item.status}`) || item.status}</span></td>
+                <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${levelColors[item.jobLevel] || 'bg-slate-100 text-slate-600'}`}>{t(`hr.${item.jobLevel}`) || item.jobLevel || t('common.na')}</span></td>
+                <td className="px-5 py-3 text-slate-600">{item.salaryRangeMin ?? item.salaryRangeMax ? `${item.salaryRangeMin ?? (t('common.na') || '?')} - ${item.salaryRangeMax ?? (t('common.na') || '?')}` : '-'}</td>
+                <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{t(`common.${item.status}`) || item.status || t('common.na')}</span></td>
                 <td className="px-5 py-3"><div className="flex gap-2">
                   <button onClick={() => handleEdit(item)} className="rounded-lg bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100">{t('common.edit')}</button>
                   <button onClick={() => setDeleteTarget(item._id)} className="rounded-lg bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">{t('common.delete')}</button>

@@ -57,7 +57,7 @@ const AdminLibraryBooks = () => {
   const filteredBooks = useMemo(() => {
     return books.filter(book => {
       const matchesSearch = (book.title || '').toLowerCase().includes(searchTerm.toLowerCase());
-      const catName = book.category?.name || 'Uncategorized';
+      const catName = book.category?.name || t('common.uncategorized');
       const matchesCategory = selectedCategory === 'All' || catName === selectedCategory;
       return matchesSearch && matchesCategory;
     });
@@ -190,7 +190,7 @@ const AdminLibraryBooks = () => {
             <div className="relative">
               <FiFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <select className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                {categoryNames.map(cat => (<option key={cat} value={cat}>{cat}</option>))}
+                {categoryNames.map(cat => (<option key={cat} value={cat}>{cat === 'All' ? t('common.all') : cat}</option>))}
               </select>
             </div>
           </div>
@@ -216,14 +216,14 @@ const AdminLibraryBooks = () => {
             </select>
           </div>
           <div className="flex gap-1.5">
-            <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Prev</button>
+            <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.previous')}</button>
             {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => {
               const start = Math.max(1, Math.min(page - 5, totalPages - 9));
               const p = start + i;
               if (p > totalPages) return null;
               return <button key={p} onClick={() => setPage(p)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${page === p ? 'bg-slate-800 text-white shadow-md' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{p}</button>;
             })}
-            <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Next</button>
+            <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.next')}</button>
           </div>
         </div>
       )}
@@ -241,7 +241,7 @@ const AdminLibraryBooks = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {Object.entries(books.reduce((acc, b) => {
-                const cat = b.category?.name || 'Uncategorized';
+                const cat = b.category?.name || t('common.uncategorized');
                 if (!acc[cat]) acc[cat] = { count: 0, stock: 0 };
                 acc[cat].count++; acc[cat].stock += (b.stock || 0);
                 return acc;
@@ -273,8 +273,8 @@ const AdminLibraryBooks = () => {
               <div><label className="block text-sm font-medium text-gray-700 mb-1">{t('library.publisher')}</label><input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" value={newBook.publisher} onChange={(e) => setNewBook({...newBook, publisher: e.target.value})} /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">{t('library.numberOfCopies')}</label><input type="number" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" value={newBook.stock} onChange={(e) => setNewBook({...newBook, stock: e.target.value})} min="0" /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">{t('library.pages')}</label><input type="number" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" value={newBook.pages} onChange={(e) => setNewBook({...newBook, pages: e.target.value})} min="0" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label><input type="number" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" value={newBook.purchasePrice} onChange={(e) => setNewBook({...newBook, purchasePrice: e.target.value})} min="0" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Sale Price</label><input type="number" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" value={newBook.salePrice} onChange={(e) => setNewBook({...newBook, salePrice: e.target.value})} min="0" /></div>
+              <div><label className="block text-sm font-medium text-gray-700 mb-1">{t('library.purchasePrice')}</label><input type="number" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" value={newBook.purchasePrice} onChange={(e) => setNewBook({...newBook, purchasePrice: e.target.value})} min="0" /></div>
+              <div><label className="block text-sm font-medium text-gray-700 mb-1">{t('library.salePrice')}</label><input type="number" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" value={newBook.salePrice} onChange={(e) => setNewBook({...newBook, salePrice: e.target.value})} min="0" /></div>
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={handleSubmit} className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 font-semibold">{editingId ? t('common.update') : t('library.addNewBook')}</button>

@@ -3,6 +3,7 @@ import { FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiEdit, FiSave, FiX, FiB
 import { Card, Button, Input, Badge } from '../../components/UIHelper';
 import { getUser } from '../../lib/auth';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
+import { useTranslation } from 'react-i18next';
 
 const ROLE_COLORS = {
   admin: 'purple',
@@ -11,14 +12,15 @@ const ROLE_COLORS = {
   student: 'orange',
 };
 
-const ROLE_LABELS = {
-  admin: 'Administrator',
-  staff: 'Staff Member',
-  teacher: 'Teacher',
-  student: 'Student',
-};
-
 const StaffProfile = () => {
+  const { t } = useTranslation(['staff', 'common']);
+
+  const ROLE_LABELS = {
+    admin: t('staff.profile.roleAdmin', { defaultValue: 'Administrator' }),
+    staff: t('staff.profile.roleStaff', { defaultValue: 'Staff Member' }),
+    teacher: t('staff.profile.roleTeacher', { defaultValue: 'Teacher' }),
+    student: t('staff.profile.roleStudent', { defaultValue: 'Student' }),
+  };
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState(null);
   const [editData, setEditData] = useState({});
@@ -75,10 +77,10 @@ const StaffProfile = () => {
         setProfile(prev => ({ ...prev, ...editData }));
         setIsEditing(false);
       } else {
-        setError(data.message || 'Failed to save changes');
+        setError(data.message || t('common.failedToSaveChanges', { defaultValue: 'Failed to save changes' }));
       }
     } catch {
-      setError('Failed to save changes');
+      setError(t('common.failedToSaveChanges', { defaultValue: 'Failed to save changes' }));
     } finally {
       setSaving(false);
     }
@@ -105,7 +107,7 @@ const StaffProfile = () => {
 
   if (!profile) {
     return (
-      <div className="p-8 text-center text-slate-500">No profile data found. Please log in again.</div>
+      <div className="p-8 text-center text-slate-500">{t('staff.noProfileData', { defaultValue: 'No profile data found. Please log in again.' })}</div>
     );
   }
 
@@ -114,19 +116,19 @@ const StaffProfile = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">My Profile</h1>
-          <p className="text-slate-500 text-sm mt-0.5">View and manage your account information</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('staff.myProfile', { defaultValue: 'My Profile' })}</h1>
+          <p className="text-slate-500 text-sm mt-0.5">{t('staff.profileSubtitle', { defaultValue: 'View and manage your account information' })}</p>
         </div>
         <div className="flex gap-2">
           {isEditing ? (
             <>
-              <Button variant="outline" onClick={handleCancel} icon={<FiX size={15} />}>Cancel</Button>
+              <Button variant="outline" onClick={handleCancel} icon={<FiX size={15} />}>{t('common.cancel')}</Button>
               <Button onClick={handleSave} disabled={saving} icon={<FiSave size={15} />}>
-                {saving ? 'Saving...' : 'Save'}
+                {saving ? t('common.saving', { defaultValue: 'Saving...' }) : t('common.save')}
               </Button>
             </>
           ) : (
-            <Button onClick={() => setIsEditing(true)} icon={<FiEdit size={15} />}>Edit Profile</Button>
+            <Button onClick={() => setIsEditing(true)} icon={<FiEdit size={15} />}>{t('staff.editProfile', { defaultValue: 'Edit Profile' })}</Button>
           )}
         </div>
       </div>
@@ -160,11 +162,11 @@ const StaffProfile = () => {
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <h2 className="text-xl font-bold text-slate-900">{displayName}</h2>
                   <Badge color={ROLE_COLORS[role] || 'gray'} variant="subtle">
-                    {ROLE_LABELS[role] || role}
+                    {t(`roles.${role}`, { defaultValue: ROLE_LABELS[role] || role })}
                   </Badge>
                   {profile.status && (
                     <Badge color={profile.status === 'active' ? 'green' : 'red'} variant="subtle">
-                      {profile.status}
+                      {t(`common.${profile.status}`, { defaultValue: profile.status })}
                     </Badge>
                   )}
                 </div>
@@ -172,7 +174,7 @@ const StaffProfile = () => {
                   <p className="text-slate-500 text-sm">
                     {profile.designation || ''}
                     {profile.designation && employeeType ? ' · ' : ''}
-                    {employeeType ? `${employeeType.charAt(0).toUpperCase() + employeeType.slice(1)} Department` : ''}
+                    {employeeType ? `${employeeType.charAt(0).toUpperCase() + employeeType.slice(1)} ${t('common.department', { defaultValue: 'Department' })}` : ''}
                   </p>
                 )}
                 <div className="flex flex-wrap gap-4 mt-2 text-sm text-slate-500">
@@ -187,61 +189,61 @@ const StaffProfile = () => {
             {/* Fields grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Name */}
-              <Field label="Full Name" icon={<FiUser size={13} />}>
+              <Field label={t('common.fullName', { defaultValue: 'Full Name' })} icon={<FiUser size={13} />}>
                 {isEditing
                   ? <Input value={editData.name || ''} onChange={e => setEditData(p => ({ ...p, name: e.target.value }))} className="w-full" />
                   : <span>{displayName}</span>}
               </Field>
 
               {/* Email — read only */}
-              <Field label="Email Address" icon={<FiMail size={13} />}>
+              <Field label={t('common.emailAddress', { defaultValue: 'Email Address' })} icon={<FiMail size={13} />}>
                 <span>{profile.email}</span>
               </Field>
 
               {/* Role */}
-              <Field label="System Role" icon={<FiShield size={13} />}>
+              <Field label={t('staff.systemRole', { defaultValue: 'System Role' })} icon={<FiShield size={13} />}>
                 <div className="flex items-center gap-2">
-                  <Badge color={ROLE_COLORS[role] || 'gray'} variant="subtle">{ROLE_LABELS[role] || role}</Badge>
+                  <Badge color={ROLE_COLORS[role] || 'gray'} variant="subtle">{t(`roles.${role}`, { defaultValue: ROLE_LABELS[role] || role })}</Badge>
                 </div>
               </Field>
 
               {/* Employee Type (staff/teacher only) */}
               {employeeType && (
-                <Field label="Position / Type" icon={<FiBriefcase size={13} />}>
+                <Field label={t('staff.positionType', { defaultValue: 'Position / Type' })} icon={<FiBriefcase size={13} />}>
                   <span className="capitalize">{employeeType}</span>
                 </Field>
               )}
 
               {/* Department */}
               {profile.department && (
-                <Field label="Department">
+                <Field label={t('common.department', { defaultValue: 'Department' })}>
                   <span>{profile.department}</span>
                 </Field>
               )}
 
               {/* Designation */}
               {profile.designation && (
-                <Field label="Designation">
+                <Field label={t('common.designation', { defaultValue: 'Designation' })}>
                   <span>{profile.designation}</span>
                 </Field>
               )}
 
               {/* Employee ID */}
               {profile.employeeId && (
-                <Field label="Employee ID">
+                <Field label={t('common.employeeId', { defaultValue: 'Employee ID' })}>
                   <span>{profile.employeeId}</span>
                 </Field>
               )}
 
               {/* Student ID */}
               {profile.studentId && (
-                <Field label="Student ID">
+                <Field label={t('common.studentId', { defaultValue: 'Student ID' })}>
                   <span>{profile.studentId}</span>
                 </Field>
               )}
 
               {/* Phone */}
-              <Field label="Phone" icon={<FiPhone size={13} />}>
+              <Field label={t('common.phoneNumber', { defaultValue: 'Phone' })} icon={<FiPhone size={13} />}>
                 {isEditing
                   ? <Input value={editData.phone || editData.phoneNumber || ''} onChange={e => setEditData(p => ({ ...p, phone: e.target.value }))} className="w-full" type="tel" />
                   : <span>{profile.phoneNumber || profile.phone || '—'}</span>}
@@ -249,13 +251,13 @@ const StaffProfile = () => {
 
               {/* Join Date */}
               {(profile.joinDate || profile.enrollmentDate) && (
-                <Field label="Join Date" icon={<FiCalendar size={13} />}>
+                <Field label={t('common.joinDate', { defaultValue: 'Join Date' })} icon={<FiCalendar size={13} />}>
                   <span>{new Date(profile.joinDate || profile.enrollmentDate).toLocaleDateString()}</span>
                 </Field>
               )}
 
               {/* Address */}
-              <Field label="Address" icon={<FiMapPin size={13} />} className="md:col-span-2">
+              <Field label={t('common.address', { defaultValue: 'Address' })} icon={<FiMapPin size={13} />} className="md:col-span-2">
                 {isEditing
                   ? <Input value={editData.currentAddress || ''} onChange={e => setEditData(p => ({ ...p, currentAddress: e.target.value }))} className="w-full" />
                   : <span>{profile.currentAddress || '—'}</span>}
@@ -267,28 +269,28 @@ const StaffProfile = () => {
         {/* Right — Account Info */}
         <div className="space-y-6">
           <Card className="p-6">
-            <h3 className="text-base font-semibold text-slate-900 mb-4">Account Details</h3>
+            <h3 className="text-base font-semibold text-slate-900 mb-4">{t('staff.accountDetails', { defaultValue: 'Account Details' })}</h3>
             <div className="space-y-3 text-sm">
-              <Row label="Role">
-                <Badge color={ROLE_COLORS[role] || 'gray'} variant="subtle">{ROLE_LABELS[role] || role}</Badge>
+              <Row label={t('common.role', { defaultValue: 'Role' })}>
+                <Badge color={ROLE_COLORS[role] || 'gray'} variant="subtle">{t(`roles.${role}`, { defaultValue: ROLE_LABELS[role] || role })}</Badge>
               </Row>
               {employeeType && (
-                <Row label="Type"><span className="capitalize font-medium">{employeeType}</span></Row>
+                <Row label={t('common.type')}><span className="capitalize font-medium">{employeeType}</span></Row>
               )}
               {profile.employeeId && (
-                <Row label="Employee ID"><span className="font-medium">{profile.employeeId}</span></Row>
+                <Row label={t('common.employeeId', { defaultValue: 'Employee ID' })}><span className="font-medium">{profile.employeeId}</span></Row>
               )}
               {profile.department && (
-                <Row label="Department"><span className="font-medium">{profile.department}</span></Row>
+                <Row label={t('common.department', { defaultValue: 'Department' })}><span className="font-medium">{profile.department}</span></Row>
               )}
-              <Row label="Status">
+              <Row label={t('common.status')}>
                 <Badge color={profile.status === 'active' ? 'green' : 'red'} variant="subtle">
-                  {profile.status || 'Active'}
+                  {t(`common.${profile.status || 'active'}`, { defaultValue: profile.status || 'Active' })}
                 </Badge>
               </Row>
               {profile.staffModules?.length > 0 && (
                 <div className="pt-2 border-t border-slate-100">
-                  <p className="text-slate-500 mb-2">Access Modules</p>
+                  <p className="text-slate-500 mb-2">{t('staff.accessModules', { defaultValue: 'Access Modules' })}</p>
                   <div className="flex flex-wrap gap-1">
                     {profile.staffModules.map(m => (
                       <span key={m} className="px-2 py-0.5 bg-cyan-50 text-cyan-700 rounded-full text-xs capitalize">{m}</span>

@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const StaffPagination = ({ page, limit, total, onPageChange, onPageSizeChange, pageSizeOptions = [5,10, 25, 50, 100] }) => {
+  const { t } = useTranslation(['staff', 'common']);
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const from = total === 0 ? 0 : (page - 1) * limit + 1;
   const to = Math.min(page * limit, total);
@@ -12,11 +14,11 @@ const StaffPagination = ({ page, limit, total, onPageChange, onPageSizeChange, p
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-slate-500">
-        Showing <span className="font-semibold text-slate-800">{from}–{to}</span> of <span className="font-semibold text-slate-800">{total}</span> records
+        {t('staff.pagination.showing')} <span className="font-semibold text-slate-800">{from}–{to}</span> {t('staff.pagination.of')} <span className="font-semibold text-slate-800">{total}</span> {t('staff.pagination.records')}
       </p>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <label className="text-xs font-medium text-slate-500">Rows</label>
+          <label className="text-xs font-medium text-slate-500">{t('staff.pagination.rows')}</label>
           <select
             value={limit}
             onChange={(e) => { onPageSizeChange(Number(e.target.value)); }}

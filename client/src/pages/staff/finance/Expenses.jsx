@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiAlertCircle, FiCheckCircle, FiClock, FiDollarSign, FiTag } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupAmountByMonth, groupCountByKey } from '../shared/StaffAnalyticsContent';
 import { staffApi } from '../../../api/staffApi';
@@ -45,6 +46,7 @@ export const expensesConfig = {
 };
 
 const Expenses = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [analytics, setAnalytics] = useState({ loading: true, stats: [], charts: [], insight: null });
 
   useEffect(() => {
@@ -69,26 +71,26 @@ const Expenses = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: 'Total Expenses', value: formatCurrency(totalExpenses), helper: 'All recorded outgoing spend', tone: 'rose', icon: FiDollarSign },
-            { label: 'Pending Approvals', value: pendingApprovals, helper: 'Awaiting approval action', tone: 'amber', icon: FiClock },
-            { label: 'This Month', value: formatCurrency(thisMonthTotal), helper: 'Current-month expense burn', tone: 'blue', icon: FiCheckCircle },
-            { label: 'Expense Categories', value: groupCountByKey(expenses, 'category').length, helper: 'Distinct spending buckets', tone: 'violet', icon: FiTag },
-            { label: 'Rejected Entries', value: rejectedCount, helper: 'Require review or correction', tone: 'emerald', icon: FiAlertCircle }
+            { label: t('staff.finance.expenses.statTotalExpenses'), value: formatCurrency(totalExpenses), helper: t('staff.finance.expenses.statTotalExpensesHelper'), tone: 'rose', icon: FiDollarSign },
+            { label: t('staff.finance.expenses.statPendingApprovals'), value: pendingApprovals, helper: t('staff.finance.expenses.statPendingApprovalsHelper'), tone: 'amber', icon: FiClock },
+            { label: t('staff.finance.expenses.statThisMonth'), value: formatCurrency(thisMonthTotal), helper: t('staff.finance.expenses.statThisMonthHelper'), tone: 'blue', icon: FiCheckCircle },
+            { label: t('staff.finance.expenses.statExpenseCategories'), value: groupCountByKey(expenses, 'category').length, helper: t('staff.finance.expenses.statExpenseCategoriesHelper'), tone: 'violet', icon: FiTag },
+            { label: t('staff.finance.expenses.statRejectedEntries'), value: rejectedCount, helper: t('staff.finance.expenses.statRejectedEntriesHelper'), tone: 'emerald', icon: FiAlertCircle }
           ],
           charts: [
-            { title: 'Category Distribution', type: 'pie', data: groupCountByKey(expenses, 'category') },
-            { title: 'Approval Status Breakdown', type: 'bar', data: groupCountByKey(expenses, 'approvalStatus') },
-            { title: 'Monthly Expense Trend', type: 'line', data: groupAmountByMonth(expenses, 'expenseDate', 'amount') }
+            { title: t('staff.finance.expenses.chartCategoryDistribution'), type: 'pie', data: groupCountByKey(expenses, 'category') },
+            { title: t('staff.finance.expenses.chartApprovalStatusBreakdown'), type: 'bar', data: groupCountByKey(expenses, 'approvalStatus') },
+            { title: t('staff.finance.expenses.chartMonthlyExpenseTrend'), type: 'line', data: groupAmountByMonth(expenses, 'expenseDate', 'amount') }
           ],
           insight: {
-            eyebrow: 'Approval Flow',
-            title: 'Expense oversight now includes category and approval visibility',
-            description: 'The staff panel now surfaces current-month burn, approval backlog, and schema-backed category patterns before the detailed records table.'
+            eyebrow: t('staff.finance.expenses.insightEyebrow'),
+            title: t('staff.finance.expenses.insightTitle'),
+            description: t('staff.finance.expenses.insightDescription')
           }
         });
       } catch (error) {
         if (!active) return;
-        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: 'Expense analytics could not be loaded', description: error.message || 'The expense table is still available below.' } });
+        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('staff.finance.expenses.errorTitle'), description: error.message || t('staff.finance.expenses.errorDescription') } });
       }
     };
     load();
@@ -99,7 +101,7 @@ const Expenses = () => {
 
   return (
     <ListPage
-      eyebrow="Finance"
+      eyebrow={t('staff.finance.eyebrow')}
       title={expensesConfig.title}
       subtitle={expensesConfig.subtitle}
       endpoint={expensesConfig.endpoint}
@@ -107,7 +109,7 @@ const Expenses = () => {
       createPath="/staff/finance/expenses/create"
       editPathForRow={(row) => `/staff/finance/expenses/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/expenses/view/${row._id}`}
-      searchPlaceholder="Search expenses..."
+      searchPlaceholder={t('staff.finance.expenses.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

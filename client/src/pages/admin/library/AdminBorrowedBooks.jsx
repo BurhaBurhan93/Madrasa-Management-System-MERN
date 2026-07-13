@@ -88,7 +88,7 @@ const BorrowedBooks = () => {
                   <td className="px-5 py-3 text-slate-600">{item.borrower ? `${item.borrower.firstName || ''} ${item.borrower.lastName || ''}`.trim() || item.borrower._id : '-'}</td>
                   <td className="px-5 py-3 text-slate-600">{item.borrowedAt ? new Date(item.borrowedAt).toLocaleDateString() : '-'}</td>
                   <td className="px-5 py-3 text-slate-600">{item.returnDate ? new Date(item.returnDate).toLocaleDateString() : '-'}</td>
-                  <td className="px-5 py-3"><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusBadge(item.status)}`}>{item.status || '-'}</span></td>
+                  <td className="px-5 py-3"><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusBadge(item.status)}`}>{t('common.' + item.status) || item.status || '-'}</span></td>
                 </tr>
               ))}
             </tbody>
@@ -98,11 +98,11 @@ const BorrowedBooks = () => {
           <div className="flex items-center justify-between">
             <span className="text-sm text-slate-500">{t('common.page')} {page} {t('common.of')} {totalPages}</span>
             <div className="flex gap-1.5">
-              <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Prev</button>
+              <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.previous') || 'Prev'}</button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                 <button key={p} onClick={() => setPage(p)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${page === p ? 'bg-slate-800 text-white shadow-md' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{p}</button>
               ))}
-              <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Next</button>
+              <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.next') || 'Next'}</button>
             </div>
           </div>
         )}

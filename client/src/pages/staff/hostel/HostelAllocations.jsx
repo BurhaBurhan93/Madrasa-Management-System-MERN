@@ -1,9 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 
-export const hostelAllocationsConfig = {
-  title: 'Hostel Allocations',
-  subtitle: 'Manage student room assignments and hostel residency',
+export const hostelAllocationsConfig = (t) => ({
+  title: t('staff.hostel.allocations.title'),
+  subtitle: t('staff.hostel.allocations.subtitle'),
   endpoint: '/hostel/allocations',
   createPath: '/staff/registrar/hostel-allocations/create',
   editPathForRow: (row) => `/staff/registrar/hostel-allocations/edit/${row._id}`,
@@ -11,53 +12,53 @@ export const hostelAllocationsConfig = {
   columns: [
     { 
       key: 'student', 
-      header: 'Student', 
+      header: t('common.student'), 
       render: (value) => value ? `${value.firstName || ''} ${value.lastName || ''}`.trim() : '-' 
     },
     { 
       key: 'studentCode', 
-      header: 'Student Code', 
+      header: t('staff.hostel.allocations.columns.studentCode'), 
       render: (value, row) => row.student?.studentCode || '-' 
     },
     { 
       key: 'room', 
-      header: 'Room', 
+      header: t('common.room'), 
       render: (value) => value ? `${value.roomNumber} (${value.building})` : '-' 
     },
     { 
       key: 'checkInDate', 
-      header: 'Check-in Date', 
+      header: t('staff.hostel.allocations.columns.checkInDate'), 
       render: (value) => value ? new Date(value).toLocaleDateString() : '-' 
     },
     { 
       key: 'monthlyRent', 
-      header: 'Monthly Rent', 
+      header: t('staff.hostel.allocations.columns.monthlyRent'), 
       render: (value) => `$${value || 0}` 
     },
     { 
       key: 'status', 
-      header: 'Status'
+      header: t('common.status')
     }
   ],
-  searchPlaceholder: 'Search by student name or room number...',
+  searchPlaceholder: t('staff.hostel.allocations.searchPlaceholder'),
   formFields: [
-    { name: 'student', label: 'Student', type: 'relation', relationEndpoint: '/student/all', relationLabel: (row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.user?.name, required: true },
-    { name: 'room', label: 'Room', type: 'relation', relationEndpoint: '/hostel/rooms', relationLabel: (row) => `${row.roomNumber} (${row.building})`, required: true },
-    { name: 'bedNumber', label: 'Bed Number', type: 'number' },
-    { name: 'checkInDate', label: 'Check-in Date', type: 'date', required: true },
-    { name: 'expectedCheckOutDate', label: 'Expected Check-out Date', type: 'date' },
-    { name: 'monthlyRent', label: 'Monthly Rent', type: 'number', required: true },
-    { name: 'securityDeposit', label: 'Security Deposit', type: 'number' },
-    { name: 'emergencyContact_name', label: 'Emergency Contact Name', type: 'text', required: true },
-    { name: 'emergencyContact_relationship', label: 'Emergency Contact Relationship', type: 'text', required: true },
-    { name: 'emergencyContact_phone', label: 'Emergency Contact Phone', type: 'text', required: true },
-    { name: 'emergencyContact_email', label: 'Emergency Contact Email', type: 'text' },
-    { name: 'notes', label: 'Notes', type: 'textarea' },
-    { name: 'status', label: 'Status', type: 'select', options: [
-      { value: 'active', label: 'Active' },
-      { value: 'pending', label: 'Pending' },
-      { value: 'checked-out', label: 'Checked Out' },
-      { value: 'suspended', label: 'Suspended' }
+    { name: 'student', label: t('common.student'), type: 'relation', relationEndpoint: '/student/all', relationLabel: (row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.user?.name, required: true },
+    { name: 'room', label: t('common.room'), type: 'relation', relationEndpoint: '/hostel/rooms', relationLabel: (row) => `${row.roomNumber} (${row.building})`, required: true },
+    { name: 'bedNumber', label: t('staff.hostel.allocations.form.bedNumber'), type: 'number' },
+    { name: 'checkInDate', label: t('staff.hostel.allocations.form.checkInDate'), type: 'date', required: true },
+    { name: 'expectedCheckOutDate', label: t('staff.hostel.allocations.form.expectedCheckOutDate'), type: 'date' },
+    { name: 'monthlyRent', label: t('staff.hostel.allocations.form.monthlyRent'), type: 'number', required: true },
+    { name: 'securityDeposit', label: t('staff.hostel.allocations.form.securityDeposit'), type: 'number' },
+    { name: 'emergencyContact_name', label: t('staff.hostel.allocations.form.emergencyContactName'), type: 'text', required: true },
+    { name: 'emergencyContact_relationship', label: t('staff.hostel.allocations.form.emergencyContactRelationship'), type: 'text', required: true },
+    { name: 'emergencyContact_phone', label: t('staff.hostel.allocations.form.emergencyContactPhone'), type: 'text', required: true },
+    { name: 'emergencyContact_email', label: t('staff.hostel.allocations.form.emergencyContactEmail'), type: 'text' },
+    { name: 'notes', label: t('common.notes'), type: 'textarea' },
+    { name: 'status', label: t('common.status'), type: 'select', options: [
+      { value: 'active', label: t('common.active') },
+      { value: 'pending', label: t('common.pending') },
+      { value: 'checked-out', label: t('staff.hostel.allocations.status.checkedOut') },
+      { value: 'suspended', label: t('staff.hostel.allocations.status.suspended') }
     ]}
   ],
   initialForm: {
@@ -112,10 +113,11 @@ export const hostelAllocationsConfig = {
     }
     return payload;
   }
-};
+});
 
-const HostelAllocations = () => (
-  <ListPage {...hostelAllocationsConfig} />
-);
+const HostelAllocations = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  return <ListPage {...hostelAllocationsConfig(t)} />;
+};
 
 export default HostelAllocations;

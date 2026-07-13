@@ -168,11 +168,11 @@ const AdminProfile = () => {
                 <h2 className="text-2xl font-bold text-gray-900">{displayName}</h2>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                   <span className={`px-3 py-1 text-xs font-semibold rounded-full capitalize ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'}`}>
-                    {role}
+                    {t('users.' + role) || role}
                   </span>
                   {profile.employeeType && (
                     <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full capitalize">
-                      {profile.employeeType}
+                      {t('users.employeeTypes.' + profile.employeeType) || profile.employeeType}
                     </span>
                   )}
                   <span className={`px-3 py-1 text-xs font-semibold rounded-full ${profile.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -207,7 +207,7 @@ const AdminProfile = () => {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">{t('profile.role')}</span>
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'}`}>{role}</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'}`}>{t('users.' + role) || role}</span>
               </div>
               {profile.employeeType && (
                 <div className="flex justify-between items-center">
@@ -238,7 +238,7 @@ const AdminProfile = () => {
                   <p className="text-gray-500 mb-2">{t('profile.accessModules')}</p>
                   <div className="flex flex-wrap gap-1">
                     {profile.staffModules.map(m => (
-                      <span key={m} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs capitalize">{m}</span>
+                      <span key={m} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs capitalize">{t('nav.' + m) || m}</span>
                     ))}
                   </div>
                 </div>

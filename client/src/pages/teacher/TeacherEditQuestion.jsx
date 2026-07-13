@@ -33,7 +33,7 @@ const TeacherEditQuestion = () => {
       if (form.questionType === 'truefalse') payload.options = ['True', 'False'];
       await axios.put(`http://localhost:5000/api/teacher/exams/${examId}/questions/${questionId}`, payload, api());
       navigate(`/teacher/exams/${examId}`);
-    } catch (e) { alert(t('editQuestion.failedToUpdateQuestion')); } finally { setLoading(false); }
+    } catch (e) { alert(t('teacher.editQuestion.failedToUpdateQuestion')); } finally { setLoading(false); }
   };
 
   if (!form) return <div className="flex h-64 items-center justify-center"><div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-600" /></div>;

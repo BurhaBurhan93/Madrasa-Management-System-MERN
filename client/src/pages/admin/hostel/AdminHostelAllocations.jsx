@@ -154,7 +154,7 @@ const AdminHostelAllocations = () => {
           onChange={e => handleStatusChange(e.target.value)}
           className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100"
         >
-          <option value="">{commonT('all')} {commonT('status')}</option>
+          <option value="">{t('hostel.allStatus')}</option>
           {ALLOCATION_STATUSES.map(s => (
             <option key={s} value={s}>{t(`hostel.${s === 'checked-out' ? 'checkedOut' : s}`)}</option>
           ))}

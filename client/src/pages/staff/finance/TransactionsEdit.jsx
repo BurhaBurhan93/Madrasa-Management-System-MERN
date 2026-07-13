@@ -1,14 +1,16 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import FormPage from '../shared/FormPage';
 import { transactionsConfig } from './Transactions';
 
 const TransactionsEdit = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
   return (
     <FormPage
-      titleCreate="Create Transaction"
-      titleEdit="Edit Transaction"
+      titleCreate={t('staff.finance.transactions.create')}
+      titleEdit={t('staff.finance.transactions.edit')}
       endpoint={transactionsConfig.endpoint}
       formFields={transactionsConfig.formFields}
       initialForm={transactionsConfig.initialForm}

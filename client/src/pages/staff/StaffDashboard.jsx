@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import {
   AreaChartComponent,
@@ -18,22 +19,22 @@ import {
 } from 'react-icons/fi';
 
 const RESOURCE_DEFS = [
-  { key: 'users', label: 'Users', path: '/users', route: '/staff/users' },
-  { key: 'students', label: 'Students', path: '/staff/students', route: '/staff/students' },
-  { key: 'inventory', label: 'Library Inventory', path: '/staff/inventory', route: '/staff/inventory' },
-  { key: 'activities', label: 'Recent Activity', path: '/staff/activities', route: '/staff/dashboard' },
-  { key: 'complaints', label: 'Complaints', path: '/staff/complaints', route: '/staff/complaints' },
-  { key: 'employees', label: 'Employees', path: '/hr/employees', route: '/staff/hr/employees' },
-  { key: 'leaves', label: 'Leaves', path: '/hr/leaves', route: '/staff/hr/leave' },
-  { key: 'transactions', label: 'Transactions', path: '/finance/transactions?limit=200', route: '/staff/finance/transactions' },
-  { key: 'accounts', label: 'Accounts', path: '/finance/accounts?limit=200', route: '/staff/finance/accounts' },
-  { key: 'feePayments', label: 'Fee Payments', path: '/finance/fee-payments?limit=200', route: '/staff/finance/fee-payments' },
-  { key: 'expenses', label: 'Expenses', path: '/finance/expenses?limit=200', route: '/staff/finance/expenses' },
-  { key: 'financialReports', label: 'Financial Reports', path: '/finance/reports?limit=200', route: '/staff/finance/reports' },
-  { key: 'salaryPayments', label: 'Salary Payments', path: '/payroll/salary-payments?limit=200', route: '/staff/payroll/salary-payments' },
-  { key: 'salaryAdvances', label: 'Salary Advances', path: '/payroll/salary-advances?limit=200', route: '/staff/payroll/salary-advances' },
-  { key: 'kitchenInventory', label: 'Kitchen Inventory', path: '/kitchen/inventory', route: '/staff/kitchen/inventory' },
-  { key: 'kitchenBudgets', label: 'Kitchen Budgets', path: '/kitchen/budgets', route: '/staff/kitchen/requests' },
+  { key: 'users', label: 'staff.dashboard.users', path: '/users', route: '/staff/users' },
+  { key: 'students', label: 'staff.dashboard.students', path: '/staff/students', route: '/staff/students' },
+  { key: 'inventory', label: 'staff.dashboard.libraryInventory', path: '/staff/inventory', route: '/staff/inventory' },
+  { key: 'activities', label: 'staff.dashboard.recentActivity', path: '/staff/activities', route: '/staff/dashboard' },
+  { key: 'complaints', label: 'staff.dashboard.complaints', path: '/staff/complaints', route: '/staff/complaints' },
+  { key: 'employees', label: 'staff.dashboard.employees', path: '/hr/employees', route: '/staff/hr/employees' },
+  { key: 'leaves', label: 'staff.dashboard.leaves', path: '/hr/leaves', route: '/staff/hr/leave' },
+  { key: 'transactions', label: 'staff.dashboard.transactions', path: '/finance/transactions?limit=200', route: '/staff/finance/transactions' },
+  { key: 'accounts', label: 'staff.dashboard.accounts', path: '/finance/accounts?limit=200', route: '/staff/finance/accounts' },
+  { key: 'feePayments', label: 'staff.dashboard.feePayments', path: '/finance/fee-payments?limit=200', route: '/staff/finance/fee-payments' },
+  { key: 'expenses', label: 'staff.dashboard.expenses', path: '/finance/expenses?limit=200', route: '/staff/finance/expenses' },
+  { key: 'financialReports', label: 'staff.dashboard.financialReports', path: '/finance/reports?limit=200', route: '/staff/finance/reports' },
+  { key: 'salaryPayments', label: 'staff.dashboard.salaryPayments', path: '/payroll/salary-payments?limit=200', route: '/staff/payroll/salary-payments' },
+  { key: 'salaryAdvances', label: 'staff.dashboard.salaryAdvances', path: '/payroll/salary-advances?limit=200', route: '/staff/payroll/salary-advances' },
+  { key: 'kitchenInventory', label: 'staff.dashboard.kitchenInventory', path: '/kitchen/inventory', route: '/staff/kitchen/inventory' },
+  { key: 'kitchenBudgets', label: 'staff.dashboard.kitchenBudgets', path: '/kitchen/budgets', route: '/staff/kitchen/requests' },
 ];
 
 const extractPayload = (json) => {
@@ -55,10 +56,10 @@ const formatCurrency = (value) =>
 const formatSignedCurrency = (value) =>
   `${value >= 0 ? '+' : '-'}${formatCurrency(Math.abs(value))}`;
 
-const safeDate = (value) => {
-  if (!value) return 'No date';
+const safeDate = (value, noDateLabel = 'No date') => {
+  if (!value) return noDateLabel;
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? 'No date' : date.toLocaleDateString();
+  return Number.isNaN(date.getTime()) ? noDateLabel : date.toLocaleDateString();
 };
 
 const StatCard = ({ label, value, note, accentClass, iconText }) => (
@@ -99,6 +100,7 @@ const Panel = ({ title, subtitle, children, className = '', dark = false }) => (
 );
 
 const StaffDashboard = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [resources, setResources] = useState({});
   const [failures, setFailures] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -143,7 +145,7 @@ const StaffDashboard = () => {
       setResources(nextResources);
       setFailures(nextFailures);
     } catch (fetchError) {
-      setError(fetchError?.message || 'Unable to load dashboard data.');
+      setError(fetchError?.message || t('staff.dashboard.unableToLoadDashboard'));
     } finally {
       setLoading(false);
     }
@@ -236,90 +238,51 @@ const StaffDashboard = () => {
 
   const statCards = [
     {
-      label: 'Total Income',
+      label: t('staff.dashboard.totalIncome'),
       value: formatCurrency(metrics.totalIncome + metrics.feeIncome),
-      note: 'Transactions, balances, and fee collections',
+      note: t('staff.dashboard.totalIncomeNote'),
       accentClass: 'bg-emerald-500',
       iconText: 'INC',
     },
     {
-      label: 'Total Expenses',
+      label: t('staff.dashboard.totalExpenses'),
       value: formatCurrency(metrics.totalExpenses),
-      note: 'Operational and finance expense records',
+      note: t('staff.dashboard.totalExpensesNote'),
       accentClass: 'bg-rose-500',
       iconText: 'EXP',
     },
     {
-      label: 'Payroll',
+      label: t('staff.dashboard.payroll'),
       value: formatCurrency(metrics.payrollTotal),
-      note: 'Salary payments and salary advances',
+      note: t('staff.dashboard.payrollNote'),
       accentClass: 'bg-amber-500',
       iconText: 'PAY',
     },
     {
-      label: 'Finance Reports',
+      label: t('staff.dashboard.financeReports'),
       value: metrics.financeReports,
-      note: 'Generated finance report records',
+      note: t('staff.dashboard.financeReportsNote'),
       accentClass: 'bg-sky-500',
       iconText: 'REP',
     },
   ];
 
   const overviewCards = [
-    { title: 'Users', value: metrics.users, route: '/staff/users', icon: FiUsers, tone: 'from-teal-500 to-cyan-600' },
-    { title: 'Students', value: metrics.students, route: '/staff/students', icon: FiUsers, tone: 'from-sky-500 to-blue-600' },
-    { title: 'Library Items', value: metrics.books, route: '/staff/inventory', icon: FiBookOpen, tone: 'from-indigo-500 to-blue-600' },
-    { title: 'Employees', value: metrics.employees, route: '/staff/hr/employees', icon: FiBriefcase, tone: 'from-violet-500 to-purple-600' },
-    { title: 'Complaints', value: metrics.complaints, route: '/staff/complaints', icon: FiInbox, tone: 'from-rose-500 to-red-600' },
-    { title: 'Kitchen Items', value: metrics.kitchenItems, route: '/staff/kitchen/inventory', icon: FiCoffee, tone: 'from-cyan-500 to-sky-600' },
-  ];
-
-  const moduleCards = [
-    {
-      title: 'Finance',
-      value: `${transactions.length + accounts.length + feePayments.length + expenses.length} records`,
-      note: `${formatCurrency(metrics.totalIncome + metrics.feeIncome)} visible inflow`,
-      route: '/staff/finance/transactions',
-    },
-    {
-      title: 'Payroll',
-      value: `${salaryPayments.length + salaryAdvances.length} records`,
-      note: `${formatCurrency(metrics.payrollTotal)} tracked payouts`,
-      route: '/staff/payroll/salary-payments',
-    },
-    {
-      title: 'HR',
-      value: `${employees.length + leaves.length} records`,
-      note: `${metrics.pendingLeaves} pending leave requests`,
-      route: '/staff/hr/employees',
-    },
-    {
-      title: 'Kitchen',
-      value: `${kitchenInventory.length + kitchenBudgets.length} records`,
-      note: `${metrics.lowStockCount} low stock items`,
-      route: '/staff/kitchen/inventory',
-    },
-    {
-      title: 'Library',
-      value: `${inventory.length} records`,
-      note: `${metrics.borrowedBooks} borrowed items`,
-      route: '/staff/inventory',
-    },
-    {
-      title: 'Complaints',
-      value: `${complaints.length} records`,
-      note: `${metrics.pendingComplaints} still open or pending`,
-      route: '/staff/complaints',
-    },
+    { title: t('staff.dashboard.users'), value: metrics.users, route: '/staff/users', icon: FiUsers, tone: 'from-teal-500 to-cyan-600' },
+    { title: t('staff.dashboard.students'), value: metrics.students, route: '/staff/students', icon: FiUsers, tone: 'from-sky-500 to-blue-600' },
+    { title: t('staff.dashboard.libraryItems'), value: metrics.books, route: '/staff/inventory', icon: FiBookOpen, tone: 'from-indigo-500 to-blue-600' },
+    { title: t('staff.dashboard.employees'), value: metrics.employees, route: '/staff/hr/employees', icon: FiBriefcase, tone: 'from-violet-500 to-purple-600' },
+    { title: t('staff.dashboard.complaints'), value: metrics.complaints, route: '/staff/complaints', icon: FiInbox, tone: 'from-rose-500 to-red-600' },
+    { title: t('staff.dashboard.kitchenItems'), value: metrics.kitchenItems, route: '/staff/kitchen/inventory', icon: FiCoffee, tone: 'from-cyan-500 to-sky-600' },
   ];
 
   const financeTrendData = [
-    { month: 'Jan', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.58), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.48) },
-    { month: 'Feb', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.64), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.56) },
-    { month: 'Mar', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.71), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.63) },
-    { month: 'Apr', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.78), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.7) },
-    { month: 'May', income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.88), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.82) },
-    { month: 'Jun', income: Math.round(metrics.totalIncome + metrics.feeIncome), expense: Math.round(metrics.totalExpenses + metrics.payrollTotal) },
+    { month: t('staff.dashboard.monthJan'), income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.58), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.48) },
+    { month: t('staff.dashboard.monthFeb'), income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.64), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.56) },
+    { month: t('staff.dashboard.monthMar'), income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.71), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.63) },
+    { month: t('staff.dashboard.monthApr'), income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.78), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.7) },
+    { month: t('staff.dashboard.monthMay'), income: Math.round((metrics.totalIncome + metrics.feeIncome) * 0.88), expense: Math.round((metrics.totalExpenses + metrics.payrollTotal) * 0.82) },
+    { month: t('staff.dashboard.monthJun'), income: Math.round(metrics.totalIncome + metrics.feeIncome), expense: Math.round(metrics.totalExpenses + metrics.payrollTotal) },
   ];
 
   const profitLossTrendData = financeTrendData.map((item) => ({
@@ -330,23 +293,23 @@ const StaffDashboard = () => {
   const latestProfitLoss = profitLossTrendData[profitLossTrendData.length - 1]?.value || 0;
   const previousProfitLoss = profitLossTrendData[profitLossTrendData.length - 2]?.value || 0;
   const trendDelta = latestProfitLoss - previousProfitLoss;
-  const trendDirection = trendDelta > 0 ? 'Improving' : trendDelta < 0 ? 'Declining' : 'Stable';
+  const trendDirection = trendDelta > 0 ? t('staff.dashboard.improving') : trendDelta < 0 ? t('staff.dashboard.declining') : t('staff.dashboard.stable');
   const trendDirectionText = trendDelta > 0
-    ? 'Finance is moving in a better direction than the previous period'
+    ? t('staff.dashboard.financeMovingBetter')
     : trendDelta < 0
-      ? 'Finance is moving in a weaker direction than the previous period'
-      : 'Finance is stable compared to the previous period';
-  const profitLossStatus = metrics.profitLoss >= 0 ? 'Profit' : 'Loss';
+      ? t('staff.dashboard.financeMovingWeaker')
+      : t('staff.dashboard.financeStable');
+  const profitLossStatus = metrics.profitLoss >= 0 ? t('staff.dashboard.profit') : t('staff.dashboard.loss');
 
   const moduleCoverageData = [
-    { name: 'Users', value: users.length },
-    { name: 'Students', value: students.length },
-    { name: 'Library', value: inventory.length },
-    { name: 'Complaints', value: complaints.length },
-    { name: 'HR', value: employees.length + leaves.length },
-    { name: 'Finance', value: transactions.length + accounts.length + feePayments.length + expenses.length + financialReports.length },
-    { name: 'Payroll', value: salaryPayments.length + salaryAdvances.length },
-    { name: 'Kitchen', value: kitchenInventory.length + kitchenBudgets.length },
+    { name: t('staff.dashboard.users'), value: users.length },
+    { name: t('staff.dashboard.students'), value: students.length },
+    { name: t('staff.dashboard.library'), value: inventory.length },
+    { name: t('staff.dashboard.complaints'), value: complaints.length },
+    { name: t('staff.dashboard.hr'), value: employees.length + leaves.length },
+    { name: t('staff.dashboard.finance'), value: transactions.length + accounts.length + feePayments.length + expenses.length + financialReports.length },
+    { name: t('staff.dashboard.payroll'), value: salaryPayments.length + salaryAdvances.length },
+    { name: t('staff.dashboard.kitchen'), value: kitchenInventory.length + kitchenBudgets.length },
   ];
 
   const tableRows = RESOURCE_DEFS.map((def) => {
@@ -358,41 +321,42 @@ const StaffDashboard = () => {
         : 0;
 
     return {
+      key: def.key,
       table: def.label,
       records: count,
-      status: failures.includes(def.label) ? 'Unavailable' : 'Connected',
+      status: failures.includes(def.label) ? 'staff.dashboard.unavailable' : 'staff.dashboard.connected',
       route: def.route,
     };
   });
 
   const groupedTableRows = [
     {
-      title: 'Core',
-      items: tableRows.filter((row) => ['Users', 'Students', 'Recent Activity'].includes(row.table)),
+      title: 'staff.dashboard.core',
+      items: tableRows.filter((row) => ['users', 'students', 'activities'].includes(row.key)),
       accent: 'from-cyan-500 to-sky-500',
     },
     {
-      title: 'Finance',
-      items: tableRows.filter((row) => ['Transactions', 'Accounts', 'Fee Payments', 'Expenses', 'Financial Reports'].includes(row.table)),
+      title: 'staff.dashboard.financeGroup',
+      items: tableRows.filter((row) => ['transactions', 'accounts', 'feePayments', 'expenses', 'financialReports'].includes(row.key)),
       accent: 'from-emerald-500 to-teal-500',
     },
     {
-      title: 'People',
-      items: tableRows.filter((row) => ['Employees', 'Leaves', 'Complaints'].includes(row.table)),
+      title: 'staff.dashboard.people',
+      items: tableRows.filter((row) => ['employees', 'leaves', 'complaints'].includes(row.key)),
       accent: 'from-violet-500 to-purple-500',
     },
     {
-      title: 'Operations',
-      items: tableRows.filter((row) => ['Library Inventory', 'Salary Payments', 'Salary Advances', 'Kitchen Inventory', 'Kitchen Budgets'].includes(row.table)),
+      title: 'staff.dashboard.operations',
+      items: tableRows.filter((row) => ['inventory', 'salaryPayments', 'salaryAdvances', 'kitchenInventory', 'kitchenBudgets'].includes(row.key)),
       accent: 'from-amber-500 to-orange-500',
     },
   ];
 
   const moneyMixData = [
-    { name: 'Income', value: metrics.totalIncome, color: '#10B981' },
-    { name: 'Fee Collections', value: metrics.feeIncome, color: '#06B6D4' },
-    { name: 'Expenses', value: metrics.totalExpenses, color: '#F97316' },
-    { name: 'Payroll', value: metrics.payrollTotal, color: '#F59E0B' },
+    { name: t('staff.dashboard.income'), value: metrics.totalIncome, color: '#10B981' },
+    { name: t('staff.dashboard.feeCollections'), value: metrics.feeIncome, color: '#06B6D4' },
+    { name: t('staff.dashboard.expenses'), value: metrics.totalExpenses, color: '#F97316' },
+    { name: t('staff.dashboard.payroll'), value: metrics.payrollTotal, color: '#F59E0B' },
   ].filter((item) => item.value > 0);
 
   const performanceRadarData = [
@@ -405,24 +369,24 @@ const StaffDashboard = () => {
         Math.min(100, Math.max(25, metrics.financeHealth)),
         Math.min(100, Math.max(30, metrics.financeReports * 12 || 30)),
       ],
-      name: 'Staff Operations',
+      name: t('staff.dashboard.staffOperations'),
     },
   ];
 
   const performanceIndicators = [
-    { name: 'Collections', max: 100 },
-    { name: 'Complaints', max: 100 },
-    { name: 'HR', max: 100 },
-    { name: 'Kitchen', max: 100 },
-    { name: 'Finance', max: 100 },
-    { name: 'Reporting', max: 100 },
+    { name: t('staff.dashboard.collections'), max: 100 },
+    { name: t('staff.dashboard.complaints'), max: 100 },
+    { name: t('staff.dashboard.hr'), max: 100 },
+    { name: t('staff.dashboard.kitchen'), max: 100 },
+    { name: t('staff.dashboard.finance'), max: 100 },
+    { name: t('staff.dashboard.reporting'), max: 100 },
   ];
 
   const recentRows = activities.slice(0, 5).map((item, index) => ({
     id: item?._id || index,
-    title: item?.title || item?.action || `Recent item ${index + 1}`,
-    detail: item?.detail || item?.description || 'No details available',
-    date: safeDate(item?.createdAt || item?.date || item?.updatedAt),
+    title: item?.title || item?.action || `${t('staff.dashboard.recentItem')} ${index + 1}`,
+    detail: item?.detail || item?.description || t('staff.dashboard.noDetailsAvailable'),
+    date: safeDate(item?.createdAt || item?.date || item?.updatedAt, t('staff.dashboard.noDate')),
   }));
 
   if (loading) {
@@ -437,7 +401,7 @@ const StaffDashboard = () => {
     return (
       <ErrorPage
         type="generic"
-        title="Dashboard Unavailable"
+        title={t('staff.dashboard.dashboardUnavailable')}
         message={error}
         onRetry={fetchDashboardData}
         showHomeButton={false}
@@ -455,20 +419,20 @@ const StaffDashboard = () => {
 
         <section className="mt-2">
           <Panel
-            title="Finance And Payroll Snapshot"
-            subtitle="Profit, loss, total outflow, and current direction"
+            title={t('staff.dashboard.financeAndPayrollSnapshot')}
+            subtitle={t('staff.dashboard.financeSnapshotSubtitle')}
             className="border-cyan-100 bg-transparent"
           >
             <div className="grid gap-5 lg:grid-cols-4 sm:grid-cols-2">
               <div className="rounded-3xl border border-emerald-100 bg-transparent p-5 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">Total Revenue</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">{t('staff.dashboard.totalRevenue')}</p>
                 <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(metrics.totalRevenue)}</p>
-                <p className="mt-3 text-sm leading-6 text-slate-600">Income plus fee collections</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">{t('staff.dashboard.totalRevenueNote')}</p>
               </div>
               <div className="rounded-3xl border border-orange-100 bg-transparent p-5 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600">Total Outflow</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600">{t('staff.dashboard.totalOutflow')}</p>
                 <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{formatCurrency(metrics.totalOutflow)}</p>
-                <p className="mt-3 text-sm leading-6 text-slate-600">Expenses together with payroll</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">{t('staff.dashboard.totalOutflowNote')}</p>
               </div>
                 <div className={`rounded-3xl bg-transparent p-5 shadow-sm ${metrics.profitLoss >= 0 ? 'border border-cyan-100' : 'border border-rose-100'}`}>
                 <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${metrics.profitLoss >= 0 ? 'text-cyan-600' : 'text-rose-600'}`}>{profitLossStatus}</p>
@@ -476,11 +440,11 @@ const StaffDashboard = () => {
                   {formatSignedCurrency(metrics.profitLoss)}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-slate-600">
-                  {metrics.profitLoss >= 0 ? 'Revenue is higher than costs' : 'Costs are higher than revenue'}
+                  {metrics.profitLoss >= 0 ? t('staff.dashboard.revenueHigherThanCosts') : t('staff.dashboard.costsHigherThanRevenue')}
                 </p>
               </div>
 <div className={`rounded-3xl border bg-transparent p-5 shadow-sm ${trendDelta >= 0 ? 'border-sky-100' : 'border-amber-100'}`}>
-                <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${trendDelta >= 0 ? 'text-sky-600' : 'text-amber-600'}`}>Direction</p>
+                <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${trendDelta >= 0 ? 'text-sky-600' : 'text-amber-600'}`}>{t('staff.dashboard.direction')}</p>
                 <p className={`mt-3 text-3xl font-bold tracking-tight ${trendDelta >= 0 ? 'text-sky-600' : 'text-amber-600'}`}>
                   {trendDirection}
                 </p>
@@ -490,7 +454,7 @@ const StaffDashboard = () => {
 
 <div className="mt-6 rounded-3xl border border-cyan-100 bg-transparent p-5 shadow-sm">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-base font-semibold text-slate-900">Current Result</p>
+                <p className="text-base font-semibold text-slate-900">{t('staff.dashboard.currentResult')}</p>
                 <span className={`rounded-full px-3 py-1 text-xs font-medium ${
                   metrics.profitLoss >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
                 }`}>
@@ -504,7 +468,11 @@ const StaffDashboard = () => {
                 />
               </div>
               <p className="mt-4 text-sm leading-6 text-slate-600">
-                Revenue: {formatCurrency(metrics.totalRevenue)} | Outflow: {formatCurrency(metrics.totalOutflow)} | Result: {formatSignedCurrency(metrics.profitLoss)}
+                {t('staff.dashboard.revenueOutflowResult', {
+                  revenue: formatCurrency(metrics.totalRevenue),
+                  outflow: formatCurrency(metrics.totalOutflow),
+                  result: formatSignedCurrency(metrics.profitLoss),
+                })}
               </p>
             </div>
           </Panel>
@@ -530,7 +498,7 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
                   <div>
                     <p className="text-sm font-medium text-slate-500">{card.title}</p>
                     <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{card.value}</p>
-                    <p className="mt-2 text-sm text-slate-500">Open module</p>
+                    <p className="mt-2 text-sm text-slate-500">{t('staff.dashboard.openModule')}</p>
                   </div>
                   <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${card.tone} text-white shadow-md`}>
                     <Icon size={22} />
@@ -545,7 +513,7 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
         <section className="mt-8 grid gap-6 lg:grid-cols-2">
           <div className="rounded-[28px] border border-slate-200 bg-transparent p-3 shadow-sm">
             <DoughnutChartComponent
-              title="Money Mix"
+              title={t('staff.dashboard.moneyMix')}
               data={moneyMixData}
               height={330}
               showLegend={false}
@@ -554,7 +522,7 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
 
           <div className="rounded-[28px] border border-slate-200 bg-transparent p-3 shadow-sm">
             <RadarChartComponent
-              title="Operations Radar"
+              title={t('staff.dashboard.operationsRadar')}
               data={performanceRadarData}
               indicators={performanceIndicators}
               height={330}
@@ -563,7 +531,7 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
         </section>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-[0.95fr,1.05fr]">
-          <Panel title="Recent Activity" subtitle="Latest updates from staff modules">
+          <Panel title={t('staff.dashboard.recentActivity')} subtitle={t('staff.dashboard.recentActivitySubtitle')}>
             <div className="space-y-4">
               {recentRows.length > 0 ? recentRows.map((row) => (
                 <div
@@ -583,14 +551,14 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
                 </div>
               )) : (
                 <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
-                  No recent activity available yet.
+                  {t('staff.dashboard.noRecentActivity')}
                 </div>
               )}
             </div>
           </Panel>
           <div className="rounded-[28px] border border-slate-200 bg-transparent p-3 shadow-sm">
             <BarChartComponent
-              title="Module Coverage"
+              title={t('staff.dashboard.moduleCoverage')}
               data={moduleCoverageData}
               dataKey="value"
               nameKey="name"
@@ -601,7 +569,7 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
         </section>
 
         <section className="mt-8">
-          <Panel title="Table Registry" subtitle="Clean overview of every connected module table">
+          <Panel title={t('staff.dashboard.tableRegistry')} subtitle={t('staff.dashboard.tableRegistrySubtitle')}>
             <div className="grid gap-5 xl:grid-cols-2">
               {groupedTableRows.map((group) => (
                 <div
@@ -611,10 +579,10 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
                   <div className={`h-1 bg-gradient-to-r ${group.accent}`} />
                   <div className="border-b border-slate-100 px-5 py-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                      {group.title}
+                      {t(group.title)}
                     </p>
                     <p className="mt-1 text-lg font-semibold text-slate-900">
-                      {group.items.length} connected tables
+                      {t('staff.dashboard.connectedTables', { count: group.items.length })}
                     </p>
                   </div>
                   <div className="divide-y divide-slate-100">
@@ -624,17 +592,17 @@ className="group rounded-3xl border border-slate-200 bg-transparent p-5 shadow-s
                         className="flex items-center justify-between gap-4 px-5 py-4 transition-colors duration-200 hover:bg-slate-50"
                       >
                         <div>
-                          <p className="font-medium text-slate-900">{row.table}</p>
+                          <p className="font-medium text-slate-900">{t(row.table)}</p>
                           <p className="mt-1 text-sm text-cyan-700">{row.route}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-semibold text-slate-900">{row.records} records</p>
+                          <p className="text-sm font-semibold text-slate-900">{t('staff.dashboard.records', { count: row.records })}</p>
                           <span className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                            row.status === 'Connected'
+                            row.status === 'staff.dashboard.connected'
                               ? 'bg-emerald-100 text-emerald-700'
                               : 'bg-amber-100 text-amber-700'
                           }`}>
-                            {row.status}
+                            {t(row.status)}
                           </span>
                         </div>
                       </div>

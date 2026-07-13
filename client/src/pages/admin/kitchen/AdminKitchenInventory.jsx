@@ -139,7 +139,7 @@ const AdminKitchenInventory = () => {
             <div key={item._id} className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg transition-shadow min-w-0">
               <div className="flex justify-between items-start mb-3 gap-2">
                 <div className="min-w-0 flex-1"><h3 className="font-semibold text-slate-900 truncate">{item.itemName}</h3><p className="text-xs text-slate-400">{item.category || t('common.noCategory')}</p></div>
-                <span className={`shrink-0 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[item.status] || 'bg-slate-100 text-slate-600'}`}>{t(`kitchen.${item.status}`) || item.status}</span>
+                <span className={`shrink-0 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[item.status] || 'bg-slate-100 text-slate-600'}`}>{t(`kitchen.${item.status}`) || item.status || t('common.na')}</span>
               </div>
               <div className="space-y-1.5 text-sm mb-3">
                 <div className="flex justify-between gap-2"><span className="text-slate-500">{t('kitchen.quantity')}:</span><span className="font-medium text-slate-900">{item.quantity} {item.unit}</span></div>
@@ -172,7 +172,7 @@ const AdminKitchenInventory = () => {
                     <td className="px-5 py-3 font-medium text-slate-800 truncate max-w-[180px]" title={item.itemName}>{item.itemName}</td>
                     <td className="px-5 py-3 text-slate-600">{item.category || '-'}</td>
                     <td className="px-5 py-3 text-slate-600">{item.quantity} {item.unit}</td>
-                    <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[item.status] || 'bg-slate-100 text-slate-600'}`}>{t(`kitchen.${item.status}`) || item.status}</span></td>
+                    <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[item.status] || 'bg-slate-100 text-slate-600'}`}>{t(`kitchen.${item.status}`) || item.status || t('common.na')}</span></td>
                     <td className="px-5 py-3"><div className="flex gap-1">
                       <button onClick={() => handleEdit(item)} className="rounded-lg bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100">{t('common.edit')}</button>
                       <button onClick={() => setDeleteTarget(item._id)} className="rounded-lg bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">{t('common.delete')}</button>

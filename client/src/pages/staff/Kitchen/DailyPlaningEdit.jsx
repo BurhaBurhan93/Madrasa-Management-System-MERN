@@ -1,11 +1,14 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import FormPage from '../shared/FormPage';
-import { consumptionConfig } from './DailyPlaning';
+import { getConsumptionConfig } from './DailyPlaning';
 
 const DailyPlaningEdit = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <FormPage titleCreate="Create Consumption Record" titleEdit="Edit Consumption Record" endpoint={consumptionConfig.endpoint} formFields={consumptionConfig.formFields} initialForm={consumptionConfig.initialForm} mapRowToForm={consumptionConfig.mapRowToForm} mapFormToPayload={consumptionConfig.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/kitchen/menu" readMode="collection" readEndpoint={consumptionConfig.endpoint} />;
+  const config = getConsumptionConfig(t);
+  return <FormPage titleCreate={t('staff.kitchen.dailyPlaning.titleCreate', 'Create Consumption Record')} titleEdit={t('staff.kitchen.dailyPlaning.titleEdit', 'Edit Consumption Record')} endpoint={config.endpoint} formFields={config.formFields} initialForm={config.initialForm} mapRowToForm={config.mapRowToForm} mapFormToPayload={config.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/kitchen/menu" readMode="collection" readEndpoint={config.endpoint} />;
 };
 
 export default DailyPlaningEdit;

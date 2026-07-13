@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import RecordViewPage from '../shared/RecordViewPage';
 import { educationHistoryConfig } from './EducationHistory';
@@ -9,13 +10,14 @@ const mapRowToView = (row) => ({
 });
 
 const EducationHistoryView = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  const fields = educationHistoryConfig.formFields.map((field) => ({ name: field.name, label: field.label }));
+  const fields = educationHistoryConfig.formFields.map((field) => ({ name: field.name, label: t(`staff.registrar.educationHistory.fields.${field.name}`) }));
 
   return (
     <RecordViewPage
-      title="Education History"
-      subtitle="View academic background and previous schooling"
+      title={t('staff.registrar.educationHistory.view.title')}
+      subtitle={t('staff.registrar.educationHistory.view.subtitle')}
       endpoint={educationHistoryConfig.endpoint}
       id={id}
       fields={fields}

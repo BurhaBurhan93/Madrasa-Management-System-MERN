@@ -226,7 +226,7 @@ const TeacherPanelContent = () => {
     const heading = contentNode.querySelector("h1, h2, h3");
     return {
       title: heading?.textContent?.trim() || t('print'),
-      subtitle: "Current page capture",
+      subtitle: t('currentPageCapture'),
       sections: [
         {
           type: "html",
@@ -339,7 +339,7 @@ const TeacherPanelContent = () => {
                   <img
                     key={getMadrasaLogo(madrasaInfo)}
                     src={getMadrasaLogo(madrasaInfo)}
-                    alt={`${getMadrasaDisplayName(madrasaInfo)} logo`}
+                    alt={`${getMadrasaDisplayName(madrasaInfo)} ${t('logo')}`}
                     className="h-full w-full object-cover"
                     onError={(e) => {
                       e.target.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="%2306b6d4"/><text x="24" y="30" text-anchor="middle" fill="white" font-size="20" font-weight="bold">' + (getMadrasaDisplayName(madrasaInfo)[0]?.toUpperCase() || 'M') + '</text></svg>');
@@ -567,7 +567,7 @@ const TeacherPanelContent = () => {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                aria-label="Toggle sidebar"
+                aria-label={t('toggleSidebar')}
                 className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
               >
                 <FiMenu size={20} />
@@ -583,7 +583,7 @@ const TeacherPanelContent = () => {
                 >
                   {t('welcome')}{" "}
                   <span className="bg-gradient-to-r from-cyan-600 to-sky-600 bg-clip-text text-transparent">
-                    {user?.name || "Teacher"}
+                    {user?.name || t('teacher')}
                   </span>
                 </h1>
                 <p
@@ -655,9 +655,9 @@ const TeacherPanelContent = () => {
         onClose={() => setShowLogoutConfirm(false)}
         onConfirm={confirmLogout}
         title={t('logout')}
-        message="Are you sure you want to logout?"
+        message={t('logoutConfirm')}
         confirmText={t('logout')}
-        cancelText="Cancel"
+        cancelText={t('common.cancel')}
       />
     </div>
   );

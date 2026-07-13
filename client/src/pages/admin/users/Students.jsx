@@ -101,8 +101,9 @@ const Students = () => {
   const exportCSV = () => {
     if (students.length === 0) return;
     const keys = ['rollNo', 'name', 'class', 'section', 'status', 'guardian', 'phone'];
+    const headers = [t('users.rollNo'), t('common.name'), t('common.class'), t('common.section'), t('common.status'), t('users.guardian'), t('common.phone')];
     const csvContent = [
-      keys.join(','),
+      headers.join(','),
       ...students.map(row => keys.map(k => JSON.stringify(String(row[k] ?? '')).replace(/^"|"$/g, '')).join(','))
     ].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

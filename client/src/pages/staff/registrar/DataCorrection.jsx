@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Card from '../../../components/UIHelper/Card';
 import Badge from '../../../components/UIHelper/Badge';
 import Button from '../../../components/UIHelper/Button';
@@ -15,6 +16,7 @@ const formatAuditValue = (val) => {
 };
 
 const DataCorrection = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [changeLogs, setChangeLogs] = useState([]);
@@ -48,7 +50,7 @@ const DataCorrection = () => {
       const response = await axios.get(`${API_BASE}/student/all`, getConfig());
       setStudents(response.data.data || []);
     } catch (err) {
-      setError('Failed to fetch students');
+      setError(t('staff.registrar.dataCorrection.errors.fetchFailed'));
       console.error(err);
     } finally {
       setLoading(false);
@@ -61,7 +63,7 @@ const DataCorrection = () => {
       const response = await axios.get(`${API_BASE}/student/Student/${studentId}/audit-logs`, getConfig());
       setChangeLogs(response.data?.data || response.data || []);
     } catch (err) {
-      console.error('Failed to fetch change logs:', err);
+      console.error(t('staff.registrar.dataCorrection.errors.fetchLogsFailed'), err);
     }
   };
 
@@ -78,12 +80,11 @@ const DataCorrection = () => {
 
   const handleSubmitCorrection = async () => {
     if (!selectedStudent || !correctionData.newValue || !correctionData.reason) {
-      alert('Please fill all fields and provide a reason for the change');
+      alert(t('staff.registrar.dataCorrection.errors.fillAllFields'));
       return;
     }
 
     try {
-      // Call the correction endpoint
       await axios.post(
         `${API_BASE}/student/students/${selectedStudent._id}/correct-data`,
         {
@@ -95,12 +96,12 @@ const DataCorrection = () => {
         getConfig()
       );
 
-      alert('Data correction submitted successfully!');
+      alert(t('staff.registrar.dataCorrection.success'));
       setShowCorrectionForm(false);
       fetchStudents();
     } catch (error) {
-      console.error('Correction error:', error);
-      alert(error.response?.data?.message || 'Failed to submit correction');
+      console.error(t('staff.registrar.dataCorrection.errors.correctionError'), error);
+      alert(error.response?.data?.message || t('staff.registrar.dataCorrection.errors.submitFailed'));
     }
   };
 
@@ -152,7 +153,7 @@ const DataCorrection = () => {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading students...</p>
+        <p className="mt-4 text-gray-600">{t('staff.registrar.dataCorrection.loading')}</p>
       </div>
     );
   }
@@ -169,10 +170,10 @@ const DataCorrection = () => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-rose-900">Unable to Load Data</h3>
+                <h3 className="text-sm font-semibold text-rose-900">{t('staff.registrar.dataCorrection.errors.unableToLoad')}</h3>
                 <p className="mt-1 text-sm text-rose-700">{error}</p>
                 <button onClick={fetchStudents} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
-                  Retry
+                  {t('staff.registrar.dataCorrection.retry')}
                 </button>
               </div>
             </div>
@@ -184,33 +185,31 @@ const DataCorrection = () => {
 
   return (
     <div className="w-full bg-gray-50 min-h-screen p-6">
-      {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Data Correction & Audit Trail</h1>
-        <p className="text-gray-600">Correct student data with full audit trail and change history</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('staff.registrar.dataCorrection.title')}</h1>
+        <p className="text-gray-600">{t('staff.registrar.dataCorrection.subtitle')}</p>
       </div>
 
-      {/* Students List */}
       <Card className="mb-8">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Code</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Father Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('staff.registrar.dataCorrection.table.studentCode')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('staff.registrar.dataCorrection.table.name')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('staff.registrar.dataCorrection.table.fatherName')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('staff.registrar.dataCorrection.table.class')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('staff.registrar.dataCorrection.table.phone')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('staff.registrar.dataCorrection.table.level')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('staff.registrar.dataCorrection.table.status')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('staff.registrar.dataCorrection.table.actions')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {students.map((student) => (
                 <tr key={student._id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {student.studentCode || 'N/A'}
+                    {student.studentCode || t('staff.registrar.dataCorrection.table.na')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="font-medium">
@@ -221,7 +220,7 @@ const DataCorrection = () => {
                     {student.fatherName || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {student.currentClass?.name || student.currentClass?.className || 'Not Assigned'}
+                    {student.currentClass?.name || student.currentClass?.className || t('staff.registrar.dataCorrection.table.notAssigned')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {student.phone || student.user?.phone || '-'}
@@ -231,7 +230,7 @@ const DataCorrection = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${student.status === 'active' ? 'bg-green-100 text-green-800' : student.status === 'inactive' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                      {student.status || 'N/A'}
+                      {student.status || t('staff.registrar.dataCorrection.table.na')}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -239,7 +238,7 @@ const DataCorrection = () => {
                       onClick={() => setSelectedStudent(student)}
                       className="text-blue-600 hover:text-blue-800 font-medium"
                     >
-                      View History
+                      {t('staff.registrar.dataCorrection.table.viewHistory')}
                     </button>
                   </td>
                 </tr>
@@ -249,7 +248,6 @@ const DataCorrection = () => {
         </div>
       </Card>
 
-      {/* Change History Panel */}
       {selectedStudent && (
         <Card className="mb-8">
           <div className="flex justify-between items-center mb-4">
@@ -257,33 +255,32 @@ const DataCorrection = () => {
               onClick={() => fetchChangeLogs(selectedStudent._id)}
               className="text-xl font-semibold text-blue-600 hover:text-blue-800 bg-transparent border-none cursor-pointer text-left"
             >
-              Change History: {selectedStudent.firstName} {selectedStudent.lastName}
+              {t('staff.registrar.dataCorrection.changeHistory')} {selectedStudent.firstName} {selectedStudent.lastName}
             </button>
             <button
               onClick={() => { setSelectedStudent(null); setChangeLogs([]); }}
               className="text-gray-500 hover:text-gray-700"
             >
-              ✕ Close
+              ✕ {t('staff.registrar.dataCorrection.close')}
             </button>
           </div>
 
           <div className="space-y-4">
-            {/* Editable Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries({
-                'First Name': selectedStudent.firstName,
-                'Last Name': selectedStudent.lastName,
-                'Father Name': selectedStudent.fatherName,
-                'Grandfather Name': selectedStudent.grandfatherName,
-                'Date of Birth': selectedStudent.dob ? new Date(selectedStudent.dob).toLocaleDateString() : 'N/A',
-                'Blood Type': selectedStudent.bloodType || 'N/A',
-                'Current Class': selectedStudent.currentClass?.name || selectedStudent.currentClass?.className || 'Not Assigned',
-                'Phone': selectedStudent.phone || selectedStudent.user?.phone || 'N/A',
-                'WhatsApp': selectedStudent.whatsapp || 'N/A',
-                'Email': selectedStudent.email || selectedStudent.user?.email || 'N/A',
-                'Student Code': selectedStudent.studentCode || 'N/A',
-                'Current Level': selectedStudent.currentLevel || 'N/A',
-                'Status': selectedStudent.status || 'N/A'
+                [t('staff.registrar.dataCorrection.fields.firstName')]: selectedStudent.firstName,
+                [t('staff.registrar.dataCorrection.fields.lastName')]: selectedStudent.lastName,
+                [t('staff.registrar.dataCorrection.fields.fatherName')]: selectedStudent.fatherName,
+                [t('staff.registrar.dataCorrection.fields.grandfatherName')]: selectedStudent.grandfatherName,
+                [t('staff.registrar.dataCorrection.fields.dateOfBirth')]: selectedStudent.dob ? new Date(selectedStudent.dob).toLocaleDateString() : t('staff.registrar.dataCorrection.table.na'),
+                [t('staff.registrar.dataCorrection.fields.bloodType')]: selectedStudent.bloodType || t('staff.registrar.dataCorrection.table.na'),
+                [t('staff.registrar.dataCorrection.fields.currentClass')]: selectedStudent.currentClass?.name || selectedStudent.currentClass?.className || t('staff.registrar.dataCorrection.table.notAssigned'),
+                [t('staff.registrar.dataCorrection.fields.phone')]: selectedStudent.phone || selectedStudent.user?.phone || t('staff.registrar.dataCorrection.table.na'),
+                [t('staff.registrar.dataCorrection.fields.whatsapp')]: selectedStudent.whatsapp || t('staff.registrar.dataCorrection.table.na'),
+                [t('staff.registrar.dataCorrection.fields.email')]: selectedStudent.email || selectedStudent.user?.email || t('staff.registrar.dataCorrection.table.na'),
+                [t('staff.registrar.dataCorrection.fields.studentCode')]: selectedStudent.studentCode || t('staff.registrar.dataCorrection.table.na'),
+                [t('staff.registrar.dataCorrection.fields.currentLevel')]: selectedStudent.currentLevel || t('staff.registrar.dataCorrection.table.na'),
+                [t('staff.registrar.dataCorrection.fields.status')]: selectedStudent.status || t('staff.registrar.dataCorrection.table.na')
               }).map(([field, value]) => (
                 <div key={field} className="border rounded-lg p-3 hover:bg-gray-50">
                   <div className="flex justify-between items-start mb-2">
@@ -292,7 +289,7 @@ const DataCorrection = () => {
                       onClick={() => handleOpenCorrection(selectedStudent, getCorrectionFieldKey(field), value)}
                       className="text-blue-600 hover:text-blue-800 text-sm"
                     >
-                      ✏️ Correct
+                      ✏️ {t('staff.registrar.dataCorrection.correct')}
                     </button>
                   </div>
                   <p className="text-gray-900">{value}</p>
@@ -300,28 +297,27 @@ const DataCorrection = () => {
               ))}
             </div>
 
-            {/* Change Logs */}
             <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-3">Recent Changes</h3>
+              <h3 className="text-lg font-semibold mb-3">{t('staff.registrar.dataCorrection.recentChanges')}</h3>
               {changeLogs.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <p className="mt-2">No change history found</p>
+                  <p className="mt-2">{t('staff.registrar.dataCorrection.noChangeHistory')}</p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {changeLogs.map((log, index) => (
                     <div key={index} className="border-l-4 border-blue-500 pl-4 py-2 bg-gray-50">
                       <p className="text-sm text-gray-600">
-                        <span className="font-medium">{log.changedBy?.name || 'Unknown'}</span> changed{' '}
-                        <span className="font-medium">{log.field}</span> from{' '}
-                        <span className="text-red-600">{formatAuditValue(log.oldValue)}</span> to{' '}
+                        <span className="font-medium">{log.changedBy?.name || t('staff.registrar.dataCorrection.unknown')}</span> {t('staff.registrar.dataCorrection.changed')}{' '}
+                        <span className="font-medium">{log.field}</span> {t('staff.registrar.dataCorrection.from')}{' '}
+                        <span className="text-red-600">{formatAuditValue(log.oldValue)}</span> {t('staff.registrar.dataCorrection.to')}{' '}
                         <span className="text-green-600">{formatAuditValue(log.newValue)}</span>
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        Reason: {log.reason} | {new Date(log.changedAt).toLocaleString()}
+                        {t('staff.registrar.dataCorrection.reason')}: {log.reason} | {new Date(log.changedAt).toLocaleString()}
                       </p>
                     </div>
                   ))}
@@ -332,16 +328,15 @@ const DataCorrection = () => {
         </Card>
       )}
 
-      {/* Correction Form Modal */}
       {showCorrectionForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-xl font-semibold mb-4">Submit Data Correction</h3>
+            <h3 className="text-xl font-semibold mb-4">{t('staff.registrar.dataCorrection.correctionForm.title')}</h3>
             
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Field to Correct
+                  {t('staff.registrar.dataCorrection.correctionForm.fieldToCorrect')}
                 </label>
                 <p className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 text-sm">
                   {correctionData.field.replace(/_/g, ' ')}
@@ -350,7 +345,7 @@ const DataCorrection = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Value
+                  {t('staff.registrar.dataCorrection.correctionForm.currentValue')}
                 </label>
                 <p className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 text-sm">
                   {correctionData.oldValue}
@@ -359,27 +354,27 @@ const DataCorrection = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Value *
+                  {t('staff.registrar.dataCorrection.correctionForm.newValue')} *
                 </label>
                 <input
                   type="text"
                   value={correctionData.newValue}
                   onChange={(e) => setCorrectionData({...correctionData, newValue: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="Enter corrected value"
+                  placeholder={t('staff.registrar.dataCorrection.correctionForm.enterCorrectedValue')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reason for Correction *
+                  {t('staff.registrar.dataCorrection.correctionForm.reasonForCorrection')} *
                 </label>
                 <textarea
                   value={correctionData.reason}
                   onChange={(e) => setCorrectionData({...correctionData, reason: e.target.value})}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="Explain why this correction is needed"
+                  placeholder={t('staff.registrar.dataCorrection.correctionForm.explainReason')}
                 />
               </div>
 
@@ -388,14 +383,14 @@ const DataCorrection = () => {
                   variant="secondary"
                   onClick={() => setShowCorrectionForm(false)}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   variant="primary"
                   onClick={handleSubmitCorrection}
                   disabled={!correctionData.newValue || !correctionData.reason}
                 >
-                  Submit Correction
+                  {t('staff.registrar.dataCorrection.correctionForm.submitCorrection')}
                 </Button>
               </div>
             </div>

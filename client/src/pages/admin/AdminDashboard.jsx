@@ -360,7 +360,7 @@ const AdminDashboard = () => {
             <div className="rounded-[28px] border border-white/60 bg-white/40 backdrop-blur-xl p-3 shadow-sm">
               <RadarChartComponent
                 title={t('dash.performanceRadar')}
-                data={hasRadarData ? performanceRadarData : [{ value: [84, 78, 91, 88, 73, 86], name: 'Operations' }]}
+                data={hasRadarData ? performanceRadarData : [{ value: [84, 78, 91, 88, 73, 86], name: t('dash.operations') }]}
                 indicators={hasIndicators ? performanceIndicators : [
                   { name: t('dash.radarAttendance'), max: 100 },
                   { name: t('dash.radarFees'), max: 100 },

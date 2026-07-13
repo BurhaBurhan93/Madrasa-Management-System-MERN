@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Card from '../../../components/UIHelper/Card';
 import { BarChartComponent, LineChartComponent, PieChartComponent } from '../../../components/UIHelper/ECharts';
 import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
@@ -51,6 +52,7 @@ const chartRenderers = {
 
 const StaffAnalyticsContent = ({ stats = [], charts = [], insight }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation(['staff', 'common']);
   const isDark = theme === 'dark';
 
   return (
@@ -97,7 +99,7 @@ const StaffAnalyticsContent = ({ stats = [], charts = [], insight }) => {
         >
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className={`text-xs font-bold uppercase tracking-[0.2em] ${isDark ? 'text-cyan-300' : 'text-cyan-700'}`}>{insight.eyebrow || 'Snapshot'}</p>
+              <p className={`text-xs font-bold uppercase tracking-[0.2em] ${isDark ? 'text-cyan-300' : 'text-cyan-700'}`}>{insight.eyebrow || t('staff.analytics.snapshot')}</p>
               <h3 className={`mt-2 text-xl font-black tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{insight.title}</h3>
               {insight.description ? <p className={`mt-2 max-w-3xl text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{insight.description}</p> : null}
             </div>

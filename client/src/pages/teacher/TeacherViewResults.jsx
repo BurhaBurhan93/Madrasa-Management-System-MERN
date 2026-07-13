@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
@@ -39,6 +40,7 @@ const MOCK_RESULTS = [
 ];
 
 const TeacherViewResults = () => {
+  const { t } = useTranslation();
   const [results, setResults] = useState([]);
   const [exams, setExams] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -89,37 +91,37 @@ const TeacherViewResults = () => {
     <div className={PANEL_PAGE_BG}>
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">View Results</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Browse and search student exam results</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.viewResults.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.viewResults.subtitle')}</p>
         </div>
 
         {/* Filters */}
         <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">Filter Results</h2>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">{t('teacher.viewResults.filterResults')}</h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-4 items-end">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-500 dark:text-slate-400">Exam</label>
+              <label className="mb-1.5 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.viewResults.exam')}</label>
               <select value={filters.examId} onChange={e => setFilters({ ...filters, examId: e.target.value })} className={fieldCls}>
-                <option value="">-- All Exams --</option>
+                <option value="">{t('teacher.viewResults.allExams')}</option>
                 {exams.map(e => <option key={e._id} value={e._id}>{e.title}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-500 dark:text-slate-400">Subject</label>
+              <label className="mb-1.5 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.viewResults.subject')}</label>
               <select value={filters.subjectId} onChange={e => setFilters({ ...filters, subjectId: e.target.value })} className={fieldCls}>
-                <option value="">-- All Subjects --</option>
+                <option value="">{t('teacher.viewResults.allSubjects')}</option>
                 {subjects.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-500 dark:text-slate-400">Class</label>
+              <label className="mb-1.5 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.viewResults.class')}</label>
               <select value={filters.classId} onChange={e => setFilters({ ...filters, classId: e.target.value })} className={fieldCls}>
-                <option value="">-- All Classes --</option>
+                <option value="">{t('teacher.viewResults.allClasses')}</option>
                 {classes.map(c => <option key={c._id} value={c._id}>{c.name} {c.section || ''}</option>)}
               </select>
             </div>
             <button onClick={fetchResults} disabled={loading} className="rounded-2xl bg-cyan-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-cyan-700 disabled:opacity-60">
-              {loading ? 'Searching...' : 'Search Results'}
+              {loading ? t('common.searching') : t('teacher.viewResults.searchResults')}
             </button>
           </div>
         </div>
@@ -127,10 +129,10 @@ const TeacherViewResults = () => {
         {/* Stats */}
         <section className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {[
-            { label: 'Total Results', value: stats.total, accent: 'bg-cyan-500' },
-            { label: 'Passed', value: stats.pass, accent: 'bg-emerald-500' },
-            { label: 'Failed', value: stats.fail, accent: 'bg-rose-500' },
-            { label: 'Average Score', value: stats.avg, accent: 'bg-sky-500' },
+            { label: t('teacher.viewResults.totalResults'), value: stats.total, accent: 'bg-cyan-500' },
+            { label: t('teacher.viewResults.passed'), value: stats.pass, accent: 'bg-emerald-500' },
+            { label: t('teacher.viewResults.failed'), value: stats.fail, accent: 'bg-rose-500' },
+            { label: t('teacher.viewResults.averageScore'), value: stats.avg, accent: 'bg-sky-500' },
           ].map(c => (
             <div key={c.label} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
               <div className={`absolute inset-x-0 top-0 h-1 ${c.accent}`} />
@@ -151,14 +153,14 @@ const TeacherViewResults = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-700/50">
-                    {['#', 'Code', 'Student', 'Exam', 'Subject', 'Score', 'Grade', 'Status', 'Date'].map(h => (
+                    {[t('common.hash'), t('common.code'), t('teacher.viewResults.student'), t('teacher.viewResults.exam'), t('teacher.viewResults.subject'), t('teacher.viewResults.score'), t('common.grade'), t('common.status'), t('common.date')].map(h => (
                       <th key={h} className="whitespace-nowrap p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
                   {results.length === 0 ? (
-                    <tr><td colSpan="9" className="p-8 text-center text-sm text-slate-400">No results found. Use the filters above and click "Search Results".</td></tr>
+                    <tr><td colSpan="9" className="p-8 text-center text-sm text-slate-400">{t('teacher.viewResults.noResults')}</td></tr>
                   ) : results.map((r, i) => (
                     <tr key={r._id} className="transition hover:bg-slate-50 dark:hover:bg-slate-800/30">
                       <td className="p-4 text-slate-500 dark:text-slate-300">{i + 1}</td>
@@ -172,7 +174,7 @@ const TeacherViewResults = () => {
                       </td>
                       <td className="p-4">
                         <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${r.status === 'pass' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
-                          {r.status === 'pass' ? 'Pass' : 'Fail'}
+                          {r.status === 'pass' ? t('teacher.viewResults.pass') : t('teacher.viewResults.fail')}
                         </span>
                       </td>
                       <td className="p-4 text-xs text-slate-500 dark:text-slate-400">{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '-'}</td>

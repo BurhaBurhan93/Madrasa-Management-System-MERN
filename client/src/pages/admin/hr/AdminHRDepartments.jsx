@@ -130,7 +130,7 @@ const Departments = () => {
                 <td className="px-5 py-3 font-medium text-slate-800">{item.departmentName || '-'}</td>
                 <td className="px-5 py-3 text-slate-600">{item.departmentCode || '-'}</td>
                 <td className="px-5 py-3 text-slate-600">{item.departmentHead?.fullName || item.headOfDepartment || '-'}</td>
-                <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{item.status || 'active'}</span></td>
+                <td className="px-5 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{item.status || t('common.active')}</span></td>
                 <td className="px-5 py-3"><div className="flex gap-2">
                   <button onClick={() => handleEdit(item)} className="rounded-lg bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100">{t('common.edit')}</button>
                   <button onClick={() => setDeleteTarget(item._id)} className="rounded-lg bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">{t('common.delete')}</button>

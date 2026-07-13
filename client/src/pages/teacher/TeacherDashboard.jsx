@@ -74,7 +74,7 @@ const TeacherDashboard = () => {
       ];
       setRecentActivity(activities);
 
-      const upcoming = exams.filter(e => e.status === 'scheduled').slice(0, 3).map(e => ({ id: e._id, title: e.title, date: e.startDate, time: '10:00 AM' }));
+      const upcoming = exams.filter(e => e.status === 'scheduled').slice(0, 3).map(e => ({ id: e._id, title: e.title, date: e.startDate, time: t('teacher.dashboard.defaultTime') }));
       setUpcomingClasses(upcoming);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -107,7 +107,7 @@ const TeacherDashboard = () => {
           <Panel className="mb-8 border-cyan-100 bg-[linear-gradient(135deg,#f0fdfa_0%,#ecfeff_45%,#f8fafc_100%)]">
             <div className="flex items-center gap-5">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-sky-600 text-2xl font-bold text-white shadow-md">
-                {user.name?.split(' ').map(n => n[0]).join('') || 'T'}
+                {user.name?.split(' ').map(n => n[0]).join('') || t('common.na')}
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900">{user.name}</h2>
@@ -176,7 +176,7 @@ const TeacherDashboard = () => {
                   </div>
                   <div>
                     <p className="font-medium text-slate-900">{c.title}</p>
-                    <p className="mt-1 text-sm text-slate-500">{formatDate(c.date)} — {c.time}</p>
+                    <p className="mt-1 text-sm text-slate-500">{formatDate(c.date)} — {c.time || t('common.na')}</p>
                   </div>
                 </div>
               )) : (

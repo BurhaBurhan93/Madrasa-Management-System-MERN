@@ -74,11 +74,8 @@ const AdminAcademicReports = () => {
   }, [filters.period, filters.date, filters.week, filters.month]);
 
   const periodLabel = useMemo(() => {
-    if (filters.period === "daily") return "today";
-    if (filters.period === "weekly") return "this week";
-    if (filters.period === "yearly") return "this year";
-    if (filters.period === "term") return "this term";
-    return "this month";
+    const labels = { daily: t('reports.today'), weekly: t('reports.thisWeek'), yearly: t('reports.thisYear'), term: t('reports.thisTerm') };
+    return labels[filters.period] || t('reports.thisMonth');
   }, [filters.period]);
 
   return (
@@ -100,11 +97,11 @@ const AdminAcademicReports = () => {
             }
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm"
           >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="term">Term</option>
-            <option value="yearly">Yearly</option>
+            <option value="daily">{t('reports.periodDaily')}</option>
+            <option value="weekly">{t('reports.periodWeekly')}</option>
+            <option value="monthly">{t('reports.periodMonthly')}</option>
+            <option value="term">{t('reports.periodTerm')}</option>
+            <option value="yearly">{t('reports.periodYearly')}</option>
           </select>
           {filters.period === "daily" && (
             <input
@@ -148,7 +145,7 @@ const AdminAcademicReports = () => {
         </div>
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
           <p className="text-xs font-medium text-emerald-600">
-            Active Students
+            {t('reports.activeStudents')}
           </p>
           <p className="mt-1 text-2xl font-bold text-emerald-700">
             {loading ? "…" : stats.activeStudents}
@@ -182,13 +179,13 @@ const AdminAcademicReports = () => {
               <thead className="border-b border-slate-200 bg-slate-50">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    Class
+                    {t('reports.class')}
                   </th>
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    Section
+                    {t('reports.section')}
                   </th>
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    Level
+                    {t('reports.level')}
                   </th>
                 </tr>
               </thead>
@@ -229,13 +226,13 @@ const AdminAcademicReports = () => {
               <thead className="border-b border-slate-200 bg-slate-50">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    Title
+                    {t('reports.title')}
                   </th>
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    Status
+                    {t('reports.status')}
                   </th>
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    Start
+                    {t('reports.start')}
                   </th>
                 </tr>
               </thead>

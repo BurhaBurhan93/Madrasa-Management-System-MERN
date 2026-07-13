@@ -140,10 +140,10 @@ const AdminTimetable = () => {
                             <p className="text-xs font-semibold text-cyan-800">{slot.subject}</p>
                             <p className="text-[10px] text-cyan-600">{slot.teacher}</p>
                             <p className="text-[10px] text-slate-400">{slot.room}</p>
-                            <button onClick={() => handleDelete(slot._id)} className="absolute -right-1 -top-1 hidden rounded-full bg-rose-500 px-1.5 text-[10px] text-white group-hover:block">×</button>
+                            <button onClick={() => handleDelete(slot._id)} aria-label={t('common.delete')} className="absolute -right-1 -top-1 hidden rounded-full bg-rose-500 px-1.5 text-[10px] text-white group-hover:block">×</button>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-300">—</span>
+                          <span className="text-xs text-slate-300">{t('common.na')}</span>
                         )}
                       </td>
                     );

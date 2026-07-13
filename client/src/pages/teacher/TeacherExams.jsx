@@ -134,8 +134,8 @@ const TeacherExams = () => {
             onChange={(e) => setAcademicYear(e.target.value)}
             className="block mt-1 border rounded px-3 py-2"
           >
-            <option value="2024-2025">2024-2025</option>
-            <option value="2023-2024">2023-2024</option>
+            <option value={`${new Date().getFullYear()}-${new Date().getFullYear() + 1}`}>{`${new Date().getFullYear()}-${new Date().getFullYear() + 1}`}</option>
+            <option value={`${new Date().getFullYear() - 1}-${new Date().getFullYear()}`}>{`${new Date().getFullYear() - 1}-${new Date().getFullYear()}`}</option>
           </select>
         </div>
       </Card>

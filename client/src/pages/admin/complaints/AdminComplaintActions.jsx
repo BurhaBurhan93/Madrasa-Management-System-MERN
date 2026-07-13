@@ -28,7 +28,7 @@ const AdminComplaintActions = () => {
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const categories = ['all', 'Academic', 'Discipline', 'Facilities', 'Hostel', 'Kitchen', 'Finance', 'Library', 'Other'];
+  const categories = ['all', 'catAcademic', 'catDiscipline', 'catFacilities', 'catHostel', 'catKitchen', 'catFinance', 'catLibrary', 'catOther'];
 
   useEffect(() => { const lang = readStoredLanguage('adminLang', 'en'); if (i18n.language !== lang) i18n.changeLanguage(lang); }, []);
 
@@ -81,7 +81,7 @@ const AdminComplaintActions = () => {
     { key: 'subject', label: t('complaints.subject'), render: (val) => <span className="font-medium text-slate-800">{val || '-'}</span> },
     { key: 'submittedBy', label: t('complaints.submittedBy'), render: (val) => <span className="text-slate-600">{val?.name || '-'}</span> },
     { key: 'category', label: t('common.category'), render: (val) => <Badge color="gray">{val || t('complaints.other')}</Badge> },
-    { key: 'priority', label: t('complaints.priority'), render: (val) => <Badge color={val === 'high' ? 'red' : val === 'medium' ? 'yellow' : 'green'}>{val || 'normal'}</Badge> },
+    { key: 'priority', label: t('complaints.priority'), render: (val) => <Badge color={val === 'high' ? 'red' : val === 'medium' ? 'yellow' : 'green'}>{t('common.' + val) || val || t('common.na')}</Badge> },
     { key: 'status', label: t('common.status'), render: (val) => <Badge color={statusBadgeColor[val]}>{val}</Badge> },
     {
       key: 'actions', label: t('common.actions'), render: (_, row) => (
@@ -115,7 +115,7 @@ const AdminComplaintActions = () => {
           <FiAlertCircle className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 p-5 text-white shadow-lg">
-          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.priority')} High</p><p className="mt-1 text-2xl font-bold">{highCount}</p></div>
+          <div className="relative z-10"><p className="text-sm font-medium text-white/80">{t('complaints.priority')}: {t('common.high')}</p><p className="mt-1 text-2xl font-bold">{highCount}</p></div>
           <FiCheckCircle className="absolute right-3 top-3 h-12 w-12 text-white/10" />
         </div>
       </div>
@@ -130,7 +130,7 @@ const AdminComplaintActions = () => {
           </select>
           <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 shadow-sm">
             <option value="all">{t('complaints.allCategories')}</option>
-            {categories.filter(c => c !== 'all').map(cat => (<option key={cat} value={cat.toLowerCase()}>{t('complaints.' + cat.toLowerCase())}</option>))}
+            {categories.filter(c => c !== 'all').map(cat => (<option key={cat} value={cat.replace('cat', '').toLowerCase()}>{t('complaints.' + cat)}</option>))}
           </select>
         </div>
       </div>

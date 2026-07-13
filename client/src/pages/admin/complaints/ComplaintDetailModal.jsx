@@ -14,7 +14,7 @@ const fields = [
   { key: 'priority', labelKey: 'priorityLabel', badge: true },
   { key: 'status', labelKey: 'status', badge: true },
   { key: 'submittedBy', labelKey: 'submittedBy', nested: 'name' },
-  { key: 'assignedTo', labelKey: 'assignedTo', nested: 'name', fallback: 'Unassigned' },
+  { key: 'assignedTo', labelKey: 'assignedTo', nested: 'name', fallbackKey: 'na' },
   { key: 'createdAt', labelKey: 'date', date: true },
   { key: 'closedAt', labelKey: 'resolvedDate', date: true },
 ];
@@ -33,7 +33,7 @@ const ComplaintDetailModal = ({ complaint, isOpen, onClose, onRefresh }) => {
     let val = complaint[field.key];
     if (field.nested && val) val = val[field.nested];
     if (field.date && val) val = new Date(val).toLocaleDateString();
-    if (val === undefined || val === null) return field.fallback || '-';
+    if (val === undefined || val === null) return field.fallbackKey ? t('common.' + field.fallbackKey) : (field.fallback || '-');
     if (field.prefix) return field.prefix + val;
     return val;
   };
@@ -62,7 +62,7 @@ const ComplaintDetailModal = ({ complaint, isOpen, onClose, onRefresh }) => {
         <div className="grid grid-cols-2 gap-4">
           {fields.map(f => (
             <div key={f.key}>
-              <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">{t('complaints.' + f.labelKey) || t('common.' + f.labelKey) || f.labelKey}</label>
+              <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">{t('complaints.' + f.labelKey) || t('common.' + f.labelKey) || t('common.na')}</label>
               <p className="mt-0.5 text-sm text-slate-800">
                 {f.badge ? (
                   <Badge color={f.key === 'priority' ? priorityColorMap[getValue(f)] : statusColorMap[getValue(f)]}>
@@ -77,7 +77,7 @@ const ComplaintDetailModal = ({ complaint, isOpen, onClose, onRefresh }) => {
         {complaint.adminNotes && (
           <div className="pt-2 border-t border-slate-100">
             <label className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-              <FiMessageSquare size={12} /> {t('complaints.actionNotes') || 'Admin Notes'}
+              <FiMessageSquare size={12} /> {t('complaints.actionNotes')}
             </label>
             <p className="text-sm text-slate-700 bg-slate-50 rounded-lg px-3 py-2 whitespace-pre-wrap">{complaint.adminNotes}</p>
           </div>
@@ -94,11 +94,11 @@ const ComplaintDetailModal = ({ complaint, isOpen, onClose, onRefresh }) => {
 
         <div className="pt-2 border-t border-slate-100">
           <label className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <FiMessageSquare size={12} /> {complaint.adminNotes ? (t('complaints.actionNotes') || 'Add Note') : (t('complaints.actionNotes') || 'Admin Notes')}
+            <FiMessageSquare size={12} /> {t('complaints.actionNotes')}
           </label>
           <textarea value={note} onChange={e => setNote(e.target.value)} rows={2}
             className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-            placeholder={t('complaints.enterActionDetails') || 'Type a note or action...'} />
+            placeholder={t('complaints.enterActionDetails')} />
           <div className="mt-1.5 flex justify-end">
             <Button size="sm" icon={FiSend} onClick={handleSendNote} disabled={sending || !note.trim()}>
               {t('common.submit')}

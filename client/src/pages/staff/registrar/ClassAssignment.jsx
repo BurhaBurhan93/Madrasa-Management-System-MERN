@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslation } from 'react-i18next';
 import ListPage from "../shared/ListPage";
 import StaffPageLayout from "../shared/StaffPageLayout";
 import Card from "../../../components/UIHelper/Card";
@@ -17,34 +18,10 @@ import {
   FiTrendingUp,
 } from "react-icons/fi";
 
-const columns = [
-  { key: "studentCode", header: "Student Code" },
-  {
-    key: "name",
-    header: "Student Name",
-    render: (_value, row) =>
-      `${row.firstName || ""} ${row.lastName || ""}`.trim() ||
-      row.user?.name ||
-      "—",
-  },
-  {
-    key: "currentClass",
-    header: "Current Class",
-    render: (value) =>
-      value?.name ||
-      value?.className || (
-        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
-          Not Assigned
-        </span>
-      ),
-  },
-  { key: "currentLevel", header: "Level" },
-  { key: "status", header: "Status" },
-];
-
 const ClassAssignment = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState("assign"); // 'assign' | 'transfer' | 'promote'
+  const [modalMode, setModalMode] = useState("assign");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [newClass, setNewClass] = useState("");
   const [classes, setClasses] = useState([]);
@@ -59,6 +36,31 @@ const ClassAssignment = () => {
     byClass: [],
     byStatus: [],
   });
+
+  const columns = [
+    { key: "studentCode", header: t('staff.registrar.classAssignment.columns.studentCode') },
+    {
+      key: "name",
+      header: t('staff.registrar.classAssignment.columns.studentName'),
+      render: (_value, row) =>
+        `${row.firstName || ""} ${row.lastName || ""}`.trim() ||
+        row.user?.name ||
+        t('staff.registrar.classAssignment.columns.na'),
+    },
+    {
+      key: "currentClass",
+      header: t('staff.registrar.classAssignment.columns.currentClass'),
+      render: (value) =>
+        value?.name ||
+        value?.className || (
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+            {t('staff.registrar.classAssignment.columns.notAssigned')}
+          </span>
+        ),
+    },
+    { key: "currentLevel", header: t('staff.registrar.classAssignment.columns.level') },
+    { key: "status", header: t('staff.registrar.classAssignment.columns.status') },
+  ];
 
   useEffect(() => {
     fetchStats();
@@ -99,7 +101,7 @@ const ClassAssignment = () => {
       const classMap = {};
       students.forEach((s) => {
         const className =
-          s.currentClass?.className || s.currentClass?.name || "Unassigned";
+          s.currentClass?.className || s.currentClass?.name || t('staff.registrar.classAssignment.unassigned');
         classMap[className] = (classMap[className] || 0) + 1;
       });
       const byClass = Object.entries(classMap)
@@ -154,17 +156,16 @@ const ClassAssignment = () => {
           newClass,
         });
       } else {
-        // 'assign' and 'transfer' both use the transfer endpoint
         await api.put(`/student/students/${selectedStudent._id}/transfer`, {
           newClass,
         });
       }
       closeModal();
       await fetchStats();
-      setListKey((k) => k + 1); // force ListPage to refetch
+      setListKey((k) => k + 1);
     } catch (error) {
       alert(
-        error.response?.data?.message || "Operation failed. Please try again.",
+        error.response?.data?.message || t('staff.registrar.classAssignment.operationFailed'),
       );
     } finally {
       setLoading(false);
@@ -172,21 +173,21 @@ const ClassAssignment = () => {
   };
 
   const modalTitle = {
-    assign: "Assign Class to Student",
-    transfer: "Transfer Student to New Class",
-    promote: "Promote Student to Next Level",
+    assign: t('staff.registrar.classAssignment.modal.assignTitle'),
+    transfer: t('staff.registrar.classAssignment.modal.transferTitle'),
+    promote: t('staff.registrar.classAssignment.modal.promoteTitle'),
   }[modalMode];
 
   const submitLabel = {
-    assign: loading ? "Assigning…" : "Assign Class",
-    transfer: loading ? "Transferring…" : "Transfer Student",
-    promote: loading ? "Promoting…" : "Promote Student",
+    assign: loading ? t('staff.registrar.classAssignment.modal.assigning') : t('staff.registrar.classAssignment.modal.assignClass'),
+    transfer: loading ? t('staff.registrar.classAssignment.modal.transferring') : t('staff.registrar.classAssignment.modal.transferStudent'),
+    promote: loading ? t('staff.registrar.classAssignment.modal.promoting') : t('staff.registrar.classAssignment.modal.promoteStudent'),
   }[modalMode];
 
   const extraActionItems = useCallback(
     (row) => [
       {
-        label: row.currentClass ? "Transfer" : "Assign Class",
+        label: row.currentClass ? t('staff.registrar.classAssignment.actions.transfer') : t('staff.registrar.classAssignment.actions.assignClass'),
         className: row.currentClass
           ? "border-blue-200 bg-blue-50 text-blue-700 hover:border-blue-300 hover:bg-blue-100"
           : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-300 hover:bg-emerald-100",
@@ -195,7 +196,7 @@ const ClassAssignment = () => {
       ...(row.currentClass
         ? [
             {
-              label: "Promote",
+              label: t('staff.registrar.classAssignment.actions.promote'),
               className:
                 "border-violet-200 bg-violet-50 text-violet-700 hover:border-violet-300 hover:bg-violet-100",
               onClick: () => openModal(row, "promote"),
@@ -203,14 +204,14 @@ const ClassAssignment = () => {
           ]
         : []),
     ],
-    [openModal],
+    [openModal, t],
   );
 
   if (pageLoading) {
     return (
       <StaffPageLayout
-        eyebrow="Registrar"
-        title="Class Assignment & Student Transfer"
+        eyebrow={t('staff.registrar.classAssignment.eyebrow')}
+        title={t('staff.registrar.classAssignment.title')}
       >
         <PageSkeleton type="dashboard" />
       </StaffPageLayout>
@@ -219,33 +220,32 @@ const ClassAssignment = () => {
 
   return (
     <StaffPageLayout
-      eyebrow="Registrar"
-      title="Class Assignment & Student Transfer"
-      subtitle="Assign students to classes, manage transfers, and promotions"
+      eyebrow={t('staff.registrar.classAssignment.eyebrow')}
+      title={t('staff.registrar.classAssignment.title')}
+      subtitle={t('staff.registrar.classAssignment.subtitle')}
     >
-      {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           {
-            label: "Total Students",
+            label: t('staff.registrar.classAssignment.stats.totalStudents'),
             value: stats.totalStudents,
             icon: FiUsers,
             color: "blue",
           },
           {
-            label: "Assigned",
+            label: t('staff.registrar.classAssignment.stats.assigned'),
             value: stats.assignedStudents,
             icon: FiUserCheck,
             color: "green",
           },
           {
-            label: "Unassigned",
+            label: t('staff.registrar.classAssignment.stats.unassigned'),
             value: stats.unassignedStudents,
             icon: FiArrowRight,
             color: "amber",
           },
           {
-            label: "Active Students",
+            label: t('staff.registrar.classAssignment.stats.activeStudents'),
             value: stats.activeStudents,
             icon: FiTrendingUp,
             color: "purple",
@@ -272,11 +272,10 @@ const ClassAssignment = () => {
         ))}
       </div>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="rounded-[28px] border border-slate-200 p-6">
           <h3 className="mb-4 text-base font-semibold text-gray-800">
-            Students by Class
+            {t('staff.registrar.classAssignment.charts.studentsByClass')}
           </h3>
           {stats.byClass.length > 0 ? (
             <BarChartComponent
@@ -287,65 +286,63 @@ const ClassAssignment = () => {
             />
           ) : (
             <p className="py-8 text-center text-sm text-gray-500">
-              No data available
+              {t('staff.registrar.classAssignment.charts.noData')}
             </p>
           )}
         </Card>
         <Card className="rounded-[28px] border border-slate-200 p-6">
           <h3 className="mb-4 text-base font-semibold text-gray-800">
-            Status Distribution
+            {t('staff.registrar.classAssignment.charts.statusDistribution')}
           </h3>
           {stats.byStatus.length > 0 ? (
             <PieChartComponent data={stats.byStatus} height={240} />
           ) : (
             <p className="py-8 text-center text-sm text-gray-500">
-              No data available
+              {t('staff.registrar.classAssignment.charts.noData')}
             </p>
           )}
         </Card>
       </div>
 
-      {/* Student Table with action buttons */}
       <ListPage
         key={listKey}
         embedded
-        eyebrow="Registrar"
-        title="Students"
-        subtitle="Click Assign Class / Transfer / Promote in the Actions column"
+        eyebrow={t('staff.registrar.classAssignment.eyebrow')}
+        title={t('staff.registrar.classAssignment.listTitle')}
+        subtitle={t('staff.registrar.classAssignment.listSubtitle')}
         endpoint="/student/all"
         columns={columns}
         deleteEnabled={false}
         clientSidePagination
-        searchPlaceholder="Search students…"
+        searchPlaceholder={t('staff.registrar.classAssignment.searchPlaceholder')}
         extraActionItemsForRow={extraActionItems}
       />
 
-      {/* Modal */}
       <Modal isOpen={showModal} onClose={closeModal} title={modalTitle}>
         <div className="space-y-5">
           <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
-              Student
+              {t('staff.registrar.classAssignment.modal.student')}
             </p>
             <p className="font-semibold text-slate-900">
               {selectedStudent
                 ? `${selectedStudent.firstName || ""} ${selectedStudent.lastName || ""}`.trim() ||
                   selectedStudent.user?.name ||
-                  "—"
-                : "—"}
+                  t('staff.registrar.classAssignment.modal.na')
+                : t('staff.registrar.classAssignment.modal.na')}
             </p>
             <p className="mt-0.5 text-sm text-slate-500">
               {modalMode === "promote"
-                ? `Current Level: ${selectedStudent?.currentLevel || "N/A"}`
-                : `Current Class: ${selectedStudent?.currentClass?.className || selectedStudent?.currentClass?.name || "Not Assigned"}`}
+                ? `${t('staff.registrar.classAssignment.modal.currentLevel')}: ${selectedStudent?.currentLevel || t('staff.registrar.classAssignment.modal.na')}`
+                : `${t('staff.registrar.classAssignment.modal.currentClass')}: ${selectedStudent?.currentClass?.className || selectedStudent?.currentClass?.name || t('staff.registrar.classAssignment.modal.notAssigned')}`}
             </p>
           </div>
 
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-slate-700">
               {modalMode === "promote"
-                ? "New Class (after promotion)"
-                : "Select Class"}{" "}
+                ? t('staff.registrar.classAssignment.modal.newClassAfter')
+                : t('staff.registrar.classAssignment.modal.selectClass')}
               <span className="text-rose-500">*</span>
             </label>
             <select
@@ -353,7 +350,7 @@ const ClassAssignment = () => {
               onChange={(e) => setNewClass(e.target.value)}
               className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
             >
-              <option value="">— Select a class —</option>
+              <option value="">{t('staff.registrar.classAssignment.modal.selectClassPlaceholder')}</option>
               {classes.map((cls) => (
                 <option key={cls._id} value={cls._id}>
                   {cls.name}
@@ -364,9 +361,9 @@ const ClassAssignment = () => {
             </select>
             {classes.length === 0 && (
               <p className="mt-1 text-xs text-amber-600">
-                No active classes found.{" "}
+                {t('staff.registrar.classAssignment.modal.noActiveClasses')}{" "}
                 <a href="/staff/registrar/classes/create" className="underline">
-                  Create a class first.
+                  {t('staff.registrar.classAssignment.modal.createClassFirst')}
                 </a>
               </p>
             )}
@@ -374,7 +371,7 @@ const ClassAssignment = () => {
 
           <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
             <Button variant="secondary" onClick={closeModal}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="primary"

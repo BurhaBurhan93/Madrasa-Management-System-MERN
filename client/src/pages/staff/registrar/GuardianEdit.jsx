@@ -1,16 +1,22 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import FormPage from '../shared/FormPage';
 import { guardianManagementConfig } from './GuardianManagement';
 
 const GuardianEdit = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
   return (
     <FormPage
-      titleCreate="Create Guardian"
-      titleEdit="Edit Guardian"
+      titleCreate={t('staff.registrar.guardianManagement.create.titleCreate')}
+      titleEdit={t('staff.registrar.guardianManagement.create.titleEdit')}
       endpoint={guardianManagementConfig.endpoint}
-      formFields={guardianManagementConfig.formFields}
+      formFields={guardianManagementConfig.formFields.map(f => ({
+        ...f,
+        label: t(`staff.registrar.guardianManagement.fields.${f.name}`),
+        options: f.options?.map(opt => ({ ...opt, label: t(`staff.registrar.guardianManagement.options.${f.name}.${opt.value}`) }))
+      }))}
       initialForm={guardianManagementConfig.initialForm}
       mapRowToForm={guardianManagementConfig.mapRowToForm}
       mapFormToPayload={guardianManagementConfig.mapFormToPayload}

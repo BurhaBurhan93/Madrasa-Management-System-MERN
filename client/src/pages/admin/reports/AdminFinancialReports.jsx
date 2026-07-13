@@ -104,14 +104,11 @@ const AdminFinancialReports = () => {
   }, [filters.period, filters.date, filters.week, filters.month]);
 
   const periodLabel = useMemo(() => {
-    if (filters.period === "daily") return "today";
-    if (filters.period === "weekly") return "this week";
-    if (filters.period === "quarterly") return "this quarter";
-    if (filters.period === "yearly") return "this year";
-    return "this month";
+    const labels = { daily: t('reports.today'), weekly: t('reports.thisWeek'), quarterly: t('reports.thisQuarter'), yearly: t('reports.thisYear') };
+    return labels[filters.period] || t('reports.thisMonth');
   }, [filters.period]);
 
-  const fmt = (n) => `${n.toLocaleString()} AFN`;
+  const fmt = (n) => `${n.toLocaleString()} ${t('common.currencyAfn')}`;
 
   return (
     <div className="space-y-6">
@@ -132,11 +129,11 @@ const AdminFinancialReports = () => {
             }
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm"
           >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="yearly">Yearly</option>
+            <option value="daily">{t('reports.periodDaily')}</option>
+            <option value="weekly">{t('reports.periodWeekly')}</option>
+            <option value="monthly">{t('reports.periodMonthly')}</option>
+            <option value="quarterly">{t('reports.periodQuarterly')}</option>
+            <option value="yearly">{t('reports.periodYearly')}</option>
           </select>
           {filters.period === "daily" && (
             <input
@@ -225,7 +222,7 @@ const AdminFinancialReports = () => {
                     {t('reports.method')}
                   </th>
                   <th className="py-2 text-right text-xs font-semibold text-slate-500">
-                    Amount (AFN)
+                    {t('reports.amount')} ({t('common.currencyAfn')})
                   </th>
                 </tr>
               </thead>
@@ -259,7 +256,7 @@ const AdminFinancialReports = () => {
                     {t('reports.expenseByCategory')}
                   </th>
                   <th className="py-2 text-right text-xs font-semibold text-slate-500">
-                    Amount (AFN)
+                    {t('reports.amount')} ({t('common.currencyAfn')})
                   </th>
                 </tr>
               </thead>

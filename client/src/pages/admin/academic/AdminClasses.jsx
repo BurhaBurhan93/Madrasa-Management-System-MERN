@@ -191,7 +191,7 @@ const AdminClasses = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t('academic.maximumStudents')}</p>
-                  <p className="font-semibold text-gray-900">{cls.maxStudents || '-'}</p>
+                  <p className="font-semibold text-gray-900">{cls.maxStudents || t('common.na') || '-'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -201,7 +201,7 @@ const AdminClasses = () => {
                 <div>
                   <p className="text-sm text-gray-500">{t('common.createdAt')}</p>
                   <p className="font-semibold text-gray-900 text-sm">
-                    {cls.createdAt ? new Date(cls.createdAt).toLocaleDateString() : '-'}
+                    {cls.createdAt ? new Date(cls.createdAt).toLocaleDateString() : t('common.na') || '-'}
                   </p>
                 </div>
               </div>

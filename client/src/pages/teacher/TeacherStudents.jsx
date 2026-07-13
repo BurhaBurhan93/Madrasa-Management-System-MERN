@@ -94,7 +94,7 @@ const TeacherStudents = () => {
             <select value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)}
               className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-600 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
               <option value="all">{t('teacher.students.allSubjects')}</option>
-              {subjects.map(sub => <option key={sub._id} value={sub._id}>{sub.name}</option>)}
+              {subjects.map(sub => <option key={sub._id} value={sub._id}>{sub.name || t('common.na')}</option>)}
             </select>
           </div>
         </div>
@@ -123,14 +123,14 @@ const TeacherStudents = () => {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-sky-600 text-xs font-bold text-white">
-                          {student.user?.name?.[0] || '?'}
+                          {student.user?.name?.[0] || t('common.na')}
                         </div>
                         <span className="font-medium text-slate-900 dark:text-slate-100">{student.user?.name || t('teacher.students.unknown')}</span>
                       </div>
                     </td>
-                    <td className="p-4 text-slate-600 dark:text-slate-300 font-mono">{student.studentCode || '-'}</td>
-                    <td className="p-4 text-slate-600 dark:text-slate-300">{student.currentClass?.name || '-'} {student.currentClass?.section || ''}</td>
-                    <td className="p-4 text-slate-600 dark:text-slate-300">{student.user?.email || '-'}</td>
+                    <td className="p-4 text-slate-600 dark:text-slate-300 font-mono">{student.studentCode || t('common.na') || '-'}</td>
+                    <td className="p-4 text-slate-600 dark:text-slate-300">{student.currentClass?.name || t('common.na') || '-'} {student.currentClass?.section || ''}</td>
+                    <td className="p-4 text-slate-600 dark:text-slate-300">{student.user?.email || t('common.na') || '-'}</td>
                     <td className="p-4">
                       <span className={`rounded-full px-3 py-1 text-xs font-medium ${student.status === 'active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
                         {student.status === 'active' ? t('teacher.common.active') : t('teacher.common.inactive')}

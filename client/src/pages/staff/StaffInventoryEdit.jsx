@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FiArrowLeft, FiSave } from 'react-icons/fi';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import StaffPageLayout from '../staff/shared/StaffPageLayout';
@@ -8,6 +9,7 @@ import Card from '../../components/UIHelper/Card';
 const StaffInventoryEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation(['staff', 'common']);
   const [form, setForm] = useState({ name: '', category: '', quantity: 0, available: 0, minLevel: 0, location: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -20,7 +22,7 @@ const StaffInventoryEdit = () => {
         const data = await parseJsonSafe(res);
         const items = Array.isArray(data) ? data : [];
         const item = items.find((i) => String(i.id) === String(id));
-        if (!item) throw new Error('Item not found');
+        if (!item) throw new Error(t('staff.inventoryEdit.itemNotFound'));
         setForm({
           name: item.name || '',
           category: item.category || 'General',
@@ -40,7 +42,7 @@ const StaffInventoryEdit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name) return setError('Name is required');
+    if (!form.name) return setError(t('staff.inventoryEdit.nameRequired'));
     setSaving(true);
     setError('');
     try {
@@ -57,7 +59,7 @@ const StaffInventoryEdit = () => {
         body: JSON.stringify(payload),
       });
       const data = await parseJsonSafe(res);
-      if (!res.ok) throw new Error(data.message || 'Failed to update item');
+      if (!res.ok) throw new Error(data.message || t('staff.inventoryEdit.failedUpdate'));
       navigate('/staff/inventory');
     } catch (err) {
       setError(err.message);
@@ -67,17 +69,17 @@ const StaffInventoryEdit = () => {
   };
 
   const fields = [
-    { key: 'name', label: 'Name', type: 'text', required: true },
-    { key: 'category', label: 'Category', type: 'text' },
-    { key: 'quantity', label: 'Quantity', type: 'number', min: 0 },
-    { key: 'available', label: 'Available', type: 'number', min: 0, readOnly: true, note: 'Auto-calculated from quantity' },
-    { key: 'minLevel', label: 'Min Level', type: 'number', min: 0 },
-    { key: 'location', label: 'Location', type: 'text' },
+    { key: 'name', label: t('staff.inventoryEdit.name'), type: 'text', required: true },
+    { key: 'category', label: t('staff.inventoryEdit.category'), type: 'text' },
+    { key: 'quantity', label: t('staff.inventoryEdit.quantity'), type: 'number', min: 0 },
+    { key: 'available', label: t('staff.inventoryEdit.available'), type: 'number', min: 0, readOnly: true, note: t('staff.inventoryEdit.autoCalculated') },
+    { key: 'minLevel', label: t('staff.inventoryEdit.minLevel'), type: 'number', min: 0 },
+    { key: 'location', label: t('staff.inventoryEdit.location'), type: 'text' },
   ];
 
   if (loading) {
     return (
-      <StaffPageLayout eyebrow="Inventory" title="Edit Inventory Item" subtitle="Loading item data...">
+      <StaffPageLayout eyebrow={t('staff.inventoryEdit.eyebrow')} title={t('staff.inventoryEdit.title')} subtitle={t('staff.inventoryEdit.loadingSubtitle')}>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500" />
         </div>
@@ -87,9 +89,9 @@ const StaffInventoryEdit = () => {
 
   return (
     <StaffPageLayout
-      eyebrow="Inventory"
-      title="Edit Inventory Item"
-      subtitle={`Editing: ${form.name}`}
+      eyebrow={t('staff.inventoryEdit.eyebrow')}
+      title={t('staff.inventoryEdit.title')}
+      subtitle={t('staff.inventoryEdit.editingSubtitle', { name: form.name })}
     >
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -125,10 +127,10 @@ const StaffInventoryEdit = () => {
 
           <div className="flex gap-3 pt-4 border-t border-gray-100 dark:border-slate-700">
             <button type="submit" disabled={saving} className="px-6 py-3 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl font-medium hover:shadow-md disabled:opacity-50 flex items-center gap-2">
-              <FiSave size={18} /> {saving ? 'Saving...' : 'Save Changes'}
+              <FiSave size={18} /> {saving ? t('staff.inventoryEdit.saving') : t('staff.inventoryEdit.saveChanges')}
             </button>
             <button type="button" onClick={() => navigate('/staff/inventory')} className="px-6 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-600 flex items-center gap-2">
-              <FiArrowLeft size={18} /> Cancel
+              <FiArrowLeft size={18} /> {t('staff.inventoryEdit.cancel')}
             </button>
           </div>
         </form>

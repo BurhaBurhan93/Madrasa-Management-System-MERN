@@ -96,8 +96,8 @@ const AdminGrading = () => {
               <div className="mt-3 space-y-1">
                 {form.grades.map((g, i) => (
                   <div key={i} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
-                    <span><strong>{g.grade}</strong> — {t('academic.gradeRange', { min: g.minMarks, max: g.maxMarks, gpa: g.gpa })}</span>
-                    <button type="button" onClick={() => removeGradeRow(i)} className="text-rose-500 hover:text-rose-700">×</button>
+                    <span><strong>{g.grade}</strong> {t('common.na') || '—'} {t('academic.gradeRange', { min: g.minMarks, max: g.maxMarks, gpa: g.gpa })}</span>
+                    <button type="button" onClick={() => removeGradeRow(i)} aria-label={t('common.remove')} className="text-rose-500 hover:text-rose-700">×</button>
                   </div>
                 ))}
               </div>

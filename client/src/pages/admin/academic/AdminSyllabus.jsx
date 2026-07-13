@@ -59,7 +59,7 @@ const AdminSyllabus = () => {
       setShowForm(false); setEditingId(null);
       setForm({ className: '', subject: '', topic: '', description: '', semester: '', order: '' });
       fetchData();
-    } catch (err) { const msg = err.response?.data?.message || err.message; alert(msg); console.error('Error saving syllabus:', msg); }
+    } catch (err) { const msg = err.response?.data?.message || err.message; alert(t('common.serverError') + ': ' + msg); console.error('Error saving syllabus:', msg); }
   };
 
   const handleEdit = (item) => {
@@ -101,7 +101,7 @@ const AdminSyllabus = () => {
       )}
 
       {error && (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</div>
+        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{t('common.error')}: {error}</div>
       )}
 
       {items.length === 0 && !error ? (

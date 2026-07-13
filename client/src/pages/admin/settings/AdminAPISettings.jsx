@@ -76,7 +76,7 @@ const AdminAPISettings = () => {
   const generateKey = () => {
     const newKey = {
       id: Date.now().toString(),
-      name: `API Key ${apiKeys.length + 1}`,
+      name: `${t('settings.apiKeyLabel')} ${apiKeys.length + 1}`,
       key: 'sk_live_' + Math.random().toString(36).substring(2, 18) + Math.random().toString(36).substring(2, 18),
       status: 'active',
       created: new Date().toISOString(),
@@ -178,7 +178,7 @@ const AdminAPISettings = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 ml-3">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${k.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>{k.status}</span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${k.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>{t('common.' + k.status) || k.status}</span>
                   <button onClick={() => deleteKey(k.id)} className="text-red-400 hover:text-red-600" title={t('common.delete')}><FiTrash2 size={14} /></button>
                 </div>
               </div>

@@ -11,17 +11,18 @@ import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { getStaffToneStyles } from './staffTheme';
 import { localizeAdminText } from '../../../lib/adminLocalization';
 import { readStoredLanguage } from '../../../lib/languageStorage';
+import { useTranslation } from 'react-i18next';
 
 const formatFieldLabel = (label = '') => label.toLowerCase().replace(/\s+/g, ' ');
 
-const getDefaultHelperText = (field, endpoint) => {
+const getDefaultHelperText = (field, endpoint, t) => {
   const context = endpoint.includes('/payroll') ? 'payroll' : endpoint.includes('/finance') ? 'finance' : endpoint.includes('/hr') ? 'HR' : endpoint.includes('/kitchen') ? 'kitchen' : 'record';
   const label = formatFieldLabel(field.label);
-  if (field.type === 'relation') return `Choose the related ${label} for this ${context} item.`;
-  if (field.type === 'date') return `Select the ${label} for this ${context} item.`;
-  if (field.type === 'number') return `Enter the ${label} as a numeric value.`;
-  if (field.type === 'select') return `Select the correct ${label} option.`;
-  return `Provide the ${label} for this ${context} item.`;
+  if (field.type === 'relation') return t('staff.form.chooseRelated', { label, context });
+  if (field.type === 'date') return t('staff.form.selectDate', { label, context });
+  if (field.type === 'number') return t('staff.form.enterNumeric', { label, context });
+  if (field.type === 'select') return t('staff.form.selectCorrect', { label, context });
+  return t('staff.form.provideLabel', { label, context });
 };
 
 const chunkFields = (fields, stepCount) => {
@@ -64,7 +65,7 @@ const RelationSelect = ({ field, value, onChange, isDark }) => {
             : 'border-slate-200 bg-slate-50 text-slate-700 focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100'
         }`}
       >
-        <option value="">{loading ? 'Loading...' : `Select ${field.label}`}</option>
+        <option value="">{loading ? t('staff.form.loading') : t('staff.form.selectOption', { label: field.label })}</option>
         {options.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
       </select>
       {field.helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{field.helperText}</p>}
@@ -72,21 +73,21 @@ const RelationSelect = ({ field, value, onChange, isDark }) => {
   );
 };
 
-const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }) => {
+const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }, t) => {
   const targetEndpoint = readEndpoint || endpoint;
   if (readMode === 'collection') {
     const res = await apiFetch(targetEndpoint);
     const data = await parseJsonSafe(res);
-    if (!res.ok) throw new Error(data?.message || 'Failed to load');
+    if (!res.ok) throw new Error(data?.message || t('staff.form.failedToLoad'));
     const rows = Array.isArray(data) ? data : (data?.data || []);
     const match = rows.find((row) => String(row._id) === String(id));
-    if (!match) throw new Error('Record not found');
+    if (!match) throw new Error(t('staff.form.recordNotFound'));
     return match;
   }
 
   const res = await apiFetch(`${targetEndpoint}/${id}`);
   const data = await parseJsonSafe(res);
-  if (!res.ok) throw new Error(data?.message || 'Failed to load');
+  if (!res.ok) throw new Error(data?.message || t('staff.form.failedToLoad'));
   return data?.data || data;
 };
 
@@ -101,6 +102,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const adminLang = readStoredLanguage('adminLang', 'en');
+  const { t } = useTranslation(['staff', 'common']);
   const toneStyles = getStaffToneStyles(endpoint || titleCreate || titleEdit);
 
   const stepCount = formFields.length > 16 ? 5 : 4;
@@ -108,8 +110,8 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
   const activeStep = Math.min(currentStep, Math.max(steps.length - 1, 0));
   const progressPercent = steps.length > 1 ? ((activeStep + 1) / steps.length) * 100 : 100;
   const stepLabels = steps.length === 5
-    ? ['Basics', 'Identity', 'Relations', 'Details', 'Review']
-    : ['Basics', 'Details', 'Relations', 'Review'].slice(0, steps.length);
+    ? [t('staff.form.basics'), t('staff.form.identity'), t('staff.form.relations'), t('staff.form.details'), t('staff.form.review')]
+    : [t('staff.form.basics'), t('staff.form.details'), t('staff.form.relations'), t('staff.form.review')].slice(0, steps.length);
 
   useEffect(() => {
     setCurrentStep(0);
@@ -118,10 +120,10 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       setLoading(true);
       setError('');
       try {
-        const record = await loadRecordByMode({ endpoint, id, readMode, readEndpoint });
+        const record = await loadRecordByMode({ endpoint, id, readMode, readEndpoint }, t);
         setForm(mapRowToForm ? mapRowToForm(record) : record);
       } catch (err) {
-        setError(err.message || 'Load error');
+        setError(err.message || t('staff.form.loadError'));
       } finally {
         setLoading(false);
       }
@@ -138,12 +140,12 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       formFields.filter((f) => f.type === 'number').forEach(({ name }) => {
         const val = form[name];
         if (val !== '' && val !== null && val !== undefined && Number.isNaN(Number(val))) {
-          newFieldErrors[name] = 'Only numbers are allowed';
+          newFieldErrors[name] = t('staff.form.onlyNumbers');
         }
       });
       formFields.forEach(({ name, required }) => {
         if (required && (!form[name] || form[name] === '')) {
-          newFieldErrors[name] = 'This field is required';
+          newFieldErrors[name] = t('staff.form.fieldRequired');
         }
       });
       if (Object.keys(newFieldErrors).length > 0) {
@@ -158,7 +160,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
         body: JSON.stringify(payload)
       });
       const data = await parseJsonSafe(res);
-      if (!res.ok || !data.success) throw new Error(data.message || 'Save failed');
+      if (!res.ok || !data.success) throw new Error(data.message || t('staff.form.saveFailed'));
       if (onSavedPath) navigate(onSavedPath);
     } catch (err) {
       setError(err.message || localizeAdminText('Save error', adminLang));
@@ -171,7 +173,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
   const goBack = () => setCurrentStep((step) => Math.max(step - 1, 0));
 
   const renderField = (field) => {
-    const helperText = field.helperText || getDefaultHelperText(field, endpoint);
+    const helperText = field.helperText || getDefaultHelperText(field, endpoint, t);
     if (field.type === 'relation') {
       return (
         <RelationSelect
@@ -195,7 +197,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
           options={field.options}
           helperText={helperText}
           error={fieldErrors[field.name]}
-          placeholder={`Select ${field.label}`}
+          placeholder={t('staff.form.selectOption', { label: field.label })}
         />
       );
     }
@@ -228,7 +230,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
           <CalendarDatePicker
             value={form[field.name]}
             onChange={(date) => setForm({ ...form, [field.name]: date })}
-            placeholder={`Select ${field.label}`}
+          placeholder={t('staff.form.selectOption', { label: field.label })}
           />
           {!fieldErrors[field.name] && helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{helperText}</p>}
           {fieldErrors[field.name] && <p className="text-sm text-red-600">{fieldErrors[field.name]}</p>}
@@ -286,7 +288,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
             {form[field.name] && (
               <img
                 src={form[field.name]}
-                alt="Preview"
+                alt={t('staff.form.preview')}
                 className="h-20 w-20 rounded-lg object-cover border border-slate-200"
               />
             )}
@@ -347,7 +349,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
                     {`${localizeAdminText('Step', adminLang)} ${activeStep + 1} of ${steps.length}`}
                   </p>
                   <h3 className={`mt-2 text-lg font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-                    {localizeAdminText(stepLabels[activeStep] || `Step ${activeStep + 1}`, adminLang)}
+                    {stepLabels[activeStep] || t('staff.form.stepN', { step: activeStep + 1 })}
                   </h3>
                 </div>
                 <div className={`h-2 w-full max-w-xs overflow-hidden rounded-full ${isDark ? 'bg-slate-800' : 'bg-white'}`}>

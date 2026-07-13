@@ -370,7 +370,7 @@ const AdminExams = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
                   value={form.academicYear}
                   onChange={(e) => setForm({...form, academicYear: e.target.value})}
-                  placeholder="e.g., 2024-2025"
+                  placeholder={t('settings.academicYearPlaceholder')}
                 />
               </div>
 

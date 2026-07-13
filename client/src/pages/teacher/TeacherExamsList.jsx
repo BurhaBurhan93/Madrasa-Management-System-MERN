@@ -156,10 +156,10 @@ const TeacherExamsList = () => {
               <td className="px-5 py-4 text-slate-600 dark:text-slate-300">
                 {exam.class?.name ? (exam.class.section ? `${exam.class.name} - ${exam.class.section}` : exam.class.name) : '-'}
               </td>
-              <td className="px-5 py-4 text-slate-600 dark:text-slate-300">{exam.duration} min</td>
+              <td className="px-5 py-4 text-slate-600 dark:text-slate-300">{exam.duration} {t('common.minutes')}</td>
               <td className="px-5 py-4">
                 <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${statusColors[exam.status] || ''}`}>
-                  {exam.status}
+                  {t('teacher.examDetails.' + exam.status) || exam.status}
                 </span>
               </td>
               <td className="px-5 py-4">

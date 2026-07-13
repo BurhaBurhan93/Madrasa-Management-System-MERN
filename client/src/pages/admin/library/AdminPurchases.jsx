@@ -118,7 +118,7 @@ const BookPurchases = () => {
                   <td className="px-5 py-3 text-slate-600 font-medium">{item.book?.title || item.book || '-'}</td>
                   <td className="px-5 py-3 text-slate-600">{item.supplierName || '-'}</td>
                   <td className="px-5 py-3 text-slate-600">{item.quantity || '-'}</td>
-                  <td className="px-5 py-3 text-slate-600">{item.totalPrice ? `Rs. ${item.totalPrice}` : '-'}</td>
+                  <td className="px-5 py-3 text-slate-600">{item.totalPrice ? `${t('common.currencyRs') || 'Rs.'} ${item.totalPrice}` : '-'}</td>
                   <td className="px-5 py-3"><button onClick={() => handleDelete(item._id)} className="rounded-lg bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">{t('common.delete')}</button></td>
                 </tr>
               ))}
@@ -129,11 +129,11 @@ const BookPurchases = () => {
           <div className="flex items-center justify-between">
             <span className="text-sm text-slate-500">{t('common.page')} {page} {t('common.of')} {totalPages}</span>
             <div className="flex gap-1.5">
-              <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Prev</button>
+              <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.previous') || 'Prev'}</button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                 <button key={p} onClick={() => setPage(p)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${page === p ? 'bg-slate-800 text-white shadow-md' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{p}</button>
               ))}
-              <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">Next</button>
+              <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">{t('common.next') || 'Next'}</button>
             </div>
           </div>
         )}

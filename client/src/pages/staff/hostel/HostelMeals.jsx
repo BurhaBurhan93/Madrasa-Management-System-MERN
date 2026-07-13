@@ -1,9 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 
-export const hostelMealsConfig = {
-  title: 'Hostel Meal Schedule',
-  subtitle: 'Manage daily meal menus and dietary information for hostel residents',
+export const hostelMealsConfig = (t) => ({
+  title: t('staff.hostel.meals.title'),
+  subtitle: t('staff.hostel.meals.subtitle'),
   endpoint: '/hostel/meals',
   createPath: '/staff/registrar/hostel-meals/create',
   editPathForRow: (row) => `/staff/registrar/hostel-meals/edit/${row._id}`,
@@ -11,54 +12,54 @@ export const hostelMealsConfig = {
   columns: [
     { 
       key: 'date', 
-      header: 'Date', 
+      header: t('common.date'), 
       render: (value) => value ? new Date(value).toLocaleDateString() : '-' 
     },
     { 
       key: 'mealType', 
-      header: 'Meal Type', 
+      header: t('staff.hostel.meals.columns.mealType'), 
       render: (value) => value ? value.charAt(0).toUpperCase() + value.slice(1) : '-' 
     },
     { 
       key: 'menu', 
-      header: 'Main Dish', 
+      header: t('staff.hostel.meals.columns.mainDish'), 
       render: (value) => value?.mainDish || '-' 
     },
     { 
       key: 'isVegetarian', 
-      header: 'Vegetarian', 
-      render: (value) => value ? 'Yes' : 'No' 
+      header: t('staff.hostel.meals.columns.vegetarian'), 
+      render: (value) => value ? t('common.yes') : t('common.no') 
     },
     { 
       key: 'attendedCount', 
-      header: 'Attendance', 
+      header: t('staff.hostel.meals.columns.attendance'), 
       render: (value, row) => `${value || 0} / ${row.totalResidents || 0}` 
     },
     { 
       key: 'allergens', 
-      header: 'Allergens', 
-      render: (value) => value && value.length > 0 ? value.join(', ') : 'None' 
+      header: t('staff.hostel.meals.columns.allergens'), 
+      render: (value) => value && value.length > 0 ? value.join(', ') : t('common.none') 
     }
   ],
-  searchPlaceholder: 'Search by meal type or dish...',
+  searchPlaceholder: t('staff.hostel.meals.searchPlaceholder'),
   formFields: [
-    { name: 'mealType', label: 'Meal Type', type: 'select', options: [
-      { value: 'breakfast', label: 'Breakfast' },
-      { value: 'lunch', label: 'Lunch' },
-      { value: 'dinner', label: 'Dinner' },
-      { value: 'snack', label: 'Snack' }
+    { name: 'mealType', label: t('staff.hostel.meals.form.mealType'), type: 'select', options: [
+      { value: 'breakfast', label: t('staff.hostel.meals.mealType.breakfast') },
+      { value: 'lunch', label: t('staff.hostel.meals.mealType.lunch') },
+      { value: 'dinner', label: t('staff.hostel.meals.mealType.dinner') },
+      { value: 'snack', label: t('staff.hostel.meals.mealType.snack') }
     ], required: true },
-    { name: 'date', label: 'Date', type: 'date', required: true },
-    { name: 'menu_mainDish', label: 'Main Dish', type: 'text' },
-    { name: 'menu_sideDish', label: 'Side Dish', type: 'text' },
-    { name: 'menu_dessert', label: 'Dessert', type: 'text' },
-    { name: 'menu_beverage', label: 'Beverage', type: 'text' },
-    { name: 'isVegetarian', label: 'Vegetarian Only', type: 'select', options: [
-      { value: 'true', label: 'Yes' },
-      { value: 'false', label: 'No' }
+    { name: 'date', label: t('common.date'), type: 'date', required: true },
+    { name: 'menu_mainDish', label: t('staff.hostel.meals.form.mainDish'), type: 'text' },
+    { name: 'menu_sideDish', label: t('staff.hostel.meals.form.sideDish'), type: 'text' },
+    { name: 'menu_dessert', label: t('staff.hostel.meals.form.dessert'), type: 'text' },
+    { name: 'menu_beverage', label: t('staff.hostel.meals.form.beverage'), type: 'text' },
+    { name: 'isVegetarian', label: t('staff.hostel.meals.form.vegetarianOnly'), type: 'select', options: [
+      { value: 'true', label: t('common.yes') },
+      { value: 'false', label: t('common.no') }
     ]},
-    { name: 'allergens', label: 'Allergens (comma-separated)', type: 'text' },
-    { name: 'specialNotes', label: 'Special Notes', type: 'textarea' }
+    { name: 'allergens', label: t('staff.hostel.meals.form.allergens'), type: 'text' },
+    { name: 'specialNotes', label: t('staff.hostel.meals.form.specialNotes'), type: 'textarea' }
   ],
   initialForm: {
     mealType: 'breakfast',
@@ -100,10 +101,11 @@ export const hostelMealsConfig = {
       specialNotes: form.specialNotes || ''
     };
   }
-};
+});
 
-const HostelMeals = () => (
-  <ListPage {...hostelMealsConfig} />
-);
+const HostelMeals = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  return <ListPage {...hostelMealsConfig(t)} />;
+};
 
 export default HostelMeals;

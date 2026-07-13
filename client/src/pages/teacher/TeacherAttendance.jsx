@@ -215,7 +215,7 @@ const TeacherAttendance = () => {
       {selectedSession && (
         <div className="fixed bottom-0 left-0 right-0 z-10 border-t border-slate-200 bg-white/90 p-4 backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/90">
           <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8">
-            <p className="text-sm text-slate-600 dark:text-slate-400">{summary.present} Present &bull; {summary.absent} Absent &bull; {summary.late} Late</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">{summary.present} {t('common.present')} &bull; {summary.absent} {t('common.absent')} &bull; {summary.late} {t('common.late')}</p>
             <button onClick={saveAttendance} disabled={saving} className={primaryBtnCls + ' disabled:opacity-60'}>
               {saving ? t('teacher.attendance.saving') : t('teacher.attendance.saveAttendance')}
             </button>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FiArrowLeft, FiEdit2, FiPackage } from 'react-icons/fi';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import StaffPageLayout from '../staff/shared/StaffPageLayout';
@@ -8,6 +9,7 @@ import Card from '../../components/UIHelper/Card';
 const StaffInventoryView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation(['staff', 'common']);
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -19,7 +21,7 @@ const StaffInventoryView = () => {
         const data = await parseJsonSafe(res);
         const items = Array.isArray(data) ? data : [];
         const found = items.find((i) => String(i.id) === String(id));
-        if (!found) throw new Error('Item not found');
+        if (!found) throw new Error(t('staff.inventoryView.itemNotFound'));
         setItem(found);
       } catch (err) {
         setError(err.message);
@@ -32,7 +34,7 @@ const StaffInventoryView = () => {
 
   if (loading) {
     return (
-      <StaffPageLayout eyebrow="Inventory" title="Inventory Item Details" subtitle="Loading...">
+      <StaffPageLayout eyebrow={t('staff.inventoryView.eyebrow')} title={t('staff.inventoryView.title')} subtitle={t('staff.inventoryView.loading')}>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500" />
         </div>
@@ -42,7 +44,7 @@ const StaffInventoryView = () => {
 
   if (error) {
     return (
-      <StaffPageLayout eyebrow="Inventory" title="Inventory Item Details" subtitle="Error">
+      <StaffPageLayout eyebrow={t('staff.inventoryView.eyebrow')} title={t('staff.inventoryView.title')} subtitle={t('staff.inventoryView.error')}>
         <div className="p-6 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-400">{error}</div>
       </StaffPageLayout>
     );
@@ -51,20 +53,20 @@ const StaffInventoryView = () => {
   const isLowStock = item.quantity <= item.minLevel;
 
   const fields = [
-    { label: 'Name', value: item.name },
-    { label: 'Category', value: item.category },
-    { label: 'Quantity', value: item.quantity },
-    { label: 'Available', value: item.available ?? item.quantity },
-    { label: 'Min Level', value: item.minLevel },
-    { label: 'Location', value: item.location },
-    { label: 'Status', value: isLowStock ? 'Low Stock' : 'In Stock', highlight: isLowStock ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-green-600 dark:text-green-400 font-semibold' },
+    { label: t('staff.inventoryView.name'), value: item.name },
+    { label: t('staff.inventoryView.category'), value: item.category },
+    { label: t('staff.inventoryView.quantity'), value: item.quantity },
+    { label: t('staff.inventoryView.available'), value: item.available ?? item.quantity },
+    { label: t('staff.inventoryView.minLevel'), value: item.minLevel },
+    { label: t('staff.inventoryView.location'), value: item.location },
+    { label: t('staff.inventoryView.status'), value: isLowStock ? t('staff.inventoryView.lowStock') : t('staff.inventoryView.inStock'), highlight: isLowStock ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-green-600 dark:text-green-400 font-semibold' },
   ];
 
   return (
     <StaffPageLayout
-      eyebrow="Inventory"
+      eyebrow={t('staff.inventoryView.eyebrow')}
       title={item.name}
-      subtitle="Inventory item details and stock information"
+      subtitle={t('staff.inventoryView.detailsSubtitle')}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -87,21 +89,21 @@ const StaffInventoryView = () => {
                 <FiPackage size={48} />
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-slate-400">Stock Status</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">{t('staff.inventoryView.stockStatus')}</p>
                 <p className={`text-xl font-bold ${isLowStock ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                  {isLowStock ? 'Low Stock' : 'In Stock'}
+                  {isLowStock ? t('staff.inventoryView.lowStock') : t('staff.inventoryView.inStock')}
                 </p>
               </div>
               {isLowStock && (
                 <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl text-sm text-red-700 dark:text-red-400 w-full">
-                  Quantity ({item.quantity}) is at or below minimum level ({item.minLevel}). Consider restocking.
+                  {t('staff.inventoryView.restockWarning', { quantity: item.quantity, minLevel: item.minLevel })}
                 </div>
               )}
               <button onClick={() => navigate(`/staff/inventory/edit/${item.id}`)} className="w-full px-4 py-3 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl font-medium hover:shadow-md flex items-center justify-center gap-2">
-                <FiEdit2 size={18} /> Edit Item
+                <FiEdit2 size={18} /> {t('staff.inventoryView.editItem')}
               </button>
               <button onClick={() => navigate('/staff/inventory')} className="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-slate-600 flex items-center justify-center gap-2">
-                <FiArrowLeft size={18} /> Back to List
+                <FiArrowLeft size={18} /> {t('staff.inventoryView.backToList')}
               </button>
             </div>
           </Card>

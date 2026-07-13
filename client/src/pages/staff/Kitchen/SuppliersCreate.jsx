@@ -1,7 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import FormPage from '../shared/FormPage';
-import { suppliersConfig } from './Suppliers';
+import { getSuppliersConfig } from './Suppliers';
 
-const SuppliersCreate = () => <FormPage titleCreate="Create Supplier" titleEdit="Edit Supplier" endpoint={suppliersConfig.endpoint} formFields={suppliersConfig.formFields} initialForm={suppliersConfig.initialForm} mapRowToForm={suppliersConfig.mapRowToForm} mapFormToPayload={suppliersConfig.mapFormToPayload} mode="create" onSavedPath="/staff/kitchen/suppliers" />;
+const SuppliersCreate = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  const config = getSuppliersConfig(t);
+  return <FormPage titleCreate={t('staff.kitchen.suppliers.titleCreate', 'Create Supplier')} titleEdit={t('staff.kitchen.suppliers.titleEdit', 'Edit Supplier')} endpoint={config.endpoint} formFields={config.formFields} initialForm={config.initialForm} mapRowToForm={config.mapRowToForm} mapFormToPayload={config.mapFormToPayload} mode="create" onSavedPath="/staff/kitchen/suppliers" />;
+};
 
 export default SuppliersCreate;

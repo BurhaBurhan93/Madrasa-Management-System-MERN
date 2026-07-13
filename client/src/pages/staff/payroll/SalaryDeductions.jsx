@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 
 export const salaryDeductionsConfig = {
@@ -43,18 +44,24 @@ export const salaryDeductionsConfig = {
   })
 };
 
-const SalaryDeductions = () => (
-  <ListPage
-    title={salaryDeductionsConfig.title}
-    subtitle={salaryDeductionsConfig.subtitle}
-    endpoint={salaryDeductionsConfig.endpoint}
-    columns={salaryDeductionsConfig.columns}
-    createPath="/staff/payroll/salary-deductions/create"
-    editPathForRow={(row) => `/staff/payroll/salary-deductions/edit/${row._id}`}
-    viewPathForRow={(row) => '/staff/payroll/salary-deductions/view/' + row._id}
-    searchPlaceholder="Search salary deductions..."
-  />
-);
+const SalaryDeductions = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  const columns = salaryDeductionsConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.payroll.salaryDeductions.columns.${col.key}`)
+  }));
+  return (
+    <ListPage
+      title={t('staff.payroll.salaryDeductions.title')}
+      subtitle={t('staff.payroll.salaryDeductions.subtitle')}
+      endpoint={salaryDeductionsConfig.endpoint}
+      columns={columns}
+      createPath="/staff/payroll/salary-deductions/create"
+      editPathForRow={(row) => `/staff/payroll/salary-deductions/edit/${row._id}`}
+      viewPathForRow={(row) => '/staff/payroll/salary-deductions/view/' + row._id}
+      searchPlaceholder={t('staff.payroll.salaryDeductions.searchPlaceholder')}
+    />
+  );
+};
 
 export default SalaryDeductions;
-

@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
 
 const RecordActionButtons = ({ onView, onEdit, onDelete, extraItems = [] }) => {
+  const { t } = useTranslation(['staff', 'common']);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -16,21 +18,21 @@ const RecordActionButtons = ({ onView, onEdit, onDelete, extraItems = [] }) => {
   const items = [
     ...extraItems,
     onView && {
-      label: "View",
+      label: t('staff.actions.view'),
       onClick: onView,
       icon: FiEye,
       className:
         "border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-300 hover:bg-sky-100",
     },
     onEdit && {
-      label: "Edit",
+      label: t('staff.actions.edit'),
       onClick: onEdit,
       icon: FiEdit2,
       className:
         "border-amber-200 bg-amber-50 text-amber-700 hover:border-amber-300 hover:bg-amber-100",
     },
     onDelete && {
-      label: "Delete",
+      label: t('staff.actions.delete'),
       onClick: onDelete,
       icon: FiTrash2,
       className:

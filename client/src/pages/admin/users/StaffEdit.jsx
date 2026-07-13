@@ -7,12 +7,12 @@ import { FiArrowLeft, FiSave } from 'react-icons/fi';
 import api from '../../../lib/api';
 
 const EMPLOYEE_TYPES = [
-  { value: 'admin', label: 'Admin' }, { value: 'finance', label: 'Finance' },
-  { value: 'registrar', label: 'Registrar' }, { value: 'hr', label: 'HR' },
-  { value: 'librarian', label: 'Librarian' }, { value: 'kitchen', label: 'Kitchen' },
-  { value: 'security', label: 'Security' }, { value: 'support', label: 'Support' },
-  { value: 'maintenance', label: 'Maintenance' }, { value: 'payroll', label: 'Payroll' },
-  { value: 'complaints', label: 'Complaints' }, { value: 'inventory', label: 'Inventory' },
+  { value: 'admin' }, { value: 'finance' },
+  { value: 'registrar' }, { value: 'hr' },
+  { value: 'librarian' }, { value: 'kitchen' },
+  { value: 'security' }, { value: 'support' },
+  { value: 'maintenance' }, { value: 'payroll' },
+  { value: 'complaints' }, { value: 'inventory' },
 ];
 
 const Field = ({ label, value, onChange, type = 'text', options, placeholder }) => (

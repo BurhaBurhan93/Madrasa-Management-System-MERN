@@ -149,7 +149,7 @@ const AdminAttendanceReportsPage = () => {
           </p>
         </div>
         <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
-          <p className="text-xs font-medium text-cyan-600">Present</p>
+          <p className="text-xs font-medium text-cyan-600">{t('common.present')}</p>
           <p className="mt-1 text-2xl font-bold text-cyan-700">
             {loading ? "…" : stats.present}
           </p>
@@ -173,12 +173,12 @@ const AdminAttendanceReportsPage = () => {
           <thead className="border-b border-slate-200 bg-slate-50">
             <tr>
                 <th className="px-5 py-3 font-semibold text-slate-600">
-                  Employee
+                  {t('common.employee')}
                 </th>
-                <th className="px-5 py-3 font-semibold text-slate-600">Code</th>
+                <th className="px-5 py-3 font-semibold text-slate-600">{t('common.code')}</th>
                 <th className="px-5 py-3 font-semibold text-slate-600">{t('reports.attendanceReports')}</th>
               <th className="px-5 py-3 text-center font-semibold text-emerald-600">
-                Present
+                {t('common.present')}
               </th>
                 <th className="px-5 py-3 text-center font-semibold text-rose-600">
                   {t('reports.absences')}
@@ -187,7 +187,7 @@ const AdminAttendanceReportsPage = () => {
                   {t('reports.lateArrivals')}
                 </th>
               <th className="px-5 py-3 text-center font-semibold text-slate-600">
-                Rate
+                {t('common.rate')}
               </th>
             </tr>
           </thead>

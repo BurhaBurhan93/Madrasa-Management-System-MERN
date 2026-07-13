@@ -181,7 +181,7 @@ const AdminHostelAttendance = () => {
 
   const mealTypeLabel = (type) => {
     const labels = { breakfast: t('kitchen.breakfast'), lunch: t('kitchen.lunch'), dinner: t('kitchen.dinner'), snack: t('kitchen.snacks') };
-    return labels[type] || type;
+    return labels[type] || type || t('common.na');
   };
 
   const formatDate = (d) => d ? new Date(d).toLocaleDateString() : '-';
@@ -335,7 +335,7 @@ const AdminHostelAttendance = () => {
                   {students.map(s => {
                     const roomInfo = studentRooms[s._id];
                     return <option key={s._id} value={s._id}>
-                      {s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim()} — {s.studentCode || s._id.slice(-6)}{roomInfo ? ` [Room ${roomInfo.roomNumber}]` : ''}
+                      {s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim()} — {s.studentCode || s._id.slice(-6)}{roomInfo ? ` [${t('hostel.room')} ${roomInfo.roomNumber}]` : ''}
                     </option>;
                   })}
                 </select>
@@ -360,7 +360,7 @@ const AdminHostelAttendance = () => {
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700">{t('hostel.notes')}</label>
-                <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} placeholder="Optional notes..." className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100" />
+                <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} placeholder={t('common.optionalNotes') || 'Optional notes...'} className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100" />
               </div>
             </div>
 
@@ -423,12 +423,12 @@ const AdminHostelAttendance = () => {
                       <span className="text-slate-500">{t('common.markedBy')}:</span>
                       <p className="mt-0.5 font-medium text-slate-800">
                         {editingId && selectedStudent ? (selectedStudent.markedBy?.name || currentUser?.name || '—') : (currentUser?.name || '—')}
-                        {!editingId && currentUser ? ' (you)' : ''}
+                        {!editingId && currentUser ? t('common.youSuffix') || ' (you)' : ''}
                       </p>
                     </div>
                     <div className="mt-1.5 text-xs">
                       <span className="text-slate-500">{t('common.time')}:</span>
-                      <p className="mt-0.5 font-medium text-slate-800">{editingId ? formatTime(new Date()) : 'Now'}</p>
+                      <p className="mt-0.5 font-medium text-slate-800">{editingId ? formatTime(new Date()) : t('common.now') || 'Now'}</p>
                     </div>
                   </div>
                   {form.notes && (

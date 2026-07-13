@@ -6,6 +6,7 @@ import Modal from '../../../components/UIHelper/Modal';
 import Input from '../../../components/UIHelper/Input';
 import Select from '../../../components/UIHelper/Select';
 import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
+import { useTranslation } from 'react-i18next';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -19,6 +20,7 @@ const CrudPage = ({
   mapRowToForm,
   mapFormToPayload
 }) => {
+  const { t } = useTranslation(['staff', 'common']);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -79,7 +81,7 @@ const CrudPage = ({
   };
 
   const handleDelete = async (row) => {
-    const ok = window.confirm('Are you sure you want to delete this record?');
+    const ok = window.confirm(t('common.confirmDelete', { defaultValue: 'Are you sure you want to delete this record?' }));
     if (!ok) return;
     try {
       const res = await apiFetch(`${endpoint}/${row._id}`, { method: 'DELETE' });
@@ -115,23 +117,23 @@ const CrudPage = ({
   return (
     <div className="w-full bg-gray-50 min-h-screen">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-        {subtitle && <p className="text-gray-600">{subtitle}</p>}
+        <h1 className="text-3xl font-bold text-gray-900">{t(title, { defaultValue: title })}</h1>
+        {subtitle && <p className="text-gray-600">{t(subtitle, { defaultValue: subtitle })}</p>}
       </div>
 
       <Card className="mb-6">
         <div className="flex flex-col md:flex-row md:items-end gap-4">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.search')}</label>
             <input
               value={query}
               onChange={(e) => { setQuery(e.target.value); setPage(1); }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500"
-              placeholder="Search..."
+              placeholder={t('common.searchPlaceholder', { defaultValue: t('common.search') })}
             />
           </div>
           <div className="md:ml-auto">
-            <Button variant="primary" onClick={openCreate}>Add New</Button>
+            <Button variant="primary" onClick={openCreate}>{t('common.addNew', { defaultValue: t('common.create') })}</Button>
           </div>
         </div>
       </Card>
@@ -146,10 +148,10 @@ const CrudPage = ({
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-rose-900">Unable to Load Data</h3>
+                <h3 className="text-sm font-semibold text-rose-900">{t('common.unableToLoadData', { defaultValue: 'Unable to Load Data' })}</h3>
                 <p className="mt-1 text-sm text-rose-700">{error}</p>
                 <button onClick={fetchItems} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">
-                  Retry
+                  {t('common.retry')}
                 </button>
               </div>
             </div>
@@ -159,12 +161,14 @@ const CrudPage = ({
 
       <Card>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">Records</h2>
-          <div className="text-sm text-gray-500">Showing {items.length} of {total}</div>
+          <h2 className="text-xl font-semibold text-gray-900">{t('common.records', { defaultValue: 'Records' })}</h2>
+          <div className="text-sm text-gray-500">
+            {t('common.showing', { defaultValue: 'Showing' })} {items.length} {t('common.of', { defaultValue: 'of' })} {total}
+          </div>
         </div>
         <div className="overflow-x-auto rounded-lg border border-gray-100">
           {loading ? (
-            <div className="text-sm text-gray-500 p-4">Loading data...</div>
+            <div className="text-sm text-gray-500 p-4">{t('common.loadingData', { defaultValue: t('common.loading') })}</div>
           ) : (
             <DataTable
               columns={columns}
@@ -177,18 +181,18 @@ const CrudPage = ({
       </Card>
 
       <div className="mt-6 flex items-center justify-between">
-        <div className="text-sm text-gray-500">Page {page}</div>
+        <div className="text-sm text-gray-500">{t('common.page', { defaultValue: 'Page' })} {page}</div>
         <div className="flex gap-2">
           <Button variant="outline" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
-            Previous
+            {t('common.previous')}
           </Button>
           <Button variant="outline" disabled={page * limit >= total} onClick={() => setPage((p) => p + 1)}>
-            Next
+            {t('common.next')}
           </Button>
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={isEdit ? 'Edit Record' : 'Create Record'} size="2xl">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={isEdit ? t('common.editRecord', { defaultValue: 'Edit Record' }) : t('common.createRecord', { defaultValue: 'Create Record' })} size="2xl">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {formFields.map((field) => (
@@ -217,9 +221,9 @@ const CrudPage = ({
           {formError && <div className="text-sm text-red-600">{formError}</div>}
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setIsModalOpen(false)}>{t('common.cancel')}</Button>
             <Button variant="primary" onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Save'}
+              {saving ? t('common.saving', { defaultValue: 'Saving...' }) : t('common.save')}
             </Button>
           </div>
         </div>

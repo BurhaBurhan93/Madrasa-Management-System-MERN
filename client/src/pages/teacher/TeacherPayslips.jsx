@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
-const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const monthNames = ['month1','month2','month3','month4','month5','month6','month7','month8','month9','month10','month11','month12'];
 
 const paymentStatusColors = {
   paid: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
@@ -10,7 +11,7 @@ const paymentStatusColors = {
   failed: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
 };
 
-const paymentMethodLabels = { cash: 'Cash', bank: 'Bank Transfer', card: 'Card', other: 'Other' };
+const paymentMethodLabels = {};
 
 const MOCK = [
   { _id: '1', salaryMonth: 6, salaryYear: 2026, grossSalary: 30000, totalAllowance: 5000, totalDeduction: 3000, netSalary: 32000, paymentDate: '2026-06-28T10:00:00Z', paymentMethod: 'bank', paymentStatus: 'paid', transactionReference: 'TXN-2026-06-001', deductionDetails: [{ deductionType: 'Tax', deductionReason: 'Income tax', deductionAmount: 2000 }, { deductionType: 'Social Security', deductionReason: 'SS contribution', deductionAmount: 1000 }], approvedBy: { name: 'Admin User' }, paidBy: { name: 'Finance Manager' } },
@@ -22,6 +23,7 @@ const MOCK = [
 ];
 
 const TeacherPayslips = () => {
+  const { t } = useTranslation();
   const [payslips, setPayslips] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -73,23 +75,23 @@ const TeacherPayslips = () => {
   const totalNet = payslips.reduce((s, p) => s + (p.netSalary || 0), 0);
 
   const statCards = [
-    { label: 'Total Payments', value: payslips.length, accent: 'bg-cyan-500' },
-    { label: 'Total Gross', value: fmt(totalGross), accent: 'bg-blue-500' },
-    { label: 'Total Allowances', value: fmt(totalAllowances), accent: 'bg-emerald-500' },
-    { label: 'Total Net Paid', value: fmt(totalNet), accent: 'bg-violet-500' },
+    { label: t('teacher.payslips.totalPayments'), value: payslips.length, accent: 'bg-cyan-500' },
+    { label: t('teacher.payslips.totalGross'), value: fmt(totalGross), accent: 'bg-blue-500' },
+    { label: t('teacher.payslips.totalAllowances'), value: fmt(totalAllowances), accent: 'bg-emerald-500' },
+    { label: t('teacher.payslips.totalNetPaid'), value: fmt(totalNet), accent: 'bg-violet-500' },
   ];
 
   const renderLoading = () => (
     <div className="flex items-center justify-center py-20">
       <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-500 dark:border-slate-700 dark:border-t-cyan-400" />
-      <span className="ml-3 text-sm text-slate-500 dark:text-slate-400">Loading...</span>
+      <span className="ml-3 text-sm text-slate-500 dark:text-slate-400">{t('common.loading')}</span>
     </div>
   );
 
   const renderEmpty = () => (
     <div className="flex flex-col items-center justify-center py-20">
       <div className="mb-4 text-5xl">💰</div>
-      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No payslips found</p>
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('teacher.payslips.noPayslips')}</p>
     </div>
   );
 
@@ -99,15 +101,15 @@ const TeacherPayslips = () => {
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-700">
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Month</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Gross Salary</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Allowances</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Deductions</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Net Salary</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Method</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Payment Date</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Status</th>
-              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">Actions</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.payslips.month')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.payslips.grossSalary')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.payslips.allowances')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.payslips.deductions')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.payslips.netSalary')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.payslips.method')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.payslips.paymentDate')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('common.status')}</th>
+              <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">{t('common.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -119,10 +121,10 @@ const TeacherPayslips = () => {
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                      {monthNames[p.salaryMonth - 1]?.slice(0, 3) || '?'}
+                      {t('teacher.payslips.' + monthNames[p.salaryMonth - 1])?.slice(0, 3) || t('common.na')}
                     </div>
                     <div>
-                      <div className="font-medium text-slate-900 dark:text-slate-100">{monthNames[p.salaryMonth - 1] || p.salaryMonth}</div>
+                      <div className="font-medium text-slate-900 dark:text-slate-100">{t('teacher.payslips.' + monthNames[p.salaryMonth - 1]) || p.salaryMonth}</div>
                       <div className="text-xs text-slate-500 dark:text-slate-400">{p.salaryYear}</div>
                     </div>
                   </div>
@@ -131,11 +133,11 @@ const TeacherPayslips = () => {
                 <td className="px-5 py-4 text-emerald-600 dark:text-emerald-400">+{fmt(p.totalAllowance)}</td>
                 <td className="px-5 py-4 text-rose-600 dark:text-rose-400">-{fmt(p.totalDeduction)}</td>
                 <td className="px-5 py-4 font-semibold text-emerald-600 dark:text-emerald-400">{fmt(p.netSalary)}</td>
-                <td className="px-5 py-4 text-slate-600 dark:text-slate-300">{paymentMethodLabels[p.paymentMethod] || p.paymentMethod || '-'}</td>
+                <td className="px-5 py-4 text-slate-600 dark:text-slate-300">{t('teacher.payslips.' + p.paymentMethod) || p.paymentMethod || t('common.na')}</td>
                 <td className="px-5 py-4 text-slate-600 dark:text-slate-300">{fmtDate(p.paymentDate)}</td>
                 <td className="px-5 py-4">
                   <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize ${paymentStatusColors[p.paymentStatus] || ''}`}>
-                    {p.paymentStatus || 'paid'}
+                    {t('teacher.payslips.' + (p.paymentStatus || 'paid')) || p.paymentStatus || t('common.paid')}
                   </span>
                 </td>
                 <td className="px-5 py-4">
@@ -143,7 +145,7 @@ const TeacherPayslips = () => {
                     onClick={() => setSelected(p)}
                     className="rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-xs font-medium text-cyan-700 transition hover:bg-cyan-100 dark:border-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400 dark:hover:bg-cyan-900/50"
                   >
-                    View Details
+                    {t('common.viewDetails')}
                   </button>
                 </td>
               </tr>
@@ -158,8 +160,8 @@ const TeacherPayslips = () => {
     <div className={PANEL_PAGE_BG}>
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">My Payslips</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">View your salary payment history</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.payslips.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.payslips.subtitle')}</p>
         </div>
 
         <section className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -180,64 +182,64 @@ const TeacherPayslips = () => {
           <div className="mx-4 w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-700 dark:bg-slate-800" onClick={(e) => e.stopPropagation()}>
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-                Payslip — {monthNames[selected.salaryMonth - 1]} {selected.salaryYear}
+                {t('teacher.payslips.payslip')} — {t('teacher.payslips.' + monthNames[selected.salaryMonth - 1])} {selected.salaryYear}
               </h2>
               <button onClick={() => setSelected(null)} className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
-                Close
+                {t('common.close')}
               </button>
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Salary Breakdown</h3>
+                <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('teacher.payslips.salaryBreakdown')}</h3>
                 <div className="flex justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Gross Salary</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.payslips.grossSalary')}</span>
                   <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{fmt(selected.grossSalary)}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Allowances</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.payslips.allowances')}</span>
                   <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">+{fmt(selected.totalAllowance)}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Deductions</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.payslips.deductions')}</span>
                   <span className="text-sm font-medium text-rose-600 dark:text-rose-400">-{fmt(selected.totalDeduction)}</span>
                 </div>
                 <div className="flex justify-between pt-2">
-                  <span className="text-base font-semibold text-slate-700 dark:text-slate-300">Net Salary</span>
+                  <span className="text-base font-semibold text-slate-700 dark:text-slate-300">{t('teacher.payslips.netSalary')}</span>
                   <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">{fmt(selected.netSalary)}</span>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Payment Info</h3>
+                <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('teacher.payslips.paymentInfo')}</h3>
                 <div className="flex justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Payment Method</span>
-                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{paymentMethodLabels[selected.paymentMethod] || selected.paymentMethod || '-'}</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.payslips.paymentMethod')}</span>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{t('teacher.payslips.' + selected.paymentMethod) || selected.paymentMethod || t('common.na')}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Status</span>
-                  <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize ${paymentStatusColors[selected.paymentStatus] || ''}`}>{selected.paymentStatus || 'paid'}</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">{t('common.status')}</span>
+                  <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize ${paymentStatusColors[selected.paymentStatus] || ''}`}>{t('teacher.payslips.' + (selected.paymentStatus || 'paid')) || selected.paymentStatus || t('common.paid')}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Payment Date</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.payslips.paymentDate')}</span>
                   <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{fmtDate(selected.paymentDate)}</span>
                 </div>
                 {selected.transactionReference && (
                   <div className="flex justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
-                    <span className="text-sm text-slate-500 dark:text-slate-400">Transaction Ref</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.payslips.transactionRef')}</span>
                     <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-100">{selected.transactionReference}</span>
                   </div>
                 )}
                 {selected.approvedBy && (
                   <div className="flex justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
-                    <span className="text-sm text-slate-500 dark:text-slate-400">Approved By</span>
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{selected.approvedBy.name || '-'}</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.payslips.approvedBy')}</span>
+                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{selected.approvedBy.name || t('common.na')}</span>
                   </div>
                 )}
                 {selected.paidBy && (
                   <div className="flex justify-between">
-                    <span className="text-sm text-slate-500 dark:text-slate-400">Paid By</span>
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{selected.paidBy.name || '-'}</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">{t('teacher.payslips.paidBy')}</span>
+                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{selected.paidBy.name || t('common.na')}</span>
                   </div>
                 )}
               </div>
@@ -245,14 +247,14 @@ const TeacherPayslips = () => {
 
             {selected.deductionDetails && selected.deductionDetails.length > 0 && (
               <div className="mt-6">
-                <h3 className="mb-3 text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Deduction Breakdown</h3>
+                <h3 className="mb-3 text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('teacher.payslips.deductionBreakdown')}</h3>
                 <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
                   <table className="w-full text-left text-sm">
                     <thead>
                       <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-700/30">
-                        <th className="px-4 py-2.5 font-semibold text-slate-600 dark:text-slate-300">Type</th>
-                        <th className="px-4 py-2.5 font-semibold text-slate-600 dark:text-slate-300">Reason</th>
-                        <th className="px-4 py-2.5 text-right font-semibold text-slate-600 dark:text-slate-300">Amount</th>
+                        <th className="px-4 py-2.5 font-semibold text-slate-600 dark:text-slate-300">{t('teacher.payslips.type')}</th>
+                        <th className="px-4 py-2.5 font-semibold text-slate-600 dark:text-slate-300">{t('teacher.payslips.reason')}</th>
+                        <th className="px-4 py-2.5 text-right font-semibold text-slate-600 dark:text-slate-300">{t('teacher.payslips.amount')}</th>
                       </tr>
                     </thead>
                     <tbody>

@@ -96,12 +96,12 @@ const AdminPayments = () => {
     const { default: autoTable } = await import('jspdf-autotable');
     const doc = new jsPDF('l', 'mm', 'a4');
     doc.setFontSize(16);
-    doc.text('Fee Payments Report', 14, 20);
+    doc.text(t('finance.payments'), 14, 20);
     doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
+    doc.text(new Date().toLocaleDateString(), 14, 28);
     autoTable(doc, {
       startY: 34,
-      head: [['Receipt#', 'Student', 'Amount', 'Method', 'Date', 'Status', 'Verification', 'Transaction Ref']],
+      head: [[t('finance.receiptNo'), t('finance.student'), t('finance.amount'), t('finance.method'), t('finance.paymentDate'), t('finance.status'), t('finance.verificationStatus'), t('finance.transactionReference')]],
       body: payments.map(p => {
         const stud = p.studentFee?.student || {};
         return [
@@ -198,7 +198,7 @@ const AdminPayments = () => {
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
                 <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.receiptNo')}</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">{'Student'}</th>
+                <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.student')}</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.amount')}</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.method')}</th>
                 <th className="px-4 py-3 font-semibold text-slate-600">{t('finance.paymentDate')}</th>
@@ -280,7 +280,7 @@ const AdminPayments = () => {
               disabled={page === 1}
               onClick={() => setPage(p => Math.max(1, p - 1))}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >Prev</button>
+            >{t('common.previous')}</button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
               <button
                 key={p}
@@ -294,7 +294,7 @@ const AdminPayments = () => {
               disabled={page === totalPages}
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >Next</button>
+            >{t('common.next')}</button>
           </div>
         </div>
       )}
@@ -363,7 +363,7 @@ const AdminPayments = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.receiptNo')} *</label>
-                  <input type="text" value={form.receiptNo} onChange={e => setForm({...form, receiptNo: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder="REC-001" required />
+                  <input type="text" value={form.receiptNo} onChange={e => setForm({...form, receiptNo: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder={t('finance.receiptNo')} required />
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.amountLabel')} *</label>
@@ -400,11 +400,11 @@ const AdminPayments = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.transactionReference')}</label>
-                  <input type="text" value={form.transactionReference} onChange={e => setForm({...form, transactionReference: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder="TXN-12345" />
+                  <input type="text" value={form.transactionReference} onChange={e => setForm({...form, transactionReference: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder={t('finance.transactionReference')} />
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.paymentChannel')}</label>
-                  <input type="text" value={form.paymentChannel} onChange={e => setForm({...form, paymentChannel: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder="e.g., Bank Transfer" />
+                  <input type="text" value={form.paymentChannel} onChange={e => setForm({...form, paymentChannel: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder={t('finance.paymentChannel')} />
                 </div>
               </div>
 
@@ -412,14 +412,14 @@ const AdminPayments = () => {
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.verificationStatus')}</label>
                   <select value={form.verificationStatus} onChange={e => setForm({...form, verificationStatus: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
-                    <option value="verified">{t('common.verified') || 'Verified'}</option>
+                    <option value="verified">{t('common.verified')}</option>
                     <option value="pending">{t('finance.pending')}</option>
-                    <option value="rejected">{t('finance.rejected') || 'Rejected'}</option>
+                    <option value="rejected">{t('finance.rejected')}</option>
                   </select>
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">{t('finance.remarks')}</label>
-                  <input type="text" value={form.remarks} onChange={e => setForm({...form, remarks: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder="Optional notes" />
+                  <input type="text" value={form.remarks} onChange={e => setForm({...form, remarks: e.target.value})} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder={t('finance.remarks')} />
                 </div>
               </div>
             </div>

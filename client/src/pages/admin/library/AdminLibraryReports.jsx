@@ -48,7 +48,7 @@ const LibraryReports = () => {
   const categoryBreakdown = useMemo(() => {
     const map = {};
     books.forEach(b => {
-      const cat = b.category?.name || 'Uncategorized';
+      const cat = b.category?.name || t('common.uncategorized') || 'Uncategorized';
       if (!map[cat]) map[cat] = { count: 0, stock: 0 };
       map[cat].count++;
       map[cat].stock += b.stock || 0;
@@ -130,7 +130,7 @@ const LibraryReports = () => {
                   <tr key={item._id} className="border-b border-slate-50 hover:bg-slate-50">
                     <td className="py-2.5 text-slate-700">{item.book?.title || '-'}</td>
                     <td className="py-2.5 text-slate-600">{item.borrower ? `${item.borrower.firstName || ''} ${item.borrower.lastName || ''}`.trim() || '-' : '-'}</td>
-                    <td className="py-2.5"><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${item.status === 'returned' ? 'bg-emerald-100 text-emerald-700' : item.status === 'borrowed' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'}`}>{item.status || '-'}</span></td>
+                    <td className="py-2.5"><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${item.status === 'returned' ? 'bg-emerald-100 text-emerald-700' : item.status === 'borrowed' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'}`}>{t('common.' + item.status) || item.status || '-'}</span></td>
                   </tr>
                 ))}
               </tbody>
@@ -153,7 +153,7 @@ const LibraryReports = () => {
                     <td className="py-2.5 text-slate-700">{item.book?.title || '-'}</td>
                     <td className="py-2.5 text-slate-600">{item.supplierName || '-'}</td>
                     <td className="py-2.5 text-slate-600">{item.quantity || '-'}</td>
-                    <td className="py-2.5 text-slate-600">{item.totalPrice ? `Rs. ${item.totalPrice}` : '-'}</td>
+                    <td className="py-2.5 text-slate-600">{item.totalPrice ? `${t('common.currencyRs') || 'Rs.'} ${item.totalPrice}` : '-'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -174,7 +174,7 @@ const LibraryReports = () => {
                     <td className="py-2.5 text-slate-700">{item.book?.title || '-'}</td>
                     <td className="py-2.5 text-slate-600">{item.student?.firstName ? `${item.student.firstName} ${item.student.lastName || ''}` : item.buyerName || '-'}</td>
                     <td className="py-2.5 text-slate-600">{item.quantity || '-'}</td>
-                    <td className="py-2.5 text-slate-600">{item.totalAmount ? `Rs. ${item.totalAmount}` : '-'}</td>
+                    <td className="py-2.5 text-slate-600">{item.totalAmount ? `${t('common.currencyRs') || 'Rs.'} ${item.totalAmount}` : '-'}</td>
                   </tr>
                 ))}
               </tbody>

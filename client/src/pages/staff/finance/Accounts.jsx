@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiCheckCircle, FiCreditCard, FiDollarSign, FiPieChart, FiSlash } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupCountByKey } from '../shared/StaffAnalyticsContent';
 import { staffApi } from '../../../api/staffApi';
@@ -39,6 +40,7 @@ export const accountsConfig = {
 };
 
 const Accounts = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [analytics, setAnalytics] = useState({ loading: true, stats: [], charts: [], insight: null });
 
   useEffect(() => {
@@ -56,25 +58,25 @@ const Accounts = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: 'Total Accounts', value: accounts.length, helper: 'All finance accounts in the ledger', tone: 'blue', icon: FiCreditCard },
-            { label: 'Active Accounts', value: activeCount, helper: 'Ready for transaction use', tone: 'emerald', icon: FiCheckCircle },
-            { label: 'Inactive Accounts', value: inactiveCount, helper: 'Currently unavailable or retired', tone: 'rose', icon: FiSlash },
-            { label: 'Total Balance', value: formatCurrency(totalBalance), helper: `Avg ${formatCurrency(averageBalance)} per account`, tone: 'violet', icon: FiDollarSign },
-            { label: 'Account Types', value: groupCountByKey(accounts, 'accountType').length, helper: 'Cash and petty cash mix', tone: 'amber', icon: FiPieChart }
+            { label: t('staff.finance.accounts.statTotalAccounts'), value: accounts.length, helper: t('staff.finance.accounts.statTotalAccountsHelper'), tone: 'blue', icon: FiCreditCard },
+            { label: t('staff.finance.accounts.statActiveAccounts'), value: activeCount, helper: t('staff.finance.accounts.statActiveAccountsHelper'), tone: 'emerald', icon: FiCheckCircle },
+            { label: t('staff.finance.accounts.statInactiveAccounts'), value: inactiveCount, helper: t('staff.finance.accounts.statInactiveAccountsHelper'), tone: 'rose', icon: FiSlash },
+            { label: t('staff.finance.accounts.statTotalBalance'), value: formatCurrency(totalBalance), helper: t('staff.finance.accounts.statTotalBalanceHelper', { avg: formatCurrency(averageBalance) }), tone: 'violet', icon: FiDollarSign },
+            { label: t('staff.finance.accounts.statAccountTypes'), value: groupCountByKey(accounts, 'accountType').length, helper: t('staff.finance.accounts.statAccountTypesHelper'), tone: 'amber', icon: FiPieChart }
           ],
           charts: [
-            { title: 'Account Type Distribution', type: 'pie', data: groupCountByKey(accounts, 'accountType') },
-            { title: 'Account Status Distribution', type: 'bar', data: groupCountByKey(accounts, 'status') }
+            { title: t('staff.finance.accounts.chartAccountTypeDistribution'), type: 'pie', data: groupCountByKey(accounts, 'accountType') },
+            { title: t('staff.finance.accounts.chartAccountStatusDistribution'), type: 'bar', data: groupCountByKey(accounts, 'status') }
           ],
           insight: {
-            eyebrow: 'Balance Coverage',
-            title: 'Account monitoring now reflects the live schema',
-            description: 'Balances, account states, and account types are summarized above the table so the staff panel matches the richer student-side dashboard experience.'
+            eyebrow: t('staff.finance.accounts.insightEyebrow'),
+            title: t('staff.finance.accounts.insightTitle'),
+            description: t('staff.finance.accounts.insightDescription')
           }
         });
       } catch (error) {
         if (!active) return;
-        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: 'Account analytics could not be loaded', description: error.message || 'The account table is still available below.' } });
+        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('staff.finance.accounts.errorTitle'), description: error.message || t('staff.finance.accounts.errorDescription') } });
       }
     };
 
@@ -86,7 +88,7 @@ const Accounts = () => {
 
   return (
     <ListPage
-      eyebrow="Finance"
+      eyebrow={t('staff.finance.eyebrow')}
       title={accountsConfig.title}
       subtitle={accountsConfig.subtitle}
       endpoint={accountsConfig.endpoint}
@@ -94,7 +96,7 @@ const Accounts = () => {
       createPath="/staff/finance/accounts/create"
       editPathForRow={(row) => `/staff/finance/accounts/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/accounts/view/${row._id}`}
-      searchPlaceholder="Search accounts..."
+      searchPlaceholder={t('staff.finance.accounts.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

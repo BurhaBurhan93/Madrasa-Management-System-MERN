@@ -26,7 +26,7 @@ const AdminComplaints = () => {
   const [page, setPage] = useState(1);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
-  const categories = ['all', 'Academic', 'Discipline', 'Facilities', 'Hostel', 'Kitchen', 'Finance', 'Library', 'Other'];
+  const categories = ['all', 'catAcademic', 'catDiscipline', 'catFacilities', 'catHostel', 'catKitchen', 'catFinance', 'catLibrary', 'catOther'];
 
   useEffect(() => { const lang = readStoredLanguage('adminLang', 'en'); if (i18n.language !== lang) i18n.changeLanguage(lang); }, []);
 
@@ -64,7 +64,7 @@ const AdminComplaints = () => {
   if (loading) return <div className="flex items-center justify-center h-64"><LoadingSpinner size="lg" /></div>;
 
   const columns = [
-    { key: 'complaintCode', label: t('common.id'), render: (val, row) => <span className="text-xs font-medium text-slate-500">#{val || row._id?.slice(-6)}</span> },
+    { key: 'complaintCode', label: t('common.id'), render: (val, row) => <span className="text-xs font-medium text-slate-500">{t('common.hash')}{val || row._id?.slice(-6)}</span> },
     { key: 'subject', label: t('complaints.complaintTitle'), render: (val) => <span className="font-medium text-slate-800">{val || '-'}</span> },
     { key: 'category', label: t('common.category'), render: (val) => <Badge color="gray">{val || t('complaints.other')}</Badge> },
     { key: 'submittedBy', label: t('complaints.complaintStudent'), render: (val) => <span className="text-slate-600">{val?.name || '-'}</span> },
@@ -136,7 +136,7 @@ const AdminComplaints = () => {
           <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 shadow-sm">
             <option value="all">{t('complaints.allCategories')}</option>
             {categories.filter(c => c !== 'all').map(cat => (
-              <option key={cat} value={cat.toLowerCase()}>{t('complaints.' + cat.toLowerCase())}</option>
+              <option key={cat} value={cat.replace('cat', '').toLowerCase()}>{t('complaints.' + cat)}</option>
             ))}
           </select>
         </div>

@@ -103,14 +103,14 @@ const AdminAcademicSettings = () => {
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('settings.termStructure')}</h2>
-          <Field label={t('settings.termStructure')} name="termStructure" type="select" options={[{ value: 'semester', label: 'Semester' }, { value: 'trimester', label: 'Trimester' }, { value: 'quarter', label: 'Quarter' }]} />
+          <Field label={t('settings.termStructure')} name="termStructure" type="select" options={[{ value: 'semester', label: t('settings.semester') }, { value: 'trimester', label: t('settings.trimester') }, { value: 'quarter', label: t('settings.quarter') }]} />
           <Field label={t('settings.termsPerYear')} name="termsPerYear" type="number" />
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('settings.gradingPolicy')}</h2>
           <Field label={t('settings.enableGradingPolicy')} name="enableGrading" type="checkbox" />
-          <Field label={t('settings.gradingSystem')} name="gradingSystem" type="select" options={[{ value: 'letter', label: 'Letter (A, B, C, D, F)' }, { value: 'percentage', label: 'Percentage' }, { value: 'gpa', label: 'GPA (4.0 Scale)' }]} />
+          <Field label={t('settings.gradingSystem')} name="gradingSystem" type="select" options={[{ value: 'letter', label: t('settings.gradingLetter') }, { value: 'percentage', label: t('settings.gradingPercentage') }, { value: 'gpa', label: t('settings.gradingGpa') }]} />
           <Field label={t('settings.passPercentage')} name="passPercentage" type="number" />
           {settings?.gradingSystem === 'gpa' && <Field label={t('settings.maxGradePoints')} name="maxGradePoints" type="number" step="0.1" />}
         </div>

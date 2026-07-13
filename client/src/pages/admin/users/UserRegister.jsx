@@ -110,7 +110,7 @@ const UserRegister = () => {
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.name')} *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.name')} <span className="text-red-500">*</span></label>
                 <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder={t('users.fullName')} />
               </div>
               <div>
@@ -126,15 +126,15 @@ const UserRegister = () => {
             {/* Account Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.email')} *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.email')} <span className="text-red-500">*</span></label>
                 <input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.password')} *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.password')} <span className="text-red-500">*</span></label>
                 <input type="password" required value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.role')} *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.role')} <span className="text-red-500">*</span></label>
                 <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                   <option value="student">{t('users.student')}</option>
                   <option value="teacher">{t('users.teacher')}</option>

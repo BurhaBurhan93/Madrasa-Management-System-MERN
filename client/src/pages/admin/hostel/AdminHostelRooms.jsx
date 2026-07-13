@@ -229,7 +229,7 @@ const AdminHostelRooms = () => {
             value={search}
             onChange={e => setSearch(e.target.value)}
             onKeyDown={handleSearchKeyDown}
-            placeholder={commonT('search') + '...'}
+            placeholder={commonT('search')}
             className="w-full rounded-lg border border-slate-300 py-2 pl-10 pr-4 text-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-100"
           />
         </div>
@@ -353,12 +353,15 @@ const AdminHostelRooms = () => {
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700">{t('hostel.amenities')}</label>
             <div className="flex flex-wrap gap-2">
-              {AMENITY_OPTIONS.map(a => (
+              {AMENITY_OPTIONS.map(a => {
+                const amenityLabels = { wifi: t('hostel.amenityWifi'), ac: t('hostel.amenityAc'), fan: t('hostel.amenityFan'), study_table: t('hostel.amenityStudyTable'), chair: t('hostel.amenityChair'), wardrobe: t('hostel.amenityWardrobe'), attached_bathroom: t('hostel.amenityAttachedBathroom'), tv: t('hostel.amenityTv'), refrigerator: t('hostel.amenityRefrigerator') };
+                return (
                 <label key={a} className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${form.amenities.includes(a) ? 'border-cyan-400 bg-cyan-50 text-cyan-700' : 'border-slate-200 text-slate-600 hover:border-slate-300'}`}>
                   <input type="checkbox" checked={form.amenities.includes(a)} onChange={() => toggleAmenity(a)} className="sr-only" />
-                  {a.replace(/_/g, ' ')}
+                  {amenityLabels[a] || a.replace(/_/g, ' ')}
                 </label>
-              ))}
+                );
+              })}
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-2">

@@ -48,7 +48,7 @@ const TeacherAttendanceReports = () => {
   const getCount = (statuses, status) => statuses?.find(item => item.status === status)?.count || 0;
 
   const chartData = summary.map(row => ({
-    name: row.user?.name?.split(' ')[0] || t('teacher.teacherAttendanceReports.messages.na', 'N/A'),
+    name: row.user?.name?.split(' ')[0] || t('teacher.teacherAttendanceReports.messages.na'),
     present: getCount(row.statuses, 'present'),
     absent: getCount(row.statuses, 'absent'),
     late: getCount(row.statuses, 'late'),
@@ -65,70 +65,70 @@ const TeacherAttendanceReports = () => {
   const rate = totalSessions > 0 ? Math.round((totals.present / totalSessions) * 100) : 0;
 
   const statCards = [
-    { label: t('teacher.teacherAttendanceReports.stats.totalSessions', 'Total Sessions'), value: totalSessions, accent: 'bg-cyan-500' },
-    { label: t('teacher.teacherAttendanceReports.stats.present', 'Present'), value: totals.present, accent: 'bg-emerald-500' },
-    { label: t('teacher.teacherAttendanceReports.stats.absent', 'Absent'), value: totals.absent, accent: 'bg-rose-500' },
-    { label: t('teacher.teacherAttendanceReports.stats.attendanceRate', 'Attendance Rate'), value: `${rate}%`, accent: 'bg-violet-500' },
+    { label: t('teacher.teacherAttendanceReports.stats.totalSessions'), value: totalSessions, accent: 'bg-cyan-500' },
+    { label: t('teacher.teacherAttendanceReports.stats.present'), value: totals.present, accent: 'bg-emerald-500' },
+    { label: t('teacher.teacherAttendanceReports.stats.absent'), value: totals.absent, accent: 'bg-rose-500' },
+    { label: t('teacher.teacherAttendanceReports.stats.attendanceRate'), value: `${rate}%`, accent: 'bg-violet-500' },
   ];
 
   const months = [
-    t('teacher.teacherAttendanceReports.months.jan', 'Jan'),
-    t('teacher.teacherAttendanceReports.months.feb', 'Feb'),
-    t('teacher.teacherAttendanceReports.months.mar', 'Mar'),
-    t('teacher.teacherAttendanceReports.months.apr', 'Apr'),
-    t('teacher.teacherAttendanceReports.months.may', 'May'),
-    t('teacher.teacherAttendanceReports.months.jun', 'Jun'),
-    t('teacher.teacherAttendanceReports.months.jul', 'Jul'),
-    t('teacher.teacherAttendanceReports.months.aug', 'Aug'),
-    t('teacher.teacherAttendanceReports.months.sep', 'Sep'),
-    t('teacher.teacherAttendanceReports.months.oct', 'Oct'),
-    t('teacher.teacherAttendanceReports.months.nov', 'Nov'),
-    t('teacher.teacherAttendanceReports.months.dec', 'Dec'),
+    t('teacher.teacherAttendanceReports.months.jan'),
+    t('teacher.teacherAttendanceReports.months.feb'),
+    t('teacher.teacherAttendanceReports.months.mar'),
+    t('teacher.teacherAttendanceReports.months.apr'),
+    t('teacher.teacherAttendanceReports.months.may'),
+    t('teacher.teacherAttendanceReports.months.jun'),
+    t('teacher.teacherAttendanceReports.months.jul'),
+    t('teacher.teacherAttendanceReports.months.aug'),
+    t('teacher.teacherAttendanceReports.months.sep'),
+    t('teacher.teacherAttendanceReports.months.oct'),
+    t('teacher.teacherAttendanceReports.months.nov'),
+    t('teacher.teacherAttendanceReports.months.dec'),
   ];
 
   const periodSubtitle = useMemo(() => {
-    if (filters.period === 'daily') return t('teacher.teacherAttendanceReports.periods.daily', 'Daily attendance analytics for your classes');
-    if (filters.period === 'weekly') return t('teacher.teacherAttendanceReports.periods.weekly', 'Weekly attendance analytics for your classes');
-    return t('teacher.teacherAttendanceReports.periods.monthly', 'Monthly attendance analytics for your classes');
+    if (filters.period === 'daily') return t('teacher.teacherAttendanceReports.periods.daily');
+    if (filters.period === 'weekly') return t('teacher.teacherAttendanceReports.periods.weekly');
+    return t('teacher.teacherAttendanceReports.periods.monthly');
   }, [filters.period, t]);
 
   return (
     <div className={PANEL_PAGE_BG}>
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.teacherAttendanceReports.title', 'Attendance Reports')}</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.teacherAttendanceReports.title')}</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{periodSubtitle}</p>
         </div>
 
         <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           <div className="flex flex-wrap items-end gap-4">
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.class', 'Class')}</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.class')}</label>
               <select value={filters.classId} onChange={e => setFilters(current => ({ ...current, classId: e.target.value }))} className={fieldCls}>
-                <option value="">{t('teacher.teacherAttendanceReports.filters.allClasses', 'All Classes')}</option>
+                <option value="">{t('teacher.teacherAttendanceReports.filters.allClasses')}</option>
                 {classes.map(c => <option key={c._id} value={c._id}>{c.name} {c.section}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.period', 'Period')}</label>
+              <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.period')}</label>
               <select value={filters.period} onChange={e => setFilters(current => ({ ...current, period: e.target.value }))} className={fieldCls}>
-                <option value="daily">{t('teacher.teacherAttendanceReports.periods.daily', 'Daily')}</option>
-                <option value="weekly">{t('teacher.teacherAttendanceReports.periods.weekly', 'Weekly')}</option>
-                <option value="monthly">{t('teacher.teacherAttendanceReports.periods.monthly', 'Monthly')}</option>
+                <option value="daily">{t('teacher.teacherAttendanceReports.periods.daily')}</option>
+                <option value="weekly">{t('teacher.teacherAttendanceReports.periods.weekly')}</option>
+                <option value="monthly">{t('teacher.teacherAttendanceReports.periods.monthly')}</option>
               </select>
             </div>
 
             {filters.period === 'daily' && (
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.date', 'Date')}</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.date')}</label>
                 <input type="date" value={filters.date} onChange={e => setFilters(current => ({ ...current, date: e.target.value }))} className={fieldCls} />
               </div>
             )}
 
             {filters.period === 'weekly' && (
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.week', 'Week')}</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.week')}</label>
                 <input type="week" value={filters.week} onChange={e => setFilters(current => ({ ...current, week: e.target.value }))} className={fieldCls} />
               </div>
             )}
@@ -136,14 +136,14 @@ const TeacherAttendanceReports = () => {
             {filters.period === 'monthly' && (
               <>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.month', 'Month')}</label>
+                  <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.month')}</label>
                   <select value={filters.month} onChange={e => setFilters(current => ({ ...current, month: e.target.value }))} className={fieldCls}>
-                    <option value="">{t('teacher.teacherAttendanceReports.filters.selectMonth', 'Select month')}</option>
+                    <option value="">{t('teacher.teacherAttendanceReports.filters.selectMonth')}</option>
                     {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.year', 'Year')}</label>
+                  <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.filters.year')}</label>
                   <input type="number" value={filters.year || ''} onChange={e => setFilters(current => ({ ...current, year: e.target.value }))} className={`${fieldCls} w-24`} />
                 </div>
               </>
@@ -163,30 +163,30 @@ const TeacherAttendanceReports = () => {
 
         {chartData.length > 0 && (
           <div className="mb-6 rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
-            <BarChartComponent data={chartData} dataKey="present" nameKey="name" title={t('teacher.teacherAttendanceReports.chartTitle', 'Student Attendance Overview')} height={300} color="#0EA5E9" />
+            <BarChartComponent data={chartData} dataKey="present" nameKey="name" title={t('teacher.teacherAttendanceReports.chartTitle')} height={300} color="#0EA5E9" />
           </div>
         )}
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
           {loading ? (
-            <div className="flex h-32 items-center justify-center text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.messages.loading', 'Loading...')}</div>
+            <div className="flex h-32 items-center justify-center text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.messages.loading')}</div>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50 dark:border-slate-700/50 dark:bg-slate-800/80">
-                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{t('teacher.teacherAttendanceReports.table.student', 'Student')}</th>
-                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{t('teacher.teacherAttendanceReports.table.code', 'Code')}</th>
-                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-emerald-600">{t('teacher.teacherAttendanceReports.table.present', 'Present')}</th>
-                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-rose-600">{t('teacher.teacherAttendanceReports.table.absent', 'Absent')}</th>
-                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-amber-600">{t('teacher.teacherAttendanceReports.table.late', 'Late')}</th>
-                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-600">{t('teacher.teacherAttendanceReports.table.excused', 'Excused')}</th>
-                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{t('teacher.teacherAttendanceReports.table.rate', 'Rate')}</th>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{t('teacher.teacherAttendanceReports.table.student')}</th>
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{t('teacher.teacherAttendanceReports.table.code')}</th>
+                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-emerald-600">{t('teacher.teacherAttendanceReports.table.present')}</th>
+                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-rose-600">{t('teacher.teacherAttendanceReports.table.absent')}</th>
+                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-amber-600">{t('teacher.teacherAttendanceReports.table.late')}</th>
+                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-600">{t('teacher.teacherAttendanceReports.table.excused')}</th>
+                  <th className="p-4 text-center text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-300">{t('teacher.teacherAttendanceReports.table.rate')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
                 {summary.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-8 text-center text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.messages.noData', 'No attendance data for the selected period')}</td>
+                    <td colSpan="7" className="p-8 text-center text-slate-500 dark:text-slate-400">{t('teacher.teacherAttendanceReports.messages.noData')}</td>
                   </tr>
                 ) : (
                   summary.map(row => {

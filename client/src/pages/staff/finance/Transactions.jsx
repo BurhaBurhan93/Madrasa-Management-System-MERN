@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiActivity, FiAlertCircle, FiDollarSign, FiTrendingDown, FiTrendingUp } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupAmountByMonth, groupCountByKey } from '../shared/StaffAnalyticsContent';
 import { staffApi } from '../../../api/staffApi';
@@ -48,6 +49,7 @@ export const transactionsConfig = {
 };
 
 const Transactions = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [analytics, setAnalytics] = useState({ loading: true, stats: [], charts: [], insight: null });
 
   useEffect(() => {
@@ -70,21 +72,21 @@ const Transactions = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: 'Total Transactions', value: transactions.length, helper: 'All recorded inflow and outflow entries', tone: 'blue', icon: FiActivity },
-            { label: 'Total Income', value: formatCurrency(totalIncome), helper: 'Verified and pending income combined', tone: 'emerald', icon: FiTrendingUp },
-            { label: 'Total Expenses', value: formatCurrency(totalExpenses), helper: 'Tracked outgoing cash movement', tone: 'rose', icon: FiTrendingDown },
-            { label: 'Net Balance', value: formatCurrency(netBalance), helper: netBalance >= 0 ? 'Operating above expense level' : 'Expenses are ahead of income', tone: 'violet', icon: FiDollarSign },
-            { label: 'Verification Queue', value: pendingCount, helper: 'Transactions waiting for review', tone: 'amber', icon: FiAlertCircle }
+            { label: t('staff.finance.transactions.statTotalTransactions'), value: transactions.length, helper: t('staff.finance.transactions.statTotalTransactionsHelper'), tone: 'blue', icon: FiActivity },
+            { label: t('staff.finance.transactions.statTotalIncome'), value: formatCurrency(totalIncome), helper: t('staff.finance.transactions.statTotalIncomeHelper'), tone: 'emerald', icon: FiTrendingUp },
+            { label: t('staff.finance.transactions.statTotalExpenses'), value: formatCurrency(totalExpenses), helper: t('staff.finance.transactions.statTotalExpensesHelper'), tone: 'rose', icon: FiTrendingDown },
+            { label: t('staff.finance.transactions.statNetBalance'), value: formatCurrency(netBalance), helper: netBalance >= 0 ? t('staff.finance.transactions.statNetBalancePositive') : t('staff.finance.transactions.statNetBalanceNegative'), tone: 'violet', icon: FiDollarSign },
+            { label: t('staff.finance.transactions.statVerificationQueue'), value: pendingCount, helper: t('staff.finance.transactions.statVerificationQueueHelper'), tone: 'amber', icon: FiAlertCircle }
           ],
           charts: [
-            { title: 'Income Vs Expense Mix', type: 'pie', data: typeMix },
-            { title: 'Verification Status Breakdown', type: 'bar', data: groupCountByKey(transactions, 'verificationStatus') },
-            { title: 'Monthly Transaction Volume', type: 'line', data: monthlyFlow }
+            { title: t('staff.finance.transactions.chartIncomeVsExpenseMix'), type: 'pie', data: typeMix },
+            { title: t('staff.finance.transactions.chartVerificationStatusBreakdown'), type: 'bar', data: groupCountByKey(transactions, 'verificationStatus') },
+            { title: t('staff.finance.transactions.chartMonthlyTransactionVolume'), type: 'line', data: monthlyFlow }
           ],
           insight: {
-            eyebrow: 'Reconciliation',
-            title: 'Finance activity is summarized directly from transaction records',
-            description: 'This view now surfaces schema-backed totals for income, expenses, monthly movement, and approval workload before the table so staff can act faster.'
+            eyebrow: t('staff.finance.transactions.insightEyebrow'),
+            title: t('staff.finance.transactions.insightTitle'),
+            description: t('staff.finance.transactions.insightDescription')
           }
         });
       } catch (error) {
@@ -94,9 +96,9 @@ const Transactions = () => {
           stats: [],
           charts: [],
           insight: {
-            eyebrow: 'Analytics Unavailable',
-            title: 'Transaction analytics could not be loaded',
-            description: error.message || 'The transactions table is still available below.'
+            eyebrow: t('staff.finance.transactions.insightEyebrowUnavailable'),
+            title: t('staff.finance.transactions.errorTitle'),
+            description: error.message || t('staff.finance.transactions.errorDescription')
           }
         });
       }
@@ -110,7 +112,7 @@ const Transactions = () => {
 
   return (
     <ListPage
-      eyebrow="Finance"
+      eyebrow={t('staff.finance.eyebrow')}
       title={transactionsConfig.title}
       subtitle={transactionsConfig.subtitle}
       endpoint={transactionsConfig.endpoint}
@@ -118,7 +120,7 @@ const Transactions = () => {
       createPath="/staff/finance/transactions/create"
       editPathForRow={(row) => `/staff/finance/transactions/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/transactions/view/${row._id}`}
-      searchPlaceholder="Search transactions..."
+      searchPlaceholder={t('staff.finance.transactions.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

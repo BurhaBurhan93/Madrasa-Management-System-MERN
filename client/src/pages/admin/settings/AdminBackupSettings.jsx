@@ -142,15 +142,15 @@ const AdminBackupSettings = () => {
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('settings.backupSchedule')}</h2>
           <Field label={t('settings.enableAutoBackup')} name="enableAutoBackup" type="checkbox" />
-          <Field label={t('settings.backupFrequency')} name="backupFrequency" type="select" options={[{ value: 'hourly', label: 'Hourly' }, { value: 'daily', label: 'Daily' }, { value: 'weekly', label: 'Weekly' }, { value: 'monthly', label: 'Monthly' }]} />
+          <Field label={t('settings.backupFrequency')} name="backupFrequency" type="select" options={[{ value: 'hourly', label: t('common.hourly') }, { value: 'daily', label: t('common.daily') }, { value: 'weekly', label: t('common.weekly') }, { value: 'monthly', label: t('common.monthly') }]} />
           <Field label={t('settings.backupTime')} name="backupTime" type="time" />
-          <Field label={t('settings.backupDay')} name="backupDay" type="select" options={[{ value: 'sunday', label: 'Sunday' }, { value: 'monday', label: 'Monday' }, { value: 'tuesday', label: 'Tuesday' }, { value: 'wednesday', label: 'Wednesday' }, { value: 'thursday', label: 'Thursday' }, { value: 'friday', label: 'Friday' }, { value: 'saturday', label: 'Saturday' }]} />
+          <Field label={t('settings.backupDay')} name="backupDay" type="select" options={[{ value: 'sunday', label: t('common.sunday') }, { value: 'monday', label: t('common.monday') }, { value: 'tuesday', label: t('common.tuesday') }, { value: 'wednesday', label: t('common.wednesday') }, { value: 'thursday', label: t('common.thursday') }, { value: 'friday', label: t('common.friday') }, { value: 'saturday', label: t('common.saturday') }]} />
           <Field label={t('settings.retentionDays')} name="retentionDays" type="number" />
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-slate-800">{t('settings.storageLocation')}</h2>
-          <Field label={t('settings.storageType')} name="storageType" type="select" options={[{ value: 'local', label: 'Local Server' }, { value: 's3', label: 'Amazon S3' }, { value: 'gcs', label: 'Google Cloud Storage' }, { value: 'azure', label: 'Azure Blob' }]} />
+          <Field label={t('settings.storageType')} name="storageType" type="select" options={[{ value: 'local', label: t('settings.storageLocal') }, { value: 's3', label: t('settings.storageS3') }, { value: 'gcs', label: t('settings.storageGcs') }, { value: 'azure', label: t('settings.storageAzure') }]} />
           <Field label={t('settings.storagePath')} name="storagePath" />
           {settings?.storageType !== 'local' && (
             <>
@@ -196,7 +196,7 @@ const AdminBackupSettings = () => {
               {backups.map((b, i) => (
                 <div key={b.id || i} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg text-sm">
                   <div className="truncate flex-1">
-                    <p className="font-medium text-slate-700 truncate">{b.filename || b.action || `Backup #${i + 1}`}</p>
+                    <p className="font-medium text-slate-700 truncate">{b.filename || b.action || `${t('settings.backupLabel')} #${i + 1}`}</p>
                     <p className="text-xs text-slate-400">{b.size ? `${b.size} — ` : ''}{b.createdAt ? new Date(b.createdAt).toLocaleDateString() : ''}</p>
                   </div>
                   <button onClick={handleRestore} disabled={restoring} className="text-cyan-600 hover:text-cyan-800 ml-2" title={t('settings.restore')}>

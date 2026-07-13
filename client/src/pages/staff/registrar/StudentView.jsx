@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import RecordViewPage from '../shared/RecordViewPage';
 import { studentProfilesConfig } from './StudentProfiles';
@@ -17,17 +18,17 @@ const mapRowToView = (row) => ({
 });
 
 const StudentView = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  
-  // Prepare view fields from studentProfilesConfig.formFields, adding custom render for image
+
   const viewFields = studentProfilesConfig.formFields.map(field => ({
     name: field.name,
-    label: field.label,
-    renderView: field.name === 'image' 
+    label: t(`staff.registrar.studentProfiles.fields.${field.name}`),
+    renderView: field.name === 'image'
       ? (value, item) => {
           const imgSrc = value || item?.user?.image;
-          return imgSrc 
-            ? <img src={imgSrc} alt="Profile" className="h-24 w-24 rounded-lg object-cover border border-slate-200" />
+          return imgSrc
+            ? <img src={imgSrc} alt={t('staff.registrar.studentProfiles.view.profileAlt')} className="h-24 w-24 rounded-lg object-cover border border-slate-200" />
             : '-';
         }
       : undefined
@@ -35,7 +36,7 @@ const StudentView = () => {
 
   return (
     <RecordViewPage
-      title="Student Profile"
+      title={t('staff.registrar.studentProfiles.view.title')}
       endpoint={studentProfilesConfig.endpoint}
       id={id}
       fields={viewFields}

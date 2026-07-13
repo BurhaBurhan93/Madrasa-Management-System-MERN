@@ -103,9 +103,9 @@ const AdminKitchenWaste = () => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.itemName')}</label><input value={form.itemName} onChange={e => setForm({ ...form, itemName: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('library.quantity')}</label><input type="number" min="0" step="0.01" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" required /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.unit')}</label><select value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"><option value="kg">kg</option><option value="g">g</option><option value="liter">liter</option><option value="piece">piece</option></select></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.unit')}</label><select value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"><option value="kg">{t('kitchen.unitKg')}</option><option value="g">{t('kitchen.unitG')}</option><option value="liter">{t('kitchen.unitLiter')}</option><option value="piece">{t('kitchen.unitPiece')}</option></select></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.date')}</label><CalendarDatePicker value={form.wasteDate} onChange={(date) => setForm({ ...form, wasteDate: date })} required /></div>
-            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.reason')}</label><select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">{REASONS.map(r => <option key={r} value={r}>{t(`kitchen.${r}`) || r}</option>)}</select></div>
+            <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.reason')}</label><select value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">{REASONS.map(r => <option key={r} value={r}>{t(`kitchen.${r}`) || r || t('common.na')}</option>)}</select></div>
             <div><label className="mb-1 block text-sm font-medium text-slate-700">{t('kitchen.remarks')}</label><input value={form.remarks} onChange={e => setForm({ ...form, remarks: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></div>
           </div>
           <button type="submit" className="mt-4 rounded-lg bg-cyan-600 px-6 py-2 text-sm font-medium text-white hover:bg-cyan-700">{editingId ? t('common.update') : t('common.create')}</button>
@@ -141,7 +141,7 @@ const AdminKitchenWaste = () => {
                   <h3 className="font-semibold text-slate-900 truncate">{item.itemName}</h3>
                   <p className="text-xs text-slate-400">{item.wasteDate ? new Date(item.wasteDate).toLocaleDateString() : '-'}</p>
                 </div>
-                <span className="shrink-0 inline-block rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">{t(`kitchen.${item.reason}`) || item.reason}</span>
+                <span className="shrink-0 inline-block rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">{t(`kitchen.${item.reason}`) || item.reason || t('common.na')}</span>
               </div>
               <div className="space-y-1.5 text-sm mb-3">
                 <div className="flex justify-between gap-2"><span className="text-slate-500">{t('library.quantity')}:</span><span className="font-medium text-slate-900">{item.quantity} {item.unit}</span></div>
@@ -173,7 +173,7 @@ const AdminKitchenWaste = () => {
                     <td className="px-5 py-3 text-slate-600 whitespace-nowrap">{item.wasteDate ? new Date(item.wasteDate).toLocaleDateString() : '-'}</td>
                     <td className="px-5 py-3 font-medium text-slate-800 truncate max-w-[160px]" title={item.itemName}>{item.itemName}</td>
                     <td className="px-5 py-3 text-slate-600">{item.quantity} {item.unit}</td>
-                    <td className="px-5 py-3"><span className="inline-block rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">{t(`kitchen.${item.reason}`) || item.reason}</span></td>
+                    <td className="px-5 py-3"><span className="inline-block rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">{t(`kitchen.${item.reason}`) || item.reason || t('common.na')}</span></td>
                     <td className="px-5 py-3"><div className="flex gap-1">
                       <button onClick={() => handleEdit(item)} className="rounded-lg bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100">{t('common.edit')}</button>
                       <button onClick={() => setDeleteTarget(item._id)} className="rounded-lg bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700 hover:bg-rose-100">{t('common.delete')}</button>

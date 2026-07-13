@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -7,6 +8,7 @@ import Card from '../../components/UIHelper/Card';
 import { PieChartComponent, BarChartComponent } from '../../components/UIHelper/ECharts';
 
 const StaffStudents = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -49,20 +51,20 @@ const StaffStudents = () => {
   const handleExport = () => {
     const doc = new jsPDF({ orientation: 'landscape' });
     doc.setFontSize(18);
-    doc.text('Student List', 14, 20);
+    doc.text(t('staff.students.pdfTitle'), 14, 20);
     doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
+    doc.text(t('staff.students.pdfGenerated', { date: new Date().toLocaleDateString() }), 14, 28);
     const tableData = filteredStudents.map(s => [
       s.name || '', s.studentId || '', s.class || '', s.email || '', s.status || ''
     ]);
     autoTable(doc, {
       startY: 34,
-      head: [['Name', 'Student ID', 'Class', 'Email', 'Status']],
+      head: [[t('staff.students.pdfName'), t('staff.students.pdfStudentId'), t('staff.students.pdfClass'), t('staff.students.pdfEmail'), t('staff.students.pdfStatus')]],
       body: tableData,
       styles: { fontSize: 8 },
       headStyles: { fillColor: [14, 165, 233] },
     });
-    doc.save('students_export.pdf');
+    doc.save(t('staff.students.pdfFileName'));
   };
 
   const filteredStudents = students.filter(student => {
@@ -89,8 +91,8 @@ const StaffStudents = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Student Management</h2>
-          <p className="text-gray-500 mt-1">View and manage student information</p>
+          <h2 className="text-2xl font-bold text-gray-800">{t('staff.students.title')}</h2>
+          <p className="text-gray-500 mt-1">{t('staff.students.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <button 
@@ -98,14 +100,14 @@ const StaffStudents = () => {
             className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-shadow flex items-center gap-2"
           >
             <FiRefreshCw size={16} />
-            Refresh
+            {t('staff.students.refresh')}
           </button>
           <button
             onClick={handleExport}
             className="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-md transition-shadow flex items-center gap-2"
           >
             <FiDownload size={16} />
-            Export List
+            {t('staff.students.exportList')}
           </button>
         </div>
       </div>
@@ -113,34 +115,34 @@ const StaffStudents = () => {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <p className="text-gray-500 text-sm">Total Students</p>
+          <p className="text-gray-500 text-sm">{t('staff.students.totalStudents')}</p>
           <p className="text-2xl font-bold text-gray-800">{students.length}</p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <p className="text-gray-500 text-sm">Active Students</p>
+          <p className="text-gray-500 text-sm">{t('staff.students.activeStudents')}</p>
           <p className="text-2xl font-bold text-green-600">
             {students.filter(s => s.status === 'active').length}
           </p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <p className="text-gray-500 text-sm">Inactive Students</p>
+          <p className="text-gray-500 text-sm">{t('staff.students.inactiveStudents')}</p>
           <p className="text-2xl font-bold text-red-600">
             {students.filter(s => s.status === 'inactive').length}
           </p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <p className="text-gray-500 text-sm">Classes</p>
+          <p className="text-gray-500 text-sm">{t('staff.students.classes')}</p>
           <p className="text-2xl font-bold text-blue-600">{classes.length - 1}</p>
         </div>
       </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card title="Student Status Distribution">
+        <Card title={t('staff.students.studentStatusDistribution')}>
           <PieChartComponent 
             data={[
-              { name: 'Active', value: students.filter(s => s.status === 'active').length, color: '#10B981' },
-              { name: 'Inactive', value: students.filter(s => s.status === 'inactive').length, color: '#EF4444' }
+              { name: t('staff.students.active'), value: students.filter(s => s.status === 'active').length, color: '#10B981' },
+              { name: t('staff.students.inactive'), value: students.filter(s => s.status === 'inactive').length, color: '#EF4444' }
             ].filter(d => d.value > 0)}
             dataKey="value"
             nameKey="name"
@@ -148,10 +150,10 @@ const StaffStudents = () => {
           />
         </Card>
 
-        <Card title="Students by Class">
+        <Card title={t('staff.students.studentsByClass')}>
           <BarChartComponent 
             data={classes.filter(c => c !== 'all').map(cls => ({
-              name: `Class ${cls}`,
+              name: t('staff.students.classWithNumber', { classNumber: cls }),
               value: students.filter(s => s.class === cls).length
             }))}
             dataKey="value"
@@ -167,7 +169,7 @@ const StaffStudents = () => {
           <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search by name or ID..."
+            placeholder={t('staff.students.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500"
@@ -180,7 +182,7 @@ const StaffStudents = () => {
         >
           {classes.map(cls => (
             <option key={cls} value={cls}>
-              {cls === 'all' ? 'All Classes' : `Class ${cls}`}
+              {cls === 'all' ? t('staff.students.allClasses') : t('staff.students.classWithNumber', { classNumber: cls })}
             </option>
           ))}
         </select>
@@ -192,11 +194,11 @@ const StaffStudents = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Student</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Class</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Contact</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('staff.students.student')}</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('staff.students.class')}</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('staff.students.contact')}</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('staff.students.status')}</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('staff.students.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -215,13 +217,13 @@ const StaffStudents = () => {
                   </td>
                   <td className="px-6 py-4">
                     <span className="px-3 py-1 bg-sky-100 text-sky-700 rounded-lg text-sm font-medium">
-                      {student.class || 'N/A'}
+                      {student.class || t('common.notAvailable')}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm">
                       <p className="flex items-center gap-1 text-gray-600">
-                        <FiMail size={14} /> {student.email || 'N/A'}
+                        <FiMail size={14} /> {student.email || t('common.notAvailable')}
                       </p>
                     </div>
                   </td>
@@ -231,7 +233,7 @@ const StaffStudents = () => {
                         ? 'bg-green-100 text-green-700' 
                         : 'bg-red-100 text-red-700'
                     }`}>
-                      {student.status}
+                      {t(`common.${student.status}`, { defaultValue: student.status })}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -246,7 +248,7 @@ const StaffStudents = () => {
               )) : (
                 <tr>
                   <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
-                    No students found
+                    {t('staff.students.noStudentsFound')}
                   </td>
                 </tr>
               )}
@@ -255,7 +257,7 @@ const StaffStudents = () => {
         </div>
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Rows per page:</span>
+            <span className="text-sm text-gray-500">{t('staff.students.rowsPerPage')}</span>
             <select
               value={rowsPerPage}
               onChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(0); }}
@@ -267,8 +269,8 @@ const StaffStudents = () => {
             </select>
             <span className="text-sm text-gray-500 ml-2">
               {filteredStudents.length > 0
-                ? `${page * rowsPerPage + 1}-${Math.min((page + 1) * rowsPerPage, filteredStudents.length)} of ${filteredStudents.length}`
-                : '0 of 0'}
+                ? t('staff.students.paginationInfo', { start: page * rowsPerPage + 1, end: Math.min((page + 1) * rowsPerPage, filteredStudents.length), total: filteredStudents.length })
+                : t('staff.students.paginationEmpty')}
             </span>
           </div>
           <div className="flex items-center gap-1">
@@ -277,14 +279,14 @@ const StaffStudents = () => {
               disabled={page === 0}
               className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              First
+              {t('staff.students.first')}
             </button>
             <button
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0}
               className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Prev
+              {t('staff.students.prev')}
             </button>
             {Array.from({ length: totalPages }, (_, i) => (
               <button
@@ -304,14 +306,14 @@ const StaffStudents = () => {
               disabled={page >= totalPages - 1}
               className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Next
+              {t('staff.students.next')}
             </button>
             <button
               onClick={() => setPage(totalPages - 1)}
               disabled={page >= totalPages - 1}
               className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Last
+              {t('staff.students.last')}
             </button>
           </div>
         </div>
@@ -322,7 +324,7 @@ const StaffStudents = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-900">Student Details</h3>
+              <h3 className="text-xl font-bold text-gray-900">{t('staff.students.studentDetails')}</h3>
               <button 
                 onClick={() => setShowDetailModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -343,42 +345,42 @@ const StaffStudents = () => {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">Class</p>
-                  <p className="font-medium text-gray-900">{selectedStudent.student?.class || 'N/A'}</p>
+                  <p className="text-sm text-gray-500">{t('staff.students.class')}</p>
+                  <p className="font-medium text-gray-900">{selectedStudent.student?.class || t('common.notAvailable')}</p>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">Status</p>
+                  <p className="text-sm text-gray-500">{t('staff.students.status')}</p>
                   <span className={`px-2 py-1 rounded text-sm font-medium ${
                     selectedStudent.student?.status === 'active' 
                       ? 'bg-green-100 text-green-700' 
                       : 'bg-red-100 text-red-700'
                   }`}>
-                    {selectedStudent.student?.status}
+                    {t(`common.${selectedStudent.student?.status}`, { defaultValue: selectedStudent.student?.status })}
                   </span>
                 </div>
               </div>
 
               <div>
-                <h5 className="font-semibold text-gray-900 mb-2">Contact Information</h5>
+                <h5 className="font-semibold text-gray-900 mb-2">{t('staff.students.contactInformation')}</h5>
                 <div className="space-y-2">
                   <p className="flex items-center gap-2 text-gray-600">
-                    <FiMail size={16} /> {selectedStudent.student?.email || 'N/A'}
+                    <FiMail size={16} /> {selectedStudent.student?.email || t('common.notAvailable')}
                   </p>
                   <p className="flex items-center gap-2 text-gray-600">
-                    <FiPhone size={16} /> {selectedStudent.student?.phone || 'N/A'}
+                    <FiPhone size={16} /> {selectedStudent.student?.phone || t('common.notAvailable')}
                   </p>
                 </div>
               </div>
 
               {selectedStudent.borrowedBooks && selectedStudent.borrowedBooks.length > 0 && (
                 <div>
-                  <h5 className="font-semibold text-gray-900 mb-2">Borrowed Books</h5>
+                  <h5 className="font-semibold text-gray-900 mb-2">{t('staff.students.borrowedBooks')}</h5>
                   <div className="space-y-2">
                     {selectedStudent.borrowedBooks.map((book, index) => (
                       <div key={index} className="flex items-center gap-2 bg-sky-50 p-2 rounded-lg">
                         <FiBook size={16} className="text-sky-600" />
                         <span className="text-sm">{book.bookTitle}</span>
-                        <span className="text-xs text-gray-500">(Due: {new Date(book.dueDate).toLocaleDateString()})</span>
+                        <span className="text-xs text-gray-500">({t('staff.students.due')}: {new Date(book.dueDate).toLocaleDateString()})</span>
                       </div>
                     ))}
                   </div>
@@ -390,7 +392,7 @@ const StaffStudents = () => {
                 onClick={() => setShowDetailModal(false)}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Close
+                {t('staff.students.close')}
               </button>
             </div>
           </div>

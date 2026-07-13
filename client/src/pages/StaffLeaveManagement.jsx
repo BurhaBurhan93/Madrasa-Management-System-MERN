@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ErrorPage from '../components/UIHelper/ErrorPage';
@@ -13,6 +14,7 @@ import { PieChartComponent, BarChartComponent } from '../components/UIHelper/ECh
 import CalendarDatePicker from "../components/UIHelper/CalendarDatePicker";
 
 const StaffLeaveManagement = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [leaveRequests, setLeaveRequests] = useState([]);
@@ -129,7 +131,7 @@ const StaffLeaveManagement = () => {
       fetchData();
     } catch (err) {
       console.error('Error saving leave request:', err);
-      alert('Failed to save leave request. Please try again.');
+      alert(t('staff.leaveManagement.saveError'));
     }
   };
 
@@ -147,14 +149,14 @@ const StaffLeaveManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this leave request?')) {
+    if (window.confirm(t('staff.leaveManagement.deleteConfirm'))) {
       try {
         const config = getConfig();
         await axios.delete(`http://localhost:5000/api/hr/leaves/${id}`, config);
         fetchData();
       } catch (err) {
         console.error('Error deleting leave request:', err);
-        alert('Failed to delete leave request. Please try again.');
+        alert(t('staff.leaveManagement.deleteError'));
       }
     }
   };
@@ -166,12 +168,12 @@ const StaffLeaveManagement = () => {
       fetchData();
     } catch (err) {
       console.error('Error approving leave request:', err);
-      alert('Failed to approve leave request. Please try again.');
+      alert(t('staff.leaveManagement.approveError'));
     }
   };
 
   const handleReject = async (id) => {
-    const reason = prompt('Enter rejection reason:');
+    const reason = prompt(t('staff.leaveManagement.rejectionReason'));
     if (reason) {
       try {
         const config = getConfig();
@@ -179,7 +181,7 @@ const StaffLeaveManagement = () => {
         fetchData();
       } catch (err) {
         console.error('Error rejecting leave request:', err);
-        alert('Failed to reject leave request. Please try again.');
+        alert(t('staff.leaveManagement.rejectError'));
       }
     }
   };
@@ -187,11 +189,11 @@ const StaffLeaveManagement = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'approved':
-        return <Badge variant="success">Approved</Badge>;
+        return <Badge variant="success">{t('staff.leaveManagement.approved')}</Badge>;
       case 'pending':
-        return <Badge variant="warning">Pending</Badge>;
+        return <Badge variant="warning">{t('staff.leaveManagement.pending')}</Badge>;
       case 'rejected':
-        return <Badge variant="danger">Rejected</Badge>;
+        return <Badge variant="danger">{t('staff.leaveManagement.rejected')}</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -202,9 +204,9 @@ const StaffLeaveManagement = () => {
     : leaveRequests.filter(req => req.status === filterStatus);
 
   const statusDistribution = [
-    { name: 'Pending', value: stats.pending, color: '#F59E0B' },
-    { name: 'Approved', value: stats.approved, color: '#10B981' },
-    { name: 'Rejected', value: stats.rejected, color: '#EF4444' }
+    { name: t('staff.leaveManagement.pending'), value: stats.pending, color: '#F59E0B' },
+    { name: t('staff.leaveManagement.approved'), value: stats.approved, color: '#10B981' },
+    { name: t('staff.leaveManagement.rejected'), value: stats.rejected, color: '#EF4444' }
   ].filter(s => s.value > 0);
 
   const leaveTypeData = leaveTypes.map(type => ({
@@ -216,14 +218,14 @@ const StaffLeaveManagement = () => {
     <div className="w-full min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Staff Leave Management</h1>
-        <p className="text-gray-600 mt-1">Manage employee leave requests and approvals</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t('staff.leaveManagement.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('staff.leaveManagement.subtitle')}</p>
       </div>
 
       {error && !loading && (
         <ErrorPage 
           type="generic" 
-          title="Leave Management Unavailable"
+          title={t('staff.leaveManagement.leaveManagementUnavailable')}
           message={error}
           onRetry={fetchData}
           onHome={() => navigate('/staff/dashboard')}
@@ -234,7 +236,7 @@ const StaffLeaveManagement = () => {
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading leave data...</p>
+          <p className="mt-4 text-gray-600">{t('staff.leaveManagement.loadingLeaveData')}</p>
         </div>
       ) : (
       <>
@@ -243,7 +245,7 @@ const StaffLeaveManagement = () => {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Requests</p>
+              <p className="text-sm text-gray-600">{t('staff.leaveManagement.totalRequests')}</p>
               <p className="text-2xl font-bold text-blue-600">{stats.totalRequests}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-full"><FiCalendar className="w-6 h-6 text-blue-600" /></div>
@@ -252,7 +254,7 @@ const StaffLeaveManagement = () => {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pending</p>
+              <p className="text-sm text-gray-600">{t('staff.leaveManagement.pending')}</p>
               <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
             </div>
             <div className="p-3 bg-yellow-100 rounded-full"><FiClock className="w-6 h-6 text-yellow-600" /></div>
@@ -261,7 +263,7 @@ const StaffLeaveManagement = () => {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Approved</p>
+              <p className="text-sm text-gray-600">{t('staff.leaveManagement.approved')}</p>
               <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-full"><FiCheckCircle className="w-6 h-6 text-green-600" /></div>
@@ -270,7 +272,7 @@ const StaffLeaveManagement = () => {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Rejected</p>
+              <p className="text-sm text-gray-600">{t('staff.leaveManagement.rejected')}</p>
               <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
             </div>
             <div className="p-3 bg-red-100 rounded-full"><FiXCircle className="w-6 h-6 text-red-600" /></div>
@@ -279,7 +281,7 @@ const StaffLeaveManagement = () => {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Days</p>
+              <p className="text-sm text-gray-600">{t('staff.leaveManagement.totalDays')}</p>
               <p className="text-2xl font-bold text-purple-600">{stats.totalDays}</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-full"><FiCalendar className="w-6 h-6 text-purple-600" /></div>
@@ -289,7 +291,7 @@ const StaffLeaveManagement = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card title="Leave Status Distribution">
+        <Card title={t('staff.leaveManagement.leaveStatusDistribution')}>
           {statusDistribution.length > 0 ? (
             <PieChartComponent 
               data={statusDistribution}
@@ -298,10 +300,10 @@ const StaffLeaveManagement = () => {
               height={250}
             />
           ) : (
-            <p className="text-center py-8 text-gray-500">No data available</p>
+            <p className="text-center py-8 text-gray-500">{t('staff.leaveManagement.noDataAvailable')}</p>
           )}
         </Card>
-        <Card title="Leave by Type">
+        <Card title={t('staff.leaveManagement.leaveByType')}>
           {leaveTypeData.length > 0 ? (
             <BarChartComponent 
               data={leaveTypeData}
@@ -310,7 +312,7 @@ const StaffLeaveManagement = () => {
               height={250}
             />
           ) : (
-            <p className="text-center py-8 text-gray-500">No data available</p>
+            <p className="text-center py-8 text-gray-500">{t('staff.leaveManagement.noDataAvailable')}</p>
           )}
         </Card>
       </div>
@@ -322,52 +324,52 @@ const StaffLeaveManagement = () => {
             variant={filterStatus === 'all' ? 'primary' : 'outline'} 
             onClick={() => setFilterStatus('all')}
           >
-            All
+            {t('staff.leaveManagement.all')}
           </Button>
           <Button 
             variant={filterStatus === 'pending' ? 'primary' : 'outline'} 
             onClick={() => setFilterStatus('pending')}
           >
-            Pending
+            {t('staff.leaveManagement.pending')}
           </Button>
           <Button 
             variant={filterStatus === 'approved' ? 'primary' : 'outline'} 
             onClick={() => setFilterStatus('approved')}
           >
-            Approved
+            {t('staff.leaveManagement.approved')}
           </Button>
           <Button 
             variant={filterStatus === 'rejected' ? 'primary' : 'outline'} 
             onClick={() => setFilterStatus('rejected')}
           >
-            Rejected
+            {t('staff.leaveManagement.rejected')}
           </Button>
         </div>
         <Button onClick={() => setShowModal(true)}>
-          <FiPlus className="mr-2" /> Add Leave Request
+          <FiPlus className="mr-2" /> {t('staff.leaveManagement.addLeaveRequest')}
         </Button>
       </div>
 
       {/* Leave Requests Table */}
-      <Card title="Leave Requests">
+        <Card title={t('staff.leaveManagement.leaveRequests')}>
         {filteredRequests.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiCalendar className="w-10 h-10 text-gray-400" />
             </div>
-            <p className="text-gray-500">No leave requests found.</p>
+            <p className="text-gray-500">{t('staff.leaveManagement.noLeaveRequestsFound')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Leave Type</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duration</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('staff.leaveManagement.employee')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('staff.leaveManagement.leaveType')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('staff.leaveManagement.duration')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('staff.leaveManagement.reason')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('staff.leaveManagement.status')}</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('staff.leaveManagement.actions')}</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -383,8 +385,8 @@ const StaffLeaveManagement = () => {
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-900">{leave.leaveType?.name}</td>
                     <td className="px-4 py-4 text-sm text-gray-500">
-                      <div>{new Date(leave.startDate).toLocaleDateString()} - {new Date(leave.endDate).toLocaleDateString()}</div>
-                      <div className="text-xs">{leave.leaveDays} days</div>
+                      <div>{new Date(leave.startDate).toLocaleDateString()}{t('staff.leaveManagement.dateSeparator')}{new Date(leave.endDate).toLocaleDateString()}</div>
+                      <div className="text-xs">{leave.leaveDays} {t('staff.leaveManagement.days')}</div>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600 max-w-xs truncate" title={leave.leaveReason}>
                       {leave.leaveReason}
@@ -397,14 +399,14 @@ const StaffLeaveManagement = () => {
                             <button 
                               onClick={() => handleApprove(leave._id)}
                               className="text-green-600 hover:text-green-900 p-1 hover:bg-green-50 rounded"
-                              title="Approve"
+                              title={t('staff.leaveManagement.approve')}
                             >
                               <FiCheckCircle size={18} />
                             </button>
                             <button 
                               onClick={() => handleReject(leave._id)}
                               className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"
-                              title="Reject"
+                              title={t('staff.leaveManagement.reject')}
                             >
                               <FiXCircle size={18} />
                             </button>
@@ -413,14 +415,14 @@ const StaffLeaveManagement = () => {
                         <button 
                           onClick={() => handleEdit(leave)}
                           className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
-                          title="Edit"
+                              title={t('staff.leaveManagement.edit')}
                         >
                           <FiEdit2 size={18} />
                         </button>
                         <button 
                           onClick={() => handleDelete(leave._id)}
                           className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"
-                          title="Delete"
+                              title={t('staff.leaveManagement.delete')}
                         >
                           <FiTrash2 size={18} />
                         </button>
@@ -442,55 +444,55 @@ const StaffLeaveManagement = () => {
           setEditingId(null);
           setFormData({ employee: '', leaveType: '', leaveReason: '', startDate: '', endDate: '', leaveDays: 0 });
         }}
-        title={editingId ? 'Edit Leave Request' : 'Add Leave Request'}
+        title={editingId ? t('staff.leaveManagement.editLeaveRequest') : t('staff.leaveManagement.addLeaveRequest')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Select
-            label="Employee"
+            label={t('staff.leaveManagement.employee')}
             name="employee"
             value={formData.employee}
             onChange={handleInputChange}
             options={[
-              { value: '', label: 'Select Employee' },
+              { value: '', label: t('staff.leaveManagement.selectEmployee') },
               ...employees.map(emp => ({ value: emp._id, label: emp.name }))
             ]}
             required
           />
           <Select
-            label="Leave Type"
+            label={t('staff.leaveManagement.leaveType')}
             name="leaveType"
             value={formData.leaveType}
             onChange={handleInputChange}
             options={[
-              { value: '', label: 'Select Leave Type' },
-              ...leaveTypes.map(lt => ({ value: lt._id, label: `${lt.name} (${lt.daysAllowed} days)` }))
+              { value: '', label: t('staff.leaveManagement.selectLeaveType') },
+              ...leaveTypes.map(lt => ({ value: lt._id, label: `${lt.name} (${lt.daysAllowed} ${t('staff.leaveManagement.days')})` }))
             ]}
             required
           />
           <div className="grid grid-cols-2 gap-4">
-            <CalendarDatePicker value={formData.startDate} name="startDate" onChange={handleInputChange} placeholder="Select date" />
-            <CalendarDatePicker value={formData.endDate} name="endDate" onChange={handleInputChange} placeholder="Select date" />
+            <CalendarDatePicker value={formData.startDate} name="startDate" onChange={handleInputChange} placeholder={t('staff.leaveManagement.selectDate')} />
+            <CalendarDatePicker value={formData.endDate} name="endDate" onChange={handleInputChange} placeholder={t('staff.leaveManagement.selectDate')} />
           </div>
           {formData.startDate && formData.endDate && (
             <div className="text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded">
-              Total Days: {calculateLeaveDays(formData.startDate, formData.endDate)}
+              {t('staff.leaveManagement.totalDaysLabel')}: {calculateLeaveDays(formData.startDate, formData.endDate)}
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('staff.leaveManagement.reason')}</label>
             <textarea
               name="leaveReason"
               value={formData.leaveReason}
               onChange={handleInputChange}
               rows="3"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter reason for leave..."
+              placeholder={t('staff.leaveManagement.enterReason')}
               required
             />
           </div>
           <div className="flex space-x-4 pt-4">
             <Button type="submit">
-              {editingId ? 'Update Request' : 'Submit Request'}
+              {editingId ? t('staff.leaveManagement.updateRequest') : t('staff.leaveManagement.submitRequest')}
             </Button>
             <Button 
               variant="outline" 
@@ -500,7 +502,7 @@ const StaffLeaveManagement = () => {
                 setFormData({ employee: '', leaveType: '', leaveReason: '', startDate: '', endDate: '', leaveDays: 0 });
               }}
             >
-              Cancel
+              {t('staff.leaveManagement.cancel')}
             </Button>
           </div>
         </form>

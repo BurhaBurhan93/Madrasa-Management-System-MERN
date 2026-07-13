@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { FiPlus, FiSearch, FiFilter, FiDownload, FiEdit, FiEye, FiTrash2 } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import { Table, Button, Card, Input, Select, Badge, Modal, Loading } from '../components/UIHelper';
-import { localizeAdminText } from '../lib/adminLocalization';
-import { readStoredLanguage } from '../lib/languageStorage';
 
 const BasicPageTemplate = ({
   title,
@@ -20,9 +19,9 @@ const BasicPageTemplate = ({
   pageSize = 10,
   showActions = true,
   onRowClick,
-  emptyMessage = 'No records found',
+  emptyMessage,
 }) => {
-  const adminLang = readStoredLanguage('adminLang', 'en');
+  const { t } = useTranslation('admin');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -73,7 +72,7 @@ const BasicPageTemplate = ({
     ...columns,
     {
       key: 'actions',
-      label: localizeAdminText('Actions', adminLang),
+      label: t('users.actions'),
       render: (_, row) => (
         <div className="flex gap-2">
           {onView && (
@@ -83,7 +82,7 @@ const BasicPageTemplate = ({
               onClick={() => onView(row)}
               icon={<FiEye size={14} />}
             >
-              {localizeAdminText('View Details', adminLang)}
+              {t('common.viewDetails')}
             </Button>
           )}
           {onEdit && (
@@ -93,7 +92,7 @@ const BasicPageTemplate = ({
               onClick={() => onEdit(row)}
               icon={<FiEdit size={14} />}
             >
-              {localizeAdminText('Edit', adminLang)}
+              {t('users.edit')}
             </Button>
           )}
           {onDelete && (
@@ -104,7 +103,7 @@ const BasicPageTemplate = ({
               onClick={() => handleDelete(row)}
               icon={<FiTrash2 size={14} />}
             >
-              {localizeAdminText('Delete', adminLang)}
+              {t('users.delete')}
             </Button>
           )}
         </div>
@@ -118,15 +117,15 @@ const BasicPageTemplate = ({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">{localizeAdminText(title, adminLang)}</h1>
-          <p className="text-slate-600">{localizeAdminText(description, adminLang)}</p>
+          <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
+          <p className="text-slate-600">{description}</p>
         </div>
         {onCreate && (
           <Button
             onClick={onCreate}
             icon={<FiPlus size={18} />}
           >
-            {localizeAdminText('Add New', adminLang)}
+            {t('common.addNew')}
           </Button>
         )}
       </div>
@@ -135,7 +134,7 @@ const BasicPageTemplate = ({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className={filters.length > 0 ? "md:col-span-2" : "md:col-span-4"}>
             <Input
-              placeholder={localizeAdminText(`Search ${String(title).toLowerCase()}...`, adminLang)}
+              placeholder={t('common.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               icon={<FiSearch />}
@@ -148,7 +147,7 @@ const BasicPageTemplate = ({
               value={activeFilters[filter.key] || ''}
               onChange={(e) => setActiveFilters(prev => ({ ...prev, [filter.key]: e.target.value }))}
               options={[
-                { value: '', label: localizeAdminText(`All ${filter.label}`, adminLang) },
+                { value: '', label: t('users.allFilter', { filter: filter.label }) },
                 ...filter.options
               ]}
             />
@@ -157,17 +156,17 @@ const BasicPageTemplate = ({
 
         <div className="flex justify-between items-center mb-4">
           <div className="text-sm text-slate-600">
-            Showing {filteredData.length} of {data.length} records
+            {t('users.showingRecords', { count: filteredData.length, total: data.length })}
           </div>
           <div className="flex gap-2">
             {filters.length > 0 && (
               <Button variant="outline" onClick={() => setActiveFilters({})} icon={<FiFilter size={16} />}>
-                {Object.keys(activeFilters).some(k => activeFilters[k]) ? 'Clear Filters' : localizeAdminText('Filter By', adminLang)}
+                {Object.keys(activeFilters).some(k => activeFilters[k]) ? t('users.clearFilters') : t('users.filterBy')}
               </Button>
             )}
             {exportData && (
               <Button variant="outline" onClick={exportCSV} icon={<FiDownload size={16} />}>
-                {localizeAdminText('Export', adminLang)}
+                {t('common.export')}
               </Button>
             )}
           </div>
@@ -184,15 +183,15 @@ const BasicPageTemplate = ({
         ) : (
           <div className="text-center py-12">
             <div className="text-4xl mb-4">📭</div>
-            <h3 className="text-lg font-semibold text-slate-700 mb-2">{localizeAdminText(emptyMessage, adminLang)}</h3>
-            <p className="text-slate-500">{localizeAdminText('Try changing the search terms, switching the filter column, or create the first record for this module.', adminLang)}</p>
+            <h3 className="text-lg font-semibold text-slate-700 mb-2">{emptyMessage || t('common.noData')}</h3>
+            <p className="text-slate-500">{t('users.filterSuggestion')}</p>
             {onCreate && (
               <Button
                 onClick={onCreate}
                 className="mt-4"
                 icon={<FiPlus size={18} />}
               >
-                {localizeAdminText('Create Record', adminLang)}
+                {t('common.createRecord')}
               </Button>
             )}
           </div>
@@ -202,19 +201,19 @@ const BasicPageTemplate = ({
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title={localizeAdminText('Confirm Delete', adminLang)}
+        title={t('users.confirmDelete')}
         size="sm"
       >
         <div className="space-y-4">
           <p className="text-slate-700">
-            {localizeAdminText('Are you sure you want to delete this record?', adminLang)} This action cannot be undone.
+            {t('users.cannotUndo')}
           </p>
           <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
-              {localizeAdminText('Cancel', adminLang)}
+              {t('users.cancel')}
             </Button>
             <Button color="red" onClick={confirmDelete}>
-              {localizeAdminText('Delete', adminLang)}
+              {t('users.delete')}
             </Button>
           </div>
         </div>

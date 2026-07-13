@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { PANEL_PAGE_BG } from '../../Constatns/pageStyles';
 
@@ -23,6 +24,7 @@ const MOCK = [
 ];
 
 const TeacherGradingSchemes = () => {
+  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -55,14 +57,14 @@ const TeacherGradingSchemes = () => {
     <div className={PANEL_PAGE_BG}>
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Grading Schemes</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Grading criteria and grade boundaries</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('teacher.grading.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('teacher.grading.subtitle')}</p>
         </div>
 
         {loading ? renderLoading() : schemes.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="mb-4 text-5xl">📊</div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No grading schemes found</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('teacher.grading.noSchemes')}</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -78,11 +80,11 @@ const TeacherGradingSchemes = () => {
                   <table className="w-full text-left text-sm">
                     <thead>
                       <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-700/50">
-                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">Grade</th>
-                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">Min Marks</th>
-                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">Max Marks</th>
-                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">GPA</th>
-                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">Remark</th>
+                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.grading.grade')}</th>
+                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.grading.minMarks')}</th>
+                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.grading.maxMarks')}</th>
+                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.grading.gpa')}</th>
+                        <th className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">{t('teacher.grading.remark')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -97,7 +99,7 @@ const TeacherGradingSchemes = () => {
                       ))}
                       {(!scheme.grades || scheme.grades.length === 0) && (
                         <tr>
-                          <td colSpan={5} className="px-4 py-6 text-center text-sm text-slate-400">No grade boundaries defined</td>
+                          <td colSpan={5} className="px-4 py-6 text-center text-sm text-slate-400">{t('teacher.grading.noBoundaries')}</td>
                         </tr>
                       )}
                     </tbody>

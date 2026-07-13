@@ -116,7 +116,7 @@ const StudentFees = () => {
 
     } catch (err) {
       console.error('Error fetching fee data:', err);
-      setError('Failed to fetch fee information. Please try again.');
+      setError(t('student.fees.fetchError'));
       const fallback = MOCK_PAYMENTS;
       setPayments(fallback);
       setFeeSummary({
@@ -134,9 +134,9 @@ const StudentFees = () => {
 
   const handlePrintReceipt = (payment) => {
     const data = encodeURIComponent(JSON.stringify({
-      studentName: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : 'Student',
-      className: 'Class 1',
-      rollNumber: '123',
+      studentName: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : t('student.fees.defaultStudentName'),
+      className: t('student.fees.defaultClassName'),
+      rollNumber: t('student.fees.defaultRollNumber'),
       feeAmount: payment.paidAmount,
       paidDate: payment.createdAt || payment.paymentDate,
       status: payment.paymentStatus,
@@ -152,8 +152,8 @@ const StudentFees = () => {
   };
 
   const chartData = [
-    { name: 'Paid', value: feeSummary.paidAmount, color: '#10B981' },
-    { name: 'Pending', value: feeSummary.pendingAmount, color: '#F59E0B' }
+    { name: t('common.paid'), value: feeSummary.paidAmount, color: '#10B981' },
+    { name: t('common.pending'), value: feeSummary.pendingAmount, color: '#F59E0B' }
   ].filter(item => item.value > 0);
 
   if (loading) {
@@ -167,7 +167,7 @@ const StudentFees = () => {
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('finance', { ns: 'student' })}</p>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('feesPayments', { ns: 'student' })}</h1>
-          <p className="text-slate-500 mt-1 font-medium italic">{t('feesSubtitle', 'Manage your financial obligations and payment history')}</p>
+          <p className="text-slate-500 mt-1 font-medium italic">{t('student.fees.subtitle')}</p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -175,18 +175,18 @@ const StudentFees = () => {
             className="flex items-center gap-2"
             onClick={() => {
               const data = encodeURIComponent(JSON.stringify({
-                studentName: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : 'Student',
-                className: 'Class 1',
-                rollNumber: '123',
+                studentName: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : t('student.fees.defaultStudentName'),
+                className: t('student.fees.defaultClassName'),
+                rollNumber: t('student.fees.defaultRollNumber'),
                 feeAmount: feeSummary.totalFees,
                 paidDate: feeSummary.lastPaymentDate,
-                status: feeSummary.pendingAmount === 0 ? 'Paid' : 'Partial',
+                status: feeSummary.pendingAmount === 0 ? t('student.fees.statusPaid') : t('student.fees.statusPartial'),
               }));
               navigate(`/student/print/fee-receipt/statement?data=${data}`);
             }}
           >
             <FiPrinter className="w-4 h-4" />
-            {t('printStatement', 'Print Statement')}
+            {t('student.fees.printStatement')}
           </Button>
           <div className={`h-12 px-6 rounded-2xl border flex items-center gap-3 ${
             feeSummary.pendingAmount === 0
@@ -195,7 +195,7 @@ const StudentFees = () => {
           }`}>
             <FiCheckCircle className="w-5 h-5" />
             <span className="text-sm font-black uppercase tracking-widest">
-              {feeSummary.pendingAmount === 0 ? t('accountClear', 'Account Clear') : t('paymentDue', 'Payment Due')}
+              {feeSummary.pendingAmount === 0 ? t('student.fees.accountClear') : t('student.fees.paymentDue')}
             </span>
           </div>
         </div>
@@ -210,12 +210,12 @@ const StudentFees = () => {
               <div className="w-10 h-10 rounded-xl bg-cyan-100 flex items-center justify-center">
                 <FiDollarSign className="w-5 h-5 text-cyan-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('totalFees', 'Total Fees')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('student.fees.totalFees')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">
               ${feeSummary.totalFees.toLocaleString()}
             </p>
-            <p className="text-sm text-slate-500 mt-1">{t('academicYearLabel', 'Academic Year 2024-25')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('student.fees.academicYearLabel')}</p>
           </div>
         </Card>
 
@@ -233,8 +233,8 @@ const StudentFees = () => {
             </p>
             <p className="text-sm text-slate-500 mt-1">
               {feeSummary.lastPaymentDate
-                ? `Last paid ${formatDate(feeSummary.lastPaymentDate)}`
-                : t('noPaymentsYet', 'No payments yet')}
+                ? t('student.fees.lastPaid', {date: formatDate(feeSummary.lastPaymentDate)})
+                : t('student.fees.noPaymentsYet')}
             </p>
           </div>
         </Card>
@@ -253,8 +253,8 @@ const StudentFees = () => {
             </p>
             <p className="text-sm text-slate-500 mt-1">
               {feeSummary.nextDueDate
-                ? `Due by ${formatDate(feeSummary.nextDueDate)}`
-                : t('noPendingPayments', 'No pending payments')}
+                ? t('student.fees.dueBy', {date: formatDate(feeSummary.nextDueDate)})
+                : t('student.fees.noPendingPayments')}
             </p>
           </div>
         </Card>
@@ -266,7 +266,7 @@ const StudentFees = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <FiTrendingUp className="w-5 h-5 text-purple-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('paymentProgress', 'Payment Progress')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('student.fees.paymentProgress')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">
               {feeSummary.totalFees > 0
@@ -287,7 +287,7 @@ const StudentFees = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Payment Distribution Chart */}
         <Card className="lg:col-span-1">
-          <h3 className="text-lg font-bold text-slate-900 mb-4">{t('paymentDistribution', 'Payment Distribution')}</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-4">{t('student.fees.paymentDistribution')}</h3>
           {chartData.length > 0 ? (
             <BarChartComponent
               data={chartData}
@@ -304,7 +304,7 @@ const StudentFees = () => {
         {/* Recent Payments */}
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-slate-900">{t('recentPayments', 'Recent Payments')}</h3>
+            <h3 className="text-lg font-bold text-slate-900">{t('student.fees.recentPayments')}</h3>
             <Button variant="outline" size="sm" onClick={() => navigate('/student/transactions')}>
               {t('view', { ns: 'common' })} <FiArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -325,7 +325,7 @@ const StudentFees = () => {
                     <FiCreditCard className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">{t('paymentNumber', 'Payment #')}{payment.receiptNo || index + 1}</p>
+                    <p className="font-bold text-slate-900">{t('student.fees.paymentNumber')}{payment.receiptNo || index + 1}</p>
                     <p className="text-sm text-slate-500">
                       {formatDate(payment.createdAt || payment.paymentDate)}
                     </p>
@@ -355,7 +355,7 @@ const StudentFees = () => {
             {payments.length === 0 && (
               <div className="text-center py-8 text-slate-400">
                 <FiActivity className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>{t('noPaymentsFound', 'No payments found')}</p>
+                <p>{t('student.fees.noPaymentsFound')}</p>
               </div>
             )}
           </div>
@@ -364,7 +364,7 @@ const StudentFees = () => {
 
       {/* Quick Actions */}
       <Card>
-        <h3 className="text-lg font-bold text-slate-900 mb-4">{t('quickActions', 'Quick Actions')}</h3>
+        <h3 className="text-lg font-bold text-slate-900 mb-4">{t('student.fees.quickActions')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button
             variant="outline"
@@ -376,8 +376,8 @@ const StudentFees = () => {
               <FiCreditCard className="w-5 h-5 text-cyan-600" />
             </div>
             <div className="text-left">
-              <p className="font-bold text-slate-900">{t('makePayment', 'Make Payment')}</p>
-              <p className="text-sm text-slate-500">{t('payPendingFees', 'Pay pending fees online')}</p>
+              <p className="font-bold text-slate-900">{t('student.fees.makePayment')}</p>
+              <p className="text-sm text-slate-500">{t('student.fees.payPendingFees')}</p>
             </div>
           </Button>
 
@@ -390,8 +390,8 @@ const StudentFees = () => {
               <FiCalendar className="w-5 h-5 text-purple-600" />
             </div>
             <div className="text-left">
-              <p className="font-bold text-slate-900">{t('feeStructure', 'Fee Structure')}</p>
-              <p className="text-sm text-slate-500">{t('viewFeeBreakdown', 'View detailed fee breakdown')}</p>
+              <p className="font-bold text-slate-900">{t('student.fees.feeStructure')}</p>
+              <p className="text-sm text-slate-500">{t('student.fees.viewFeeBreakdown')}</p>
             </div>
           </Button>
 
@@ -404,8 +404,8 @@ const StudentFees = () => {
               <FiDownload className="w-5 h-5 text-emerald-600" />
             </div>
             <div className="text-left">
-              <p className="font-bold text-slate-900">{t('downloadStatement', 'Download Statement')}</p>
-              <p className="text-sm text-slate-500">{t('completePaymentHistory', 'Get complete payment history')}</p>
+              <p className="font-bold text-slate-900">{t('student.fees.downloadStatement')}</p>
+              <p className="text-sm text-slate-500">{t('student.fees.completePaymentHistory')}</p>
             </div>
           </Button>
         </div>
