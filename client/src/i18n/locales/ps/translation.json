@@ -139,7 +139,7 @@
     "active": "فعال",
     "inactive": "غیر فعال",
     "completed": "مکمل شوی",
-    "pending": "د انتظار",
+    "pending": "په تمه",
     "overdue": "تیر شوی",
     "submitted": "سپارل شوی",
     "approved": "منل شوی",
@@ -195,6 +195,7 @@
     "code": "کوډ",
     "viewDetails": "تفصیلات کتل",
     "student": "زده کونکی",
+    "currency": "$",
     "email": "بریښنالیک",
     "phone": "تلیفون",
     "gender": "جنس",
@@ -249,7 +250,53 @@
     "sep": "سپتمبر",
     "uncategorized": "غیر طبقه بندي",
     "logo": "لوګو",
-    "currentPageCapture": "د اوسني پاڼې نیول"
+    "currentPageCapture": "د اوسني پاڼې نیول",
+    "password": "پټنوم",
+    "rememberMe": "ما په یاد وساته",
+    "signIn": "ننوتل",
+    "signingIn": "ننوځي...",
+    "allRightsReserved": "ټول حقوق خوندي دي.",
+    "selectRole": "رول غوره کړئ",
+    "enterEmail": "خپل بریښنالیک دننه کړئ",
+    "enterPassword": "خپل پټنوم دننه کړئ",
+    "invalidCredentials": "ناسم معلومات. مهرباني وکړئ بیا هڅه وکړئ.",
+    "usernameRequired": "کارن نوم اړین دی",
+    "passwordRequired": "پټنوم اړین دی",
+    "passwordMinLength": "پټنوم باید لږترلږه ۶ توري وي",
+    "adminLabel": "ادمین",
+    "teacherLabel": "استاد",
+    "studentLabel": "زده کونکی",
+    "staffLabel": "کارمند",
+    "supportStaff": "د ملاتړ کارمند",
+    "financeStaff": "د مالیې کارمند",
+    "registrarStaff": "د ثبت کارمند",
+    "hrStaff": "د بشري سرچینو کارمند",
+    "libraryStaff": "د کتابتون کارمند",
+    "kitchenStaff": "د پخلنځي کارمند",
+    "payrollStaff": "د معاشاتو کارمند",
+    "complaintsStaff": "د شکایاتو کارمند",
+    "inventoryStaff": "د موجودي کارمند",
+    "generalManagerStaff": "جنرال مدیر",
+    "backToHome": "بیرته",
+    "madrasaSubtitle": "د مدرسې مدیریت سیسټم",
+    "searching": "لټون...",
+    "serverError": "د سرور تېروتنه",
+    "correct": "سم",
+    "minutes": "دقیقې",
+    "daily": "ورځنی",
+    "weekly": "اوونیز",
+    "monthly": "میاشتنی",
+    "refresh": "تازه کول",
+    "year": "کال",
+    "remarks": "ملاحظات",
+    "category": "کټګوري",
+    "quantity": "تعداد",
+    "unit": "واحد",
+    "month": "میاشت",
+    "breakfast": "ناشته",
+    "lunch": "غرمه",
+    "dinner": "ماښام",
+    "unnamed": "بې نومه"
   },
   "student": {
     "console": "د زده کونکي کنسول",
@@ -260,6 +307,7 @@
     "overview": "کتنه",
     "operations": "عملیات",
     "dashboard": {
+      "label": "ډشبورډ",
       "defaultStudentName": "زده کونکی",
       "defaultStudentCode": "STU001",
       "defaultStatus": "فعال",
@@ -270,6 +318,7 @@
     "academic": "اکاډمیک",
     "myCourses": "زما کورسونه",
     "schedule": {
+      "label": "Schedule",
       "title": "د ټولګي مهال ویش",
       "subtitle": "ستاسو د اکاډمیک ژمنو مدیریت او کتل",
       "weekly": "اونیز",
@@ -300,6 +349,7 @@
       "offlineError": "د آفلاین معلوماتو کارول — API شتون نلري."
     },
     "attendance": {
+      "label": "Attendance",
       "overallRate": "ټوله کچه",
       "daysPresent": "حاضر ورځې",
       "daysAbsent": "غیر حاضر ورځې",
@@ -315,6 +365,7 @@
       "offlineError": "د آفلاین معلوماتو کارول — API شتون نلري."
     },
     "exams": {
+      "label": "Exams",
       "title": "ازمایښتونه",
       "subtitle": "راتلونکي ازمایښتونه تعقیب او خپل فعالیت وګورئ",
       "upcoming": "راتلونکی",
@@ -349,6 +400,7 @@
       "offlineError": "د آفلاین معلوماتو کارول — API شتون نلري."
     },
     "examResults": {
+      "label": "Exam Results",
       "academic": "تعلیمي",
       "title": "د ازمایښت پایلې",
       "subtitle": "د ښوونکو معلوماتو سره ستاسو ټول د ازمایښت پایلې وګورئ",
@@ -381,6 +433,7 @@
       "exam": "ازمایښت"
     },
     "timetable": {
+      "label": "Timetable",
       "totalClasses": "ټول ټولګي",
       "currentClass": "اوسنی ټولګی",
       "academicYearValue": "۲۰۲۳-۲۴",
@@ -419,6 +472,7 @@
     "myDegrees": "سندي پروګرامونه",
     "eduHistory": "د زده کړو تاریخ",
     "assignments": {
+      "label": "دندې",
       "statusSubmitted": "سپارل شوی",
       "statusPending": "د انتظار",
       "statusOverdue": "تیر شوی",
@@ -444,14 +498,17 @@
     "feesPayments": "فیسونه او تادیات",
     "transactionHistory": "د معاملو تاریخ",
     "hostel": {
+      "label": "هوټل",
       "standard": "معیاري"
     },
     "leave": {
-      "errorSubmittingLeaveWithMsg": "د رخصتۍ په سپارلو کې خطا: "
+      "label": "رخصتي",
+      "errorSubmittingLeaveWithMsg": "د رخصتۍ په سپارلو کې تېروتنه: "
     },
     "communications": "اړیکې",
     "messages": "پیغامونه",
     "complaints": {
+      "label": "شکایتونه",
       "support": "ملاتړ",
       "title": "مرسته او فیډبیک",
       "subtitle": "ستاسو غږ زموږ د موسسې په جوړولو کې مهم دی",
@@ -508,6 +565,7 @@
       "statusOpen": "خلاص"
     },
     "certificates": {
+      "label": "سندونه",
       "portfolioTitle": "د زده کونکي لاسته راوړنې پورټ فولیو",
       "shareMessage": "زما پورټ فولیو وګورئ چې {{certificates}} سندونه او {{achievements}} لاسته راوړنې لري!",
       "certificateTitle": "سند",
@@ -543,6 +601,7 @@
       "requestHardCopy": "چاپ شوې کاپي غوښتنه وکړئ"
     },
     "events": {
+      "label": "پیښې",
       "typePersonal": "شخصي",
       "typeExamination": "ازمایښت",
       "typeAssignment": "دنده",
@@ -561,6 +620,7 @@
       "defaultAssignmentDesc": "د سپارلو نیټه: {{title}}"
     },
     "profile": {
+      "label": "پروفایل",
       "personal": "شخصي",
       "title": "د زده کونکي پروفایل",
       "subtitle": "تایید شوي پیژندپاڼې او علمي اسناد",
@@ -865,6 +925,7 @@
   },
   "teacher": {
     "dashboard": {
+      "label": "ډشبورډ",
       "acrossAllClasses": "د ټولو ټولګیو په اوږدو کې",
       "activeClasses": "فعال ټولګي",
       "activeThisTerm": "په دې ترم کې فعال",
@@ -880,7 +941,8 @@
       "scheduledExamsSessions": "ټاکل شوې ازمایښت غونډې",
       "totalStudents": "ټول زده کونکي",
       "totalSubjects": "ټول مضامین",
-      "upcomingClasses": "راتلونکي ټولګي"
+      "upcomingClasses": "راتلونکي ټولګي",
+      "defaultTime": "ډیفالټ وخت"
     },
     "myClasses": "زما ټولګي",
     "classes": {
@@ -892,6 +954,7 @@
     "myStudents": "زما زده کونکي",
     "myCourses": "زما کورسونه",
     "attendance": {
+      "label": "حاضري",
       "absent": "غیر حاضر",
       "allAbsent": "ټول غیر حاضر",
       "allExcused": "ټول معاف",
@@ -932,6 +995,7 @@
     },
     "exams": "د ازمایښت مدیریت",
     "assignments": {
+      "label": "دندې",
       "active": "فعال",
       "allStatus": "ټول حالتونه",
       "allSubjects": "ټول مضامین",
@@ -960,6 +1024,7 @@
     "reports": "راپورونه",
     "markAttendance": "حاضري نښه کول",
     "createExam": {
+      "label": "ازمایښت جوړول",
       "editExam": "د ازمایښت سمول",
       "createExam": "نوی ازمایښت جوړول",
       "editSubtitle": "لاندې د ازمایښت تفصیلات تازه کړئ.",
@@ -979,6 +1044,7 @@
       "createAndAddQuestions": "جوړول او پوښتنې اضافه کول"
     },
     "createAssignment": {
+      "label": "دنده جوړول",
       "assignmentTitle": "د دندې سرلیک",
       "assignmentTitlePlaceholder": "د مثال په توګه د کور شپږم تمرین",
       "create": "جوړول",
@@ -1037,6 +1103,7 @@
     "class": "ټولګی",
     "section": "برخه",
     "announcements": {
+      "label": "اعلانیه‌ونه",
       "title": "اعلانیه‌ونه",
       "subtitle": "د ښوونځي اعلانیه او خبرتیاوې",
       "highPriority": "لوړ اولویت",
@@ -1054,6 +1121,7 @@
     },
     "applyLeave": "د رخصتۍ غوښتنه",
     "assignedComplaints": {
+      "label": "ټاکل شوي شکایتونه",
       "title": "ټاکل شوي شکایتونه",
       "subtitle": "د ټاکل شوي شکایتونو مدیریت او ځواب",
       "addComplaint": "شکایت اضافه کړئ",
@@ -1099,7 +1167,11 @@
       "updateStatusFailed": "د حالت تازه کول ناکام شو",
       "feedbackFailed": "د غبرګون سپارل ناکام شو",
       "deleteFeedbackConfirm": "دا غبرګون ړنګ کړئ؟",
-      "deleteFeedbackFailed": "د غبرګون ړنګول ناکام شو"
+      "deleteFeedbackFailed": "د غبرګون ړنګول ناکام شو",
+      "resolve": "حلول",
+      "edit": "سمون",
+      "view": "کتل",
+      "delete": "ړنګول"
     },
     "messages": {
       "title": "پیغامونه",
@@ -1114,6 +1186,7 @@
     "communications": "اړیکې",
     "console": "کنسول",
     "enterMarks": {
+      "label": "نمرې داخلول",
       "title": "نمرات داخلول",
       "subtitle": "امتحان، مضمون، ټولګی انتخاب کړئ او د زده کونکو نمرات داخل کړئ",
       "examInfo": "د امتحان معلومات",
@@ -1153,7 +1226,8 @@
       "saveFailed": "د نمراتو خوندي کول ناکام شول",
       "examLabel": "امتحان: ",
       "subjectLabel": "مضمون: ",
-      "classLabel": "ټولګی: "
+      "classLabel": "ټولګی: ",
+      "section": "برخه"
     },
     "expandSidebar": "د اړخ پټه پراخه کړئ",
     "examSubmissions": {
@@ -1172,6 +1246,7 @@
       "fail": "ناکام"
     },
     "feedback": {
+      "label": "غبرګون",
       "subjectRequired": "مضمون اړین دی",
       "createFailed": "د فیډبیک جوړول ناکام شو",
       "updateFailed": "د فیډبیک تازه کول ناکام شو",
@@ -1214,9 +1289,12 @@
         "participation": "ګډون",
         "improvement": "بهترۍ",
         "general": "عمومي"
-      }
+      },
+      "edit": "سمون",
+      "delete": "ړنګول"
     },
     "grading": {
+      "label": "نمرې ورکول",
       "title": "د نمرې ورکولو سکیمونه",
       "subtitle": "د نمرې ورکولو معیارونه او د نمرې حدود",
       "noSchemes": "د نمرې ورکولو هیڅ سکیم ونه موندل شو",
@@ -1234,6 +1312,7 @@
     "mySubjects": "زما مضامین",
     "overview": "کتنه",
     "payslips": {
+      "label": "تنخواه",
       "title": "زما تنخواه",
       "subtitle": "د معاش د تادیاتو تاریخ وګورئ",
       "totalPayments": "ټولې تادیات",
@@ -1281,6 +1360,7 @@
       "month12": "دسمبر"
     },
     "sessions": {
+      "label": "غونډې",
       "title": "د حاضري غونډې",
       "subtitle": "د ټولو حاضري غونډو کتل",
       "newSession": "+ نوې غونډه",
@@ -1291,6 +1371,7 @@
       "createFirstSession": "لومړۍ غونډه جوړه کړئ"
     },
     "syllabus": {
+      "label": "نصاب",
       "title": "نصاب",
       "subtitle": "د کورس نصاب او موضوعات وګورئ",
       "allClasses": "ټول ټولګي",
@@ -1305,6 +1386,7 @@
     "teaching": "تدریس",
     "theme": "بڼه",
     "viewResults": {
+      "label": "پایلې کتل",
       "title": "پایلې وګورئ",
       "subtitle": "د زده کونکو د امتحان پایلې وپلټئ",
       "filterResults": "پایلې فلټر کړئ",
@@ -1374,7 +1456,9 @@
       "subjects": "مضامین",
       "unnamedSubject": "نامعلوم مضمون",
       "update": "تازه کول",
-      "weeklyHours": "اونیز ساعتونه"
+      "weeklyHours": "اونیز ساعتونه",
+      "all": "ټول",
+      "upcoming": "راatlid"
     },
     "editQuestion": {
       "cancel": "لغوه کول",
@@ -1508,48 +1592,50 @@
       },
       "title": "د حاضري راپورونه"
     },
-    "teacherProfile": {
-      "buttons": {
-        "cancel": "لغوه کول",
-        "editProfile": "پروفایل سمول",
-        "saveChanges": "بدلونونه خوندي کړئ",
-        "saving": "خوندي کول"
-      },
-      "department": "څانګه",
-      "designation": "عنوان",
-      "employeeId": "د کارمند ID",
-      "fields": {
-        "bloodType": "د وینې ډول",
-        "district": "ولسوالۍ",
-        "email": "بریښنالیک",
-        "fatherName": "د پلار نوم",
-        "grandfatherName": "د نیکه نوم",
-        "idNumber": "د پېژندپاڼې شمېره",
-        "name": "نوم",
-        "phone": "تلیفون",
-        "province": "ولایت",
-        "role": "رول",
-        "village": "کلی"
-      },
-      "joined": "شامل شوی",
-      "messages": {
-        "noProfile": "هیڅ پروفایل نشته",
-        "saveFailed": "خوندي کول ناکام شول"
-      },
-      "modules": "ماډلونه",
-      "sections": {
-        "addressInformation": "د پتې معلومات",
-        "currentAddress": "اوسنی پته",
-        "permanentAddress": "دایمي پته",
-        "personalInformation": "شخصي معلومات"
-      },
-      "status": {
-        "title": "سرلیک",
-        "active": "فعال",
-        "inactive": "غیر فعال"
-      },
-      "subtitle": "فرعي سرلیک",
-      "title": "سرلیک"
+    "teacher": {
+      "teacherProfile": {
+        "buttons": {
+          "cancel": "لغوه کول",
+          "editProfile": "پروفایل سمول",
+          "saveChanges": "بدلونونه خوندي کړئ",
+          "saving": "خوندي کول"
+        },
+        "department": "څانګه",
+        "designation": "عنوان",
+        "employeeId": "د کارمند ID",
+        "fields": {
+          "bloodType": "د وینې ډول",
+          "district": "ولسوالۍ",
+          "email": "بریښنالیک",
+          "fatherName": "د پلار نوم",
+          "grandfatherName": "د نیکه نوم",
+          "idNumber": "د پېژندپاڼې شمېره",
+          "name": "نوم",
+          "phone": "تلیفون",
+          "province": "ولایت",
+          "role": "رول",
+          "village": "کلی"
+        },
+        "joined": "شامل شوی",
+        "messages": {
+          "noProfile": "هیڅ پروفایل نشته",
+          "saveFailed": "خوندي کول ناکام شول"
+        },
+        "modules": "ماډلونه",
+        "sections": {
+          "addressInformation": "د پتې معلومات",
+          "currentAddress": "اوسنی پته",
+          "permanentAddress": "دایمي پته",
+          "personalInformation": "شخصي معلومات"
+        },
+        "status": {
+          "title": "سرلیک",
+          "active": "فعال",
+          "inactive": "غیر فعال"
+        },
+        "subtitle": "فرعي سرلیک",
+        "title": "سرلیک"
+      }
     },
     "teacherResults": {
       "enterMarksButton": "نمرې داخل کړئ",
@@ -1632,6 +1718,7 @@
   },
   "admin": {
     "dashboard": "ډشبورډ",
+    "print": "چاپ",
     "dash": {
       "title": "د اداري ډشبورډ",
       "subtitle": "د ثبتنام، عاید، کارکوونکو او ورځنیو عملیاتو لپاره پاک قومانده مرکز.",
@@ -1704,7 +1791,6 @@
     "operations": "عملیات",
     "management": "مدیریت",
     "navMadrasaInfo": "د مدرسې معلومات",
-    "print": "چاپ",
     "userMgmt": "د کاروونکو مدیریت",
     "allUsers": "ټول کاروونکي",
     "students": "زده‌کوونکي",
@@ -1784,6 +1870,7 @@
     "backup": "بیک اپ او بیاځلې",
     "apiMgmt": "API مدیریت",
     "profile": {
+      "label": "پروفایل",
       "title": "د ادمین پروفایل",
       "subtitle": "د خپل ادمین حساب اداره کړئ",
       "saveChanges": "بدلونونه خوندي کړئ",
@@ -2146,7 +2233,6 @@
       "editTeacher": "ښوونکی سم کړئ",
       "teacherNotFound": "ښوونکی ونه موندل شو",
       "employmentInfo": "د دندې معلومات",
-      "personalInformation": "شخصي معلومات",
       "contactInformation": "د اړیکې معلومات",
       "emergencyContact": "بیړنۍ اړیکه",
       "salaryBankInfo": "د معاش او بانک معلومات",
@@ -2265,7 +2351,8 @@
         "maintenance": "ساتنه",
         "payroll": "معاش",
         "complaints": "شکایتونه",
-        "inventory": "Inventory"
+        "inventory": "Inventory",
+        "general-manager": "جنرال مدیر"
       },
       "serverError": "د سرور تېروتنه",
       "connectionError": "د سرور سره اړیکه نشته. مهرباني وکړئ ډاډ ترلاسه کړئ چې سرور روان دی.",
@@ -3762,10 +3849,7 @@
       "staffOperations": "د کارکوونکو عملیات",
       "collections": "راټولول",
       "reporting": "راپور ورکول",
-      "hr": "HR",
-      "library": "کتابتون",
-      "finance": "مالیه",
-      "kitchen": "مطبخ",
+      "hr": "بشري سرچینې",
       "monthJan": "جنوري",
       "monthFeb": "فبروري",
       "monthMar": "مارچ",
@@ -3777,6 +3861,7 @@
     },
     "print": "چاپ",
     "registrar": {
+      "label": "ثبت‌ونکی",
       "classAssignment": {
         "actions": {
           "assignClass": "ټولګی وټاکئ",
@@ -3786,7 +3871,8 @@
         "charts": {
           "noData": "معلومات نشته",
           "statusDistribution": "د حالت ویش",
-          "studentsByClass": "د ټولګیو له مخې زده کونکي"
+          "studentsByClass": "د ټولګیو له مخې زده کونکي",
+          "unknown": "نامعلوم"
         },
         "columns": {
           "currentClass": "اوسنی ټولګی",
@@ -3829,21 +3915,51 @@
           "totalStudents": "ټول زده کونکي",
           "unassigned": "نه ټاکل شوي"
         },
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "subtitle": "د زده کونکو د ټولګیو ترمنځ ټاکنه، ترفیع او تبدیل",
+        "title": "د ټولګي ټاکنه",
         "unassigned": "نه ټاکل شوي"
       },
       "classManagement": {
+        "columns": {
+          "name": "د ټولګي نوم",
+          "code": "کوډ",
+          "type": "ډول",
+          "maxStudents": "د زده کونکو اعظمي شمیر",
+          "status": "حالت"
+        },
         "create": {
           "titleCreate": "جوړول",
           "titleEdit": "سمول"
         },
         "eyebrow": "د ټولګیو مدیریت کتنه",
+        "fields": {
+          "name": "د ټولګي نوم",
+          "code": "د ټولګي کوډ",
+          "type": "ډول",
+          "maxStudents": "د زده کونکو اعظمي شمیر",
+          "status": "حالت"
+        },
+        "options": {
+          "type": {
+            "boys": "هلکان",
+            "girls": "نجونې",
+            "mixed": "مخلوط"
+          },
+          "status": {
+            "active": "فعال",
+            "inactive": "غیر فعال"
+          }
+        },
+        "placeholders": {
+          "name": "د بیلګې په توګه: لومړی ټولګی، الف",
+          "code": "د بیلګې په توګه: GR1-A",
+          "maxStudents": "۳۰"
+        },
         "searchPlaceholder": "لټون...",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "subtitle": "د زده کونکو د ټاکلو لپاره ټولګي جوړ او اداره کړئ",
+        "title": "د ټولګیو مدیریت",
         "view": {
-          "title": "سرلیک"
+          "title": "د ټولګي جزیات"
         }
       },
       "dataCorrection": {
@@ -3890,7 +4006,7 @@
         "reason": "دلیل",
         "recentChanges": "وروستي بدلونونه",
         "retry": "بیا هڅه",
-        "subtitle": "فرعي سرلیک",
+        "subtitle": "د زده کونکو معلومات سم کړئ او بدلونونه تعقیب کړئ",
         "success": "اصلاح په بریالیتوب سره وسپارل شوه",
         "table": {
           "actions": "کړنې",
@@ -3905,11 +4021,43 @@
           "studentCode": "د زده کونکی کوډ",
           "viewHistory": "تاریخ وګورئ"
         },
-        "title": "سرلیک",
+        "title": "د معلوماتو اصلاح",
         "to": "تر",
         "unknown": "نامعلوم"
       },
       "documentsManagement": {
+        "title": "د زده کونکو اسناد مدیریت",
+        "subtitle": "د زده کونکو اسناد او تصدیقونه پورته کړئ، اداره کړئ او تعقیب کړئ",
+        "columns": {
+          "student": "زده کونکی",
+          "type": "د سند ډول",
+          "title": "سرلیک",
+          "description": "تفصیل",
+          "createdAt": "د پورته کولو نیټه",
+          "status": "حالت"
+        },
+        "fields": {
+          "student": "زده کونکی",
+          "type": "د سند ډول",
+          "title": "د سند سرلیک",
+          "description": "تفصیل",
+          "filePath": "فایل",
+          "status": "حالت"
+        },
+        "options": {
+          "type": {
+            "passport": "د پاسپورټ انځور",
+            "certificate": "تصدیق",
+            "transcript": "لېک",
+            "id_card": "پیژندپاڼه",
+            "birth_certificate": "د زیږون تصدیق",
+            "other": "نور"
+          },
+          "status": {
+            "active": "فعال",
+            "archived": "آرشیف شوی"
+          }
+        },
         "charts": {
           "documentDistribution": "د اسنادو ویش",
           "documentsByType": "د ډول له مخې اسناد"
@@ -3936,6 +4084,24 @@
         }
       },
       "educationHistory": {
+        "title": "د زده کونکو تعلیمي تاریخچه",
+        "subtitle": "د تیرو تعلیمي ریکارډونو او علمي شالید مدیریت",
+        "columns": {
+          "student": "زده کونکی",
+          "previousDegree": "مخکینی سند",
+          "previousInstitution": "مؤسسه",
+          "location": "ځای",
+          "yearOfCompletion": "د فراغت کال"
+        },
+        "fields": {
+          "student": "زده کونکی",
+          "previousDegree": "مخکینی سند",
+          "previousInstitution": "تعلیمي مؤسسه",
+          "location": "ځای",
+          "yearOfCompletion": "د فراغت کال",
+          "grade": "نمره",
+          "fieldOfStudy": "د زده کړې رشته"
+        },
         "charts": {
           "educationByDegree": "د سند له مخې زده کړې"
         },
@@ -3957,6 +4123,33 @@
         }
       },
       "guardianManagement": {
+        "title": "د سرپرستانو مدیریت",
+        "subtitle": "د زده کونکو د سرپرستانو او ضامنانو معلومات اداره کړئ",
+        "columns": {
+          "name": "د سرپرست نوم",
+          "relationship": "اړیکه",
+          "phone": "تلیفون",
+          "email": "ایمیل",
+          "occupation": "دنده",
+          "isPrimary": "لومړنی"
+        },
+        "fields": {
+          "student": "زده کونکی",
+          "name": "د سرپرست نوم",
+          "relationship": "له زده کونکي سره اړیکه",
+          "phone": "د تلیفون شمېره",
+          "email": "ایمیل",
+          "occupation": "دنده",
+          "address": "پته",
+          "idNumber": "د پیژندنې شمېره",
+          "isPrimary": "لومړنی دی"
+        },
+        "options": {
+          "isPrimary": {
+            "true": "هو",
+            "false": "نه"
+          }
+        },
         "charts": {
           "guardiansByRelationship": "د اړیکې له مخې سرپرستان",
           "relationshipDistribution": "د اړیکو ویش"
@@ -4045,7 +4238,7 @@
           "totalStudents": "ټول زده کونکي"
         },
         "studentList": "د زده کونکو لیست",
-        "subtitle": "فرعي سرلیک",
+        "subtitle": "د زده کونکو راپورونه جوړ او صادر کړئ",
         "table": {
           "admissionDate": "د شاملېدو نېټه",
           "class": "ټولګی",
@@ -4055,14 +4248,82 @@
           "name": "نوم",
           "status": "حالت"
         },
-        "title": "سرلیک"
+        "title": "راپورونه او صادرول"
       },
       "studentAdmissions": {
+        "title": "د زده کونکو شاملول",
+        "subtitle": "د نویو زده کونکو شاملول اداره کړئ - د ټولو اړینو معلوماتو سره بشپړ ثبت",
+        "columns": {
+          "studentCode": "د زده کونکي کوډ",
+          "name": "د زده کونکي نوم",
+          "fatherName": "د پلار نوم",
+          "phone": "تلیفون",
+          "email": "ایمیل",
+          "degree": "سند",
+          "currentClass": "ټولګی",
+          "status": "حالت",
+          "createdAt": "د غوښتنې نیټه"
+        },
+        "fields": {
+          "user": "د کارونکي حساب (که شتون ولري)",
+          "studentCode": "د زده کونکي کوډ",
+          "firstName": "لومړی نوم",
+          "lastName": "وروستی نوم",
+          "fatherName": "د پلار نوم",
+          "grandfatherName": "د نیکه نوم",
+          "dob": "د زیږیدو نیټه",
+          "bloodType": "د وینې ډول",
+          "phone": "د تلیفون شمېره",
+          "whatsapp": "د واټساپ شمېره",
+          "email": "د ایمیل آدرس",
+          "permanentAddress_province": "ولایت (دایمي)",
+          "permanentAddress_district": "ولسوالی (دایمي)",
+          "permanentAddress_village": "کلی/سړک (دایمي)",
+          "currentAddress_province": "ولایت (اوسنی)",
+          "currentAddress_district": "ولسوالی (اوسنی)",
+          "currentAddress_village": "کلی/سړک (اوسنی)",
+          "guardianName": "د سرپرست نوم",
+          "guardianRelationship": "له سرپرست سره اړیکه",
+          "guardianPhone": "د سرپرست تلیفون",
+          "guardianEmail": "د سرپرست ایمیل",
+          "degree": "شامل شوی سند",
+          "currentClass": "ټاکل شوی ټولګی",
+          "currentLevel": "اکاډمیک کچه",
+          "admissionDate": "د شاملیدو نیټه",
+          "status": "د شاملیدو حالت",
+          "previousDegree": "مخکینی سند/تصدیق",
+          "previousInstitution": "مخکینۍ موسسه",
+          "locationOfInstitution": "د موسسې موقعیت"
+        },
+        "placeholders": {
+          "studentCode": "لکه STU-2024-001",
+          "guardianRelationship": "لکه پلار، مور، کاکا",
+          "currentLevel": "لکه کچه ۱، پیلونکی"
+        },
+        "options": {
+          "bloodType": {
+            "": "انتخاب",
+            "A+": "A+",
+            "A-": "A-",
+            "B+": "B+",
+            "B-": "B-",
+            "AB+": "AB+",
+            "AB-": "AB-",
+            "O+": "O+",
+            "O-": "O-"
+          },
+          "status": {
+            "pending": "په تمه",
+            "accepted": "منل شوی",
+            "rejected": "رد شوی"
+          }
+        },
         "charts": {
           "admissionsByDegree": "د سند له مخې شاملول",
           "monthlyAdmissionsTrend": "میاشتنی د شاملېدو تمایل",
           "noDegreeData": "د سند معلومات نشته",
-          "noMonthlyData": "میاشتني معلومات نشته"
+          "noMonthlyData": "میاشتني معلومات نشته",
+          "notAssigned": "ټاکل شوی نه دی"
         },
         "create": {
           "titleCreate": "جوړول",
@@ -4084,6 +4345,19 @@
         }
       },
       "studentProfiles": {
+        "title": "د زده کونکو پروفایل مدیریت",
+        "subtitle": "د زده کونکو بشپړ پروفایلونه، شخصي معلومات او اکاډمیک ریکارډونه اداره کړئ",
+        "columns": {
+          "image": "عکس",
+          "studentCode": "د زده کونکي کوډ",
+          "name": "د زده کونکي نوم",
+          "fatherName": "د پلار نوم",
+          "phone": "تلیفون",
+          "currentClass": "ټولګی",
+          "currentLevel": "کچه",
+          "status": "حالت",
+          "admissionDate": "د شاملیدو نیټه"
+        },
         "charts": {
           "active": "فعال",
           "enrollmentStatus": "د نوم لیکنې حالت",
@@ -4109,7 +4383,97 @@
           "title": "سرلیک"
         }
       },
+      "studentRegistration": {
+        "title": "د زده کونکي ثبت",
+        "completeTitle": "د زده کونکي ثبت بشپړ شو",
+        "eyebrow": "ثبت",
+        "pageEyebrow": "ثبت / د زده کونکو چارې",
+        "pageSubtitle": "دوه مرحله‌ییز ثبت: د زده کونکي معلومات + د استوګنې ټاکل (اختیاري)",
+        "registrationSuccessful": "ثبت بریالی شو!",
+        "registrationSuccessMessage": "زده کونکی په بریالیتوب سره ثبت شو.",
+        "redirectingMessage": "د زده کونکو لیست ته اړول کیږي...",
+        "phase1": "لومړی پړاو: د زده کونکي معلومات",
+        "phase2": "دوهم پړاو: استوګنه (اختیاري)",
+        "studentInfo": "د زده کونکي معلومات",
+        "basicInfo": "اساسي معلومات",
+        "profilePhoto": "پروفایل عکس",
+        "previewAlt": "مخکتنه",
+        "profilePhotoHint": "JPG، PNG یا GIF. اعظمي ۵MB وړاندیز کیږي.",
+        "studentCode": "د زده کونکي کوډ *",
+        "studentCodePlaceholder": "د زده کونکي کوډ دننه کړئ",
+        "firstName": "لومړی نوم *",
+        "lastName": "وروستی نوم",
+        "fatherName": "د پلار نوم *",
+        "grandfatherName": "د نیکه نوم",
+        "dateOfBirth": "د زیږیدو نیټه",
+        "dateOfBirthPlaceholder": "د زیږیدو نیټه وټاکئ",
+        "gender": "جنس",
+        "male": "نارینه",
+        "female": "ښځینه",
+        "bloodType": "د وینې ډول",
+        "bloodTypeSelect": "د وینې ډول وټاکئ",
+        "contactInfo": "د اړیکو معلومات",
+        "phone": "تلیفون *",
+        "whatsapp": "واټساپ",
+        "email": "ایمیل *",
+        "emailPlaceholder": "د ایمیل آدرس دننه کړئ",
+        "password": "پټ نوم *",
+        "passwordPlaceholder": "پټ نوم دننه کړئ",
+        "loginRole": "د ننوتلو رول",
+        "studentRoleValue": "زده کونکی",
+        "guardianInfo": "د سرپرست معلومات",
+        "guardianName": "د سرپرست نوم *",
+        "relationship": "اړیکه *",
+        "relationshipPlaceholder": "اړیکه دننه کړئ",
+        "guardianPhone": "د سرپرست تلیفون",
+        "guardianEmail": "د سرپرست ایمیل",
+        "academicInfo": "اکاډمیک معلومات",
+        "admissionDate": "د شاملیدو نیټه",
+        "admissionDatePlaceholder": "د شاملیدو نیټه وټاکئ",
+        "currentLevel": "اوسنۍ کچه",
+        "currentLevelPlaceholder": "اوسنۍ کچه دننه کړئ",
+        "nextPhase": "بل: د استوګنې ټاکل",
+        "hostelAssignment": "د استوګنې ټاکل (اختیاري)",
+        "hostelCheckbox": "زده کونکی د استوګنې غوښتونکی دی",
+        "selectRoom": "کوټه وټاکئ *",
+        "selectRoomPlaceholder": "یوه کوټه وټاکئ",
+        "roomOption": "کوټه {{roomNumber}} - {{building}} پوړ {{floor}} ({{roomType}}) - ${{rent}}/میاشت",
+        "noRooms": "خالي کوټې ونه موندل شوې",
+        "bedNumber": "د بستر شمېره",
+        "checkinDate": "د ننوتلو نیټه *",
+        "checkinDatePlaceholder": "د ننوتلو نیټه وټاکئ",
+        "monthlyRent": "میاشتنی کرایه ($)",
+        "securityDeposit": "امنیتي زیرمه ($)",
+        "hostelEmergencyContact": "د استوګنې بیړنی اړیکه",
+        "emergencyName": "نوم *",
+        "emergencyRelationship": "اړیکه *",
+        "emergencyPhone": "تلیفون *",
+        "emergencyEmail": "ایمیل",
+        "back": "شاته",
+        "registering": "ثبت روان...",
+        "completeRegistration": "ثبت بشپړ کړئ",
+        "imageSizeError": "د عکس اندازه باید له ۵MB څخه کمه وي",
+        "validationRequiredFields": "مهرباني وکړئ ټول اړین ساحې ډکې کړئ",
+        "validationEmailRequired": "د زده کونکي حساب ایمیل اړین دی",
+        "validationPasswordRequired": "د زده کونکي حساب پټ نوم اړین دی",
+        "validationPasswordLength": "د زده کونکي حساب پټ نوم باید لږترلږه ۶ حروف وي",
+        "createStudentFailed": "د زده کونکي جوړول ناکام شو",
+        "hostelAllocationFailed": "زده کونکی جوړ شو مګر د استوګنې تخصیص ناکام شو"
+      },
       "studentsList": {
+        "title": "ټول زده کونکي",
+        "subtitle": "د ثبت شویو زده کونکو او د هغوی د معلوماتو مدیریت",
+        "columns": {
+          "image": "عکس",
+          "studentCode": "د زده کونکي کوډ",
+          "name": "د زده کونکي نوم",
+          "fatherName": "د پلار نوم",
+          "phone": "تلیفون",
+          "currentClass": "ټولګی",
+          "currentLevel": "کچه",
+          "status": "حالت",
+          "admissionDate": "د شاملیدو نیټه"
+        },
         "charts": {
           "active": "فعال",
           "inactive": "غیر فعال",
@@ -4297,107 +4661,174 @@
       "cancel": "لغوه کړئ"
     },
     "library": {
+      "label": "کتابتون",
       "books": {
-        "booksByCategory": "د کټګورۍ له مخې کتابونه",
-        "errorFetching": "تېروتنه: راوړل",
-        "highRange": "لوړ ذخیره",
-        "inventoryValue": "د ذخیرې ارزښت",
-        "lowRange": "ټیټه ذخیره",
-        "lowStock": "ټیټه ذخیره",
-        "mediumRange": "منځنۍ ذخیره",
-        "outOfStock": "له ذخیرې وتلی",
-        "searchPlaceholder": "لټون...",
-        "stockDistribution": "د ذخیرې ویش",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "booksByCategory": "کتابونه د کټګورۍ له مخې",
+        "errorFetching": "د کتابونو بارولو کې تېروتنه",
+        "highRange": "لوړ (۲۰+)",
+        "inventoryValue": "د موجودي ارزښت",
+        "lowRange": "کم (۱-۵)",
+        "lowStock": "کم موجودي",
+        "mediumRange": "منځنی (۶-۲۰)",
+        "outOfStock": "پای ته رسېدلي",
+        "searchPlaceholder": "د کتابونو لټون د سرلیک، لیکوال یا ISBN له مخې...",
+        "stockDistribution": "د موجودي وېش",
+        "subtitle": "د کتابخانه د ټولو کتابونو او موجودي مدیریت",
+        "title": "د کتابخانه کتابونه",
         "titleCreate": "جوړول",
         "titleEdit": "سمول",
         "totalBooks": "ټول کتابونه",
-        "totalStock": "ټوله ذخیره",
-        "viewTitle": "تفصیلات وګورئ"
+        "totalStock": "ټوله موجودي",
+        "viewTitle": "تفصیلات وګورئ",
+        "columnTitle": "سرلیک",
+        "columnCategory": "کټګوري",
+        "columnPublisher": "خپروونکی",
+        "columnPublisherYear": "د خپرېدو کال",
+        "columnPages": "مخونه",
+        "columnStock": "موجودي",
+        "columnPurchasePrice": "د اخستلو بیه",
+        "columnSalePrice": "د پلور بیه",
+        "fieldTitle": "سرلیک",
+        "fieldCategory": "کټګوري",
+        "fieldPages": "مخونه",
+        "fieldPublisher": "خپروونکی",
+        "fieldPublisherYear": "د خپرېدو کال",
+        "fieldStock": "موجودي",
+        "fieldPurchasePrice": "د اخستلو بیه",
+        "fieldSalePrice": "د پلور بیه"
       },
       "borrowed": {
         "currentlyBorrowed": "اوس مهال پور اخیستل شوي",
-        "errorFetching": "تېروتنه: راوړل",
+        "errorFetching": "د پور اخیستل شویو ریکارډونو بارولو کې تېروتنه",
         "inStock": "په ذخیره کې",
-        "markReturned": "بیرته راستنیدل په نښه کړئ",
-        "monthlyTrend": "میاشتنی تمایل",
-        "overdue": "تېر شوی",
-        "returned": "راستنیدل شوی",
-        "searchPlaceholder": "لټون...",
-        "statusDistribution": "د حالت ویش",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "markReturned": "د بیرته راستنیدو نښه",
+        "monthlyTrend": "میاشتنی رجحان",
+        "overdue": "ننګه شوي",
+        "returned": "بېرته راستانه شوي",
+        "searchPlaceholder": "د پور اخیستل شویو ریکارډونو لټون...",
+        "statusDistribution": "د حالت وېش",
+        "subtitle": "د اوسنیو پور اخیستل شویو کتابونو تعقیب",
+        "title": "پور اخیستل شوي کتابونه",
         "titleCreate": "جوړول",
         "titleEdit": "سمول",
         "totalRecords": "ټول ریکارډونه",
-        "viewTitle": "تفصیلات وګورئ"
+        "viewTitle": "تفصیلات وګورئ",
+        "columnBorrower": "زده‌کوونکی",
+        "columnBook": "کتاب",
+        "columnBorrowedAt": "د پور نیټه",
+        "columnReturnDate": "د بېرته راستنېدو نیټه",
+        "columnStatus": "حالت",
+        "fieldBorrower": "زده‌کوونکی",
+        "fieldBook": "کتاب",
+        "fieldStatus": "حالت",
+        "fieldReturnDate": "د بېرته راستنېدو نیټه",
+        "optionBorrowed": "پور اخیستل شوی",
+        "optionReturned": "بېرته راستانه شوی"
       },
       "categories": {
-        "avgBooksPerCategory": "په هر کټګورۍ اوسط کتابونه",
-        "booksPerCategory": "په هر کټګورۍ کتابونه",
-        "errorFetching": "تېروتنه: راوړل",
-        "searchPlaceholder": "لټون...",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "avgBooksPerCategory": "اوسط کتاب / کټګوري",
+        "booksPerCategory": "کتابونه په هر کټګورۍ کې",
+        "errorFetching": "د کټګوریو بارولو کې تېروتنه",
+        "searchPlaceholder": "د کټګوریو لټون...",
+        "subtitle": "د کتابخانه د کتاب کټګوریو او طبقه‌بندۍ مدیریت",
+        "title": "د کتاب کټګورۍ",
         "titleCreate": "جوړول",
         "titleEdit": "سمول",
         "totalBooks": "ټول کتابونه",
         "totalCategories": "ټولې کټګورۍ",
-        "viewTitle": "تفصیلات وګورئ"
+        "viewTitle": "تفصیلات وګورئ",
+        "columnName": "د کټګورۍ نوم",
+        "columnDescription": "تفصیل",
+        "columnCreatedAt": "جوړ شوی",
+        "fieldName": "د کټګورۍ نوم",
+        "fieldDescription": "تفصیل"
       },
       "purchases": {
-        "bySupplier": "د عرضه کوونکي له مخې",
-        "errorFetching": "تېروتنه: راوړل",
-        "monthlyTrend": "میاشتنی تمایل",
-        "searchPlaceholder": "لټون...",
-        "subtitle": "فرعي سرلیک",
+        "bySupplier": "د چمتو کوونکي له مخې",
+        "errorFetching": "د اخستنو بارولو کې تېروتنه",
+        "monthlyTrend": "میاشتنی رجحان",
+        "searchPlaceholder": "د اخستنو لټون...",
+        "subtitle": "د کتاب د اخستنې امرونو او ریکارډونو مدیریت",
         "thisMonth": "دا میاشت",
-        "title": "سرلیک",
+        "title": "د کتاب اخستنې",
         "titleCreate": "جوړول",
         "titleEdit": "سمول",
-        "totalPurchases": "ټولې پیرودنې",
-        "totalQuantity": "ټوله اندازه",
+        "totalPurchases": "ټولې اخستنې",
+        "totalQuantity": "ټول تعداد",
         "totalSpent": "ټول لګښت",
-        "viewTitle": "تفصیلات وګورئ"
+        "viewTitle": "تفصیلات وګورئ",
+        "columnPurchaseCode": "د اخستنې کوډ",
+        "columnPurchaseDate": "د اخستنې نیټه",
+        "columnSupplierName": "چمتو کوونکی",
+        "columnInvoiceReference": "د رسید حواله",
+        "columnBook": "کتاب",
+        "columnQuantity": "تعداد",
+        "columnUnit": "واحد",
+        "columnUnitPrice": "د واحد بیه",
+        "columnTotalPrice": "ټوله بیه",
+        "columnPaymentMethod": "د تادیې طریقه",
+        "fieldPurchaseCode": "د اخستنې کوډ",
+        "fieldSupplierName": "د چمتو کوونکي نوم",
+        "fieldInvoiceReference": "د رسید حواله",
+        "fieldBook": "کتاب",
+        "fieldQuantity": "تعداد",
+        "fieldUnit": "واحد",
+        "fieldUnitPrice": "د واحد بیه",
+        "fieldPaymentMethod": "د تادیې طریقه",
+        "fieldPurchaseDate": "د اخستنې نیټه",
+        "optionCash": "نغد",
+        "optionOther": "نور"
       },
       "reports": {
-        "available": "شتون لري",
-        "bookStatusDistribution": "د کتاب د حالت ویش",
-        "borrowed": "پور اخیستل شوی",
+        "available": "شته",
+        "bookStatusDistribution": "د کتابونو د حالت وېش",
+        "borrowed": "پور اخیستل شوي",
         "borrowedRate": "د پور اخیستلو کچه",
-        "errorMessage": "تېروتنه: پیغام",
-        "failedToFetch": "راپورونه راوړل ناکام شول",
-        "libraryActivityOverview": "د کتابتون د فعالیت کتنه",
-        "loading": "بارول کیږي...",
-        "lowStock": "ټیټه ذخیره",
-        "lowStockLabel": "ټیټه ذخیره",
-        "quickRatios": "چټک تناسب",
+        "errorMessage": "د راپورونو بارولو پرمهال تېروتنه رامنځته شوه",
+        "failedToFetch": "د کتابخانه احصایې راوړل ناکام شول",
+        "libraryActivityOverview": "د کتابخانه فعالیت کتنه",
+        "loading": "بارېږي...",
+        "lowStock": "کم موجودي",
+        "lowStockLabel": "د کم موجودي توکي",
+        "quickRatios": "چټک نسبتونه",
         "retry": "بیا هڅه",
-        "returned": "راستنیدل شوی",
-        "returnedRate": "د راستنیدو کچه",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "returned": "بېرته راستانه شوي",
+        "returnedRate": "د بېرته راستنېدو کچه",
+        "subtitle": "د کتابخانه کارونې احصایې او شننه",
+        "title": "د کتابخانه راپورونه",
         "total": "ټول",
         "totalBooks": "ټول کتابونه",
-        "unableToLoad": "راپورونه بارول ناشوني دي"
+        "unableToLoad": "راپورونه نشي بارېدلی"
       },
       "sales": {
-        "errorFetching": "تېروتنه: راوړل",
-        "monthlyTrend": "میاشتنی تمایل",
-        "quantitySold": "پلورل شوی اندازه",
-        "searchPlaceholder": "لټون...",
-        "student": "زده کونکی",
-        "subtitle": "فرعي سرلیک",
+        "errorFetching": "د پلور بارولو کې تېروتنه",
+        "monthlyTrend": "میاشتنی رجحان",
+        "quantitySold": "د پلورل شویو تعداد",
+        "searchPlaceholder": "د پلور لټون...",
+        "student": "زده‌کوونکی",
+        "subtitle": "د کتاب پلور او تصفیې تعقیب",
         "thisMonth": "دا میاشت",
-        "title": "سرلیک",
+        "title": "د کتاب پلور",
         "titleCreate": "جوړول",
         "titleEdit": "سمول",
-        "topBuyers": "غوره پیرودونکي",
-        "totalRevenue": "ټوله عواید",
+        "topBuyers": "لوړ پیرودونکي",
+        "totalRevenue": "ټول عاید",
         "totalSales": "ټول پلور",
         "viewTitle": "تفصیلات وګورئ",
-        "walkIn": "مستقیم راغلی"
+        "walkIn": "مراجعه کوونکی",
+        "columnReceiptNo": "د رسید شمېره",
+        "columnSaleDate": "د پلور نیټه",
+        "columnStudent": "زده‌کوونکی",
+        "columnBook": "کتاب",
+        "columnQuantity": "تعداد",
+        "columnUnitPrice": "د واحد بیه",
+        "columnTotalAmount": "ټوله اندازه",
+        "fieldReceiptNo": "د رسید شمېره",
+        "fieldStudent": "زده‌کوونکی",
+        "fieldBook": "کتاب",
+        "fieldQuantity": "تعداد",
+        "fieldUnitPrice": "د واحد بیه",
+        "fieldSaleDate": "د پلور نیټه"
       }
     },
     "categories": "کتګورۍ",
@@ -4407,29 +4838,61 @@
     "sales": "پلورنې",
     "reports": "راپورونه",
     "complaints": {
+      "label": "شکایتونه",
       "actions": {
         "completed": "بشپړ شوی",
         "eyebrow": "د کړنو کتنه",
         "followups": "تعقیبونه",
         "monthlyTrend": "میاشتنی تمایل",
         "pending": "په تمه",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
-        "totalActions": "ټولې کړنې"
+        "subtitle": "د شکایتونو کړنو مدیریت د ورته شکایتونو د کاري جریان په کارولو سره",
+        "title": "د شکایت کړنې",
+        "totalActions": "ټولې کړنې",
+        "searchPlaceholder": "د شکایت کړنو پلټنه...",
+        "columns": {
+          "complaint": "شکایت",
+          "actionType": "د کړنې ډول",
+          "actionDescription": "د کړنې تفصیل",
+          "actionResult": "د کړنې پایله",
+          "actionDate": "د کړنې نېټه",
+          "followUpDate": "د تعقیب نېټه",
+          "nextActionRequired": "بله کړنه",
+          "visibilityScope": "لید"
+        },
+        "fields": {
+          "complaint": "شکایت",
+          "actionType": "د کړنې ډول",
+          "actionDescription": "د کړنې تفصیل",
+          "actionResult": "د کړنې پایله",
+          "followUpDate": "د تعقیب نېټه",
+          "nextActionRequired": "بله کړنه اړینه ده",
+          "visibilityScope": "لید",
+          "remarks": "ملاحظات"
+        },
+        "options": {
+          "nextActionRequired": {
+            "true": "هو",
+            "false": "نه"
+          },
+          "visibilityScope": {
+            "public": "عام",
+            "private": "شخصي"
+          }
+        }
       },
       "actionsCreate": {
-        "titleCreate": "جوړول",
-        "titleEdit": "سمول"
+        "titleCreate": "کړنه جوړول",
+        "titleEdit": "کړنه سمول"
       },
       "actionsView": {
-        "title": "سرلیک"
+        "title": "د کړنې جزئیات"
       },
       "complaintsEdit": {
-        "titleCreate": "جوړول",
-        "titleEdit": "سمول"
+        "titleCreate": "شکایت جوړول",
+        "titleEdit": "شکایت سمول"
       },
       "complaintsView": {
-        "title": "سرلیک"
+        "title": "د شکایت جزئیات"
       },
       "feedback": {
         "avgSatisfaction": "اوسط رضایت",
@@ -4437,16 +4900,39 @@
         "monthlyTrend": "میاشتنی تمایل",
         "needsImprovement": "پرمختګ ته اړتیا لري",
         "satisfactionDistribution": "د رضایت ویش",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
-        "totalFeedback": "ټول غبرګون"
+        "subtitle": "د غبرګون ریکارډونو مدیریت د ورته بیا کارونې وړ شکایتونو جدول او فورمې سیسټم سره",
+        "title": "د شکایت غبرګون",
+        "totalFeedback": "ټول غبرګون",
+        "searchPlaceholder": "د شکایت غبرګون پلټنه...",
+        "columns": {
+          "complaint": "شکایت",
+          "satisfactionLevel": "رضایت (1-5)",
+          "comments": "نظریې",
+          "feedbackDate": "د غبرګون نېټه",
+          "resolutionTime": "د حل وخت (ساعتونه)",
+          "escalationRequired": "ارجاع"
+        },
+        "fields": {
+          "complaint": "شکایت",
+          "satisfactionLevel": "د رضایت کچه (1-5)",
+          "comments": "نظریې",
+          "feedbackDate": "د غبرګون نېټه",
+          "resolutionTime": "د حل وخت (ساعتونه)",
+          "escalationRequired": "ارجاع اړینه ده"
+        },
+        "options": {
+          "escalationRequired": {
+            "true": "هو",
+            "false": "نه"
+          }
+        }
       },
       "feedbackCreate": {
-        "titleCreate": "جوړول",
-        "titleEdit": "سمول"
+        "titleCreate": "غبرګون جوړول",
+        "titleEdit": "غبرګون سمول"
       },
       "feedbackView": {
-        "title": "سرلیک"
+        "title": "د غبرګون جزئیات"
       },
       "list": {
         "byCategory": "د کټګورۍ له مخې",
@@ -4457,15 +4943,58 @@
         "inProgress": "په پرمختګ کې",
         "markInProgress": "په پرمختګ کې په نښه کړئ",
         "open": "خلاص",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
-        "total": "ټول"
+        "subtitle": "د شکایتونو ریکارډونه تعقیب او مدیریت کړئ",
+        "title": "د شکایتونو مدیریت",
+        "total": "ټول",
+        "searchPlaceholder": "د شکایتونو پلټنه...",
+        "columns": {
+          "complaintCode": "د شکایت کوډ",
+          "subject": "موضوع",
+          "category": "کټګوري",
+          "priority": "لومړیتوب",
+          "status": "حالت",
+          "submittedBy": "لېږل شوی لخوا",
+          "assignedTo": "ټاکل شوی لخوا",
+          "createdAt": "د سپارلو نېټه"
+        },
+        "fields": {
+          "complaintCode": "د شکایت کوډ",
+          "complainantType": "د شکایت کونکي ډول",
+          "complaintCategory": "کټګوري",
+          "subject": "موضوع",
+          "description": "تفصیل",
+          "priorityLevel": "د لومړیتوب کچه",
+          "complaintStatus": "حالت",
+          "confidentialityLevel": "د محرمیت کچه"
+        },
+        "options": {
+          "complainantType": {
+            "student": "زده کونکی",
+            "staff": "کارکوونکی",
+            "other": "نور"
+          },
+          "priorityLevel": {
+            "low": "ټیټ",
+            "medium": "منځنی",
+            "high": "لوړ"
+          },
+          "complaintStatus": {
+            "open": "خلاص",
+            "in_progress": "په پرمختګ کې",
+            "closed": "تړل شوی"
+          },
+          "confidentialityLevel": {
+            "low": "ټیټ",
+            "medium": "منځنی",
+            "high": "لوړ"
+          }
+        }
       },
       "reports": {
         "closed": "تړل شوی",
         "errorTitle": "تېروتنه",
         "fetchError": "د معلوماتو راوړل ناکام شول",
-        "filterInfo": "د فلټر معلومات",
+        "filterInfo": "د شکایت د معلوماتو د محدودولو لپاره لاندې فلټرونه وکاروئ",
         "highPriority": "لوړ لومړیتوب",
         "inProgress": "په پرمختګ کې",
         "loading": "بارول کیږي...",
@@ -4474,13 +5003,14 @@
         "recentComplaints": "وروستي شکایتونه",
         "retry": "بیا هڅه",
         "statusDistribution": "د حالت ویش",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "subtitle": "د شکایتونو تفصیلي راپورونه او شننه وګورئ",
+        "title": "د شکایتونو راپورونه",
         "total": "ټول"
       }
     },
     "compList": "د شکایتونو لیست",
     "actions": {
+      "label": "کړنې",
       "view": "کتل",
       "edit": "سمول",
       "delete": "ړنګول"
@@ -4489,147 +5019,422 @@
     "support": "ملاتړ",
     "supportTickets": "د ملاتړ ټیکټونه",
     "finance": {
+      "label": "مالیه",
       "accounts": {
-        "chartAccountStatusDistribution": "د حساب د حالت ویش",
-        "chartAccountTypeDistribution": "د حساب د ډول ویش",
+        "title": "حسابونه",
+        "subtitle": "مالي حسابونه وګورئ او اداره کړئ",
         "create": "جوړول",
         "edit": "سمول",
-        "errorDescription": "د معلوماتو بارولو کې تېروتنه رامنځته شوه",
-        "errorTitle": "تېروتنه",
-        "insightDescription": "توضیح",
-        "insightEyebrow": "ابرو",
-        "insightTitle": "سرلیک",
-        "searchPlaceholder": "لټون...",
+        "details": "{{title}} - تفصیلات",
+        "errorDescription": "د حساب معلوماتو په بارولو کې ستونزه وه. مهرباني وکړئ خپل اړیکه وګورئ او بیا هڅه وکړئ.",
+        "errorTitle": "د حساب معلوماتو تېروتنه",
+        "insight": {
+          "eyebrow": "د حساب بصیرت",
+          "title": "د حساب روغتیا کتنه",
+          "description": "د حساب بیلانسونه، فعال او غیر فعال حسابونه او د حساب ډول ویش د خپل مالي جوړښت په اوږدو کې وڅارئ."
+        },
+        "insightEyebrowUnavailable": "د حساب معلومات شتون نلري",
+        "searchPlaceholder": "د نوم، کوډ یا اسعارو له مخې لټون...",
         "statAccountTypes": "د حساب ډولونه",
-        "statAccountTypesHelper": "د حساب ډولونو مرسته کوونکی",
+        "statAccountTypesHelper": "د حساب جلا کټګورۍ چې کارول کیږي",
         "statActiveAccounts": "فعال حسابونه",
-        "statActiveAccountsHelper": "د فعال حسابونو مرسته کوونکی",
+        "statActiveAccountsHelper": "هغه حسابونه چې اوس مهال فعال په نښه شوي",
         "statInactiveAccounts": "غیر فعال حسابونه",
-        "statInactiveAccountsHelper": "د غیر فعال حسابونو مرسته کوونکی",
+        "statInactiveAccountsHelper": "هغه حسابونه چې اوس مهال غیر فعال په نښه شوي",
         "statTotalAccounts": "ټول حسابونه",
-        "statTotalAccountsHelper": "د ټولو حسابونو مرسته کوونکی",
-        "statTotalBalance": "ټوله بیلانس"
+        "statTotalAccountsHelper": "ټول ثبت شوي مالي حسابونه",
+        "statTotalBalance": "ټوله بیلانس",
+        "statTotalBalanceHelper": "د ټولو حسابونو مجموعه بیلانس",
+        "chart": {
+          "accountTypeDistribution": "د حساب د ډول ویش",
+          "accountStatusDistribution": "د حساب د حالت ویش"
+        },
+        "column": {
+          "accountCode": "د حساب کوډ",
+          "accountName": "د حساب نوم",
+          "accountType": "د حساب ډول",
+          "openingBalance": "پرانیستونکی بیلانس",
+          "currentBalance": "اوسنی بیلانس",
+          "currency": "اسعار",
+          "status": "حالت"
+        },
+        "formField": {
+          "accountCode": "د حساب کوډ",
+          "accountName": "د حساب نوم",
+          "accountType": "د حساب ډول",
+          "openingBalance": "پرانیستونکی بیلانس",
+          "currentBalance": "اوسنی بیلانس",
+          "currency": "اسعار",
+          "status": "حالت",
+          "option": {
+            "accountType": {
+              "cash": "نغد",
+              "petty_cash": "وړوکی نغد"
+            },
+            "status": {
+              "active": "فعال",
+              "inactive": "غیر فعال"
+            }
+          }
+        }
       },
       "expenses": {
-        "chartApprovalStatusBreakdown": "د تصویب حالت ماتول",
-        "chartCategoryDistribution": "د کټګورۍ ویش",
-        "chartMonthlyExpenseTrend": "میاشتنی لګښت تمایل",
+        "title": "لګښتونه",
+        "subtitle": "لګښتونه وګورئ او اداره کړئ",
         "create": "جوړول",
         "edit": "سمول",
-        "errorDescription": "د معلوماتو بارولو کې تېروتنه رامنځته شوه",
-        "errorTitle": "تېروتنه",
-        "insightDescription": "توضیح",
-        "insightEyebrow": "ابرو",
-        "insightTitle": "سرلیک",
-        "searchPlaceholder": "لټون...",
+        "details": "{{title}} - تفصیلات",
+        "errorDescription": "د لګښت معلوماتو په بارولو کې ستونزه وه. مهرباني وکړئ خپل اړیکه وګورئ او بیا هڅه وکړئ.",
+        "errorTitle": "د لګښت معلوماتو تېروتنه",
+        "insightEyebrowUnavailable": "د لګښت معلومات شتون نلري",
+        "searchPlaceholder": "د کوډ، کټګورۍ یا تادیه کوونکي له مخې لټون...",
         "statExpenseCategories": "د لګښت کټګورۍ",
-        "statExpenseCategoriesHelper": "د لګښت کټګوریو مرسته کوونکی",
+        "statExpenseCategoriesHelper": "هغه جلا کټګورۍ چې ثبت شوي لګښتونه لري",
         "statPendingApprovals": "په تمه تصویبونه",
-        "statPendingApprovalsHelper": "د تمه تصویبونو مرسته کوونکی",
+        "statPendingApprovalsHelper": "هغه لګښتونه چې د تصویب پریکړې ته انتظار دي",
         "statRejectedEntries": "رد شوي داخلې",
-        "statRejectedEntriesHelper": "د رد شویو داخلې مرسته کوونکی",
+        "statRejectedEntriesHelper": "هغه لګښتونه چې رد شوي دي",
         "statThisMonth": "دا میاشت",
-        "statThisMonthHelper": "د دې میاشتې مرسته کوونکی",
+        "statThisMonthHelper": "په دې میاشت کې ټول لګښتونه",
         "statTotalExpenses": "ټول لګښتونه",
-        "statTotalExpensesHelper": "د ټولو لګښتونو مرسته کوونکی"
+        "statTotalExpensesHelper": "د ټولو لګښتونو مجموعه ارزښت",
+        "chart": {
+          "approvalStatusBreakdown": "د تصویب حالت ماتول",
+          "categoryDistribution": "د کټګورۍ ویش",
+          "monthlyExpenseTrend": "میاشتنی لګښت تمایل"
+        },
+        "column": {
+          "expenseCode": "د لګښت کوډ",
+          "category": "کټګورۍ",
+          "title": "سرلیک",
+          "amount": "مقدار",
+          "expenseDate": "د لګښت نیټه",
+          "paymentMethod": "د تادیې میتود",
+          "approvalStatus": "د تصویب حالت"
+        },
+        "formField": {
+          "expenseCode": "د لګښت کوډ",
+          "category": "کټګورۍ",
+          "title": "سرلیک",
+          "amount": "مقدار",
+          "expenseDate": "د لګښت نیټه",
+          "paymentMethod": "د تادیې میتود",
+          "referenceNo": "حواله شمېره",
+          "paidTo": "تادیه شوی",
+          "approvalStatus": "د تصویب حالت",
+          "remarks": "ملاحظات",
+          "option": {
+            "paymentMethod": {
+              "cash": "نغد",
+              "card": "کارت",
+              "other": "نور"
+            },
+            "approvalStatus": {
+              "pending": "په تمه",
+              "approved": "تصویب شوی",
+              "rejected": "رد شوی"
+            }
+          }
+        },
+        "insight": {
+          "eyebrow": "د لګښت بصیرت",
+          "title": "د لګښت تحلیل",
+          "description": "د لګښت نمونې، د تصویب کاري بار او د کټګورۍ ویش د باخبره بودیجې پریکړو لپاره تعقیب کړئ."
+        }
       },
       "eyebrow": "مالي کتنه",
       "feePayments": {
-        "chartMonthlyCollections": "میاشتنی راټولول",
-        "chartPaymentMethodDistribution": "د تادیې د میتود ویش",
-        "chartPaymentStatusBreakdown": "د تادیې د حالت ماتول",
+        "title": "د فیس تادیات",
+        "subtitle": "د فیس تادیات وګورئ او اداره کړئ",
         "create": "جوړول",
         "edit": "سمول",
-        "errorDescription": "د معلوماتو بارولو کې تېروتنه رامنځته شوه",
-        "errorTitle": "تېروتنه",
-        "insightDescription": "توضیح",
-        "insightEyebrow": "ابرو",
-        "insightTitle": "سرلیک",
-        "searchPlaceholder": "لټون...",
+        "details": "{{title}} - تفصیلات",
+        "errorDescription": "د فیس تادیې معلوماتو په بارولو کې ستونزه وه. مهرباني وکړئ خپل اړیکه وګورئ او بیا هڅه وکړئ.",
+        "errorTitle": "د فیس تادیې معلوماتو تېروتنه",
+        "insightEyebrowUnavailable": "د فیس تادیې معلومات شتون نلري",
+        "searchPlaceholder": "د رسید شمېره، زده کونکي یا مقدار له مخې لټون...",
         "statFailedPayments": "ناکامې تادیات",
-        "statFailedPaymentsHelper": "د ناکامو تادیاتو مرسته کوونکی",
+        "statFailedPaymentsHelper": "هغه تادیات چې په بریالیتوب سره بشپړ شوي ندي",
         "statPendingPayments": "په تمه تادیات",
-        "statPendingPaymentsHelper": "د تمه تادیاتو مرسته کوونکی",
+        "statPendingPaymentsHelper": "هغه تادیات چې د پروسس یا تایید انتظار کوي",
         "statTotalCollected": "ټول راټول شوي",
-        "statTotalCollectedHelper": "د ټولو راټول شویو مرسته کوونکی",
+        "statTotalCollectedHelper": "د ټولو بریالیو تادیاتو مجموعه",
         "statTotalPayments": "ټولې تادیات",
-        "statTotalPaymentsHelper": "د ټولو تادیاتو مرسته کوونکی",
+        "statTotalPaymentsHelper": "د تادیې ټول ریکارډونه شامل په تمه او ناکام",
         "statVerificationQueue": "د تایید کتار",
-        "statVerificationQueueHelper": "د تایید کتار مرسته کوونکی"
+        "statVerificationQueueHelper": "تادیات د تایید تصویب ته انتظار",
+        "chart": {
+          "monthlyCollections": "میاشتنی راټولول",
+          "paymentMethodDistribution": "د تادیې د میتود ویش",
+          "paymentStatusBreakdown": "د تادیې د حالت ماتول"
+        },
+        "column": {
+          "studentFee": "د زده کونکي فیس",
+          "receiptNo": "رسید نمبر",
+          "paymentDate": "د تادیې نیټه",
+          "paidAmount": "تادیه شوی مقدار",
+          "paymentMethod": "د تادیې میتود",
+          "paymentStatus": "د تادیې حالت",
+          "verificationStatus": "د تایید حالت"
+        },
+        "formField": {
+          "studentFee": "د زده کونکي فیس",
+          "receiptNo": "رسید نمبر",
+          "paymentDate": "د تادیې نیټه",
+          "paidAmount": "تادیه شوی مقدار",
+          "paymentMethod": "د تادیې میتود",
+          "transactionReference": "د معاملې حواله",
+          "paymentStatus": "د تادیې حالت",
+          "verificationStatus": "د تایید حالت",
+          "paymentChannel": "د تادیې چینل",
+          "remarks": "ملاحظات",
+          "option": {
+            "paymentMethod": {
+              "cash": "نغد",
+              "card": "کارت"
+            },
+            "paymentStatus": {
+              "completed": "بشپړ شوی",
+              "pending": "په تمه",
+              "failed": "ناکام"
+            },
+            "verificationStatus": {
+              "verified": "تایید شوی",
+              "pending": "په تمه",
+              "rejected": "رد شوی"
+            }
+          }
+        },
+        "insight": {
+          "eyebrow": "د فیس تادیې بصیرت",
+          "title": "د راټولولو فعالیت",
+          "description": "د راټولولو فعالیت تعقیب کړئ، د تادیې د میتود غوره توبونه وڅارئ او په تمه یا ناکامو تادیاتو باندې تعقیب وکړئ."
+        }
       },
       "feeStructures": {
-        "chartFeeTypeDistribution": "د فیس د ډول ویش",
-        "chartFrequencyBreakdown": "د فریکونسی ماتول",
+        "title": "د فیس جوړښت",
+        "subtitle": "د فیس جوړښت وګورئ او اداره کړئ",
         "create": "جوړول",
         "edit": "سمول",
-        "errorDescription": "د معلوماتو بارولو کې تېروتنه رامنځته شوه",
-        "errorTitle": "تېروتنه",
-        "insightDescription": "توضیح",
-        "insightEyebrow": "ابرو",
-        "insightTitle": "سرلیک",
-        "searchPlaceholder": "لټون...",
+        "details": "{{title}} - تفصیلات",
+        "errorDescription": "د فیس جوړښت معلوماتو په بارولو کې ستونزه وه. مهرباني وکړئ خپل اړیکه وګورئ او بیا هڅه وکړئ.",
+        "errorTitle": "د فیس جوړښت معلوماتو تېروتنه",
+        "insight": {
+          "eyebrow": "د فیس جوړښت بصیرت",
+          "title": "د نرخ جوړښت کتنه",
+          "description": "د فیس کټګورۍ، د نرخ تکرار او فعال او اړین فیس تنظیمونه د بنسټ په اوږدو کې وڅیړئ."
+        },
+        "insightEyebrowUnavailable": "د فیس جوړښت معلومات شتون نلري",
+        "searchPlaceholder": "د فیس نوم، کوډ یا ډول له مخې لټون...",
         "statActiveStructures": "فعال جوړښتونه",
-        "statActiveStructuresHelper": "د فعال جوړښتونو مرسته کوونکی",
+        "statActiveStructuresHelper": "د فیس جوړښت داخلې چې اوس مهال کارول کیږي",
         "statAverageFee": "اوسط فیس",
-        "statAverageFeeHelper": "د اوسط فیس مرسته کوونکی",
+        "statAverageFeeHelper": "د ټولو جوړښتونو د فیس اوسط مقدار",
         "statFeeTypes": "د فیس ډولونه",
-        "statFeeTypesHelper": "د فیس ډولونو مرسته کوونکی",
+        "statFeeTypesHelper": "د فیس جلا کټګورۍ چې تنظیم شوي",
         "statMandatoryFees": "اړین فیسونه",
-        "statMandatoryFeesHelper": "د اړینو فیسونو مرسته کوونکی",
+        "statMandatoryFeesHelper": "هغه فیسونه چې د زده کونکو لپاره اړین په نښه شوي",
         "statTotalStructures": "ټول جوړښتونه",
-        "statTotalStructuresHelper": "د ټولو جوړښتونو مرسته کوونکی"
+        "statTotalStructuresHelper": "د فیس جوړښت ټول ریکارډونه",
+        "chart": {
+          "feeTypeDistribution": "د فیس د ډول ویش",
+          "frequencyBreakdown": "د فریکونسی ماتول"
+        },
+        "column": {
+          "feeCode": "د فیس کوډ",
+          "feeName": "د فیس نوم",
+          "feeType": "د فیس ډول",
+          "amount": "مقدار",
+          "frequency": "فریکونسی",
+          "isMandatory": "اړین",
+          "status": "حالت"
+        },
+        "formField": {
+          "feeCode": "د فیس کوډ",
+          "feeName": "د فیس نوم",
+          "class": "ټولګی",
+          "feeType": "د فیس ډول",
+          "amount": "مقدار",
+          "frequency": "فریکونسی",
+          "applicableFrom": "د پلي کیدو څخه",
+          "applicableTo": "د پلي کیدو پورې",
+          "isMandatory": "اړین",
+          "status": "حالت",
+          "option": {
+            "feeType": {
+              "tuition": "تیوشن",
+              "admission": "داخله",
+              "other": "نور"
+            },
+            "frequency": {
+              "one-time": "یو ځل",
+              "monthly": "میاشتنی",
+              "yearly": "کلنی"
+            },
+            "isMandatory": {
+              "yes": "هو",
+              "no": "نه"
+            },
+            "status": {
+              "active": "فعال",
+              "inactive": "غیر فعال"
+            }
+          }
+        }
       },
       "financialReports": {
+        "title": "مالي راپورونه",
+        "subtitle": "مالي راپورونه وګورئ او اداره کړئ",
         "create": "جوړول",
         "edit": "سمول",
-        "searchPlaceholder": "لټون..."
+        "details": "{{title}} - تفصیلات",
+        "searchPlaceholder": "د راپور ډول، دورې یا حالت له مخې لټون...",
+        "column": {
+          "reportType": "د راپور ډول",
+          "reportPeriod": "د راپور دوره",
+          "totalIncome": "ټول عاید",
+          "totalExpense": "ټول لګښت",
+          "netBalance": "خالص بیلانس",
+          "approvalStatus": "د تصویب حالت"
+        },
+        "formField": {
+          "reportType": "د راپور ډول",
+          "reportPeriod": "د راپور دوره",
+          "totalIncome": "ټول عاید",
+          "totalExpense": "ټول لګښت",
+          "netBalance": "خالص بیلانس",
+          "generatedAt": "په کې تولید شوی",
+          "approvalStatus": "د تصویب حالت",
+          "remarks": "ملاحظات",
+          "option": {
+            "approvalStatus": {
+              "pending": "په تمه",
+              "approved": "تصویب شوی",
+              "rejected": "رد شوی"
+            }
+          }
+        }
       },
       "studentFees": {
-        "chartAcademicYearMix": "د اکاډمیک کال ترکیب",
-        "chartPaymentStatusDistribution": "د تادیې د حالت ویش",
+        "title": "د زده کونکو فیسونه",
+        "subtitle": "د زده کونکو فیسونه وګورئ او اداره کړئ",
         "create": "جوړول",
         "edit": "سمول",
-        "errorDescription": "د معلوماتو بارولو کې تېروتنه رامنځته شوه",
-        "errorTitle": "تېروتنه",
-        "insightDescription": "توضیح",
-        "insightEyebrow": "ابرو",
-        "insightTitle": "سرلیک",
-        "searchPlaceholder": "لټون...",
+        "details": "{{title}} - تفصیلات",
+        "errorDescription": "د زده کونکو فیس معلوماتو په بارولو کې ستونزه وه. مهرباني وکړئ خپل اړیکه وګورئ او بیا هڅه وکړئ.",
+        "errorTitle": "د زده کونکو فیس معلوماتو تېروتنه",
+        "insight": {
+          "eyebrow": "د زده کونکو فیس بصیرت",
+          "title": "د فیس راټولولو حالت",
+          "description": "د فیس تخصیصونه، د تادیې بشپړیدو کچه او تېر شوي حسابونه د اکاډمیک کلونو په اوږدو کې تعقیب کړئ."
+        },
+        "insightEyebrowUnavailable": "د زده کونکو فیس معلومات شتون نلري",
+        "searchPlaceholder": "د زده کونکي نوم، آئډی یا اکاډمیک کال له مخې لټون...",
         "statFullyPaid": "بشپړ تادیه شوی",
-        "statFullyPaidHelper": "د بشپړ تادیه شوي مرسته کوونکی",
+        "statFullyPaidHelper": "هغه زده کونکي چې ټول ټاکل شوي فیسونه یې تادیه کړي",
         "statOutstandingBalance": "پاتې بیلانس",
-        "statOutstandingBalanceHelper": "د پاتې بیلانس مرسته کوونکی",
+        "statOutstandingBalanceHelper": "د ټولو زده کونکو نه تادیه شوی مقدار",
         "statOverdueAccounts": "تېر شوي حسابونه",
-        "statOverdueAccountsHelper": "د تېر شوي حسابونو مرسته کوونکی",
+        "statOverdueAccountsHelper": "هغه حسابونه چې د دوی وروستۍ نیټه تېره شوې",
         "statPartiallyPaid": "برخه یې تادیه شوی",
-        "statPartiallyPaidHelper": "د برخه تادیه شوي مرسته کوونکی",
+        "statPartiallyPaidHelper": "هغه زده کونکي چې برخه یې فیس تادیه کړی",
         "statStudentsWithFees": "د فیس لرونکي زده کونکي",
-        "statStudentsWithFeesHelper": "د فیس لرونکو زده کونکو مرسته کوونکی"
+        "statStudentsWithFeesHelper": "هغه زده کونکي چې د فیس جوړښت ورته ټاکل شوی",
+        "chart": {
+          "academicYearMix": "د اکاډمیک کال ترکیب",
+          "paymentStatusDistribution": "د تادیې د حالت ویش"
+        },
+        "column": {
+          "student": "زده کونکی",
+          "feeStructure": "د فیس جوړښت",
+          "academicYear": "اکاډمیک کال",
+          "totalAmount": "ټول مقدار",
+          "discountAmount": "د تخفیف مقدار",
+          "payableAmount": "د تادیې وړ مقدار",
+          "paymentStatus": "د تادیې حالت"
+        },
+        "formField": {
+          "student": "زده کونکی",
+          "feeStructure": "د فیس جوړښت",
+          "academicYear": "اکاډمیک کال",
+          "totalAmount": "ټول مقدار",
+          "discountAmount": "د تخفیف مقدار",
+          "payableAmount": "د تادیې وړ مقدار",
+          "dueDate": "وروستۍ نیټه",
+          "paymentStatus": "د تادیې حالت",
+          "remarks": "ملاحظات",
+          "option": {
+            "paymentStatus": {
+              "pending": "په تمه",
+              "paid": "تادیه شوی",
+              "partial": "برخه",
+              "overdue": "تېر شوی"
+            }
+          }
+        }
       },
       "transactions": {
-        "chartIncomeVsExpenseMix": "عاید د لګښت په مقابل کې ترکیب",
-        "chartMonthlyTransactionVolume": "میاشتنی د معاملو حجم",
-        "chartVerificationStatusBreakdown": "د تایید حالت ماتول",
+        "title": "معاملې",
+        "subtitle": "مالي معاملې وګورئ او اداره کړئ",
         "create": "جوړول",
         "edit": "سمول",
-        "errorDescription": "د معلوماتو بارولو کې تېروتنه رامنځته شوه",
-        "errorTitle": "تېروتنه",
-        "insightDescription": "توضیح",
-        "insightEyebrow": "ابرو",
-        "insightEyebrowUnavailable": "ابرو شتون نلري",
-        "insightTitle": "سرلیک",
-        "searchPlaceholder": "لټون...",
+        "details": "{{title}} - تفصیلات",
+        "errorDescription": "د معاملو معلوماتو په بارولو کې ستونزه وه. مهرباني وکړئ خپل اړیکه وګورئ او بیا هڅه وکړئ.",
+        "errorTitle": "د معاملو معلوماتو تېروتنه",
+        "insight": {
+          "eyebrow": "د معاملو بصیرت",
+          "title": "عاید او لګښت کتنه",
+          "description": "د عاید او لګښت جریانونه، د تایید کتارونه او میاشتني حجم تمایلات د خپل مالي دریځ د څارلو لپاره وڅیړئ."
+        },
+        "insightEyebrowUnavailable": "د معاملو معلومات شتون نلري",
+        "searchPlaceholder": "د کوډ، توضیح یا حوالې له مخې لټون...",
         "statNetBalance": "خالص بیلانس",
-        "statNetBalanceNegative": "منفي خالص بیلانس",
-        "statNetBalancePositive": "مثبت خالص بیلانس",
+        "statNetBalanceNegative": "لګښتونه له عاید څخه زیات دي",
+        "statNetBalancePositive": "عاید له لګښتونو څخه زیات دی",
         "statTotalExpenses": "ټول لګښتونه",
-        "statTotalExpensesHelper": "د ټولو لګښتونو مرسته کوونکی",
+        "statTotalExpensesHelper": "د ټولو لګښت ډول معاملو مجموعه",
         "statTotalIncome": "ټول عاید",
-        "statTotalIncomeHelper": "د ټول عاید مرسته کوونکی",
+        "statTotalIncomeHelper": "د ټولو عاید ډول معاملو مجموعه",
         "statTotalTransactions": "ټولې معاملې",
-        "statTotalTransactionsHelper": "د ټولو معاملو مرسته کوونکی",
+        "statTotalTransactionsHelper": "د عاید او لګښت ټول ریکارډونه",
         "statVerificationQueue": "د تایید کتار",
-        "statVerificationQueueHelper": "د تایید کتار مرسته کوونکی"
+        "statVerificationQueueHelper": "معاملې د تایید تصویب ته انتظار",
+        "chart": {
+          "incomeVsExpenseMix": "عاید د لګښت په مقابل کې ترکیب",
+          "monthlyTransactionVolume": "میاشتنی د معاملو حجم",
+          "verificationStatusBreakdown": "د تایید حالت ماتول",
+          "income": "عاید",
+          "expense": "لګښت"
+        },
+        "column": {
+          "transactionDate": "د معاملې نیټه",
+          "transactionCode": "د معاملې کوډ",
+          "description": "توضیح",
+          "transactionType": "د معاملې ډول",
+          "amount": "مقدار",
+          "verificationStatus": "د تایید حالت"
+        },
+        "formField": {
+          "transactionType": "د معاملې ډول",
+          "account": "حساب",
+          "amount": "مقدار",
+          "transactionDate": "د معاملې نیټه",
+          "referenceType": "د حوالې ډول",
+          "description": "توضیح",
+          "verificationStatus": "د تایید حالت",
+          "accountCode": "د حساب کوډ",
+          "option": {
+            "transactionType": {
+              "income": "عاید",
+              "expense": "لګښت"
+            },
+            "verificationStatus": {
+              "verified": "تایید شوی",
+              "pending": "په تمه",
+              "rejected": "رد شوی"
+            }
+          }
+        }
       }
     },
     "transactions": "معاملې",
@@ -4640,37 +5445,163 @@
     "expenses": "مصارف",
     "finReports": "مالي راپورونه",
     "payroll": {
+      "label": "معاش",
       "salaryAdvances": {
-        "create": {
-          "titleCreate": "جوړول",
-          "titleEdit": "سمول"
+        "title": "د معاش پیشکي",
+        "subtitle": "د معاش د پیشکي غوښتنې مدیریت",
+        "eyebrow": "د معاش د پیشکي کتنه",
+        "loadingSubtitle": "مهرباني وکړئ انتظار وکړئ معلومات بارول کیږي",
+        "searchPlaceholder": "د معاش پیشکي لټون...",
+        "columns": {
+          "employee": "کارکوونکی",
+          "advanceAmount": "د پیشکي مقدار",
+          "requestDate": "د غوښتنې نېټه",
+          "approvalDate": "د تصویب نېټه",
+          "remainingBalance": "پاتې بیلانس",
+          "advanceStatus": "حالت"
         },
-        "searchPlaceholder": "لټون...",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "fields": {
+          "employee": "کارکوونکی",
+          "advanceAmount": "د پیشکي مقدار",
+          "requestDate": "د غوښتنې نېټه",
+          "approvalDate": "د تصویب نېټه",
+          "repaymentStartMonth": "د بیا تادیې پیل میاشت",
+          "monthlyDeductionAmount": "میاشتنی کسر مقدار",
+          "remainingBalance": "پاتې بیلانس",
+          "advanceStatus": "حالت"
+        },
+        "options": {
+          "advanceStatus": {
+            "pending": "په تمه",
+            "approved": "منظور شوی",
+            "rejected": "رد شوی",
+            "closed": "بند شوی"
+          }
+        },
+        "cards": {
+          "totalRequests": "ټول غوښتنې",
+          "approvedRequests": "منظور شوی",
+          "pendingRequests": "په تمه",
+          "totalAdvanced": "ټول پیشکي شوی",
+          "averageAdvance": "اوسط پیشکي"
+        },
+        "charts": {
+          "advanceByStatus": "د حالت له مخې پیشکي",
+          "monthlyAdvances": "میاشتني پیشکي",
+          "advanceDistribution": "د پیشکي ویش"
+        },
+        "create": {
+          "titleCreate": "د معاش پیشکي جوړول",
+          "titleEdit": "د معاش پیشکي سمول"
+        },
+        "errors": {
+          "loadError": "د بارولو تېروتنه",
+          "loadFailed": "معلومات بارول ناکام شول"
+        },
         "view": {
-          "details": "تفصیلات"
+          "details": "د معاش د پیشکي تفصیلات"
         }
       },
       "salaryDeductions": {
-        "create": {
-          "titleCreate": "جوړول",
-          "titleEdit": "سمول"
+        "title": "د معاش کسرونه",
+        "subtitle": "د معاش د کسر ریکارډونو مدیریت",
+        "eyebrow": "د معاش د کسرونو کتنه",
+        "loadingSubtitle": "مهرباني وکړئ انتظار وکړئ معلومات بارول کیږي",
+        "searchPlaceholder": "د معاش کسر لټون...",
+        "columns": {
+          "employee": "کارکوونکی",
+          "deductionType": "د کسر ډول",
+          "deductionAmount": "مقدار",
+          "deductionMonth": "میاشت",
+          "deductionYear": "کال",
+          "status": "حالت"
         },
-        "searchPlaceholder": "لټون...",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "fields": {
+          "employee": "کارکوونکی",
+          "deductionType": "د کسر ډول",
+          "deductionReason": "د کسر دلیل",
+          "deductionAmount": "د کسر مقدار",
+          "deductionMonth": "د کسر میاشت",
+          "deductionYear": "د کسر کال",
+          "status": "حالت"
+        },
+        "options": {
+          "status": {
+            "pending": "په تمه",
+            "approved": "منظور شوی",
+            "rejected": "رد شوی"
+          }
+        },
+        "cards": {
+          "totalDeductions": "ټول کسرونه",
+          "approvedDeductions": "منظور شوی",
+          "pendingDeductions": "په تمه",
+          "totalDeducted": "ټول کسر شوی",
+          "averageDeduction": "اوسط کسر"
+        },
+        "charts": {
+          "deductionByType": "د ډول له مخې کسر",
+          "monthlyDeductions": "میاشتني کسرونه",
+          "deductionByStatus": "د حالت له مخې کسر"
+        },
+        "create": {
+          "titleCreate": "د معاش کسر جوړول",
+          "titleEdit": "د معاش کسر سمول"
+        },
+        "errors": {
+          "loadError": "د بارولو تېروتنه",
+          "loadFailed": "معلومات بارول ناکام شول"
+        },
         "view": {
-          "details": "تفصیلات"
+          "details": "د معاش د کسر تفصیلات"
         }
       },
       "salaryPayments": {
+        "title": "د معاش تادیات",
+        "subtitle": "د معاش د تادیې ریکارډونو مدیریت",
+        "eyebrow": "د معاش تادیاتو کتنه",
+        "loadingSubtitle": "مهرباني وکړئ انتظار وکړئ معلومات بارول کیږي",
+        "searchPlaceholder": "د معاش تادیاتو لټون...",
+        "columns": {
+          "employee": "کارکوونکی",
+          "salaryMonth": "میاشت",
+          "salaryYear": "کال",
+          "grossSalary": "ناخالص معاش",
+          "netSalary": "خالص معاش",
+          "paymentStatus": "حالت"
+        },
+        "fields": {
+          "employee": "کارکوونکی",
+          "salaryMonth": "د معاش میاشت",
+          "salaryYear": "د معاش کال",
+          "grossSalary": "ناخالص معاش",
+          "totalAllowance": "ټول الاؤنس",
+          "totalDeduction": "ټول کسر",
+          "netSalary": "خالص معاش",
+          "paymentDate": "د تادیې نېټه",
+          "paymentMethod": "د تادیې طریقه",
+          "transactionReference": "د راکړې ورکړې حواله",
+          "paymentStatus": "د تادیې حالت"
+        },
+        "options": {
+          "paymentMethod": {
+            "cash": "نغدي",
+            "bank": "بانک",
+            "card": "کارت",
+            "other": "نور"
+          },
+          "paymentStatus": {
+            "pending": "په تمه",
+            "paid": "تادیه شوی",
+            "failed": "ناکام"
+          }
+        },
         "cards": {
-          "amountDisbursed": "تقسیم شوی مقدار",
-          "failedPayments": "ناکامې تادیات",
-          "nextPayrollDate": "د راتلونکي معاش نېټه",
           "paidThisMonth": "دا میاشت تادیه شوی",
-          "pendingPayments": "په تمه تادیات"
+          "amountDisbursed": "تقسیم شوی مقدار",
+          "pendingPayments": "په تمه تادیات",
+          "failedPayments": "ناکامې تادیات",
+          "nextPayrollDate": "د راتلونکي معاش نېټه"
         },
         "charts": {
           "monthlyPayroll": "میاشتنی معاش",
@@ -4678,57 +5609,79 @@
           "paymentStatusBreakdown": "د تادیې د حالت ماتول"
         },
         "create": {
-          "titleCreate": "جوړول",
-          "titleEdit": "سمول"
+          "titleCreate": "د معاش تادیه جوړول",
+          "titleEdit": "د معاش تادیه سمول"
         },
         "errors": {
           "loadError": "د بارولو تېروتنه",
           "loadFailed": "معلومات بارول ناکام شول"
         },
-        "eyebrow": "د معاش تادیاتو کتنه",
         "insights": {
           "noPending": "تمه تادیات نشته"
         },
-        "loadingSubtitle": "مهرباني وکړئ انتظار وکړئ معلومات بارول کیږي",
-        "searchPlaceholder": "لټون...",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
         "view": {
-          "details": "تفصیلات"
+          "details": "د معاش د تادیې تفصیلات"
         }
       },
       "salaryStructures": {
+        "title": "د معاش جوړښتونه",
+        "subtitle": "د کارکوونکي د ډول له مخې د معاش جوړښت تعریف کړئ",
+        "eyebrow": "د معاش جوړښتونو کتنه",
+        "loadingSubtitle": "مهرباني وکړئ انتظار وکړئ معلومات بارول کیږي",
+        "searchPlaceholder": "د معاش جوړښت لټون...",
+        "columns": {
+          "employeeType": "د کارکوونکي ډول",
+          "basicSalary": "اساسي معاش",
+          "allowanceAmount": "الاؤنس",
+          "overtimeRate": "د اضافه وخت کچه",
+          "taxPercentage": "د مالیه فیصدي",
+          "status": "حالت"
+        },
+        "fields": {
+          "employeeType": "د کارکوونکي ډول",
+          "basicSalary": "اساسي معاش",
+          "allowanceAmount": "د الاؤنس مقدار",
+          "housingAllowance": "د کور الاؤنس",
+          "foodAllowance": "د خوراک الاؤنس",
+          "transportAllowance": "د ترانسپورت الاؤنس",
+          "overtimeRate": "د اضافه وخت کچه",
+          "deductionType": "د کسر ډول",
+          "taxPercentage": "د مالیه فیصدي",
+          "effectiveFrom": "له نېټې څخه نافذ",
+          "status": "حالت"
+        },
+        "options": {
+          "status": {
+            "active": "فعال",
+            "inactive": "غیرفعال"
+          }
+        },
         "cards": {
+          "totalStructures": "ټول جوړښتونه",
           "activeStructures": "فعال جوړښتونه",
           "averageBasicSalary": "اوسط اساسي معاش",
-          "employeeTypesCovered": "پوښل شوي کارکوونکي ډولونه",
           "salaryRange": "د معاش سلسله",
-          "totalStructures": "ټول جوړښتونه"
+          "employeeTypesCovered": "پوښل شوي کارکوونکي ډولونه"
         },
         "charts": {
-          "allowanceDistribution": "د الاؤنس ویش",
-          "allowanceFood": "د خوراک الاؤنس",
-          "allowanceHousing": "د کور الاؤنس",
-          "allowanceStandard": "معیاري الاؤنس",
-          "allowanceTransport": "د ترانسپورت الاؤنس",
           "salaryByEmployeeType": "د کارکوونکي ډول له مخې معاش",
-          "structureStatus": "د جوړښت حالت"
+          "structureStatus": "د جوړښت حالت",
+          "allowanceDistribution": "د الاؤنس ویش",
+          "allowanceStandard": "معیاري الاؤنس",
+          "allowanceHousing": "د کور الاؤنس",
+          "allowanceFood": "د خوراک الاؤنس",
+          "allowanceTransport": "د ترانسپورت الاؤنس"
         },
         "create": {
-          "titleCreate": "جوړول",
-          "titleEdit": "سمول"
+          "titleCreate": "د معاش جوړښت جوړول",
+          "titleEdit": "د معاش جوړښت سمول"
         },
         "errors": {
           "loadError": "د بارولو تېروتنه",
           "loadFailed": "معلومات بارول ناکام شول"
         },
-        "eyebrow": "د معاش جوړښتونو کتنه",
-        "loadingSubtitle": "مهرباني وکړئ انتظار وکړئ معلومات بارول کیږي",
-        "searchPlaceholder": "لټون...",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
         "view": {
-          "details": "تفصیلات"
+          "details": "د معاش د جوړښت تفصیلات"
         }
       }
     },
@@ -4736,7 +5689,229 @@
     "salaryPayments": "د معاش تادیات",
     "salaryDeductions": "د معاش کسرونه",
     "salaryAdvances": "د معاش پیشکي",
-    "kitchen": "مطبخ",
+    "kitchen": {
+      "mealPlanning": "د خواړو پلان جوړونه",
+      "planMeals": "د زده کونکو او کارکوونکو لپاره ورځني خواړه پلان او مهالویش کړئ",
+      "mealType": "د خواړو ډول",
+      "servings": "خدمتونه",
+      "cost": "لګښت",
+      "mealName": "د خواړو نوم",
+      "type": "ډول",
+      "kitchenInventory": "د مطبخ ذخیره",
+      "trackInventory": "اجزاء، توکي او د ذخیرې کچه تعقیب کړئ",
+      "addItem": "توکی اضافه کړئ",
+      "itemName": "د توکی نوم",
+      "unit": "واحد",
+      "minStockLevel": "لږ د ذخیرې کچه",
+      "noInventory": "د ذخیرې توکي نشته",
+      "deleteItemConfirm": "دا توکی ړنګ کړئ؟",
+      "weeklyMenu": "اوونیز مینو",
+      "manageMenu": "د اوونیز مینو مهالویش مدیریت",
+      "breakfast": "ناشته (سهار)",
+      "lunch": "غرمه",
+      "dinner": "ډوډۍ",
+      "snacks": "ناشتې",
+      "wasteTracking": {
+        "title": "د ضایعاتو تعقیب",
+        "subtitle": "د آشپزخانې د ضایعاتو او تصفیې څارنه او تعقیب",
+        "itemName": "د توکي نوم",
+        "wasteDate": "د ضایعاتو نیټه",
+        "reason": "علت",
+        "spoiled": "خراب شوی",
+        "expired": "تاریخ تېر شوی",
+        "overcooked": "ډېر پخلی شوی",
+        "other": "نور",
+        "searchPlaceholder": "د ضایعاتو ریکارډونو لټون...",
+        "titleCreate": "د ضایعاتو ریکارډ جوړول",
+        "titleEdit": "د ضایعاتو ریکارډ سمول",
+        "viewTitle": "د ضایعاتو ریکارډ تفصیلات"
+      },
+      "monitorWaste": "د مطبخ ضایعات او تخریب څارل او تعقیب کړئ",
+      "disposalMethod": "د تخریب طریقه",
+      "disposal": "تخریب",
+      "suppliers": {
+        "title": "چمتو کوونکي",
+        "subtitle": "د آشپزخانې د توکو چمتو کوونکي مدیریت",
+        "supplierName": "د چمتو کوونکي نوم",
+        "itemsSupplied": "چمتو شوي توکي",
+        "searchPlaceholder": "د چمتو کوونکو لټون...",
+        "titleCreate": "چمتو کوونکی جوړول",
+        "titleEdit": "چمتو کوونکی سمول",
+        "viewTitle": "د چمتو کوونکي تفصیلات"
+      },
+      "manageSuppliers": "د مطبخ توکو چمتو کوونکي اداره کړئ",
+      "contactPerson": "د اړیکې شخص",
+      "contact": "اړیکه",
+      "kitchenReports": "د مطبخ راپورونه",
+      "kitchenAnalytics": "د مطبخ عملیات تحلیل او راپور ورکول",
+      "dailyMeals": "ورځني خواړه",
+      "monthlyCost": "میاشتنی لګښت",
+      "wastePercent": "ضایعات٪",
+      "supplierCount": "د چمتو کوونکو شمېر",
+      "date": "نیټه",
+      "description": "تشریح",
+      "category": "کتګوري",
+      "reason": "علت",
+      "addNew": "نوی اضافه کړئ",
+      "day": "ورځ",
+      "unitKg": "کیلوګرام",
+      "unitG": "ګرام",
+      "unitLiter": "لیتر",
+      "unitMl": "ملی لیتر",
+      "unitPiece": "ټوټه",
+      "unitPacket": "بسته",
+      "lowStock": "کمه ذخیره",
+      "outOfStock": "له ذخیرې وتلی",
+      "quantity": "اندازه",
+      "unitPrice": "واحد نرخ",
+      "available": "شته",
+      "totalStudents": "ټول زده کونکي",
+      "totalStaff": "ټول کارکوونکي",
+      "numberOfStudents": "د زده کونکو شمېر",
+      "numberOfStaff": "د کارکوونکو شمېر",
+      "preparedBy": "تخیر شوی له لوري",
+      "supervisedBy": "څارل شوی له لوري",
+      "filterByDate": "د نیټې له مخې فلټر",
+      "weekStart": "د اونۍ پیل",
+      "weekEnd": "د اونۍ پای",
+      "menuItems": "د مینو توکي",
+      "menuItemsHint": "د مینو توکو اشاره",
+      "notes": "یادښتونه",
+      "allDays": "ټولې ورځې",
+      "totalMeals": "ټول خواړه",
+      "students": "زده کونکي",
+      "staff": "کارکوونکي",
+      "totalPurchases": "ټولې پیرودنې",
+      "transactions": "معاملې",
+      "totalWaste": "ټول ضایعات",
+      "records": "ریکارډونه",
+      "inventoryStatus": "د ذخیرې حالت",
+      "consumptionSummary": "د مصرف لنډیز",
+      "studentMeals": "د زده کونکو خواړه",
+      "staffMeals": "د کارکوونکو خواړه",
+      "consumptionCount": "د مصرف شمېر",
+      "financialSummary": "مالي لنډیز",
+      "purchaseCount": "د پیرود شمېر",
+      "inventoryItems": "د ذخیرې توکي",
+      "lowStockItems": "کمه ذخیره توکي",
+      "itemsSupplied": "چمتو شوي توکي",
+      "itemsHint": "د توکو اشاره",
+      "remarks": "تبصرې",
+      "mainDish": "اصلي ډوډۍ",
+      "sideDish": "اړخيزه ډوډۍ",
+      "dessert": "خوږه",
+      "beverage": "څښاک",
+      "inventory": {
+        "title": "د آشپزخانه موجودي",
+        "subtitle": "د موادو، توکو او موجودي کچو تعقیب",
+        "eyebrow": "آشپزخانه",
+        "itemName": "د توکي نوم",
+        "available": "شته",
+        "unitPrice": "د واحد بیه",
+        "stockStatus": "د موجودي حالت",
+        "lowStock": "کم موجودي",
+        "outOfStock": "پای ته رسېدلی",
+        "itemsInStock": "په موجودي کې توکي",
+        "itemsToReorder": "د بیا امر توکي",
+        "inventoryValue": "د موجودي ارزښت",
+        "lowStockAlerts": "د کم موجودي خبرداری",
+        "itemsByCategory": "توکي د کټګورۍ له مخې",
+        "topItemsByQuantity": "لوړ توکي د تعداد له مخې",
+        "minimumStock": "لږ تر لږه موجودي",
+        "searchPlaceholder": "د موجودي توکو لټون...",
+        "titleCreate": "د موجودي توکي جوړول",
+        "titleEdit": "د موجودي توکي سمول",
+        "viewTitle": "د موجودي توکي تفصیلات",
+        "failedToLoad": "د موجودي بارولو ناکامي",
+        "failedToLoadInsights": "د موجودي لیدونو بارولو ناکامي",
+        "loadingSubtitle": "د موجودي معلوماتو بارول..."
+      },
+      "dailyPlaning": {
+        "title": "ورځنی مصرف",
+        "subtitle": "د ورځني خوراک مصرف او کارونې تعقیب",
+        "itemName": "د توکي نوم",
+        "mealType": "د خوراک ډول",
+        "quantityUsed": "کارول شوی مقدار",
+        "date": "نیټه",
+        "consumptionDate": "د مصرف نیټه",
+        "numberOfStudents": "د زده‌کوونکو شمېر",
+        "numberOfStaff": "د کارمندانو شمېر",
+        "preparedBy": "لخوا چمتو شوی",
+        "supervisedBy": "لخوا څارل شوی",
+        "searchPlaceholder": "د ورځني مصرف لټون...",
+        "titleCreate": "د مصرف ریکارډ جوړول",
+        "titleEdit": "د مصرف ریکارډ سمول",
+        "viewTitle": "د مصرف ریکارډ تفصیلات"
+      },
+      "mealPlaning": {
+        "title": "د خوراک پلان جوړونه",
+        "subtitle": "د زده‌کوونکو او کارمندانو لپاره د ورځنیو خوړو پلان او مهالویش",
+        "allocated": "ځانګړی شوی",
+        "allocatedAmount": "ځانګړی شوی مقدار",
+        "approved": "منل شوی",
+        "approvedAmount": "منل شوی مقدار",
+        "spent": "لګول شوی",
+        "spentAmount": "لګول شوی مقدار",
+        "remaining": "پاتې",
+        "remainingAmount": "پاتې مقدار",
+        "budgetStatus": "د بودجې حالت",
+        "searchPlaceholder": "د خوراک پلانونو لټون...",
+        "titleCreate": "د خوراک پلان جوړول",
+        "titleEdit": "د خوراک پلان سمول",
+        "viewTitle": "د خوراک پلان تفصیلات"
+      },
+      "foodRequest": {
+        "title": "د بودجې غوښتنې",
+        "subtitle": "د میاشتني آشپزخانې د بودجې غوښتنې سپارل او تعقیب",
+        "eyebrow": "آشپزخانه",
+        "totalRequests": "ټولې غوښتنې",
+        "totalRequested": "ټول غوښتل شوي",
+        "totalApproved": "ټول منل شوي",
+        "newBudgetRequest": "نوې بودجې غوښتنه",
+        "requestedAmount": "غوښتل شوی مقدار (AFN) *",
+        "remarksReason": "ملاحظات / علت",
+        "submitRequest": "غوښتنه سپارل",
+        "submitting": "سپارل کېږي...",
+        "monthYear": "میاشت/کال",
+        "requested": "غوښتل شوی",
+        "approved": "منل شوی",
+        "spent": "لګول شوی",
+        "remaining": "پاتې",
+        "noBudgetRequests": "د بودجې کومه غوښتنه ونه موندل شوه",
+        "failedToSubmit": "د غوښتنې سپارل ناکام شول"
+      },
+      "reports": {
+        "title": "د آشپزخانې راپورونه",
+        "subtitleDaily": "ورځنی د آشپزخانې لنډیز او شننه",
+        "subtitleWeekly": "اوونیز د آشپزخانې لنډیز او شننه",
+        "subtitleMonthly": "میاشتنی د آشپزخانې لنډیز او شننه",
+        "eyebrow": "آشپزخانه",
+        "loading": "راپور بارېږي...",
+        "noData": "د دې مودې لپاره معلومات شتون نلري",
+        "failedToLoad": "راپور بارول ناکام شول",
+        "totalPurchases": "ټولې اخستنې",
+        "totalMealsServed": "ټولې سرو شوې خواړه",
+        "studentMeals": "د زده‌کوونکو خواړه",
+        "staffMeals": "د کارمندانو خواړه",
+        "totalInventoryItems": "ټول د موجودي توکي",
+        "lowStockItems": "کم موجودي توکي",
+        "wasteRecords": "د ضایعاتو ریکارډونه",
+        "activeStudents": "فعال زده‌کوونکي",
+        "budget": "بودجه",
+        "budgetAllocated": "ځانګړی شوی",
+        "budgetApproved": "منل شوی",
+        "budgetSpent": "لګول شوی",
+        "budgetRemaining": "پاتې",
+        "budgetUsage": "د بودجې کارونه"
+      },
+      "label": "آشپزخانه",
+      "weekStartDate": "د اونۍ پیل",
+      "weekEndDate": "د اونۍ پای",
+      "searchPlaceholder": "د اوونیز مینو لټون...",
+      "titleCreateWeekly": "د اوونیز مینو ننوتنه جوړول",
+      "titleEditWeekly": "د اوونیز مینو ننوتنه سمول",
+      "viewTitleWeekly": "د اوونیز مینو تفصیلات"
+    },
     "kitInventory": "ذخیره",
     "mealPlan": "د خواړو پلان",
     "dailyPurchases": "ورځنۍ پیرودنې",
@@ -4745,43 +5920,321 @@
     "waste": "د ضایعاتو تعقیب",
     "budgetReq": "د بودجې غوښتنې",
     "hr": {
+      "label": "بشري سرچینې",
       "attendance": {
         "failedSave": "حاضري خوندي کول ناکام شول",
         "noEmployees": "کارکوونکي ونه موندل شول",
         "remarksPlaceholder": "یادداشتونه داخل کړئ...",
         "saveAttendance": "حاضري خوندي کړئ",
         "selectDate": "نېټه وټاکئ",
-        "subtitle": "فرعي سرلیک",
+        "status": {
+          "present": "حاضر",
+          "absent": "غیر حاضر",
+          "late": "ناوخته",
+          "half-day": "نیمه ورځ",
+          "on-leave": "رخصت"
+        },
+        "subtitle": "د کارمندانو د ورځني حاضري ریکارډونه اداره کړئ",
         "tableCheckIn": "ننوتل",
         "tableCheckOut": "وتل",
         "tableCode": "کوډ",
         "tableEmployee": "کارکوونکی",
         "tableRemarks": "یادداشتونه",
         "tableStatus": "حالت",
-        "title": "سرلیک"
+        "title": "حاضري"
       },
       "departments": {
+        "coldepartmentCode": "کوډ",
+        "coldepartmentName": "د څانګې نوم",
+        "coldepartmentHead": "د څانګې مشر",
+        "collocation": "ځای",
+        "colstatus": "حالت",
         "createTitle": "څانګه جوړه کړئ",
         "editTitle": "څانګه سمول",
+        "fielddepartmentName": "د څانګې نوم",
+        "fielddepartmentCode": "د څانګې کوډ",
+        "fielddepartmentHead": "د څانګې مشر",
+        "fieldlocation": "ځای",
+        "fieldcontactExtension": "د اړیکې تمدید",
+        "fieldstatus": "حالت",
+        "fielddescription": "تفصیل",
+        "optionstatusActive": "فعال",
+        "optionstatusInactive": "غیر فعال",
         "searchPlaceholder": "لټون...",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "subtitle": "د اداري څانګو مدیریت",
+        "title": "څانګې",
         "viewTitle": "د څانګې تفصیلات"
       },
       "designations": {
+        "coldesignationTitle": "د عنوان نوم",
+        "coldepartment": "څانګه",
+        "coljobLevel": "د دندې کچه",
+        "colsalaryRangeMin": "لږ تر لږه معاش",
+        "colsalaryRangeMax": "زیات تر زیاته معاش",
+        "colstatus": "حالت",
         "createTitle": "عنوان جوړ کړئ",
         "editTitle": "عنوان سمول",
+        "fielddesignationTitle": "د عنوان نوم",
+        "fielddepartment": "څانګه",
+        "fieldjobLevel": "د دندې کچه",
+        "fieldsalaryRangeMin": "لږ تر لږه معاش",
+        "fieldsalaryRangeMax": "زیات تر زیاته معاش",
+        "fieldstatus": "حالت",
+        "optionstatusActive": "فعال",
+        "optionstatusInactive": "غیر فعال",
         "searchPlaceholder": "لټون...",
-        "subtitle": "فرعي سرلیک",
-        "title": "سرلیک",
+        "subtitle": "د دندو عنوانونه او موقعیتونه مدیریت کړئ",
+        "title": "عنوانونه",
         "viewTitle": "د عنوان تفصیلات"
       },
       "employees": {
+        "averageSalary": "منځنی معاش",
+        "byDepartment": "کارکوونکي د څانګې له مخې",
+        "byType": "کارکوونکي د ډول له مخې",
+        "colphoto": "عکس",
+        "colemployeeCode": "کوډ",
+        "colfullName": "مکمل نوم",
+        "coldepartment": "څانګه",
+        "coldesignation": "عنوان",
+        "colphoneNumber": "د تلیفون شمېره",
+        "colemployeeType": "د کارکوونکي ډول",
+        "colstatus": "حالت",
         "createTitle": "کارکوونکی جوړ کړئ",
         "editTitle": "کارکوونکی سمول",
+        "fielduser": "د کارن حساب",
+        "fieldimage": "د کارکوونکي عکس",
+        "fieldfullName": "مکمل نوم",
+        "fieldfullNameArabic": "مکمل نوم (عربي)",
+        "fieldfatherName": "د پلار نوم",
+        "fielddateOfBirth": "د زیږون نیټه",
+        "fieldgender": "جنس",
+        "fieldcnic": "پیژندپاڼه",
+        "fieldphone": "د تلیفون شمېره",
+        "fieldemail": "ایمیل",
+        "fieldcurrentAddress": "اوسنی پته",
+        "fieldemergencyContactName": "د بیړني اړیکي نوم",
+        "fieldemergencyContactPhone": "د بیړني اړیکي تلیفون",
+        "fieldemployeeType": "د کارکوونکي ډول",
+        "fielddepartment": "څانګه",
+        "fielddesignation": "عنوان",
+        "fieldjoiningDate": "د ګډون نیټه",
+        "fieldemploymentType": "د استخدام ډول",
+        "fieldbaseSalary": "بنسټیز معاش",
+        "fieldhouseAllowance": "د کور الاوه",
+        "fieldtransportAllowance": "د ترانسپورت الاوه",
+        "fieldmedicalAllowance": "د طبي الاوه",
+        "fieldpaymentMethod": "د تادیې میتود",
+        "fieldbankName": "د بانک نوم",
+        "fieldaccountNumber": "د حساب شمېره",
+        "fieldstatus": "حالت",
+        "genderDistribution": "د جنس ویش",
+        "optiongenderMale": "نارینه",
+        "optiongenderFemale": "ښځینه",
+        "optionemploymentTypePermanent": "دایمي",
+        "optionemploymentTypeContract": "تړون",
+        "optionemploymentTypePartTime": "نیم وخت",
+        "optionpaymentMethodCash": "نقد",
+        "optionpaymentMethodBankTransfer": "بانکي لیږد",
+        "optionstatusActive": "فعال",
+        "optionstatusInactive": "غیر فعال",
         "profileAlt": "د کارکوونکي پروفایل",
-        "subtitle": "فرعي سرلیک",
-        "viewTitle": "د کارکوونکي تفصیلات"
+        "recentHires": "وروستي ګمارنې",
+        "searchPlaceholder": "لټون...",
+        "subtitle": "د کارمندانو ریکارډونه د بشپړ پروفایل سره مدیریت کړئ",
+        "title": "کارکوونکي",
+        "viewTitle": "د کارکوونکي تفصیلات",
+        "registration": {
+          "positionTitle": "د دندې / رول ټاکنه",
+          "positionDesc": "ټول مناسب موقعیتونه وټاکئ. د انتخاب لپاره کلیک وکړئ، \"د اصلي په توګه وټاکئ\" د اصلي رول لپاره.",
+          "primaryRole": "اصلي رول",
+          "setAsPrimary": "د اصلي په توګه وټاکئ",
+          "selected": "ټاکل شوی",
+          "positions": "موقعیتونه",
+          "primaryRoleLabel": "اصلي رول",
+          "loginRole": "د ننوتلو رول",
+          "loginRoleDesc": "د ټاکل شوي اصلي موقعیت پراساس.",
+          "accountInfo": "د حساب معلومات",
+          "accountInfoDesc": "د کارمند لپاره د ننوتلو حساب جوړ کړئ. که حساب دمخه شتون ولري، نو یې وصل کړئ.",
+          "linkUser": "د موجود کارن حساب سره وصل کړئ",
+          "createNewUser": "نوی کارن حساب جوړ کړئ",
+          "personalInfo": "شخصي معلومات",
+          "employeePhoto": "د کارمند عکس",
+          "profilePreview": "د پروفایل مخکتنه",
+          "noPhoto": "عکس نشته",
+          "contactInfo": "د اړیکو معلومات",
+          "emergencyContact": "بیړنۍ اړیکه",
+          "employmentDetails": "د کار جزییات",
+          "qualifications": "د وړتیاوې او تجربه",
+          "salaryBank": "د معاش او بانک جزییات",
+          "cancel": "لغوه کړئ",
+          "selectDefault": "غوره کړئ",
+          "positionTeacher": "ښوونکی",
+          "positionTeacherDesc": "د ټولګیو او مضامینو لپاره تدریسي کارکوونکي",
+          "positionAdmin": "مدیریت",
+          "positionAdminDesc": "اداري او مدیریتي کارکوونکي",
+          "positionFinance": "مالیه",
+          "positionFinanceDesc": "مالي او محاسبه کارکوونکي",
+          "positionRegistrar": "ثبت",
+          "positionRegistrarDesc": "د زده کونکو چارې او ثبت",
+          "positionHr": "HR",
+          "positionHrDesc": "د بشري منابعو او ګمارنې",
+          "positionLibrarian": "کتابتون",
+          "positionLibrarianDesc": "د کتابتون مدیریت کارکوونکي",
+          "positionKitchen": "پخلنځی",
+          "positionKitchenDesc": "د پخلنځي او خوړو کارکوونکي",
+          "positionSecurity": "امنیت",
+          "positionSecurityDesc": "د امنیت او خوندیتوب پرسونل",
+          "positionSupport": "مرسته",
+          "positionSupportDesc": "عمومي ملاتړ کارکوونکي",
+          "positionMaintenance": "ساتنه",
+          "positionMaintenanceDesc": "ساتنه او تاسیسات",
+          "positionPayroll": "معاش",
+          "positionPayrollDesc": "د معاش او تنخوا مدیریت کارکوونکي",
+          "positionComplaints": "شکایتونه",
+          "positionComplaintsDesc": "د شکایتونو مدیریت کارکوونکي",
+          "positionInventory": "زیرمه",
+          "positionInventoryDesc": "د زيرمي مدیریت کارکوونکي",
+          "positionGeneralManager": "عمومي مدیر",
+          "positionGeneralManagerDesc": "د ټولو کارمندانو پینل عملیات څاري",
+          "employeeCodePlaceholder": "لکه EMP-2024-001",
+          "shiftTimingPlaceholder": "لکه سهار (۸ بجو-۲ بجو)",
+          "highestQualPlaceholder": "لکه په اسلامي علومو کې ماسټري",
+          "specializationPlaceholder": "لکه قرآن، حدیث، فقه",
+          "accountEmailPlaceholder": "employee@madrasa.edu",
+          "accountPasswordPlaceholder": "لږترلږه ۶ حروف",
+          "selectDepartment": "څانګه وټاکئ",
+          "selectDesignation": "عنوان وټاکئ",
+          "roleAdmin": "اداره کوونکی",
+          "roleTeacher": "ښوونکی",
+          "roleStaff": "کارمند"
+        },
+        "fieldemployeeCode": "د کارمند کوډ",
+        "fieldsecondaryPhone": "ثانوي تلیفون",
+        "fieldpermanentAddress": "دایمي پته",
+        "fieldemergencyContactRelation": "اړیکه",
+        "fieldshiftTiming": "د شفټ وخت",
+        "fieldhighestQualification": "لوړه وړتیا",
+        "fieldspecialization": "تخصص / مضمون",
+        "fieldpreviousExperience": "مخکینۍ تجربه (کاله)",
+        "fieldaccountTitle": "د حساب عنوان",
+        "fieldmaritalStatus": "ازدواجي حالت",
+        "fieldbloodGroup": "د وینې ګروپ",
+        "optionmaritalSingle": "مجرد",
+        "optionmaritalMarried": "واده کړی",
+        "optionmaritalDivorced": "طلاق شوی",
+        "optionmaritalWidowed": "کونډه"
+      },
+      "leaveTypes": {
+        "title": "د رخصتۍ ډولونه",
+        "subtitle": "د رخصتۍ پالیسۍ او ترتیبات مدیریت کړئ",
+        "colleaveCode": "کوډ",
+        "colleaveTypeName": "د رخصتۍ ډول",
+        "colmaxDaysAllowed": "اعظمي ورځې",
+        "colisPaid": "تادیه",
+        "colcarryForward": "را وړل",
+        "colstatus": "حالت",
+        "fieldleaveTypeName": "د رخصتۍ ډول نوم",
+        "fieldleaveCode": "د رخصتۍ کوډ",
+        "fieldmaxDaysAllowed": "اعظمي اجازه ورځې",
+        "fieldgenderSpecific": "د جنس مخصوص",
+        "fieldpaidLeave": "معاش لرونکې رخصتي",
+        "fieldcarryForward": "را وړل",
+        "fieldmedicalCertificateRequired": "طبی تصدیق اړین دی",
+        "fieldstatus": "حالت",
+        "fielddescription": "تفصیل",
+        "optiongenderSpecificBoth": "دواړه",
+        "optiongenderSpecificMaleOnly": "یوازې نارینه",
+        "optiongenderSpecificFemaleOnly": "یوازې ښځینه",
+        "optionpaidLeaveYes": "هو",
+        "optionpaidLeaveNo": "نه",
+        "optioncarryForwardYes": "هو",
+        "optioncarryForwardNo": "نه",
+        "optionstatusActive": "فعال",
+        "optionstatusInactive": "غیر فعال",
+        "createTitle": "د رخصتۍ ډول جوړ کړئ",
+        "editTitle": "د رخصتۍ ډول سمول",
+        "viewTitle": "د رخصتۍ ډول تفصیلات",
+        "searchPlaceholder": "د رخصتۍ ډولونه لټون..."
+      },
+      "payroll": {
+        "title": "د کارمندانو معاشونه",
+        "subtitle": "د معاش تادیې او معاش ریکارډونه مدیریت کړئ",
+        "colEmployee": "کارمند",
+        "colMonth": "میاشت",
+        "colGrossSalary": "ناخالص معاش",
+        "colDeductions": "کسرونه",
+        "colNetSalary": "خالص معاش",
+        "colMethod": "میتود",
+        "colStatus": "حالت",
+        "amountDisbursed": "تادیه شوی مقدار",
+        "paidThisMonth": "دا میاشت ورکړه",
+        "pendingPayments": "په تمه تادیات",
+        "failedPayments": "ناکامه تادیات",
+        "nextPayrollDate": "راتلونکې د معاش نیټه",
+        "noPendingPayroll": "هیڅ معاش په تمه نشته",
+        "paymentMethodChart": "د تادیې د میتود ویش",
+        "paymentStatusBreakdown": "د تادیې د حالت تحلیل",
+        "monthlyPayroll": "میاشتنی معاش",
+        "payrollHistory": "د معاش تاریخچه",
+        "searchPlaceholder": "د معاش تادیات لټون...",
+        "loadingTitle": "معاشونه",
+        "loadingSubtitle": "د کارمندانو د معاش تادیې ریکارډونه، مجموعې او د تادیې حالت څارنه.",
+        "months": [
+          "جنوري",
+          "فبروري",
+          "مارچ",
+          "اپریل",
+          "می",
+          "جون",
+          "جولای",
+          "اګست",
+          "سپتمبر",
+          "اکتوبر",
+          "نومبر",
+          "دسمبر"
+        ]
+      },
+      "reports": {
+        "title": "د بشري سرچینو راپورونه",
+        "subtitle": "د حاضري، رخصتۍ، معاش او کارمندانو لنډیز",
+        "daily": "ورځنی",
+        "weekly": "اونیز",
+        "monthly": "میاشتنی",
+        "yearly": "کلنی",
+        "loadingReports": "راپورونه بارول کیږي...",
+        "employeeOverview": "د کارمندانو کتنه",
+        "totalEmployees": "ټول کارمندان",
+        "active": "فعال",
+        "inactive": "غیر فعال",
+        "departments": "څانګې",
+        "leaveSummary": "د رخصتۍ لنډیز",
+        "totalRequests": "ټولې غوښتنې",
+        "pending": "په تمه",
+        "approved": "تصویب شوی",
+        "rejected": "رد شوی",
+        "leaveStatusDistribution": "د رخصتۍ د حالت ویش",
+        "payrollOverview": "د معاش کتنه",
+        "netPaid": "خالص تادیه",
+        "deductions": "کسرونه",
+        "hrMetrics": "د بشري سرچینو معیارونه",
+        "employees": "کارمندان",
+        "attendance": "حاضري",
+        "leaveRequests": "د رخصتۍ غوښتنې",
+        "payments": "تادیات",
+        "attendanceSummary": "د حاضري لنډیز",
+        "employee": "کارمند",
+        "code": "کوډ",
+        "present": "حاضر",
+        "absent": "غیر حاضر",
+        "late": "ناوخته",
+        "halfDay": "نیمه ورځ",
+        "onLeave": "رخصت",
+        "noAttendanceData": "د دې مودې لپاره د حاضري معلومات نشته",
+        "payrollSummary": "د معاش لنډیز",
+        "employeesPaid": "تادیه شوي کارمندان",
+        "totalGross": "ټوله ناخالصه",
+        "totalDeductions": "ټول کسرونه",
+        "totalNetPaid": "ټوله خالصه تادیه"
       }
     },
     "departments": "څانګې",
@@ -4829,7 +6282,13 @@
       "enterReason": "د رخصتۍ دلیل ولیکئ",
       "updateRequest": "غوښتنه تازه کړئ",
       "submitRequest": "غوښتنه وسپارئ",
-      "cancel": "لغوه کړئ"
+      "cancel": "لغوه کړئ",
+      "searchPlaceholder": "د کارمند، د رخصتۍ ډول، حالت له مخې لټون...",
+      "totalEntries": "ټولې ننوتنې",
+      "rejectionReason": "د رد علت",
+      "enterRejectionReason": "د رد علت ولیکئ...",
+      "confirmReject": "رد تایید کړئ",
+      "deleteConfirm": "ایا د رخصتۍ دا غوښتنه ړنګه کړم؟"
     },
     "profile": {
       "label": "پروفایل",
@@ -4856,10 +6315,10 @@
     "accountDetails": "د حساب تفصیلات",
     "accessModules": "د لاسرسي ماډلونه",
     "pagination": {
-      "showing": "Showing",
-      "of": "of",
-      "records": "records",
-      "rows": "Rows"
+      "showing": "ښودل",
+      "of": "د",
+      "records": "ریکارډونه",
+      "rows": "قطارونه"
     },
     "analytics": {
       "snapshot": "سنیپ شاټ"
@@ -4878,13 +6337,23 @@
       "details": "تفصیلات",
       "review": "بیا کتنه",
       "stepN": "ګام {{n}}",
+      "stepOf": "ګام {{current}} له {{total}}",
       "onlyNumbers": "یوازې شمېرې اجازه لري",
       "fieldRequired": "دا ځای اړین دی",
       "failedToLoad": "معلومات بارول ناکام شول",
       "recordNotFound": "ریکارډ ونه موندل شو",
       "loadError": "د معلوماتو بارولو تېروتنه",
       "saveFailed": "بدلونونه خوندي کول ناکام شول",
-      "preview": "مخکتنه"
+      "preview": "مخکتنه",
+      "correctFields": "لکه ښکاره شوي ځایونه سمون کړئ.",
+      "saveError": "د خوندي کولو تېروتنه",
+      "editFlow": "تغیراتو جریان",
+      "createFlow": "جوانب جریان",
+      "flowSubtitle": "یو مرحله‌ای دننه جریان جوانب او تغیرات وظیفو آسانوي.",
+      "nextStep": "بل ګام",
+      "saveRecord": "ریکارډ خوندي کړئ",
+      "formError": "د فورم تېروتنه",
+      "imageSize": "د عکس اندازه باید د 5MB کم وي"
     },
     "list": {
       "unknownError": "یوه نامعلومه تېروتنه رامنځته شوه",
@@ -4893,7 +6362,26 @@
       "typeToFilter": "د فلټر کولو لپاره ټایپ کړئ...",
       "deletingRecord": "ریکارډ ړنګول...",
       "report": "راپور",
-      "searchPlaceholder": "لټون..."
+      "searchPlaceholder": "لټون...",
+      "rowNum": "#",
+      "actions": "اقدامات",
+      "unableToLoad": "معلومات بارول ناکام شول",
+      "noRecords": "ریکارډ ونه موندل شو",
+      "noMatch": "مطابق ریکارډ ونه موندل شو",
+      "tryChanging": "خپل د لټون یا فلټر معیارونه بدل کړئ.",
+      "loadingData": "معلومات بارول...",
+      "addNew": "نوی اضافه کړئ",
+      "export": "صادرول",
+      "exportPdf": "PDF صادرول",
+      "exportCsv": "CSV صادرول",
+      "searchAndFilter": "لټون او فلټر",
+      "filterBy": "فلټر په",
+      "recordsTable": "د ریکارډونو جدول",
+      "confirmDelete": "ایا تاسو ډاکړین چې دا ریکارډ ړنګړئ؟",
+      "quickControls": "د ریکارډونو چټک لټون لپاره چټک کنټرولونه.",
+      "allColumns": "ټول ستونونه",
+      "filterValue": "د فلټر ارزښت",
+      "tableDescription": "یوځای فلټر، ترتیب، صفحه بندی او د قطار actionونه."
     },
     "recordView": {
       "dash": "-",

@@ -128,7 +128,7 @@ const DocumentsManagement = () => {
 
   const columns = documentsManagementConfig.columns.map(col => ({
     ...col,
-    header: t(`staff.registrar.documentsManagement.columns.${col.key}`)
+    header: t(`registrar.documentsManagement.columns.${col.key}`)
   }));
 
   return (
@@ -141,10 +141,10 @@ const DocumentsManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-xl">📄</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.documentsManagement.stats.totalDocuments')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.documentsManagement.stats.totalDocuments')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">{docStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.documentsManagement.stats.allUploadedFiles')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.documentsManagement.stats.allUploadedFiles')}</p>
           </div>
         </Card>
 
@@ -155,24 +155,24 @@ const DocumentsManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <span className="text-xl">✅</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.documentsManagement.stats.active')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.documentsManagement.stats.active')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{docStats.active}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.documentsManagement.stats.currentDocuments')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.documentsManagement.stats.currentDocuments')}</p>
           </div>
         </Card>
 
         <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gray-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-transparent rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center">
                 <span className="text-xl">📦</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.documentsManagement.stats.archived')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.documentsManagement.stats.archived')}</span>
             </div>
             <p className="text-3xl font-black text-gray-600">{docStats.archived}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.documentsManagement.stats.storedDocuments')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.documentsManagement.stats.storedDocuments')}</p>
           </div>
         </Card>
 
@@ -183,26 +183,26 @@ const DocumentsManagement = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <span className="text-xl">📊</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.documentsManagement.stats.documentTypes')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.documentsManagement.stats.documentTypes')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{docStats.byType.length}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.documentsManagement.stats.differentCategories')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.documentsManagement.stats.differentCategories')}</p>
           </div>
         </Card>
       </div>
 
       {docStats.byType.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card title={t('staff.registrar.documentsManagement.charts.documentsByType')}>
+          <Card title={t('registrar.documentsManagement.charts.documentsByType')}>
             <PieChartComponent data={docStats.byType} height={300} />
           </Card>
-          <Card title={t('staff.registrar.documentsManagement.charts.documentDistribution')}>
+          <Card title={t('registrar.documentsManagement.charts.documentDistribution')}>
             <BarChartComponent data={docStats.byType} dataKey="value" nameKey="name" height={300} />
           </Card>
         </div>
       )}
 
-      <ListPage {...documentsManagementConfig} columns={columns} />
+      <ListPage {...documentsManagementConfig} title={t('registrar.documentsManagement.title')} subtitle={t('registrar.documentsManagement.subtitle')} columns={columns} extraActionItemsForRow={(row) => documentsManagementConfig.extraActionItemsForRow(row).map(item => ({ ...item, label: t('registrar.documentsManagement.view.viewDownloadFile') }))} />
     </div>
   );
 };

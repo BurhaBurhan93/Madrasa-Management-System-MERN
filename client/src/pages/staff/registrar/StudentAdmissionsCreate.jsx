@@ -7,14 +7,14 @@ const StudentAdmissionsCreate = () => {
   const { t } = useTranslation(['staff', 'common']);
   return (
     <FormPage
-      titleCreate={t('staff.registrar.studentAdmissions.create.titleCreate')}
-      titleEdit={t('staff.registrar.studentAdmissions.create.titleEdit')}
+      titleCreate={t('registrar.studentAdmissions.create.titleCreate')}
+      titleEdit={t('registrar.studentAdmissions.create.titleEdit')}
       endpoint={studentAdmissionsConfig.endpoint}
       formFields={studentAdmissionsConfig.formFields.map(f => ({
         ...f,
-        label: t(`staff.registrar.studentAdmissions.fields.${f.name}`),
-        placeholder: f.placeholder ? t(`staff.registrar.studentAdmissions.placeholders.${f.name}`) : undefined,
-        options: f.options?.map(opt => ({ ...opt, label: t(`staff.registrar.studentAdmissions.options.${f.name}.${opt.value}`) }))
+        label: t(`registrar.studentAdmissions.fields.${f.name}`),
+        placeholder: f.placeholder ? t(`registrar.studentAdmissions.placeholders.${f.name}`) : undefined,
+        options: f.options?.map(opt => ({ ...opt, label: t(`registrar.studentAdmissions.options.${f.name}.${opt.value}`) }))
       }))}
       initialForm={studentAdmissionsConfig.initialForm}
       mapRowToForm={studentAdmissionsConfig.mapRowToForm}

@@ -9,14 +9,14 @@ const ClassEdit = () => {
   const { id } = useParams();
   return (
     <FormPage
-      titleCreate={t('staff.registrar.classManagement.create.titleCreate')}
-      titleEdit={t('staff.registrar.classManagement.create.titleEdit')}
+      titleCreate={t('registrar.classManagement.create.titleCreate')}
+      titleEdit={t('registrar.classManagement.create.titleEdit')}
       endpoint={classManagementConfig.endpoint}
       formFields={classManagementConfig.formFields.map(f => ({
         ...f,
-        label: t(`staff.registrar.classManagement.fields.${f.name}`),
-        placeholder: f.placeholder ? t(`staff.registrar.classManagement.placeholders.${f.name}`) : undefined,
-        options: f.options?.map(opt => ({ ...opt, label: t(`staff.registrar.classManagement.options.${f.name}.${opt.value}`) }))
+        label: t(`registrar.classManagement.fields.${f.name}`),
+        placeholder: f.placeholder ? t(`registrar.classManagement.placeholders.${f.name}`) : undefined,
+        options: f.options?.map(opt => ({ ...opt, label: t(`registrar.classManagement.options.${f.name}.${opt.value}`) }))
       }))}
       initialForm={classManagementConfig.initialForm}
       mapRowToForm={classManagementConfig.mapRowToForm}

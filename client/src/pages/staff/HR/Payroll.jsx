@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import Card from '../../../components/UIHelper/Card';
 import StaffPageLayout from '../shared/StaffPageLayout';
@@ -10,6 +11,7 @@ import { staffApi } from '../../../api/staffApi';
 import { FiAlertTriangle, FiCalendar, FiCheckCircle, FiCreditCard, FiDollarSign } from 'react-icons/fi';
 
 const HRPayroll = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [payments, setPayments] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ const HRPayroll = () => {
       totalAmountDisbursed,
       pendingPayments,
       failedPayments,
-      nextPayrollDate: nextPending?.paymentDate ? new Date(nextPending.paymentDate).toLocaleDateString('en-US') : 'No pending payroll',
+      nextPayrollDate: nextPending?.paymentDate ? new Date(nextPending.paymentDate).toLocaleDateString('en-US') : t('hr.payroll.noPendingPayroll'),
       byMethod: groupCountBy(payments, (payment) => payment.paymentMethod || 'unknown'),
       byStatus: groupCountBy(payments, (payment) => payment.paymentStatus || 'unknown'),
       monthlyPayroll: getLastMonths(payments, (payment) => payment.paymentDate || payment.createdAt, (payment) => payment.netSalary)
@@ -67,12 +69,12 @@ const HRPayroll = () => {
     return emp ? `${emp.fullName} (${emp.employeeCode || ''})` : '-';
   };
 
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const months = t('hr.payroll.months', { returnObjects: true });
 
   const columns = [
     {
       key: 'employee',
-      header: 'Employee',
+      header: t('hr.payroll.colEmployee'),
       render: (value, row) => {
         const empId = value?._id || value;
         const emp = employees.find(e => e._id?.toString() === empId?.toString());
@@ -81,16 +83,16 @@ const HRPayroll = () => {
     },
     {
       key: 'salaryMonth',
-      header: 'Month',
+      header: t('hr.payroll.colMonth'),
       render: (value, row) => `${months[value - 1] || ''} ${row.salaryYear || ''}`
     },
-    { key: 'grossSalary', header: 'Gross Salary', render: (value) => `${(value || 0).toLocaleString()} AFN` },
-    { key: 'totalDeduction', header: 'Deductions', render: (value) => `${(value || 0).toLocaleString()} AFN` },
-    { key: 'netSalary', header: 'Net Salary', render: (value) => `${(value || 0).toLocaleString()} AFN` },
-    { key: 'paymentMethod', header: 'Method' },
+    { key: 'grossSalary', header: t('hr.payroll.colGrossSalary'), render: (value) => `${(value || 0).toLocaleString()} AFN` },
+    { key: 'totalDeduction', header: t('hr.payroll.colDeductions'), render: (value) => `${(value || 0).toLocaleString()} AFN` },
+    { key: 'netSalary', header: t('hr.payroll.colNetSalary'), render: (value) => `${(value || 0).toLocaleString()} AFN` },
+    { key: 'paymentMethod', header: t('hr.payroll.colMethod') },
     {
       key: 'paymentStatus',
-      header: 'Status',
+      header: t('hr.payroll.colStatus'),
       render: (value) => (
         <span className={`px-2 py-1 text-xs rounded-full font-medium ${
           value === 'paid' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
@@ -105,7 +107,7 @@ const HRPayroll = () => {
 
   if (loading) {
     return (
-      <StaffPageLayout eyebrow="HR" title="Payroll" subtitle="Employee salary payment records, disbursement totals, and payment status monitoring.">
+      <StaffPageLayout eyebrow={t('hr.label')} title={t('hr.payroll.loadingTitle')} subtitle={t('hr.payroll.loadingSubtitle')}>
         <PageSkeleton type="dashboard" />
       </StaffPageLayout>
     );
@@ -115,11 +117,11 @@ const HRPayroll = () => {
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[
-          { label: 'Paid This Month', value: insights.paidThisMonth, icon: FiCheckCircle, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700' },
-          { label: 'Amount Disbursed', value: formatCurrency(insights.totalAmountDisbursed), icon: FiDollarSign, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700' },
-          { label: 'Pending Payments', value: insights.pendingPayments, icon: FiCreditCard, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700' },
-          { label: 'Failed Payments', value: insights.failedPayments, icon: FiAlertTriangle, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700' },
-          { label: 'Next Payroll Date', value: insights.nextPayrollDate, icon: FiCalendar, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700' }
+          { label: t('hr.payroll.paidThisMonth'), value: insights.paidThisMonth, icon: FiCheckCircle, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700' },
+          { label: t('hr.payroll.amountDisbursed'), value: formatCurrency(insights.totalAmountDisbursed), icon: FiDollarSign, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700' },
+          { label: t('hr.payroll.pendingPayments'), value: insights.pendingPayments, icon: FiCreditCard, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700' },
+          { label: t('hr.payroll.failedPayments'), value: insights.failedPayments, icon: FiAlertTriangle, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700' },
+          { label: t('hr.payroll.nextPayrollDate'), value: insights.nextPayrollDate, icon: FiCalendar, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700' }
         ].map((item) => (
           <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none`}>
             <div className="flex items-start justify-between gap-4">
@@ -135,24 +137,24 @@ const HRPayroll = () => {
         ))}
       </div>
       <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <BarChartComponent title="Monthly Payroll" data={insights.monthlyPayroll} dataKey="value" nameKey="name" height={320} />
-        <PieChartComponent title="Payment Method Distribution" data={insights.byMethod} height={320} donut />
-        <PieChartComponent title="Payment Status Breakdown" data={insights.byStatus} height={320} />
+        <BarChartComponent title={t('hr.payroll.monthlyPayroll')} data={insights.monthlyPayroll} dataKey="value" nameKey="name" height={320} />
+        <PieChartComponent title={t('hr.payroll.paymentMethodChart')} data={insights.byMethod} height={320} donut />
+        <PieChartComponent title={t('hr.payroll.paymentStatusBreakdown')} data={insights.byStatus} height={320} />
       </div>
     </>
   );
 
   return (
     <ListPage
-      title="HR Payroll"
-      subtitle="Employee salary payment records, disbursement totals, and payment status monitoring."
+      title={t('hr.payroll.title')}
+      subtitle={t('hr.payroll.subtitle')}
       endpoint={staffApi.payroll.salaryPayments}
       columns={columns}
       createPath="/staff/payroll/salary-payments/create"
       editPathForRow={(row) => `/staff/payroll/salary-payments/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/payroll/salary-payments/view/${row._id}`}
-      searchPlaceholder="Search salary payments..."
-      eyebrow="HR"
+      searchPlaceholder={t('hr.payroll.searchPlaceholder')}
+      eyebrow={t('hr.label')}
       headerContent={headerContent}
       enableExport={true}
     />

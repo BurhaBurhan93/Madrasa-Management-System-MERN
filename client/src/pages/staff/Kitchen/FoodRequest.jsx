@@ -37,7 +37,7 @@ const FoodRequest = () => {
         body: JSON.stringify({ ...form, month: Number(form.month), year: Number(form.year), allocatedAmount: Number(form.allocatedAmount || 0) })
       });
       const data = await parseJsonSafe(res);
-      if (!res.ok || !data.success) throw new Error(data.message || t('staff.kitchen.foodRequest.failedToSubmit', 'Failed to submit request'));
+      if (!res.ok || !data.success) throw new Error(data.message || t('kitchen.foodRequest.failedToSubmit', 'Failed to submit request'));
       await fetchBudgets();
       setForm({ month: new Date().getMonth() + 1, year: new Date().getFullYear(), allocatedAmount: '', remarks: '' });
     } catch (e) {
@@ -49,13 +49,13 @@ const FoodRequest = () => {
   const totalApproved = budgets.filter(b => b.budgetStatus === 'approved').reduce((s, b) => s + (b.approvedAmount || 0), 0);
 
   return (
-    <StaffPageLayout eyebrow={t('staff.kitchen.foodRequest.eyebrow', 'Kitchen')} title={t('staff.kitchen.foodRequest.title', 'Budget Requests')} subtitle={t('staff.kitchen.foodRequest.subtitle', 'Submit and track monthly kitchen budget requests.')}>
+    <StaffPageLayout eyebrow={t('kitchen.foodRequest.eyebrow', 'Kitchen')} title={t('kitchen.foodRequest.title', 'Budget Requests')} subtitle={t('kitchen.foodRequest.subtitle', 'Submit and track monthly kitchen budget requests.')}>
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.kitchen.foodRequest.totalRequests', 'Total Requests')}</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('kitchen.foodRequest.totalRequests', 'Total Requests')}</p>
                 <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{budgets.length}</p>
               </div>
               <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -66,7 +66,7 @@ const FoodRequest = () => {
           <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.kitchen.foodRequest.totalRequested', 'Total Requested')}</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('kitchen.foodRequest.totalRequested', 'Total Requested')}</p>
                 <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{totalRequested.toLocaleString()} AFN</p>
               </div>
               <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -77,7 +77,7 @@ const FoodRequest = () => {
           <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.kitchen.foodRequest.totalApproved', 'Total Approved')}</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('kitchen.foodRequest.totalApproved', 'Total Approved')}</p>
                 <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{totalApproved.toLocaleString()} AFN</p>
               </div>
               <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
@@ -89,15 +89,15 @@ const FoodRequest = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="rounded-2xl border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-slate-100 mb-4">{t('staff.kitchen.foodRequest.newBudgetRequest', 'New Budget Request')}</h2>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-slate-100 mb-4">{t('kitchen.foodRequest.newBudgetRequest', 'New Budget Request')}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <select value={form.month} onChange={e => setForm({ ...form, month: e.target.value })} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/20">
                 {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
               </select>
               <input type="number" placeholder={t('common.year', 'Year')} value={form.year} onChange={e => setForm({ ...form, year: e.target.value })} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/20" />
-              <input type="number" placeholder={t('staff.kitchen.foodRequest.requestedAmount', 'Requested Amount (AFN) *')} value={form.allocatedAmount} onChange={e => setForm({ ...form, allocatedAmount: e.target.value })} required min="0" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/20" />
-              <textarea placeholder={t('staff.kitchen.foodRequest.remarksReason', 'Remarks / Reason')} value={form.remarks} onChange={e => setForm({ ...form, remarks: e.target.value })} rows={3} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/20" />
-              <Button type="submit" disabled={submitting} className="w-full">{submitting ? t('staff.kitchen.foodRequest.submitting', 'Submitting...') : t('staff.kitchen.foodRequest.submitRequest', 'Submit Request')}</Button>
+              <input type="number" placeholder={t('kitchen.foodRequest.requestedAmount', 'Requested Amount (AFN) *')} value={form.allocatedAmount} onChange={e => setForm({ ...form, allocatedAmount: e.target.value })} required min="0" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/20" />
+              <textarea placeholder={t('kitchen.foodRequest.remarksReason', 'Remarks / Reason')} value={form.remarks} onChange={e => setForm({ ...form, remarks: e.target.value })} rows={3} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-cyan-400 dark:focus:ring-cyan-500/20" />
+              <Button type="submit" disabled={submitting} className="w-full">{submitting ? t('kitchen.foodRequest.submitting', 'Submitting...') : t('kitchen.foodRequest.submitRequest', 'Submit Request')}</Button>
             </form>
           </Card>
 
@@ -105,18 +105,18 @@ const FoodRequest = () => {
             {loading ? (
               <Card className="rounded-2xl border border-slate-200 p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-400">{t('common.loading', 'Loading...')}</Card>
             ) : budgets.length === 0 ? (
-              <Card className="rounded-2xl border border-slate-200 p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-400">{t('staff.kitchen.foodRequest.noBudgetRequests', 'No budget requests found')}</Card>
+              <Card className="rounded-2xl border border-slate-200 p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-400">{t('kitchen.foodRequest.noBudgetRequests', 'No budget requests found')}</Card>
             ) : (
               <Card className="rounded-2xl border border-slate-200 overflow-hidden dark:border-slate-700 dark:bg-slate-800/50">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-slate-200 dark:border-slate-700">
-                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('staff.kitchen.foodRequest.monthYear', 'Month/Year')}</th>
-                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('staff.kitchen.foodRequest.requested', 'Requested')}</th>
-                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('staff.kitchen.foodRequest.approved', 'Approved')}</th>
-                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('staff.kitchen.foodRequest.spent', 'Spent')}</th>
-                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('staff.kitchen.foodRequest.remaining', 'Remaining')}</th>
+                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('kitchen.foodRequest.monthYear', 'Month/Year')}</th>
+                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('kitchen.foodRequest.requested', 'Requested')}</th>
+                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('kitchen.foodRequest.approved', 'Approved')}</th>
+                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('kitchen.foodRequest.spent', 'Spent')}</th>
+                        <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('kitchen.foodRequest.remaining', 'Remaining')}</th>
                         <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('common.remarks', 'Remarks')}</th>
                         <th className="p-4 text-left font-semibold text-slate-600 dark:text-slate-300">{t('common.status', 'Status')}</th>
                       </tr>

@@ -7,7 +7,8 @@ import { complaintFeedbackConfig } from './Feedback';
 const ComplaintFeedbackView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.complaints.feedbackView.title')} subtitle={t('staff.complaints.feedback.subtitle')} endpoint={complaintFeedbackConfig.endpoint} id={id} fields={complaintFeedbackConfig.formFields} listPath="/staff/complaints/feedback" editPath={`/staff/complaints/feedback/edit/${id}`} />;
+  const fields = complaintFeedbackConfig.formFields.map(f => ({ name: f.name, label: t(`staff.complaints.feedback.fields.${f.name}`), type: f.type }));
+  return <RecordViewPage title={t('staff.complaints.feedbackView.title')} subtitle={t('staff.complaints.feedback.subtitle')} endpoint={complaintFeedbackConfig.endpoint} id={id} fields={fields} listPath="/staff/complaints/feedback" editPath={`/staff/complaints/feedback/edit/${id}`} />;
 };
 
 export default ComplaintFeedbackView;

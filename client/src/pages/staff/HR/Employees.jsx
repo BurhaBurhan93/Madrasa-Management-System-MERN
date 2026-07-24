@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 import StaffPageLayout from '../shared/StaffPageLayout';
 import Card from '../../../components/UIHelper/Card';
@@ -19,11 +20,14 @@ export const employeesConfig = {
       header: 'Photo',
       render: (value, row) => {
         const photo = value || row.photo;
+        const src = photo ? `${import.meta.env.VITE_API_URL || ''}/${photo}` : null;
+        const fallback = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect fill='%23f1f5f9' width='40' height='40' rx='20'/%3E%3Ctext x='20' y='26' text-anchor='middle' font-size='18' fill='%2394a3b8' font-family='system-ui'%3E%3F%3C/text%3E%3C/svg%3E";
         return (
           <img
-            src={photo || 'https://via.placeholder.com/40'}
+            src={src || fallback}
             alt="Profile"
             className="h-10 w-10 rounded-full object-cover border border-slate-200"
+            onError={(e) => { e.target.src = fallback; }}
           />
         );
       }
@@ -56,9 +60,18 @@ export const employeesConfig = {
     { name: 'employeeType', label: 'Employee Type', type: 'select', options: [
       { value: 'teacher', label: 'Teacher' },
       { value: 'admin', label: 'Admin' },
-      { value: 'support', label: 'Support' },
+      { value: 'finance', label: 'Finance' },
+      { value: 'registrar', label: 'Registrar' },
+      { value: 'hr', label: 'HR' },
+      { value: 'librarian', label: 'Librarian' },
       { value: 'kitchen', label: 'Kitchen' },
-      { value: 'security', label: 'Security' }
+      { value: 'security', label: 'Security' },
+      { value: 'support', label: 'Support' },
+      { value: 'maintenance', label: 'Maintenance' },
+      { value: 'payroll', label: 'Payroll' },
+      { value: 'complaints', label: 'Complaints' },
+      { value: 'inventory', label: 'Inventory' },
+      { value: 'general-manager', label: 'General Manager' }
     ] },
     { name: 'department', label: 'Department', type: 'relation', relationEndpoint: '/hr/departments', relationLabel: (row) => `${row.departmentName} (${row.departmentCode})` },
     { name: 'designation', label: 'Designation', type: 'relation', relationEndpoint: '/hr/designations', relationLabel: (row) => row.designationTitle },
@@ -149,6 +162,7 @@ export const employeesConfig = {
 };
 
 const Employees = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -205,7 +219,7 @@ const Employees = () => {
 
   if (loading) {
     return (
-      <StaffPageLayout eyebrow="HR" title="Employees" subtitle="A richer overview of staffing, departments, and onboarding trends.">
+      <StaffPageLayout eyebrow={t('hr.label')} title={t('hr.employees.title')} subtitle={t('hr.employees.subtitle')}>
         <PageSkeleton type="dashboard" />
       </StaffPageLayout>
     );
@@ -215,19 +229,19 @@ const Employees = () => {
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[
-          { label: 'Total Employees', value: employees.length, icon: FiUsers, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700' },
-          { label: 'Active Employees', value: insights.activeEmployees, icon: FiCheckCircle, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700' },
-          { label: 'Inactive Employees', value: insights.inactiveEmployees, icon: FiXCircle, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700' },
-          { label: 'Average Salary', value: formatCurrency(insights.averageSalary), icon: FiBriefcase, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700' },
-          { label: 'Recent Hires', value: insights.recentHires, icon: FiClock, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700' }
+          { label: t('hr.reports.totalEmployees'), value: employees.length, icon: FiUsers },
+          { label: t('hr.reports.active'), value: insights.activeEmployees, icon: FiCheckCircle },
+          { label: t('hr.reports.inactive'), value: insights.inactiveEmployees, icon: FiXCircle },
+          { label: t('hr.employees.averageSalary'), value: formatCurrency(insights.averageSalary), icon: FiBriefcase },
+          { label: t('hr.employees.recentHires'), value: insights.recentHires, icon: FiClock }
         ].map((item) => (
-          <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none`}>
+          <Card key={item.label} className="rounded-[26px] border border-slate-200 bg-transparent p-5 shadow-none">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{item.label}</p>
                 <p className="mt-3 text-2xl font-bold text-slate-900">{item.value}</p>
               </div>
-              <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.chip}`}>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-transparent text-cyan-600">
                 <item.icon size={22} />
               </span>
             </div>
@@ -236,23 +250,23 @@ const Employees = () => {
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <PieChartComponent title="Employees By Type" data={insights.byType} height={320} donut />
-        <PieChartComponent title="Gender Distribution" data={insights.byGender} height={320} />
-        <BarChartComponent title="Employees By Department" data={insights.byDepartment} dataKey="value" nameKey="name" height={320} horizontal />
+        <PieChartComponent title={t('hr.employees.byType')} data={insights.byType} height={320} donut />
+        <PieChartComponent title={t('hr.employees.genderDistribution')} data={insights.byGender} height={320} />
+        <BarChartComponent title={t('hr.employees.byDepartment')} data={insights.byDepartment} dataKey="value" nameKey="name" height={320} horizontal />
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.7fr_1fr]">
         <BarChartComponent title="Hiring Trend" data={insights.monthlyHires} dataKey="value" nameKey="name" height={300} />
-        <Card className="rounded-[26px] border border-slate-200 p-6 shadow-none">
+        <Card className="rounded-[26px] border border-slate-200 bg-transparent p-6 shadow-none">
           <h3 className="text-lg font-semibold text-slate-900">Staffing Signals</h3>
           <div className="mt-5 space-y-4">
-            <div className="rounded-2xl bg-slate-50 p-4">
+            <div className="rounded-2xl bg-transparent p-4 border border-slate-200">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Top Department</p>
               <p className="mt-2 text-base font-semibold text-slate-900">
                 {[...insights.byDepartment].sort((a, b) => b.value - a.value)[0]?.name || 'No department data'}
               </p>
             </div>
-            <div className="rounded-2xl bg-slate-50 p-4">
+            <div className="rounded-2xl bg-transparent p-4 border border-slate-200">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Coverage Mix</p>
               <p className="mt-2 text-sm text-slate-600">
                 {insights.byType.length
@@ -260,7 +274,7 @@ const Employees = () => {
                   : 'No employee types available'}
               </p>
             </div>
-            <div className="rounded-2xl bg-slate-50 p-4">
+            <div className="rounded-2xl bg-transparent p-4 border border-slate-200">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Directory Readiness</p>
               <p className="mt-2 text-sm text-slate-600">
                 {employees.filter((employee) => !employee.email || !employee.phoneNumber).length} employee records still need complete contact details.
@@ -274,16 +288,16 @@ const Employees = () => {
 
   return (
     <ListPage
-      title={employeesConfig.title}
-      subtitle={employeesConfig.subtitle}
+      title={t('hr.employees.title')}
+      subtitle={t('hr.employees.subtitle')}
       endpoint={employeesConfig.endpoint}
-      columns={employeesConfig.columns}
+      columns={employeesConfig.columns.map(col => ({ ...col, header: t(`hr.employees.col${col.key}`) }))}
       createPath="/staff/hr/employee-registration"
       editPathForRow={(row) => `/staff/hr/employees/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/hr/employees/view/${row._id}`}
-      searchPlaceholder="Search employees..."
+      searchPlaceholder={t('hr.employees.searchPlaceholder')}
       clientSidePagination={true}
-      eyebrow="HR"
+      eyebrow={t('hr.label')}
       headerContent={headerContent}
       enableExport={true}
     />

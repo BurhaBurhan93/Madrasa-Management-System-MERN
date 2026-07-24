@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FiSave, FiX, FiUser, FiBriefcase, FiDollarSign, FiPhone, FiMapPin, FiPlus } from 'react-icons/fi';
 import { CreateUserModal } from '../../../components/UIHelper';
 import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 
 const POSITIONS = [
-  { id: 'teacher', label: 'Teacher', description: 'Teaching staff for classes and subjects', color: 'blue' },
-  { id: 'admin', label: 'Admin', description: 'Administrative and management staff', color: 'purple' },
-  { id: 'finance', label: 'Finance', description: 'Finance and accounting staff', color: 'green' },
-  { id: 'registrar', label: 'Registrar', description: 'Student affairs and registration', color: 'orange' },
-  { id: 'hr', label: 'HR', description: 'Human resources and recruitment', color: 'pink' },
-  { id: 'librarian', label: 'Librarian', description: 'Library management staff', color: 'indigo' },
-  { id: 'kitchen', label: 'Kitchen', description: 'Kitchen and catering staff', color: 'yellow' },
-  { id: 'security', label: 'Security', description: 'Security and safety personnel', color: 'red' },
-  { id: 'support', label: 'Support', description: 'General support staff', color: 'gray' },
-  { id: 'maintenance', label: 'Maintenance', description: 'Maintenance and facilities', color: 'teal' }
+  { id: 'teacher', labelKey: 'hr.employees.registration.positionTeacher', descKey: 'hr.employees.registration.positionTeacherDesc', color: 'blue' },
+  { id: 'admin', labelKey: 'hr.employees.registration.positionAdmin', descKey: 'hr.employees.registration.positionAdminDesc', color: 'purple' },
+  { id: 'finance', labelKey: 'hr.employees.registration.positionFinance', descKey: 'hr.employees.registration.positionFinanceDesc', color: 'green' },
+  { id: 'registrar', labelKey: 'hr.employees.registration.positionRegistrar', descKey: 'hr.employees.registration.positionRegistrarDesc', color: 'orange' },
+  { id: 'hr', labelKey: 'hr.employees.registration.positionHr', descKey: 'hr.employees.registration.positionHrDesc', color: 'pink' },
+  { id: 'librarian', labelKey: 'hr.employees.registration.positionLibrarian', descKey: 'hr.employees.registration.positionLibrarianDesc', color: 'indigo' },
+  { id: 'kitchen', labelKey: 'hr.employees.registration.positionKitchen', descKey: 'hr.employees.registration.positionKitchenDesc', color: 'yellow' },
+  { id: 'security', labelKey: 'hr.employees.registration.positionSecurity', descKey: 'hr.employees.registration.positionSecurityDesc', color: 'red' },
+  { id: 'maintenance', labelKey: 'hr.employees.registration.positionMaintenance', descKey: 'hr.employees.registration.positionMaintenanceDesc', color: 'teal' },
+  { id: 'payroll', labelKey: 'hr.employees.registration.positionPayroll', descKey: 'hr.employees.registration.positionPayrollDesc', color: 'emerald' },
+  { id: 'complaints', labelKey: 'hr.employees.registration.positionComplaints', descKey: 'hr.employees.registration.positionComplaintsDesc', color: 'rose' },
+  { id: 'inventory', labelKey: 'hr.employees.registration.positionInventory', descKey: 'hr.employees.registration.positionInventoryDesc', color: 'cyan' },
+  { id: 'general-manager', labelKey: 'hr.employees.registration.positionGeneralManager', descKey: 'hr.employees.registration.positionGeneralManagerDesc', color: 'slate' }
 ];
 
 const getRoleForPosition = (positionId) => {
@@ -23,14 +27,15 @@ const getRoleForPosition = (positionId) => {
   return 'staff';
 };
 
-const getRoleLabel = (role) => ({
-  admin: 'Admin',
-  teacher: 'Teacher',
-  staff: 'Staff'
-}[role] || 'Staff');
+const getRoleLabel = (role, t) => ({
+  admin: t('hr.employees.registration.roleAdmin'),
+  teacher: t('hr.employees.registration.roleTeacher'),
+  staff: t('hr.employees.registration.roleStaff')
+}[role] || t('hr.employees.registration.roleStaff'));
 
 const EmployeeRegistration = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['staff', 'common']);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -60,8 +65,8 @@ const EmployeeRegistration = () => {
     emergencyContactRelation: '',
     emergencyContactPhone: '',
     employeeCode: '',
-    selectedPositions: ['support'],
-    primaryPosition: 'support',
+    selectedPositions: [],
+    primaryPosition: '',
     department: '',
     designation: '',
     joiningDate: '',
@@ -294,16 +299,16 @@ const EmployeeRegistration = () => {
 
   const getColorClasses = (color) => {
     const colors = {
-      blue: 'bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-100',
-      purple: 'bg-purple-50 border-purple-200 text-purple-800 hover:bg-purple-100',
-      green: 'bg-green-50 border-green-200 text-green-800 hover:bg-green-100',
-      orange: 'bg-orange-50 border-orange-200 text-orange-800 hover:bg-orange-100',
-      pink: 'bg-pink-50 border-pink-200 text-pink-800 hover:bg-pink-100',
-      indigo: 'bg-indigo-50 border-indigo-200 text-indigo-800 hover:bg-indigo-100',
-      yellow: 'bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100',
-      red: 'bg-red-50 border-red-200 text-red-800 hover:bg-red-100',
-      gray: 'bg-gray-50 border-gray-200 text-gray-800 hover:bg-gray-100',
-      teal: 'bg-teal-50 border-teal-200 text-teal-800 hover:bg-teal-100'
+      blue: 'bg-transparent border-blue-200 text-blue-800 hover:bg-blue-100',
+      purple: 'bg-transparent border-purple-200 text-purple-800 hover:bg-purple-100',
+      green: 'bg-transparent border-green-200 text-green-800 hover:bg-green-100',
+      orange: 'bg-transparent border-orange-200 text-orange-800 hover:bg-orange-100',
+      pink: 'bg-transparent border-pink-200 text-pink-800 hover:bg-pink-100',
+      indigo: 'bg-transparent border-indigo-200 text-indigo-800 hover:bg-indigo-100',
+      yellow: 'bg-transparent border-yellow-200 text-yellow-800 hover:bg-yellow-100',
+      red: 'bg-transparent border-red-200 text-red-800 hover:bg-red-100',
+      gray: 'bg-transparent border-gray-200 text-gray-800 hover:bg-gray-100',
+      teal: 'bg-transparent border-teal-200 text-teal-800 hover:bg-teal-100'
     };
     return colors[color] || colors.gray;
   };
@@ -331,12 +336,12 @@ const EmployeeRegistration = () => {
         <select
           value={form[name]}
           onChange={(e) => handleChange(name, e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-slate-100 disabled:text-slate-500"
+          className="w-full bg-transparent px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-transparent disabled:text-slate-500"
           disabled={extra.disabled}
         >
           {options.map((opt, idx) => (
             <option key={idx} value={typeof opt === 'object' ? opt.value : opt}>
-              {typeof opt === 'object' ? opt.label : opt || 'Select'}
+              {typeof opt === 'object' ? opt.label : opt || t('hr.employees.registration.selectDefault')}
             </option>
           ))}
         </select>
@@ -345,7 +350,7 @@ const EmployeeRegistration = () => {
           value={form[name]}
           onChange={(e) => handleChange(name, e.target.value)}
           rows={extra.rows || 3}
-          className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-slate-100 disabled:text-slate-500"
+          className="w-full bg-transparent px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-transparent disabled:text-slate-500"
           placeholder={extra.placeholder}
           disabled={extra.disabled}
         />
@@ -354,7 +359,7 @@ const EmployeeRegistration = () => {
           type={type}
           value={form[name]}
           onChange={(e) => handleChange(name, e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-slate-100 disabled:text-slate-500"
+          className="w-full bg-transparent px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:bg-transparent disabled:text-slate-500"
           placeholder={extra.placeholder}
           disabled={extra.disabled}
         />
@@ -367,20 +372,20 @@ const EmployeeRegistration = () => {
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Employee Registration</h1>
-          <p className="text-slate-600">Register new employee with complete information and position assignments</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('hr.employees.title')}</h1>
+          <p className="text-slate-600">{t('hr.employees.subtitle')}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Positions Selection */}
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 bg-gradient-to-r from-cyan-50 to-sky-50 border-b border-slate-200">
+        <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 bg-transparent border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiBriefcase className="text-cyan-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Position / Role Assignment *</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('hr.employees.registration.positionTitle')} *</h2>
             </div>
-            <p className="text-sm text-slate-600 mt-1">Select all applicable positions. Click to select, "Set as Primary" to make main role.</p>
+            <p className="text-sm text-slate-600 mt-1">{t('hr.employees.registration.positionDesc')}</p>
           </div>
           <div className="p-6">
             {errors.selectedPositions && (
@@ -404,12 +409,12 @@ const EmployeeRegistration = () => {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => {}}
-                        className="mt-0.5 w-4 h-4 rounded border-2 cursor-pointer"
+                        className="mt-0.5 w-4 h-4 rounded border-2 cursor-pointer bg-transparent"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-sm">{pos.label}</div>
+                        <div className="font-semibold text-sm">{t(pos.labelKey)}</div>
                         <div className={`text-xs mt-0.5 ${isSelected ? 'text-white/80' : 'text-slate-500'}`}>
-                          {pos.description}
+                          {t(pos.descKey)}
                         </div>
                       </div>
                     </div>
@@ -422,11 +427,11 @@ const EmployeeRegistration = () => {
                         }}
                         className={`mt-2 w-full text-xs py-1 px-2 rounded font-medium transition-colors ${
                           isPrimary 
-                            ? 'bg-white/30 text-white border border-white/50' 
-                            : 'bg-white/20 text-white/90 border border-white/30 hover:bg-white/30'
+                            ? 'bg-transparent/30 text-white border border-white/50' 
+                            : 'bg-transparent/20 text-white/90 border border-white/30 hover:bg-transparent/30'
                         }`}
                       >
-                        {isPrimary ? 'Primary Role' : 'Set as Primary'}
+                        {isPrimary ? t('hr.employees.registration.primaryRole') : t('hr.employees.registration.setAsPrimary')}
                       </button>
                     )}
                   </div>
@@ -435,49 +440,49 @@ const EmployeeRegistration = () => {
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
               <span className="text-slate-600">
-                Selected: <strong className="text-slate-900">{form.selectedPositions.length}</strong> positions
+                {t('hr.employees.registration.selected')}: <strong className="text-slate-900">{form.selectedPositions.length}</strong> {t('hr.employees.registration.positions')}
               </span>
               <span className="text-slate-400">|</span>
               <span className="text-slate-600">
-                Primary Role: <strong className="text-cyan-700">{POSITIONS.find(p => p.id === form.primaryPosition)?.label || 'None'}</strong>
+                {t('hr.employees.registration.primaryRoleLabel')}: <strong className="text-cyan-700">{t(POSITIONS.find(p => p.id === form.primaryPosition)?.labelKey || '') || '—'}</strong>
               </span>
               <span className="text-slate-400">|</span>
               <span className="text-slate-600">
-                Login Role: <strong className="text-cyan-700">{getRoleLabel(getRoleForPosition(form.primaryPosition))}</strong>
+                {t('hr.employees.registration.loginRole')}: <strong className="text-cyan-700">{getRoleLabel(getRoleForPosition(form.primaryPosition), t)}</strong>
               </span>
             </div>
           </div>
         </div>
 
         {/* Account Information */}
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 bg-gradient-to-r from-cyan-50 to-sky-50 border-b border-slate-200">
+        <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 bg-transparent border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiUser className="text-cyan-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Account Information *</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('hr.employees.registration.accountInfo')} *</h2>
             </div>
-            <p className="text-sm text-slate-600 mt-1">Create a login account for the employee. If an account already exists, link it instead.</p>
+            <p className="text-sm text-slate-600 mt-1">{t('hr.employees.registration.accountInfoDesc')}</p>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {renderField('Link Existing User Account', 'user', 'select', 
-                [{ value: '', label: 'Create new user account' }, ...users.map(u => ({ value: u._id, label: `${u.name} (${u.email})` }))])}
-              {renderField('Account Email *', 'accountEmail', 'email', null, {
+              {renderField(t('hr.employees.registration.linkUser'), 'user', 'select', 
+                [{ value: '', label: t('hr.employees.registration.createNewUser') }, ...users.map(u => ({ value: u._id, label: `${u.name} (${u.email})` }))])}
+              {renderField(t('hr.employees.registration.roleStaff') + ' Email *', 'accountEmail', 'email', null, {
                 required: !form.user,
                 disabled: !!form.user,
-                placeholder: 'employee@madrasa.edu'
+                placeholder: t('hr.employees.registration.accountEmailPlaceholder')
               })}
-              {renderField('Account Password *', 'accountPassword', 'password', null, {
+              {renderField(t('hr.employees.registration.roleStaff') + ' Password *', 'accountPassword', 'password', null, {
                 required: !form.user,
                 disabled: !!form.user,
-                placeholder: 'At least 6 characters'
+                placeholder: t('hr.employees.registration.accountPasswordPlaceholder')
               })}
               <div className="lg:col-span-1">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Login Role</label>
-                <div className="w-full px-3 py-2 rounded-lg border border-cyan-200 bg-cyan-50 text-sm font-semibold text-cyan-800">
-                  {getRoleLabel(getRoleForPosition(form.primaryPosition))}
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('hr.employees.registration.loginRole')}</label>
+                <div className="w-full px-3 py-2 rounded-lg border border-cyan-200 bg-transparent text-sm font-semibold text-cyan-800">
+                  {getRoleLabel(getRoleForPosition(form.primaryPosition), t)}
                 </div>
-                <p className="text-xs text-slate-500 mt-1">Based on the selected primary position.</p>
+                <p className="text-xs text-slate-500 mt-1">{t('hr.employees.registration.loginRoleDesc')}</p>
               </div>
             </div>
             {errors.primaryPosition && <p className="text-red-600 text-xs mt-2">{errors.primaryPosition}</p>}
@@ -485,157 +490,157 @@ const EmployeeRegistration = () => {
         </div>
 
         {/* Personal Information */}
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+        <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 bg-transparent border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiUser className="text-slate-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Personal Information</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('hr.employees.registration.personalInfo')}</h2>
             </div>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               <div className="lg:col-span-1">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Employee Photo</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('hr.employees.registration.employeePhoto')}</label>
                 <div className="flex items-center gap-3">
                   {form.photo ? (
                     <img
                       src={form.photo}
-                      alt="Profile Preview"
+                      alt={t('hr.employees.registration.profilePreview')}
                       className="h-24 w-24 rounded-lg object-cover border border-slate-200"
                     />
                   ) : (
-                    <div className="h-24 w-24 rounded-lg border border-dashed border-slate-300 flex items-center justify-center text-slate-400">
-                      No Photo
+                    <div className="h-24 w-24 rounded-lg border border-dashed border-slate-300 flex items-center justify-center text-slate-400 bg-transparent">
+                      {t('hr.employees.registration.noPhoto')}
                     </div>
                   )}
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
-                    className="flex-1 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="flex-1 px-3 py-2 rounded-lg border border-slate-300 bg-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {renderField('Employee Code *', 'employeeCode', 'text', null, { required: true, placeholder: 'e.g., EMP-2024-001' })}
-              {renderField('Full Name *', 'fullName', 'text', null, { required: true })}
-              {renderField('Full Name (Arabic)', 'fullNameArabic')}
-              {renderField('Father Name', 'fatherName')}
-              {renderField('Date of Birth', 'dateOfBirth', 'date')}
-              {renderField('Gender', 'gender', 'select', [{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }])}
-              {renderField('CNIC / ID Number', 'cnic')}
-              {renderField('Blood Group', 'bloodGroup', 'select', ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(b => ({ value: b, label: b || 'Select' })))}
-              {renderField('Marital Status', 'maritalStatus', 'select', [
-                { value: 'single', label: 'Single' },
-                { value: 'married', label: 'Married' },
-                { value: 'divorced', label: 'Divorced' },
-                { value: 'widowed', label: 'Widowed' }
+              {renderField(t('hr.employees.fieldemployeeCode') + ' *', 'employeeCode', 'text', null, { required: true, placeholder: t('hr.employees.registration.employeeCodePlaceholder') })}
+              {renderField(t('hr.employees.fieldfullName') + ' *', 'fullName', 'text', null, { required: true })}
+              {renderField(t('hr.employees.fieldfullNameArabic'), 'fullNameArabic')}
+              {renderField(t('hr.employees.fieldfatherName'), 'fatherName')}
+              {renderField(t('hr.employees.fielddateOfBirth'), 'dateOfBirth', 'date')}
+              {renderField(t('hr.employees.fieldgender'), 'gender', 'select', [{ value: 'male', label: t('hr.employees.optiongenderMale') }, { value: 'female', label: t('hr.employees.optiongenderFemale') }])}
+              {renderField(t('hr.employees.fieldcnic'), 'cnic')}
+              {renderField(t('hr.employees.fieldbloodGroup'), 'bloodGroup', 'select', ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(b => ({ value: b, label: b || t('hr.employees.registration.selectDefault') })))}
+              {renderField(t('hr.employees.fieldmaritalStatus'), 'maritalStatus', 'select', [
+                { value: 'single', label: t('hr.employees.optionmaritalSingle') },
+                { value: 'married', label: t('hr.employees.optionmaritalMarried') },
+                { value: 'divorced', label: t('hr.employees.optionmaritalDivorced') },
+                { value: 'widowed', label: t('hr.employees.optionmaritalWidowed') }
               ])}
             </div>
           </div>
         </div>
 
         {/* Contact Information */}
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+        <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 bg-transparent border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiPhone className="text-slate-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Contact Information</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('hr.employees.registration.contactInfo')}</h2>
             </div>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {renderField('Phone Number *', 'phoneNumber', 'text', null, { required: true })}
-              {renderField('Secondary Phone', 'secondaryPhone')}
-              {renderField('Email', 'email', 'email')}
-              {renderField('Current Address', 'currentAddress')}
-              {renderField('Permanent Address', 'permanentAddress')}
+              {renderField(t('hr.employees.fieldphone') + ' *', 'phoneNumber', 'text', null, { required: true })}
+              {renderField(t('hr.employees.fieldsecondaryPhone'), 'secondaryPhone')}
+              {renderField(t('hr.employees.fieldemail'), 'email', 'email')}
+              {renderField(t('hr.employees.fieldcurrentAddress'), 'currentAddress')}
+              {renderField(t('hr.employees.fieldpermanentAddress'), 'permanentAddress')}
             </div>
           </div>
         </div>
 
         {/* Emergency Contact */}
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900">Emergency Contact</h2>
+        <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 bg-transparent border-b border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900">{t('hr.employees.registration.emergencyContact')}</h2>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {renderField('Contact Name', 'emergencyContactName')}
-              {renderField('Relationship', 'emergencyContactRelation')}
-              {renderField('Contact Phone', 'emergencyContactPhone')}
+              {renderField(t('hr.employees.fieldemergencyContactName'), 'emergencyContactName')}
+              {renderField(t('hr.employees.fieldemergencyContactRelation'), 'emergencyContactRelation')}
+              {renderField(t('hr.employees.fieldemergencyContactPhone'), 'emergencyContactPhone')}
             </div>
           </div>
         </div>
 
         {/* Employment Details */}
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+        <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 bg-transparent border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiBriefcase className="text-slate-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Employment Details</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('hr.employees.registration.employmentDetails')}</h2>
             </div>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {renderField('Department', 'department', 'select', 
-                [{ value: '', label: 'Select Department' }, ...departments.map(d => ({ value: d._id, label: d.departmentName }))])}
-              {renderField('Designation', 'designation', 'select',
-                [{ value: '', label: 'Select Designation' }, ...designations.map(d => ({ value: d._id, label: d.designationTitle }))])}
-              {renderField('Joining Date *', 'joiningDate', 'date', null, { required: true })}
-              {renderField('Employment Type', 'employmentType', 'select', [
-                { value: 'permanent', label: 'Permanent' },
-                { value: 'contract', label: 'Contract' },
-                { value: 'part-time', label: 'Part Time' }
+              {renderField(t('hr.employees.fielddepartment'), 'department', 'select', 
+                [{ value: '', label: t('hr.employees.registration.selectDepartment') }, ...departments.map(d => ({ value: d._id, label: d.departmentName }))])}
+              {renderField(t('hr.employees.fielddesignation'), 'designation', 'select',
+                [{ value: '', label: t('hr.employees.registration.selectDesignation') }, ...designations.map(d => ({ value: d._id, label: d.designationTitle }))])}
+              {renderField(t('hr.employees.fieldjoiningDate') + ' *', 'joiningDate', 'date', null, { required: true })}
+              {renderField(t('hr.employees.fieldemploymentType'), 'employmentType', 'select', [
+                { value: 'permanent', label: t('hr.employees.optionemploymentTypePermanent') },
+                { value: 'contract', label: t('hr.employees.optionemploymentTypeContract') },
+                { value: 'part-time', label: t('hr.employees.optionemploymentTypePartTime') }
               ])}
-              {renderField('Shift Timing', 'shiftTiming', 'text', null, { placeholder: 'e.g., Morning (8AM-2PM)' })}
+              {renderField(t('hr.employees.fieldshiftTiming'), 'shiftTiming', 'text', null, { placeholder: t('hr.employees.registration.shiftTimingPlaceholder') })}
             </div>
           </div>
         </div>
 
         {/* Qualifications */}
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900">Qualifications & Experience</h2>
+        <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 bg-transparent border-b border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900">{t('hr.employees.registration.qualifications')}</h2>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {renderField('Highest Qualification', 'highestQualification', 'text', null, { placeholder: 'e.g., Masters in Islamic Studies' })}
-              {renderField('Specialization / Subject', 'specialization', 'text', null, { placeholder: 'e.g., Quran, Hadith, Fiqh' })}
-              {renderField('Previous Experience (Years)', 'previousExperience', 'number')}
+              {renderField(t('hr.employees.fieldhighestQualification'), 'highestQualification', 'text', null, { placeholder: t('hr.employees.registration.highestQualPlaceholder') })}
+              {renderField(t('hr.employees.fieldspecialization'), 'specialization', 'text', null, { placeholder: t('hr.employees.registration.specializationPlaceholder') })}
+              {renderField(t('hr.employees.fieldpreviousExperience'), 'previousExperience', 'number')}
             </div>
           </div>
         </div>
 
         {/* Salary & Bank Details */}
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+        <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 bg-transparent border-b border-slate-200">
             <div className="flex items-center gap-2">
               <FiDollarSign className="text-slate-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Salary & Bank Details</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('hr.employees.registration.salaryBank')}</h2>
             </div>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {renderField('Base Salary *', 'baseSalary', 'number', null, { required: true })}
-              {renderField('House Allowance', 'houseAllowance', 'number')}
-              {renderField('Transport Allowance', 'transportAllowance', 'number')}
-              {renderField('Medical Allowance', 'medicalAllowance', 'number')}
-              {renderField('Payment Method', 'paymentMethod', 'select', [
-                { value: 'cash', label: 'Cash' }, { value: 'bank', label: 'Bank Transfer' }
+              {renderField(t('hr.employees.fieldbaseSalary') + ' *', 'baseSalary', 'number', null, { required: true })}
+              {renderField(t('hr.employees.fieldhouseAllowance'), 'houseAllowance', 'number')}
+              {renderField(t('hr.employees.fieldtransportAllowance'), 'transportAllowance', 'number')}
+              {renderField(t('hr.employees.fieldmedicalAllowance'), 'medicalAllowance', 'number')}
+              {renderField(t('hr.employees.fieldpaymentMethod'), 'paymentMethod', 'select', [
+                { value: 'cash', label: t('hr.employees.optionpaymentMethodCash') }, { value: 'bank', label: t('hr.employees.optionpaymentMethodBankTransfer') }
               ])}
-              {renderField('Bank Name', 'bankName')}
-              {renderField('Account Number', 'accountNumber')}
-              {renderField('Account Title', 'accountTitle')}
+              {renderField(t('hr.employees.fieldbankName'), 'bankName')}
+              {renderField(t('hr.employees.fieldaccountNumber'), 'accountNumber')}
+              {renderField(t('hr.employees.fieldaccountTitle'), 'accountTitle')}
             </div>
           </div>
         </div>
 
         {/* Status */}
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-          {renderField('Status', 'status', 'select', [
-            { value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }
+        <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+          {renderField(t('hr.employees.fieldstatus'), 'status', 'select', [
+            { value: 'active', label: t('hr.employees.optionstatusActive') }, { value: 'inactive', label: t('hr.employees.optionstatusInactive') }
           ])}
         </div>
 
@@ -646,14 +651,14 @@ const EmployeeRegistration = () => {
             onClick={() => navigate('/staff/hr/employees')}
             className="flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-colors"
           >
-            <FiX /> Cancel
+            <FiX /> {t('hr.employees.registration.cancel')}
           </button>
           <button
             type="submit"
             disabled={loading}
             className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 text-white font-medium hover:from-cyan-700 hover:to-sky-700 transition-all disabled:opacity-50"
           >
-            <FiSave /> {loading ? 'Saving...' : 'Register Employee'}
+            <FiSave /> {loading ? t('common.saving') : t('hr.employees.createTitle')}
           </button>
         </div>
       </form>

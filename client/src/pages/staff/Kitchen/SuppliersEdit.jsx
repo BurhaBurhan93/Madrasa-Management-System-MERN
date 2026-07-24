@@ -8,7 +8,7 @@ const SuppliersEdit = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
   const config = getSuppliersConfig(t);
-  return <FormPage titleCreate={t('staff.kitchen.suppliers.titleCreate', 'Create Supplier')} titleEdit={t('staff.kitchen.suppliers.titleEdit', 'Edit Supplier')} endpoint={config.endpoint} formFields={config.formFields} initialForm={config.initialForm} mapRowToForm={config.mapRowToForm} mapFormToPayload={config.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/kitchen/suppliers" readMode="collection" readEndpoint={config.endpoint} />;
+  return <FormPage titleCreate={t('kitchen.suppliers.titleCreate', 'Create Supplier')} titleEdit={t('kitchen.suppliers.titleEdit', 'Edit Supplier')} endpoint={config.endpoint} formFields={config.formFields} initialForm={config.initialForm} mapRowToForm={config.mapRowToForm} mapFormToPayload={config.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/kitchen/suppliers" readMode="collection" readEndpoint={config.endpoint} />;
 };
 
 export default SuppliersEdit;

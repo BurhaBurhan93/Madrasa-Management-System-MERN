@@ -57,10 +57,10 @@ const StaffLibraryBooks = () => {
   const { t } = useTranslation(['staff', 'common']);
   const localizedConfig = useMemo(() => ({
     ...libraryBooksConfig,
-    title: t('staff.library.books.title'),
-    subtitle: t('staff.library.books.subtitle'),
-    columns: libraryBooksConfig.columns.map(col => ({ ...col, header: t(`staff.library.books.column${col.key.charAt(0).toUpperCase() + col.key.slice(1)}`) })),
-    formFields: libraryBooksConfig.formFields.map(f => ({ ...f, label: t(`staff.library.books.field${f.name.charAt(0).toUpperCase() + f.name.slice(1)}`) }))
+    title: t('library.books.title'),
+    subtitle: t('library.books.subtitle'),
+    columns: libraryBooksConfig.columns.map(col => ({ ...col, header: t(`library.books.column${col.key.charAt(0).toUpperCase() + col.key.slice(1)}`) })),
+    formFields: libraryBooksConfig.formFields.map(f => ({ ...f, label: t(`library.books.field${f.name.charAt(0).toUpperCase() + f.name.slice(1)}`) }))
   }), [t]);
   const [stats, setStats] = useState({
     totalBooks: 0,
@@ -106,10 +106,10 @@ const StaffLibraryBooks = () => {
         
         // Stock Distribution
         const stockRanges = {
-          [t('staff.library.books.outOfStock')]: books.filter(b => (b.stock || 0) === 0).length,
-          [t('staff.library.books.lowRange')]: books.filter(b => (b.stock || 0) >= 1 && (b.stock || 0) <= 5).length,
-          [t('staff.library.books.mediumRange')]: books.filter(b => (b.stock || 0) > 5 && (b.stock || 0) <= 20).length,
-          [t('staff.library.books.highRange')]: books.filter(b => (b.stock || 0) > 20).length
+          [t('library.books.outOfStock')]: books.filter(b => (b.stock || 0) === 0).length,
+          [t('library.books.lowRange')]: books.filter(b => (b.stock || 0) >= 1 && (b.stock || 0) <= 5).length,
+          [t('library.books.mediumRange')]: books.filter(b => (b.stock || 0) > 5 && (b.stock || 0) <= 20).length,
+          [t('library.books.highRange')]: books.filter(b => (b.stock || 0) > 20).length
         };
         const stockDistribution = Object.entries(stockRanges)
           .filter(([, value]) => value > 0)
@@ -125,7 +125,7 @@ const StaffLibraryBooks = () => {
         });
       }
     } catch (err) {
-      console.error(t('staff.library.books.errorFetching'), err);
+      console.error(t('library.books.errorFetching'), err);
     } finally {
       setLoading(false);
     }
@@ -137,7 +137,7 @@ const StaffLibraryBooks = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.library.books.totalBooks')}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('library.books.totalBooks')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalBooks}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -148,7 +148,7 @@ const StaffLibraryBooks = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.library.books.totalStock')}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('library.books.totalStock')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalStock}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -159,7 +159,7 @@ const StaffLibraryBooks = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.library.books.inventoryValue')}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('library.books.inventoryValue')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">${stats.totalValue.toFixed(2)}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -170,7 +170,7 @@ const StaffLibraryBooks = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-rose-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.library.books.lowStock')}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('library.books.lowStock')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.lowStockBooks}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -181,11 +181,11 @@ const StaffLibraryBooks = () => {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
-          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('staff.library.books.booksByCategory')}</h3>
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('library.books.booksByCategory')}</h3>
           <PieChartComponent data={stats.byCategory} height={250} />
         </Card>
         <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
-          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('staff.library.books.stockDistribution')}</h3>
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('library.books.stockDistribution')}</h3>
           <BarChartComponent data={stats.stockDistribution} dataKey="value" nameKey="name" height={250} />
         </Card>
       </div>
@@ -200,7 +200,7 @@ const StaffLibraryBooks = () => {
         createPath="/staff/library/books/create"
         editPathForRow={(row) => `/staff/library/books/edit/${getId(row)}`}
         viewPathForRow={(row) => `/staff/library/books/view/${getId(row)}`}
-        searchPlaceholder={t('staff.library.books.searchPlaceholder')} clientSidePagination={true}
+        searchPlaceholder={t('library.books.searchPlaceholder')} clientSidePagination={true}
         headerContent={<PageSkeleton type="dashboard" />}
       />
     );
@@ -213,7 +213,7 @@ const StaffLibraryBooks = () => {
       createPath="/staff/library/books/create"
       editPathForRow={(row) => `/staff/library/books/edit/${getId(row)}`}
       viewPathForRow={(row) => `/staff/library/books/view/${getId(row)}`}
-      searchPlaceholder={t('staff.library.books.searchPlaceholder')} clientSidePagination={true}
+      searchPlaceholder={t('library.books.searchPlaceholder')} clientSidePagination={true}
       headerContent={headerContent}
     />
   );

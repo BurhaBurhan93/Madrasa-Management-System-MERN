@@ -17,8 +17,17 @@ const UserRegister = () => {
     phone: '', whatsapp: '', dob: '', bloodType: '', idNumber: '', image: '',
     permanentAddress: { province: '', district: '', village: '' },
     currentAddress: { province: '', district: '', village: '' },
-    status: 'active'
+    status: 'active', employeeType: ''
   });
+
+  const EMPLOYEE_TYPES = [
+    'finance', 'registrar', 'hr', 'librarian', 'kitchen',
+    'security', 'support', 'maintenance', 'payroll',
+    'complaints', 'inventory', 'general-manager'
+  ];
+
+  const employeeTypeLabel = (type) =>
+    type.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   const [imagePreview, setImagePreview] = useState(null);
   const [showCreateUser, setShowCreateUser] = useState(false);
 
@@ -142,6 +151,17 @@ const UserRegister = () => {
                   <option value="admin">{t('users.admin')}</option>
                 </select>
               </div>
+              {formData.role === 'staff' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.employeeType')} <span className="text-red-500">*</span></label>
+                  <select value={formData.employeeType} onChange={(e) => setFormData({ ...formData, employeeType: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">{t('users.select')}</option>
+                    {EMPLOYEE_TYPES.map(type => (
+                      <option key={type} value={type}>{employeeTypeLabel(type)}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.status')}</label>
                 <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">

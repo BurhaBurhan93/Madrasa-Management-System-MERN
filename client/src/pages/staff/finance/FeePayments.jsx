@@ -6,29 +6,29 @@ import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupAmount
 import { staffApi } from '../../../api/staffApi';
 
 export const feePaymentsConfig = {
-  title: 'Fee Payments',
-  subtitle: 'Manage collection activity, verification queues, and payment channels.',
+  title: 'finance.feePayments.title',
+  subtitle: 'finance.feePayments.subtitle',
   endpoint: staffApi.finance.feePayments,
   columns: [
-    { key: 'studentFee', header: 'Student Fee ID' },
-    { key: 'receiptNo', header: 'Receipt No' },
-    { key: 'paymentDate', header: 'Payment Date' },
-    { key: 'paidAmount', header: 'Paid Amount' },
-    { key: 'paymentMethod', header: 'Method' },
-    { key: 'paymentStatus', header: 'Status' },
-    { key: 'verificationStatus', header: 'Verification' }
+    { key: 'studentFee', header: 'finance.feePayments.column.studentFee' },
+    { key: 'receiptNo', header: 'finance.feePayments.column.receiptNo' },
+    { key: 'paymentDate', header: 'finance.feePayments.column.paymentDate' },
+    { key: 'paidAmount', header: 'finance.feePayments.column.paidAmount' },
+    { key: 'paymentMethod', header: 'finance.feePayments.column.paymentMethod' },
+    { key: 'paymentStatus', header: 'finance.feePayments.column.paymentStatus' },
+    { key: 'verificationStatus', header: 'finance.feePayments.column.verificationStatus' }
   ],
   formFields: [
-    { name: 'studentFee', label: 'Student Fee', type: 'relation', relationEndpoint: '/finance/student-fees', relationLabel: (r) => `${r.student?.name || r.student} - ${r.academicYear}` },
-    { name: 'receiptNo', label: 'Receipt No' },
-    { name: 'paymentDate', label: 'Payment Date', type: 'date' },
-    { name: 'paidAmount', label: 'Paid Amount', type: 'number' },
-    { name: 'paymentMethod', label: 'Payment Method', type: 'select', options: [{ value: 'cash', label: 'Cash' }, { value: 'card', label: 'Card' }] },
-    { name: 'transactionReference', label: 'Transaction Reference' },
-    { name: 'paymentStatus', label: 'Payment Status', type: 'select', options: [{ value: 'completed', label: 'Completed' }, { value: 'pending', label: 'Pending' }, { value: 'failed', label: 'Failed' }] },
-    { name: 'verificationStatus', label: 'Verification Status', type: 'select', options: [{ value: 'verified', label: 'Verified' }, { value: 'pending', label: 'Pending' }, { value: 'rejected', label: 'Rejected' }] },
-    { name: 'paymentChannel', label: 'Payment Channel' },
-    { name: 'remarks', label: 'Remarks' }
+    { name: 'studentFee', label: 'finance.feePayments.formField.studentFee', type: 'relation', relationEndpoint: '/finance/student-fees', relationLabel: (r) => `${r.student?.name || r.student} - ${r.academicYear}` },
+    { name: 'receiptNo', label: 'finance.feePayments.formField.receiptNo' },
+    { name: 'paymentDate', label: 'finance.feePayments.formField.paymentDate', type: 'date' },
+    { name: 'paidAmount', label: 'finance.feePayments.formField.paidAmount', type: 'number' },
+    { name: 'paymentMethod', label: 'finance.feePayments.formField.paymentMethod', type: 'select', options: [{ value: 'cash', label: 'finance.feePayments.formField.paymentMethod.cash' }, { value: 'card', label: 'finance.feePayments.formField.paymentMethod.card' }] },
+    { name: 'transactionReference', label: 'finance.feePayments.formField.transactionReference' },
+    { name: 'paymentStatus', label: 'finance.feePayments.formField.paymentStatus', type: 'select', options: [{ value: 'completed', label: 'finance.feePayments.formField.paymentStatus.completed' }, { value: 'pending', label: 'finance.feePayments.formField.paymentStatus.pending' }, { value: 'failed', label: 'finance.feePayments.formField.paymentStatus.failed' }] },
+    { name: 'verificationStatus', label: 'finance.feePayments.formField.verificationStatus', type: 'select', options: [{ value: 'verified', label: 'finance.feePayments.formField.verificationStatus.verified' }, { value: 'pending', label: 'finance.feePayments.formField.verificationStatus.pending' }, { value: 'rejected', label: 'finance.feePayments.formField.verificationStatus.rejected' }] },
+    { name: 'paymentChannel', label: 'finance.feePayments.formField.paymentChannel' },
+    { name: 'remarks', label: 'finance.feePayments.formField.remarks' }
   ],
   initialForm: {
     studentFee: '',
@@ -64,26 +64,26 @@ const FeePayments = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: t('staff.finance.feePayments.statTotalPayments'), value: payments.length, helper: t('staff.finance.feePayments.statTotalPaymentsHelper'), tone: 'blue', icon: FiCreditCard },
-            { label: t('staff.finance.feePayments.statTotalCollected'), value: formatCurrency(totalCollected), helper: t('staff.finance.feePayments.statTotalCollectedHelper'), tone: 'emerald', icon: FiDollarSign },
-            { label: t('staff.finance.feePayments.statPendingPayments'), value: pendingCount, helper: t('staff.finance.feePayments.statPendingPaymentsHelper'), tone: 'amber', icon: FiClock },
-            { label: t('staff.finance.feePayments.statFailedPayments'), value: failedCount, helper: t('staff.finance.feePayments.statFailedPaymentsHelper'), tone: 'rose', icon: FiAlertTriangle },
-            { label: t('staff.finance.feePayments.statVerificationQueue'), value: verificationQueue, helper: t('staff.finance.feePayments.statVerificationQueueHelper'), tone: 'violet', icon: FiCheckCircle }
+            { label: t('finance.feePayments.statTotalPayments'), value: payments.length, helper: t('finance.feePayments.statTotalPaymentsHelper'), tone: 'blue', icon: FiCreditCard },
+            { label: t('finance.feePayments.statTotalCollected'), value: formatCurrency(totalCollected), helper: t('finance.feePayments.statTotalCollectedHelper'), tone: 'emerald', icon: FiDollarSign },
+            { label: t('finance.feePayments.statPendingPayments'), value: pendingCount, helper: t('finance.feePayments.statPendingPaymentsHelper'), tone: 'amber', icon: FiClock },
+            { label: t('finance.feePayments.statFailedPayments'), value: failedCount, helper: t('finance.feePayments.statFailedPaymentsHelper'), tone: 'rose', icon: FiAlertTriangle },
+            { label: t('finance.feePayments.statVerificationQueue'), value: verificationQueue, helper: t('finance.feePayments.statVerificationQueueHelper'), tone: 'violet', icon: FiCheckCircle }
           ],
           charts: [
-            { title: t('staff.finance.feePayments.chartPaymentMethodDistribution'), type: 'pie', data: groupCountByKey(payments, 'paymentMethod') },
-            { title: t('staff.finance.feePayments.chartPaymentStatusBreakdown'), type: 'bar', data: groupCountByKey(payments, 'paymentStatus') },
-            { title: t('staff.finance.feePayments.chartMonthlyCollections'), type: 'line', data: groupAmountByMonth(payments, 'paymentDate', 'paidAmount') }
+            { title: t('finance.feePayments.chart.paymentMethodDistribution'), type: 'pie', data: groupCountByKey(payments, 'paymentMethod') },
+            { title: t('finance.feePayments.chart.paymentStatusBreakdown'), type: 'bar', data: groupCountByKey(payments, 'paymentStatus') },
+            { title: t('finance.feePayments.chart.monthlyCollections'), type: 'line', data: groupAmountByMonth(payments, 'paymentDate', 'paidAmount') }
           ],
           insight: {
-            eyebrow: t('staff.finance.feePayments.insightEyebrow'),
-            title: t('staff.finance.feePayments.insightTitle'),
-            description: t('staff.finance.feePayments.insightDescription')
+            eyebrow: t('finance.feePayments.insight.eyebrow'),
+            title: t('finance.feePayments.insight.title'),
+            description: t('finance.feePayments.insight.description')
           }
         });
       } catch (error) {
         if (!active) return;
-        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('staff.finance.feePayments.errorTitle'), description: error.message || t('staff.finance.feePayments.errorDescription') } });
+        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('finance.feePayments.errorTitle'), description: error.message || t('finance.feePayments.errorDescription') } });
       }
     };
     load();
@@ -94,7 +94,7 @@ const FeePayments = () => {
 
   return (
     <ListPage
-      eyebrow={t('staff.finance.eyebrow')}
+      eyebrow={t('finance.eyebrow')}
       title={feePaymentsConfig.title}
       subtitle={feePaymentsConfig.subtitle}
       endpoint={feePaymentsConfig.endpoint}
@@ -102,7 +102,7 @@ const FeePayments = () => {
       createPath="/staff/finance/fee-payments/create"
       editPathForRow={(row) => `/staff/finance/fee-payments/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/fee-payments/view/${row._id}`}
-      searchPlaceholder={t('staff.finance.feePayments.searchPlaceholder')}
+      searchPlaceholder={t('finance.feePayments.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

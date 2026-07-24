@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../../contexts/ThemeContext.jsx";
 import { getStaffToneStyles } from "./staffTheme";
 import { useTranslation } from 'react-i18next';
-import { localizeAdminText } from "../../../lib/adminLocalization";
 
 const getCellValue = (row, key) => {
   const value = row?.[key];
@@ -30,6 +29,9 @@ const getCellValue = (row, key) => {
       value.designationTitle ||
       value.subject ||
       value.complaintCode ||
+      value.student?.name ||
+      value.receiptNo ||
+      value.code ||
       JSON.stringify(value)
     );
   }
@@ -109,12 +111,12 @@ const getStatusVariant = (value) => {
   return "info";
 };
 
-const renderStatusBadge = (value) => (
+const renderStatusBadge = (value, t) => (
   <Badge
     variant={getStatusVariant(value)}
     className="px-3 py-1 text-[11px] font-semibold tracking-[0.04em]"
   >
-    {formatStatusLabel(value)}
+    {t(`status.${String(value || "").trim().toLowerCase().replace(/[\s-_]+/g, '_')}`, { defaultValue: formatStatusLabel(value) })}
   </Badge>
 );
 
@@ -136,7 +138,6 @@ const ListPage = ({
   enableExport = false,
   embedded = false,
 }) => {
-  const adminLang = localStorage.getItem("adminLang") || "en";
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -157,13 +158,13 @@ const ListPage = ({
 
   const cardShellClass = isDark
     ? "border-slate-700 bg-slate-900/80"
-    : "border-slate-200 bg-white";
+    : "border-slate-200 bg-transparent";
   const panelShellClass = isDark
     ? "border-slate-700 bg-slate-950/70"
-    : "border-slate-200 bg-gradient-to-r from-slate-50 via-white to-cyan-50/40";
+    : "border-slate-200 bg-transparent";
   const controlClass = isDark
     ? "border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-500 focus:border-cyan-400 focus:ring-cyan-500/20"
-    : "border-slate-200 bg-white text-slate-700 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-100";
+    : "border-slate-200 bg-transparent text-slate-700 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-100";
 
   const fetchItems = async () => {
     setLoading(true);
@@ -190,7 +191,7 @@ const ListPage = ({
           (Array.isArray(records) ? records.length : 0),
       );
     } catch (err) {
-      setError(err.message || t('staff.list.unknownError'));
+      setError(err.message || t('list.unknownError'));
     } finally {
       setLoading(false);
     }
@@ -202,10 +203,7 @@ const ListPage = ({
 
   const handleDelete = async (row) => {
     const ok = window.confirm(
-      localizeAdminText(
-        "Are you sure you want to delete this record?",
-        adminLang,
-      ),
+      t('list.confirmDelete'),
     );
     if (!ok) return;
 
@@ -215,10 +213,10 @@ const ListPage = ({
         method: "DELETE",
       });
       const data = await parseJsonSafe(res);
-      if (!res.ok) throw new Error(data.message || t('staff.list.deleteFailed'));
+      if (!res.ok) throw new Error(data.message || t('list.deleteFailed'));
       await fetchItems();
     } catch (err) {
-      setError(err.message || t('staff.list.deleteError'));
+      setError(err.message || t('list.deleteError'));
     } finally {
       setDeletingId(null);
     }
@@ -228,8 +226,11 @@ const ListPage = ({
     () =>
       columns.filter(
         (column) => column.key && !String(column.key).startsWith("__"),
-      ),
-    [columns],
+      ).map((column) => ({
+        ...column,
+        header: column.header ? t(column.header, { defaultValue: column.header }) : column.header,
+      })),
+    [columns, t],
   );
 
   const filteredSortedItems = useMemo(() => {
@@ -304,14 +305,16 @@ const ListPage = ({
         String(column.header || "")
           .toLowerCase()
           .includes("status");
-      if (!isStatusColumn || column.render) return column;
-      return { ...column, render: (value) => renderStatusBadge(value) };
+      const translatedHeader = column.header ? t(column.header, { defaultValue: column.header }) : column.header;
+      if (column.render) return { ...column, header: translatedHeader };
+      if (isStatusColumn) return { ...column, header: translatedHeader, render: (value) => renderStatusBadge(value, t) };
+      return { ...column, header: translatedHeader, render: (value) => getCellValue({ [column.key]: value }, column.key) };
     });
 
     return [
       {
         key: "__index",
-        header: localizeAdminText("No.", adminLang),
+        header: t('list.rowNum'),
         sortable: false,
         render: (_value, _row, rowIndex) => (
           <div className="min-w-[56px] text-slate-700">
@@ -322,7 +325,7 @@ const ListPage = ({
       ...enhancedColumns,
       {
         key: "__actions",
-        header: localizeAdminText("Actions", adminLang),
+        header: t('list.actions'),
         sortable: false,
         render: (_value, row) => (
           <RecordActionButtons
@@ -344,6 +347,7 @@ const ListPage = ({
     ];
   }, [
     columns,
+    t,
     viewPathForRow,
     editPathForRow,
     deleteEnabled,
@@ -360,10 +364,13 @@ const ListPage = ({
   const handlePDFExport = () => {
     const exportableColumns = columns.filter(
       (column) => column.key && !String(column.key).startsWith("__"),
-    );
+    ).map((column) => ({
+      ...column,
+      header: column.header ? t(column.header, { defaultValue: column.header }) : column.header,
+    }));
     const doc = new jsPDF({ orientation: "landscape" });
     doc.setFontSize(18);
-    doc.text(title || t('staff.list.report'), 14, 20);
+    doc.text(title || t('list.report'), 14, 20);
     doc.setFontSize(10);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 28);
     const tableData = filteredSortedItems.map((row) =>
@@ -384,7 +391,10 @@ const ListPage = ({
   const handleExport = () => {
     const exportableColumns = columns.filter(
       (column) => column.key && !String(column.key).startsWith("__"),
-    );
+    ).map((column) => ({
+      ...column,
+      header: column.header ? t(column.header, { defaultValue: column.header }) : column.header,
+    }));
     const rows = filteredSortedItems.map((row) =>
       exportableColumns
         .map(
@@ -413,10 +423,10 @@ const ListPage = ({
       {enableExport ? (
         <>
           <Button variant="outline" icon={FiDownload} onClick={handlePDFExport}>
-            {localizeAdminText("Export", adminLang)} PDF
+            {t('list.exportPdf')}
           </Button>
           <Button variant="outline" icon={FiDownload} onClick={handleExport}>
-            {localizeAdminText("Export", adminLang)} CSV
+            {t('list.exportCsv')}
           </Button>
         </>
       ) : null}
@@ -427,7 +437,7 @@ const ListPage = ({
           icon={FiPlus}
           onClick={() => navigate(createPath)}
         >
-          {localizeAdminText("Add New", adminLang)}
+          {t('list.addNew')}
         </Button>
       ) : null}
     </div>
@@ -437,20 +447,17 @@ const ListPage = ({
     <>
       {headerContent}
       <Card className="rounded-[28px] shadow-none">
-        <div className={`rounded-[24px] border p-5 lg:p-6 ${panelShellClass}`}>
+        <div className={`rounded-[24px] border p-3 sm:p-4 lg:p-6 ${panelShellClass}`}>
           <div className="mb-5 flex flex-wrap items-center gap-3">
             <div
               className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${toneStyles.soft}`}
             >
-              {localizeAdminText("Search And Filter", adminLang)}
+              {t('list.searchAndFilter')}
             </div>
             <div
               className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}
             >
-              {localizeAdminText(
-                "Quick controls for finding records faster.",
-                adminLang,
-              )}
+              {t('list.quickControls')}
             </div>
           </div>
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -459,7 +466,7 @@ const ListPage = ({
                 <label
                   className={`mb-2 block text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-700"}`}
                 >
-                  {localizeAdminText("Search", adminLang)}
+                  {t('list.searchPlaceholder')}
                 </label>
                 <input
                   value={query}
@@ -468,14 +475,14 @@ const ListPage = ({
                     setPage(1);
                   }}
                   className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${controlClass}`}
-                  placeholder={searchPlaceholder || t('staff.list.searchPlaceholder')}
+                  placeholder={searchPlaceholder || t('list.searchPlaceholder')}
                 />
               </div>
               <div>
                 <label
                   className={`mb-2 block text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-700"}`}
                 >
-                  {localizeAdminText("Filter By", adminLang)}
+                  {t('list.filterBy')}
                 </label>
                 <select
                   value={filterColumn}
@@ -486,7 +493,7 @@ const ListPage = ({
                   className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${controlClass}`}
                 >
                   <option value="all">
-                    {localizeAdminText("All Columns", adminLang)}
+                    {t('list.allColumns')}
                   </option>
                   {filterableColumns.map((column) => (
                     <option key={column.key} value={column.key}>
@@ -499,7 +506,7 @@ const ListPage = ({
                 <label
                   className={`mb-2 block text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-700"}`}
                 >
-                  {localizeAdminText("Filter Value", adminLang)}
+                  {t('list.filterValue')}
                 </label>
                 <input
                   value={filterValue}
@@ -508,7 +515,7 @@ const ListPage = ({
                     setPage(1);
                   }}
                   className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${controlClass}`}
-                  placeholder={t('staff.list.typeToFilter')}
+                  placeholder={t('list.typeToFilter')}
                 />
               </div>
             </div>
@@ -517,7 +524,7 @@ const ListPage = ({
       </Card>
       {error && !loading && (
         <Card className="rounded-[28px] shadow-none">
-          <div className="p-6">
+          <div className="p-3 sm:p-4 lg:p-6">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
                 <svg
@@ -538,7 +545,7 @@ const ListPage = ({
                 <h3
                   className={`text-sm font-semibold ${isDark ? "text-rose-200" : "text-rose-900"}`}
                 >
-                  {localizeAdminText("Unable to Load Data", adminLang)}
+                  {t('list.unableToLoad')}
                 </h3>
                 <p
                   className={`mt-1 text-sm ${isDark ? "text-rose-300" : "text-rose-700"}`}
@@ -549,7 +556,7 @@ const ListPage = ({
                   onClick={fetchItems}
                   className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors"
                 >
-                  {localizeAdminText("Retry", adminLang)}
+                  {t('common.retry')}
                 </button>
               </div>
             </div>
@@ -562,52 +569,43 @@ const ListPage = ({
             <h2
               className={`text-xl font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}
             >
-              {localizeAdminText("Records Table", adminLang)}
+              {t('list.recordsTable')}
             </h2>
             <p
               className={`mt-1 text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}
             >
-              {localizeAdminText(
-                "Unified filtering, sorting, pagination, and row actions.",
-                adminLang,
-              )}
+              {t('list.tableDescription')}
             </p>
           </div>
           {deletingId && (
             <div className="text-sm text-rose-500">
-              {t('staff.list.deletingRecord')}
+              {t('list.deletingRecord')}
             </div>
           )}
         </div>
         <div
-          className={`overflow-x-auto rounded-[24px] border ${isDark ? "border-slate-700 bg-slate-900" : "border-slate-200 bg-white"}`}
+          className={`overflow-x-auto rounded-[24px] border ${isDark ? "border-slate-700 bg-slate-900"     : "border-slate-200 bg-transparent"}`}
         >
           {loading ? (
-            <div className="p-6 text-sm text-slate-500">
-              {localizeAdminText("Loading data...", adminLang)}
+            <div className="p-3 sm:p-4 lg:p-6 text-sm text-slate-500">
+              {t('list.loadingData')}
             </div>
           ) : visibleItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+            <div className="flex flex-col items-center justify-center px-3 sm:px-4 lg:px-6 py-16 text-center">
               <div
-                className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] ${isDark ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-500"}`}
+                className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] ${isDark ? "bg-slate-800 text-slate-300" : "bg-transparent text-slate-500"}`}
               >
-                {localizeAdminText("No Records", adminLang)}
+                {t('list.noRecords')}
               </div>
               <h3
                 className={`mt-4 text-xl font-black ${isDark ? "text-slate-100" : "text-slate-900"}`}
               >
-                {localizeAdminText(
-                  "Nothing matches your current filters",
-                  adminLang,
-                )}
+                {t('list.noMatch')}
               </h3>
               <p
                 className={`mt-2 max-w-xl text-sm leading-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}
               >
-                {localizeAdminText(
-                  "Try changing the search terms, switching the filter column, or create the first record for this module.",
-                  adminLang,
-                )}
+                {t('list.tryChanging')}
               </p>
             </div>
           ) : (
@@ -620,9 +618,9 @@ const ListPage = ({
                   column.sortable !== false,
               }))}
               data={visibleItems}
-              rowClassName="odd:bg-white even:bg-slate-50/30 hover:bg-cyan-50/40"
+              rowClassName="odd:bg-transparent even:bg-transparent hover:bg-cyan-50/40"
               cellClassName="align-middle"
-              headerClassName="bg-slate-100 text-slate-700"
+              headerClassName="bg-transparent text-slate-700"
               sortKey={sortKey}
               sortDirection={sortDirection}
               onSort={handleSort}

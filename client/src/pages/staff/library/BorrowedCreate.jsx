@@ -5,7 +5,7 @@ import { libraryBorrowedConfig } from './Borrowed';
 
 const BorrowedCreate = () => {
   const { t } = useTranslation(['staff', 'common']);
-  return <FormPage titleCreate={t('staff.library.borrowed.titleCreate')} titleEdit={t('staff.library.borrowed.titleEdit')} endpoint={libraryBorrowedConfig.endpoint} formFields={libraryBorrowedConfig.formFields} initialForm={libraryBorrowedConfig.initialForm} mapRowToForm={libraryBorrowedConfig.mapRowToForm} mode="create" onSavedPath="/staff/library/borrowed" />;
+  return <FormPage titleCreate={t('library.borrowed.titleCreate')} titleEdit={t('library.borrowed.titleEdit')} endpoint={libraryBorrowedConfig.endpoint} formFields={libraryBorrowedConfig.formFields} initialForm={libraryBorrowedConfig.initialForm} mapRowToForm={libraryBorrowedConfig.mapRowToForm} mode="create" onSavedPath="/staff/library/borrowed" />;
 };
 
 export default BorrowedCreate;

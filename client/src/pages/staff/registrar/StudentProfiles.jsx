@@ -26,11 +26,11 @@ export const studentProfilesConfig = {
             {img ? (
               <img 
                 src={img} 
-                alt="Student" 
+                alt="Profile" 
                 className="h-10 w-10 rounded-full object-cover border border-slate-200" 
               />
             ) : (
-              <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+              <div className="h-10 w-10 rounded-full bg-transparent flex items-center justify-center text-slate-400">
                 👤
               </div>
             )}
@@ -46,7 +46,7 @@ export const studentProfilesConfig = {
     { key: 'currentLevel', header: 'Level' },
     { key: 'status', header: 'Status', render: (value) => (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-        value === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+        value === 'active' ? 'bg-green-100 text-green-800' : 'bg-transparent text-gray-800'
       }`}>
         {value || 'N/A'}
       </span>
@@ -209,7 +209,7 @@ const StudentProfiles = () => {
       
       const classMap = {};
       students.forEach(s => {
-        const className = s.currentClass?.name || s.currentClass?.className || 'Not Assigned';
+        const className = s.currentClass?.name || s.currentClass?.className || t('registrar.studentProfiles.charts.notAssigned');
         classMap[className] = (classMap[className] || 0) + 1;
       });
       const byClass = Object.entries(classMap)
@@ -238,7 +238,7 @@ const StudentProfiles = () => {
 
   const columns = studentProfilesConfig.columns.map(col => ({
     ...col,
-    header: t(`staff.registrar.studentProfiles.columns.${col.key}`)
+    header: t(`registrar.studentProfiles.columns.${col.key}`)
   }));
 
   return (
@@ -251,10 +251,10 @@ const StudentProfiles = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-xl">👥</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentProfiles.stats.totalStudents')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentProfiles.stats.totalStudents')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">{profileStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentProfiles.stats.allRegisteredStudents')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentProfiles.stats.allRegisteredStudents')}</p>
           </div>
         </Card>
 
@@ -265,24 +265,24 @@ const StudentProfiles = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <span className="text-xl">✅</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentProfiles.stats.activeStudents')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentProfiles.stats.activeStudents')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{profileStats.active}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentProfiles.stats.currentlyEnrolled')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentProfiles.stats.currentlyEnrolled')}</p>
           </div>
         </Card>
 
         <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gray-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-transparent rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center">
                 <span className="text-xl">⏸️</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentProfiles.stats.inactive')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentProfiles.stats.inactive')}</span>
             </div>
             <p className="text-3xl font-black text-gray-600">{profileStats.inactive}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentProfiles.stats.notCurrentlyActive')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentProfiles.stats.notCurrentlyActive')}</p>
           </div>
         </Card>
 
@@ -293,29 +293,29 @@ const StudentProfiles = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <span className="text-xl">🆕</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentProfiles.stats.new30Days')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentProfiles.stats.new30Days')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{profileStats.recentAdmissions}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentProfiles.stats.recentAdmissions')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentProfiles.stats.recentAdmissions')}</p>
           </div>
         </Card>
       </div>
 
       {profileStats.byClass.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card title={t('staff.registrar.studentProfiles.charts.studentDistributionByClass')}>
+          <Card title={t('registrar.studentProfiles.charts.studentDistributionByClass')}>
             <BarChartComponent data={profileStats.byClass} dataKey="value" nameKey="name" height={300} />
           </Card>
-          <Card title={t('staff.registrar.studentProfiles.charts.enrollmentStatus')}>
+          <Card title={t('registrar.studentProfiles.charts.enrollmentStatus')}>
             <PieChartComponent data={[
-              { name: t('staff.registrar.studentProfiles.charts.active'), value: profileStats.active },
-              { name: t('staff.registrar.studentProfiles.charts.inactive'), value: profileStats.inactive }
+              { name: t('registrar.studentProfiles.charts.active'), value: profileStats.active },
+              { name: t('registrar.studentProfiles.charts.inactive'), value: profileStats.inactive }
             ].filter(item => item.value > 0)} height={300} />
           </Card>
         </div>
       )}
 
-      <ListPage {...studentProfilesConfig} columns={columns} />
+      <ListPage {...studentProfilesConfig} title={t('registrar.studentProfiles.title')} subtitle={t('registrar.studentProfiles.subtitle')} columns={columns} />
     </div>
   );
 };

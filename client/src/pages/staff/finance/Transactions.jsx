@@ -6,26 +6,26 @@ import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupAmount
 import { staffApi } from '../../../api/staffApi';
 
 export const transactionsConfig = {
-  title: 'Financial Transactions',
-  subtitle: 'Manage income and expense transactions with live balance and verification visibility.',
+  title: 'finance.transactions.title',
+  subtitle: 'finance.transactions.subtitle',
   endpoint: staffApi.finance.transactions,
   columns: [
-    { key: 'transactionDate', header: 'Date', render: (value) => new Date(value).toISOString().slice(0, 10) },
-    { key: 'transactionCode', header: 'Code' },
-    { key: 'description', header: 'Description' },
-    { key: 'transactionType', header: 'Type' },
-    { key: 'amount', header: 'Amount' },
-    { key: 'verificationStatus', header: 'Status' }
+    { key: 'transactionDate', header: 'finance.transactions.column.transactionDate', render: (value) => new Date(value).toISOString().slice(0, 10) },
+    { key: 'transactionCode', header: 'finance.transactions.column.transactionCode' },
+    { key: 'description', header: 'finance.transactions.column.description' },
+    { key: 'transactionType', header: 'finance.transactions.column.transactionType' },
+    { key: 'amount', header: 'finance.transactions.column.amount' },
+    { key: 'verificationStatus', header: 'finance.transactions.column.verificationStatus' }
   ],
   formFields: [
-    { name: 'transactionType', label: 'Transaction Type', type: 'select', options: [{ value: 'income', label: 'Income' }, { value: 'expense', label: 'Expense' }] },
-    { name: 'account', label: 'Account', type: 'relation', relationEndpoint: '/finance/accounts', relationLabel: (r) => `${r.accountName} (${r.accountCode})` },
-    { name: 'amount', label: 'Amount', type: 'number' },
-    { name: 'transactionDate', label: 'Transaction Date', type: 'date' },
-    { name: 'referenceType', label: 'Reference Type' },
-    { name: 'description', label: 'Description' },
-    { name: 'verificationStatus', label: 'Verification Status', type: 'select', options: [{ value: 'verified', label: 'Verified' }, { value: 'pending', label: 'Pending' }, { value: 'rejected', label: 'Rejected' }] },
-    { name: 'accountCode', label: 'Account Code' }
+    { name: 'transactionType', label: 'finance.transactions.formField.transactionType', type: 'select', options: [{ value: 'income', label: 'finance.transactions.formField.transactionType.income' }, { value: 'expense', label: 'finance.transactions.formField.transactionType.expense' }] },
+    { name: 'account', label: 'finance.transactions.formField.account', type: 'relation', relationEndpoint: '/finance/accounts', relationLabel: (r) => `${r.accountName} (${r.accountCode})` },
+    { name: 'amount', label: 'finance.transactions.formField.amount', type: 'number' },
+    { name: 'transactionDate', label: 'finance.transactions.formField.transactionDate', type: 'date' },
+    { name: 'referenceType', label: 'finance.transactions.formField.referenceType' },
+    { name: 'description', label: 'finance.transactions.formField.description' },
+    { name: 'verificationStatus', label: 'finance.transactions.formField.verificationStatus', type: 'select', options: [{ value: 'verified', label: 'finance.transactions.formField.verificationStatus.verified' }, { value: 'pending', label: 'finance.transactions.formField.verificationStatus.pending' }, { value: 'rejected', label: 'finance.transactions.formField.verificationStatus.rejected' }] },
+    { name: 'accountCode', label: 'finance.transactions.formField.accountCode' }
   ],
   initialForm: {
     transactionType: 'income',
@@ -65,28 +65,28 @@ const Transactions = () => {
         const netBalance = totalIncome - totalExpenses;
         const monthlyFlow = groupAmountByMonth(transactions, 'transactionDate', 'amount');
         const typeMix = [
-          { name: 'Income', value: Math.round(totalIncome) },
-          { name: 'Expense', value: Math.round(totalExpenses) }
+          { name: t('finance.transactions.chart.income'), value: Math.round(totalIncome) },
+          { name: t('finance.transactions.chart.expense'), value: Math.round(totalExpenses) }
         ];
 
         setAnalytics({
           loading: false,
           stats: [
-            { label: t('staff.finance.transactions.statTotalTransactions'), value: transactions.length, helper: t('staff.finance.transactions.statTotalTransactionsHelper'), tone: 'blue', icon: FiActivity },
-            { label: t('staff.finance.transactions.statTotalIncome'), value: formatCurrency(totalIncome), helper: t('staff.finance.transactions.statTotalIncomeHelper'), tone: 'emerald', icon: FiTrendingUp },
-            { label: t('staff.finance.transactions.statTotalExpenses'), value: formatCurrency(totalExpenses), helper: t('staff.finance.transactions.statTotalExpensesHelper'), tone: 'rose', icon: FiTrendingDown },
-            { label: t('staff.finance.transactions.statNetBalance'), value: formatCurrency(netBalance), helper: netBalance >= 0 ? t('staff.finance.transactions.statNetBalancePositive') : t('staff.finance.transactions.statNetBalanceNegative'), tone: 'violet', icon: FiDollarSign },
-            { label: t('staff.finance.transactions.statVerificationQueue'), value: pendingCount, helper: t('staff.finance.transactions.statVerificationQueueHelper'), tone: 'amber', icon: FiAlertCircle }
+            { label: t('finance.transactions.statTotalTransactions'), value: transactions.length, helper: t('finance.transactions.statTotalTransactionsHelper'), tone: 'blue', icon: FiActivity },
+            { label: t('finance.transactions.statTotalIncome'), value: formatCurrency(totalIncome), helper: t('finance.transactions.statTotalIncomeHelper'), tone: 'emerald', icon: FiTrendingUp },
+            { label: t('finance.transactions.statTotalExpenses'), value: formatCurrency(totalExpenses), helper: t('finance.transactions.statTotalExpensesHelper'), tone: 'rose', icon: FiTrendingDown },
+            { label: t('finance.transactions.statNetBalance'), value: formatCurrency(netBalance), helper: netBalance >= 0 ? t('finance.transactions.statNetBalancePositive') : t('finance.transactions.statNetBalanceNegative'), tone: 'violet', icon: FiDollarSign },
+            { label: t('finance.transactions.statVerificationQueue'), value: pendingCount, helper: t('finance.transactions.statVerificationQueueHelper'), tone: 'amber', icon: FiAlertCircle }
           ],
           charts: [
-            { title: t('staff.finance.transactions.chartIncomeVsExpenseMix'), type: 'pie', data: typeMix },
-            { title: t('staff.finance.transactions.chartVerificationStatusBreakdown'), type: 'bar', data: groupCountByKey(transactions, 'verificationStatus') },
-            { title: t('staff.finance.transactions.chartMonthlyTransactionVolume'), type: 'line', data: monthlyFlow }
+            { title: t('finance.transactions.chart.incomeVsExpenseMix'), type: 'pie', data: typeMix },
+            { title: t('finance.transactions.chart.verificationStatusBreakdown'), type: 'bar', data: groupCountByKey(transactions, 'verificationStatus') },
+            { title: t('finance.transactions.chart.monthlyTransactionVolume'), type: 'line', data: monthlyFlow }
           ],
           insight: {
-            eyebrow: t('staff.finance.transactions.insightEyebrow'),
-            title: t('staff.finance.transactions.insightTitle'),
-            description: t('staff.finance.transactions.insightDescription')
+            eyebrow: t('finance.transactions.insight.eyebrow'),
+            title: t('finance.transactions.insight.title'),
+            description: t('finance.transactions.insight.description')
           }
         });
       } catch (error) {
@@ -96,9 +96,9 @@ const Transactions = () => {
           stats: [],
           charts: [],
           insight: {
-            eyebrow: t('staff.finance.transactions.insightEyebrowUnavailable'),
-            title: t('staff.finance.transactions.errorTitle'),
-            description: error.message || t('staff.finance.transactions.errorDescription')
+            eyebrow: t('finance.transactions.insightEyebrowUnavailable'),
+            title: t('finance.transactions.errorTitle'),
+            description: error.message || t('finance.transactions.errorDescription')
           }
         });
       }
@@ -112,7 +112,7 @@ const Transactions = () => {
 
   return (
     <ListPage
-      eyebrow={t('staff.finance.eyebrow')}
+      eyebrow={t('finance.eyebrow')}
       title={transactionsConfig.title}
       subtitle={transactionsConfig.subtitle}
       endpoint={transactionsConfig.endpoint}
@@ -120,7 +120,7 @@ const Transactions = () => {
       createPath="/staff/finance/transactions/create"
       editPathForRow={(row) => `/staff/finance/transactions/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/transactions/view/${row._id}`}
-      searchPlaceholder={t('staff.finance.transactions.searchPlaceholder')}
+      searchPlaceholder={t('finance.transactions.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

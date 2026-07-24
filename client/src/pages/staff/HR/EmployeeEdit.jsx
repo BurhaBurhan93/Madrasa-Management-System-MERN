@@ -7,7 +7,7 @@ import { employeesConfig } from './Employees';
 const EmployeeEdit = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <FormPage titleCreate={t('staff.hr.employees.createTitle')} titleEdit={t('staff.hr.employees.editTitle')} endpoint={employeesConfig.endpoint} formFields={employeesConfig.formFields} initialForm={employeesConfig.initialForm} mapRowToForm={employeesConfig.mapRowToForm} mapFormToPayload={employeesConfig.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/hr/employees" />;
+  return <FormPage titleCreate={t('hr.employees.createTitle')} titleEdit={t('hr.employees.editTitle')} endpoint={employeesConfig.endpoint} formFields={employeesConfig.formFields} initialForm={employeesConfig.initialForm} mapRowToForm={employeesConfig.mapRowToForm} mapFormToPayload={employeesConfig.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/hr/employees" />;
 };
 
 export default EmployeeEdit;

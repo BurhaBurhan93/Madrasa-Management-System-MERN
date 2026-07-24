@@ -2,7 +2,7 @@
 const { Schema } = mongoose;
 
 const SalaryStructureSchema = new Schema({
-  employeeType: { type: String, enum: ['teacher','admin','finance','registrar','hr','librarian','kitchen','security','support','maintenance'], required: true },
+  employeeType: { type: String, enum: ['teacher','admin','finance','registrar','hr','librarian','kitchen','security','support','maintenance','payroll','complaints','inventory','general-manager'], required: true },
   basicSalary: { type: Number, required: true },
   allowanceAmount: { type: Number, default: 0 },
   housingAllowance: { type: Number, default: 0 },

@@ -9,8 +9,6 @@ import StaffPageLayout from './StaffPageLayout';
 import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { getStaffToneStyles } from './staffTheme';
-import { localizeAdminText } from '../../../lib/adminLocalization';
-import { readStoredLanguage } from '../../../lib/languageStorage';
 import { useTranslation } from 'react-i18next';
 
 const formatFieldLabel = (label = '') => label.toLowerCase().replace(/\s+/g, ' ');
@@ -18,11 +16,11 @@ const formatFieldLabel = (label = '') => label.toLowerCase().replace(/\s+/g, ' '
 const getDefaultHelperText = (field, endpoint, t) => {
   const context = endpoint.includes('/payroll') ? 'payroll' : endpoint.includes('/finance') ? 'finance' : endpoint.includes('/hr') ? 'HR' : endpoint.includes('/kitchen') ? 'kitchen' : 'record';
   const label = formatFieldLabel(field.label);
-  if (field.type === 'relation') return t('staff.form.chooseRelated', { label, context });
-  if (field.type === 'date') return t('staff.form.selectDate', { label, context });
-  if (field.type === 'number') return t('staff.form.enterNumeric', { label, context });
-  if (field.type === 'select') return t('staff.form.selectCorrect', { label, context });
-  return t('staff.form.provideLabel', { label, context });
+  if (field.type === 'relation') return t('form.chooseRelated', { label, context });
+  if (field.type === 'date') return t('form.selectDate', { label, context });
+  if (field.type === 'number') return t('form.enterNumeric', { label, context });
+  if (field.type === 'select') return t('form.selectCorrect', { label, context });
+  return t('form.provideLabel', { label, context });
 };
 
 const chunkFields = (fields, stepCount) => {
@@ -62,10 +60,10 @@ const RelationSelect = ({ field, value, onChange, isDark }) => {
         className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${
           isDark
             ? 'border-slate-700 bg-slate-900/70 text-slate-100 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20'
-            : 'border-slate-200 bg-slate-50 text-slate-700 focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100'
+            : 'border-slate-200 bg-transparent text-slate-700 focus:border-cyan-400 focus:bg-transparent focus:ring-2 focus:ring-cyan-100'
         }`}
       >
-        <option value="">{loading ? t('staff.form.loading') : t('staff.form.selectOption', { label: field.label })}</option>
+        <option value="">{loading ? t('form.loading') : t('form.selectOption', { label: field.label })}</option>
         {options.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
       </select>
       {field.helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{field.helperText}</p>}
@@ -78,16 +76,16 @@ const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }, t) => 
   if (readMode === 'collection') {
     const res = await apiFetch(targetEndpoint);
     const data = await parseJsonSafe(res);
-    if (!res.ok) throw new Error(data?.message || t('staff.form.failedToLoad'));
+    if (!res.ok) throw new Error(data?.message || t('form.failedToLoad'));
     const rows = Array.isArray(data) ? data : (data?.data || []);
     const match = rows.find((row) => String(row._id) === String(id));
-    if (!match) throw new Error(t('staff.form.recordNotFound'));
+    if (!match) throw new Error(t('form.recordNotFound'));
     return match;
   }
 
   const res = await apiFetch(`${targetEndpoint}/${id}`);
   const data = await parseJsonSafe(res);
-  if (!res.ok) throw new Error(data?.message || t('staff.form.failedToLoad'));
+  if (!res.ok) throw new Error(data?.message || t('form.failedToLoad'));
   return data?.data || data;
 };
 
@@ -101,7 +99,6 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const adminLang = readStoredLanguage('adminLang', 'en');
   const { t } = useTranslation(['staff', 'common']);
   const toneStyles = getStaffToneStyles(endpoint || titleCreate || titleEdit);
 
@@ -110,8 +107,8 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
   const activeStep = Math.min(currentStep, Math.max(steps.length - 1, 0));
   const progressPercent = steps.length > 1 ? ((activeStep + 1) / steps.length) * 100 : 100;
   const stepLabels = steps.length === 5
-    ? [t('staff.form.basics'), t('staff.form.identity'), t('staff.form.relations'), t('staff.form.details'), t('staff.form.review')]
-    : [t('staff.form.basics'), t('staff.form.details'), t('staff.form.relations'), t('staff.form.review')].slice(0, steps.length);
+    ? [t('form.basics'), t('form.identity'), t('form.relations'), t('form.details'), t('form.review')]
+    : [t('form.basics'), t('form.details'), t('form.relations'), t('form.review')].slice(0, steps.length);
 
   useEffect(() => {
     setCurrentStep(0);
@@ -123,7 +120,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
         const record = await loadRecordByMode({ endpoint, id, readMode, readEndpoint }, t);
         setForm(mapRowToForm ? mapRowToForm(record) : record);
       } catch (err) {
-        setError(err.message || t('staff.form.loadError'));
+        setError(err.message || t('form.loadError'));
       } finally {
         setLoading(false);
       }
@@ -140,17 +137,17 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       formFields.filter((f) => f.type === 'number').forEach(({ name }) => {
         const val = form[name];
         if (val !== '' && val !== null && val !== undefined && Number.isNaN(Number(val))) {
-          newFieldErrors[name] = t('staff.form.onlyNumbers');
+          newFieldErrors[name] = t('form.onlyNumbers');
         }
       });
       formFields.forEach(({ name, required }) => {
         if (required && (!form[name] || form[name] === '')) {
-          newFieldErrors[name] = t('staff.form.fieldRequired');
+          newFieldErrors[name] = t('form.fieldRequired');
         }
       });
       if (Object.keys(newFieldErrors).length > 0) {
         setFieldErrors(newFieldErrors);
-        throw new Error(localizeAdminText('Please correct the highlighted fields.', adminLang));
+        throw new Error(t('form.correctFields'));
       }
 
       const payload = mapFormToPayload ? mapFormToPayload(form) : form;
@@ -160,10 +157,10 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
         body: JSON.stringify(payload)
       });
       const data = await parseJsonSafe(res);
-      if (!res.ok || !data.success) throw new Error(data.message || t('staff.form.saveFailed'));
+      if (!res.ok || !data.success) throw new Error(data.message || t('form.saveFailed'));
       if (onSavedPath) navigate(onSavedPath);
     } catch (err) {
-      setError(err.message || localizeAdminText('Save error', adminLang));
+      setError(err.message || t('form.saveError'));
     } finally {
       setSaving(false);
     }
@@ -173,12 +170,13 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
   const goBack = () => setCurrentStep((step) => Math.max(step - 1, 0));
 
   const renderField = (field) => {
-    const helperText = field.helperText || getDefaultHelperText(field, endpoint, t);
+    const fieldLabel = field.label ? t(field.label, { defaultValue: field.label }) : field.label;
+    const helperText = field.helperText || getDefaultHelperText({ ...field, label: fieldLabel }, endpoint, t);
     if (field.type === 'relation') {
       return (
         <RelationSelect
           key={field.name}
-          field={{ ...field, helperText }}
+          field={{ ...field, label: fieldLabel, helperText }}
           value={form[field.name]}
           onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
           isDark={isDark}
@@ -190,14 +188,14 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
       return (
         <Select
           key={field.name}
-          label={field.label}
+          label={fieldLabel}
           id={field.name}
           value={form[field.name] ?? ''}
           onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
           options={field.options}
           helperText={helperText}
           error={fieldErrors[field.name]}
-          placeholder={t('staff.form.selectOption', { label: field.label })}
+          placeholder={t('form.selectOption', { label: fieldLabel })}
         />
       );
     }
@@ -205,7 +203,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
     if (field.type === 'textarea') {
       return (
         <div key={field.name} className={`space-y-2 ${field.fullWidth !== false ? 'md:col-span-2' : ''}`}>
-          <label htmlFor={field.name} className={`block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{field.label}</label>
+          <label htmlFor={field.name} className={`block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{fieldLabel}</label>
           <textarea
             id={field.name}
             rows={field.rows || 4}
@@ -214,7 +212,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
             className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${
               isDark
                 ? 'border-slate-700 bg-slate-900/70 text-slate-100 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20'
-                : 'border-slate-200 bg-slate-50 text-slate-700 focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100'
+                : 'border-slate-200 bg-transparent text-slate-700 focus:border-cyan-400 focus:bg-transparent focus:ring-2 focus:ring-cyan-100'
             }`}
           />
           {!fieldErrors[field.name] && helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{helperText}</p>}
@@ -226,11 +224,11 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
     if (field.type === 'date') {
       return (
         <div key={field.name} className="space-y-2">
-          <label htmlFor={field.name} className={`block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{field.label}</label>
+          <label htmlFor={field.name} className={`block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{fieldLabel}</label>
           <CalendarDatePicker
             value={form[field.name]}
             onChange={(date) => setForm({ ...form, [field.name]: date })}
-          placeholder={t('staff.form.selectOption', { label: field.label })}
+          placeholder={t('form.selectOption', { label: fieldLabel })}
           />
           {!fieldErrors[field.name] && helperText && <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{helperText}</p>}
           {fieldErrors[field.name] && <p className="text-sm text-red-600">{fieldErrors[field.name]}</p>}
@@ -244,7 +242,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
         if (file) {
           // Check file size (max 5MB)
           if (file.size > 5 * 1024 * 1024) {
-            alert('Image size must be less than 5MB');
+            alert(t('form.imageSize'));
             return;
           }
 
@@ -283,12 +281,12 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
 
       return (
         <div key={field.name} className="space-y-2">
-          <label htmlFor={field.name} className={`block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{field.label}</label>
+          <label htmlFor={field.name} className={`block text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{fieldLabel}</label>
           <div className="flex items-center gap-4">
             {form[field.name] && (
               <img
                 src={form[field.name]}
-                alt={t('staff.form.preview')}
+                alt={t('form.preview')}
                 className="h-20 w-20 rounded-lg object-cover border border-slate-200"
               />
             )}
@@ -300,7 +298,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
               className={`flex-1 rounded-2xl border px-4 py-3 text-sm outline-none transition-all ${
                 isDark
                   ? 'border-slate-700 bg-slate-900/70 text-slate-100 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20'
-                  : 'border-slate-200 bg-slate-50 text-slate-700 focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100'
+                  : 'border-slate-200 bg-transparent text-slate-700 focus:border-cyan-400 focus:bg-transparent focus:ring-2 focus:ring-cyan-100'
               }`}
             />
           </div>
@@ -313,7 +311,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
     return (
       <Input
         key={field.name}
-        label={field.label}
+        label={fieldLabel}
         id={field.name}
         type={field.type || 'text'}
         value={form[field.name] ?? ''}
@@ -331,28 +329,28 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
 
   return (
     <StaffPageLayout
-      eyebrow={mode === 'edit' ? 'Edit Flow' : 'Create Flow'}
+      eyebrow={mode === 'edit' ? 'form.editFlow' : 'form.createFlow'}
       title={mode === 'edit' ? titleEdit : titleCreate}
-      subtitle="A phased entry flow keeps create and edit tasks easier to complete without overwhelming the form."
+      subtitle="form.flowSubtitle"
       tone={endpoint || titleCreate || titleEdit}
-      actions={<Button variant="outline" onClick={() => navigate(-1)}>{localizeAdminText('Back', adminLang)}</Button>}
+      actions={<Button variant="outline" onClick={() => navigate(-1)}>{t('common.back')}</Button>}
     >
       <Card className="rounded-[28px] shadow-sm">
         {loading ? (
-          <div className={`p-6 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{localizeAdminText('Loading data...', adminLang)}</div>
+          <div className={`p-3 sm:p-4 lg:p-6 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{t('list.loadingData')}</div>
         ) : (
           <div className="space-y-6">
-            <div className={`rounded-[24px] border p-5 ${isDark ? 'border-slate-700 bg-slate-950/50' : 'border-slate-200 bg-slate-50'}`}>
+            <div className={`rounded-[24px] border p-3 sm:p-4 lg:p-6 ${isDark ? 'border-slate-700 bg-slate-950/50' : 'border-slate-200 bg-transparent'}`}>
               <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className={`text-xs font-bold uppercase tracking-[0.24em] ${toneStyles.badge.split(' ')[1] || 'text-cyan-700'}`}>
-                    {`${localizeAdminText('Step', adminLang)} ${activeStep + 1} of ${steps.length}`}
+                    {t('form.stepOf', { current: activeStep + 1, total: steps.length })}
                   </p>
                   <h3 className={`mt-2 text-lg font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-                    {stepLabels[activeStep] || t('staff.form.stepN', { step: activeStep + 1 })}
+                    {stepLabels[activeStep] || t('form.stepN', { step: activeStep + 1 })}
                   </h3>
                 </div>
-                <div className={`h-2 w-full max-w-xs overflow-hidden rounded-full ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
+                <div className={`h-2 w-full max-w-xs overflow-hidden rounded-full ${isDark ? 'bg-slate-800' : 'bg-transparent'}`}>
                   <div className={`h-full rounded-full bg-gradient-to-r ${toneStyles.accent}`} style={{ width: `${progressPercent}%` }} />
                 </div>
               </div>
@@ -366,7 +364,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
                         ? toneStyles.chip
                         : isDark
                           ? 'bg-slate-800 text-slate-300'
-                          : 'bg-slate-100 text-slate-500'
+                          : 'bg-transparent text-slate-500'
                     }`}
                   >
                     {index + 1}
@@ -380,7 +378,7 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
             </div>
 
             {error && !loading && (
-              <div className={`rounded-2xl border p-6 ${isDark ? 'border-rose-500/30 bg-rose-950/30' : 'border-rose-200 bg-rose-50'}`}>
+                             <div className={`rounded-2xl border p-3 sm:p-4 lg:p-6 ${isDark ? 'border-rose-500/30 bg-rose-950/30' : 'border-rose-200 bg-rose-50'}`}>
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
                     <svg className="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -388,13 +386,13 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <h3 className={`text-sm font-semibold ${isDark ? 'text-rose-200' : 'text-rose-900'}`}>{localizeAdminText('Form Error', adminLang)}</h3>
+                    <h3 className={`text-sm font-semibold ${isDark ? 'text-rose-200' : 'text-rose-900'}`}>{t('form.formError')}</h3>
                     <p className={`mt-1 text-sm ${isDark ? 'text-rose-300' : 'text-rose-700'}`}>{error}</p>
                     <button
                       onClick={() => setError('')}
                       className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700"
                     >
-                      {localizeAdminText('Retry', adminLang)}
+                      {t('common.retry')}
                     </button>
                   </div>
                 </div>
@@ -403,14 +401,14 @@ const FormPage = ({ titleCreate, titleEdit, endpoint, formFields, initialForm, m
 
             <div className={`flex flex-col gap-3 border-t pt-5 sm:flex-row sm:justify-between ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => navigate(-1)}>{localizeAdminText('Cancel', adminLang)}</Button>
+                <Button variant="outline" onClick={() => navigate(-1)}>{t('common.cancel')}</Button>
               </div>
               <div className="flex gap-3">
-                {canGoBack && <Button variant="outline" onClick={goBack}>{localizeAdminText('Back', adminLang)}</Button>}
+                {canGoBack && <Button variant="outline" onClick={goBack}>{t('common.back')}</Button>}
                 {canGoNext ? (
-                  <Button variant="primary" onClick={goNext}>{localizeAdminText('Next Step', adminLang)}</Button>
+                  <Button variant="primary" onClick={goNext}>{t('form.nextStep')}</Button>
                 ) : (
-                  <Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? localizeAdminText('Loading...', adminLang) : localizeAdminText('Save Record', adminLang)}</Button>
+                  <Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? t('form.loading') : t('form.saveRecord')}</Button>
                 )}
               </div>
             </div>

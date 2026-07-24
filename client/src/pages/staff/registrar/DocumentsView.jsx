@@ -32,10 +32,10 @@ const DocumentsView = () => {
   const { id } = useParams();
   const fields = documentsManagementConfig.formFields
     .filter((field) => field.name !== 'filePath')
-    .map((field) => ({ name: field.name, label: t(`staff.registrar.documentsManagement.fields.${field.name}`) }));
+    .map((field) => ({ name: field.name, label: t(`registrar.documentsManagement.fields.${field.name}`) }));
   fields.push({
     name: 'filePath',
-    label: t('staff.registrar.documentsManagement.view.file'),
+    label: t('registrar.documentsManagement.view.file'),
     renderView: (value) => {
       if (!value) return '-';
       return (
@@ -44,7 +44,7 @@ const DocumentsView = () => {
           onClick={() => openFile(value)}
           className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 shadow-sm transition-all duration-200 hover:border-blue-300 hover:bg-blue-100"
         >
-          {t('staff.registrar.documentsManagement.view.viewDownloadFile')}
+          {t('registrar.documentsManagement.view.viewDownloadFile')}
         </button>
       );
     }
@@ -52,8 +52,8 @@ const DocumentsView = () => {
 
   return (
     <RecordViewPage
-      title={t('staff.registrar.documentsManagement.view.title')}
-      subtitle={t('staff.registrar.documentsManagement.view.subtitle')}
+      title={t('registrar.documentsManagement.view.title')}
+      subtitle={t('registrar.documentsManagement.view.subtitle')}
       endpoint={documentsManagementConfig.endpoint}
       id={id}
       fields={fields}

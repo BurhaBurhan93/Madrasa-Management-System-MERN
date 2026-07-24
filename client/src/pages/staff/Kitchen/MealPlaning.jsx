@@ -5,26 +5,26 @@ import ListPage from '../shared/ListPage';
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 export const getBudgetsConfig = (t) => ({
-  title: t('staff.kitchen.mealPlaning.title', 'Budget Requests'),
-  subtitle: t('staff.kitchen.mealPlaning.subtitle', 'Manage monthly kitchen budget requests and approvals.'),
+  title: t('kitchen.mealPlaning.title', 'Budget Requests'),
+  subtitle: t('kitchen.mealPlaning.subtitle', 'Manage monthly kitchen budget requests and approvals.'),
   endpoint: '/kitchen/budgets',
   columns: [
     { key: 'month', header: t('common.month', 'Month'), render: (v) => MONTH_NAMES[(v || 1) - 1] || v },
     { key: 'year',  header: t('common.year', 'Year') },
-    { key: 'allocatedAmount', header: t('staff.kitchen.mealPlaning.allocated', 'Allocated (AFN)'), render: (v) => Number(v || 0).toLocaleString() },
-    { key: 'approvedAmount',  header: t('staff.kitchen.mealPlaning.approved', 'Approved (AFN)'),  render: (v) => Number(v || 0).toLocaleString() },
-    { key: 'spentAmount',     header: t('staff.kitchen.mealPlaning.spent', 'Spent (AFN)'),     render: (v) => Number(v || 0).toLocaleString() },
-    { key: 'remainingAmount', header: t('staff.kitchen.mealPlaning.remaining', 'Remaining (AFN)'), render: (v) => Number(v || 0).toLocaleString() },
+    { key: 'allocatedAmount', header: t('kitchen.mealPlaning.allocated', 'Allocated (AFN)'), render: (v) => Number(v || 0).toLocaleString() },
+    { key: 'approvedAmount',  header: t('kitchen.mealPlaning.approved', 'Approved (AFN)'),  render: (v) => Number(v || 0).toLocaleString() },
+    { key: 'spentAmount',     header: t('kitchen.mealPlaning.spent', 'Spent (AFN)'),     render: (v) => Number(v || 0).toLocaleString() },
+    { key: 'remainingAmount', header: t('kitchen.mealPlaning.remaining', 'Remaining (AFN)'), render: (v) => Number(v || 0).toLocaleString() },
     { key: 'budgetStatus',    header: t('common.status', 'Status') },
   ],
   formFields: [
     { name: 'month', label: t('common.month', 'Month'), type: 'select', options: MONTH_NAMES.map((m, i) => ({ value: String(i + 1), label: m })) },
     { name: 'year',  label: t('common.year', 'Year'),  type: 'number' },
-    { name: 'allocatedAmount', label: t('staff.kitchen.mealPlaning.allocatedAmount', 'Allocated Amount (AFN)'), type: 'number' },
-    { name: 'approvedAmount',  label: t('staff.kitchen.mealPlaning.approvedAmount', 'Approved Amount (AFN)'),  type: 'number' },
-    { name: 'spentAmount',     label: t('staff.kitchen.mealPlaning.spentAmount', 'Spent Amount (AFN)'),     type: 'number' },
-    { name: 'remainingAmount', label: t('staff.kitchen.mealPlaning.remainingAmount', 'Remaining Amount (AFN)'), type: 'number' },
-    { name: 'budgetStatus', label: t('staff.kitchen.mealPlaning.budgetStatus', 'Budget Status'), type: 'select', options: [
+    { name: 'allocatedAmount', label: t('kitchen.mealPlaning.allocatedAmount', 'Allocated Amount (AFN)'), type: 'number' },
+    { name: 'approvedAmount',  label: t('kitchen.mealPlaning.approvedAmount', 'Approved Amount (AFN)'),  type: 'number' },
+    { name: 'spentAmount',     label: t('kitchen.mealPlaning.spentAmount', 'Spent Amount (AFN)'),     type: 'number' },
+    { name: 'remainingAmount', label: t('kitchen.mealPlaning.remainingAmount', 'Remaining Amount (AFN)'), type: 'number' },
+    { name: 'budgetStatus', label: t('kitchen.mealPlaning.budgetStatus', 'Budget Status'), type: 'select', options: [
       { value: 'pending',  label: t('common.pending', 'Pending')  },
       { value: 'approved', label: t('common.approved', 'Approved') },
       { value: 'rejected', label: t('common.rejected', 'Rejected') },
@@ -71,7 +71,7 @@ const MealPlaning = () => {
       createPath="/staff/kitchen/meals/create"
       editPathForRow={(row) => `/staff/kitchen/meals/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/kitchen/meals/view/${row._id}`}
-      searchPlaceholder={t('staff.kitchen.mealPlaning.searchPlaceholder', 'Search budget requests...')}
+      searchPlaceholder={t('kitchen.mealPlaning.searchPlaceholder', 'Search budget requests...')}
       clientSidePagination={true}
     />
   );

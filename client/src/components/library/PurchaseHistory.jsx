@@ -18,6 +18,7 @@ import Button from '../../components/UIHelper/Button';
 import { PageSkeleton } from '../../components/UIHelper/SkeletonLoader';
 import { unwrapArrayResponse } from '../../lib/studentData';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
+import { useTranslation } from 'react-i18next';
 
 const MOCK_PURCHASES = [
   { _id: 'p1', id: 'p1', purchaseCode: 'REC-2026-001', purchaseDate: '2026-06-20T14:30:00Z', bookTitle: 'Sahih Al-Bukhari (Abridged)', author: 'Imam Al-Bukhari', category: 'Hadith Studies', status: 'completed', quantity: 1, unitPrice: 25.99, totalPrice: 25.99 },
@@ -46,6 +47,7 @@ const normalizePurchase = (record) => {
 };
 
 const PurchaseHistory = () => {
+  const { t } = useTranslation(['student', 'common']);
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -152,15 +154,15 @@ const PurchaseHistory = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Library Store</p>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Purchase History</h1>
-          <p className="text-slate-500 mt-1 font-medium italic">Manage your acquisitions and digital purchases</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('library.title')}</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('purchaseHistoryPage.title')}</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">{t('purchaseHistoryPage.subtitle')}</p>
         </div>
         <div className="relative">
           <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
             type="text" 
-            placeholder="Search receipts..." 
+            placeholder={t('purchaseHistoryPage.search')} 
             className="pl-12 pr-6 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none w-full sm:w-64 font-medium text-sm transition-all shadow-sm"
           />
         </div>
@@ -169,18 +171,18 @@ const PurchaseHistory = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Purchase History List */}
         <div className="lg:col-span-2 space-y-6">
-          <Card title="Order History" className="rounded-[32px] p-8">
+          <Card title={t('purchaseHistoryPage.orderHistory')} className="rounded-[32px] p-8">
             <div className="space-y-6">
               {purchases.length > 0 ? (
                 purchases.map(purchase => (
                   <div key={purchase.id} className="group p-6 rounded-[32px] bg-slate-50 border border-slate-100 hover:border-cyan-200 hover:bg-white transition-all duration-300">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6">
                       <div className="flex items-center gap-6">
-                        <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl text-cyan-600 group-hover:scale-110 transition-transform">
+                        <div className="w-14 h-14 rounded-2xl bg-transparent shadow-sm flex items-center justify-center text-2xl text-cyan-600 group-hover:scale-110 transition-transform">
                           <FiShoppingBag />
                         </div>
                         <div>
-                          <Badge className="bg-white border-none font-black text-[10px] uppercase tracking-widest mb-2">{purchase.category}</Badge>
+                          <Badge className="bg-transparent border-none font-black text-[10px] uppercase tracking-widest mb-2">{purchase.category}</Badge>
                           <h3 className="text-xl font-black text-slate-900 tracking-tight">{purchase.bookTitle}</h3>
                           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">by {purchase.author}</p>
                         </div>
@@ -192,15 +194,15 @@ const PurchaseHistory = () => {
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-white/50 rounded-2xl border border-white">
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Date</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('common:date')}</p>
                         <p className="text-sm font-black text-slate-700">{formatPurchaseDate(purchase.purchaseDate)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Amount</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('common:amount')}</p>
                         <p className="text-lg font-black text-slate-900">${Number(purchase.totalPrice || 0).toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Receipt</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('purchaseHistoryPage.receipt')}</p>
                         <p className="text-sm font-black text-cyan-600">#{purchase.purchaseCode}</p>
                       </div>
                       <div className="flex items-end justify-end">
@@ -219,7 +221,7 @@ const PurchaseHistory = () => {
               ) : (
                 <div className="py-20 text-center">
                   <FiShoppingBag className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No purchase records found</p>
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('purchaseHistoryPage.noRecords')}</p>
                 </div>
               )}
             </div>
@@ -229,15 +231,15 @@ const PurchaseHistory = () => {
         {/* Sidebar - Quick Actions & Policies */}
         <div className="space-y-8">
           {/* Quick Actions */}
-          <Card title="Quick Actions" className="rounded-[32px] p-8 relative overflow-hidden">
+          <Card title={t('purchaseHistoryPage.quickActions')} className="rounded-[32px] p-8 relative overflow-hidden">
             <div className="relative z-10 space-y-4">
               <Button variant="outline" className="w-full justify-start gap-3 h-auto py-4" onClick={handleExportRecords}>
                 <div className="w-10 h-10 rounded-lg bg-cyan-100 flex items-center justify-center">
                   <FiDownload className="w-5 h-5 text-cyan-600" />
                 </div>
                 <div className="text-left">
-                  <p className="font-bold text-slate-900">Export Records</p>
-                  <p className="text-sm text-slate-500">Download purchase history</p>
+                  <p className="font-bold text-slate-900">{t('purchaseHistoryPage.exportRecords')}</p>
+                  <p className="text-sm text-slate-500">{t('purchaseHistoryPage.exportRecordsDesc')}</p>
                 </div>
               </Button>
               <Button variant="outline" className="w-full justify-start gap-3 h-auto py-4" onClick={handleViewInvoices}>
@@ -245,8 +247,8 @@ const PurchaseHistory = () => {
                   <FiFileText className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div className="text-left">
-                  <p className="font-bold text-slate-900">View Invoices</p>
-                  <p className="text-sm text-slate-500">All receipts and invoices</p>
+                  <p className="font-bold text-slate-900">{t('purchaseHistoryPage.viewInvoices')}</p>
+                  <p className="text-sm text-slate-500">{t('purchaseHistoryPage.viewInvoicesDesc')}</p>
                 </div>
               </Button>
             </div>
@@ -254,12 +256,12 @@ const PurchaseHistory = () => {
           </Card>
 
           {/* Policies */}
-          <Card title="Store Policies" className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20">
+          <Card title={t('purchaseHistoryPage.storePolicies')} className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20">
             <div className="space-y-4">
               {[
-                { icon: <FiRefreshCw />, title: 'Returns', text: '30-day return policy for printed books.' },
-                { icon: <FiClock />, title: 'Delivery', text: 'Free campus delivery on orders over $50.' },
-                { icon: <FiCheckCircle />, title: 'Digital', text: 'Instant access to e-books after payment.' }
+                { icon: <FiRefreshCw />, title: t('purchaseHistoryPage.returns'), text: t('purchaseHistoryPage.returnsDesc') },
+                { icon: <FiClock />, title: t('purchaseHistoryPage.delivery'), text: t('purchaseHistoryPage.deliveryDesc') },
+                { icon: <FiCheckCircle />, title: t('purchaseHistoryPage.digital'), text: t('purchaseHistoryPage.digitalDesc') }
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
                   <div className="text-cyan-400 text-lg mt-0.5">{item.icon}</div>

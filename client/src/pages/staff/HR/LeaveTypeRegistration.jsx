@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Badge from '../../../components/UIHelper/Badge';
 import ListPage from '../shared/ListPage';
 
@@ -9,7 +10,7 @@ export const leaveTypesConfig = {
   columns: [
     { key: 'leaveCode', header: 'Code' },
     { key: 'leaveTypeName', header: 'Leave Type' },
-    { key: 'maxDaysAllowed', header: 'Max Days', render: (value) => `${value} days` },
+    { key: 'maxDaysAllowed', header: 'Max Days', render: (value) => `${value}` },
     { key: 'isPaid', header: 'Payment', render: (value) => <Badge variant={value ? 'success' : 'warning'}>{value ? 'Paid' : 'Unpaid'}</Badge> },
     { key: 'carryForward', header: 'Carry Forward', render: (value) => value ? 'Yes' : 'No' },
     { key: 'status', header: 'Status' }
@@ -72,18 +73,21 @@ export const leaveTypesConfig = {
   })
 };
 
-const LeaveTypeRegistration = () => (
-  <ListPage
-    title={leaveTypesConfig.title}
-    subtitle={leaveTypesConfig.subtitle}
-    endpoint={leaveTypesConfig.endpoint}
-    columns={leaveTypesConfig.columns}
-    createPath="/staff/hr/leave-types/create"
-    editPathForRow={(row) => `/staff/hr/leave-types/edit/${row._id}`}
-    viewPathForRow={(row) => `/staff/hr/leave-types/view/${row._id}`}
-    searchPlaceholder="Search leave types..."
-    clientSidePagination={true}
-  />
-);
+const LeaveTypeRegistration = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  return (
+    <ListPage
+      title={t('hr.leaveTypes.title')}
+      subtitle={t('hr.leaveTypes.subtitle')}
+      endpoint={leaveTypesConfig.endpoint}
+      columns={leaveTypesConfig.columns.map(col => ({ ...col, header: t(`hr.leaveTypes.col${col.key}`) }))}
+      createPath="/staff/hr/leave-types/create"
+      editPathForRow={(row) => `/staff/hr/leave-types/edit/${row._id}`}
+      viewPathForRow={(row) => `/staff/hr/leave-types/view/${row._id}`}
+      searchPlaceholder={t('hr.leaveTypes.searchPlaceholder')}
+      clientSidePagination={true}
+    />
+  );
+};
 
 export default LeaveTypeRegistration;

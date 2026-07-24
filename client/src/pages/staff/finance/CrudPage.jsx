@@ -7,6 +7,8 @@ import Input from '../../../components/UIHelper/Input';
 import Select from '../../../components/UIHelper/Select';
 import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 import { useTranslation } from 'react-i18next';
+import { localizeAdminText } from '../../../lib/adminLocalization';
+import { readStoredLanguage } from '../../../lib/languageStorage';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -20,6 +22,7 @@ const CrudPage = ({
   mapRowToForm,
   mapFormToPayload
 }) => {
+  const adminLang = readStoredLanguage('adminLang', 'en');
   const { t } = useTranslation(['staff', 'common']);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -53,7 +56,7 @@ const CrudPage = ({
       setItems(data.data || []);
       setTotal(data.total || 0);
     } catch (err) {
-      setError(err.message || 'Unknown error');
+      setError(err.message || localizeAdminText('Unknown error', adminLang));
     } finally {
       setLoading(false);
     }
@@ -86,10 +89,10 @@ const CrudPage = ({
     try {
       const res = await apiFetch(`${endpoint}/${row._id}`, { method: 'DELETE' });
       const data = await parseJsonSafe(res);
-      if (!res.ok || !data.success) throw new Error(data.message || 'Delete failed');
+      if (!res.ok || !data.success) throw new Error(data.message || localizeAdminText('Delete failed', adminLang));
       fetchItems();
     } catch (err) {
-      setError(err.message || 'Delete error');
+      setError(err.message || localizeAdminText('Delete error', adminLang));
     }
   };
 
@@ -104,11 +107,11 @@ const CrudPage = ({
         body: JSON.stringify(payload)
       });
       const data = await parseJsonSafe(res);
-      if (!res.ok || !data.success) throw new Error(data.message || 'Save failed');
+      if (!res.ok || !data.success) throw new Error(data.message || localizeAdminText('Save failed', adminLang));
       setIsModalOpen(false);
       fetchItems();
     } catch (err) {
-      setFormError(err.message || 'Save error');
+      setFormError(err.message || localizeAdminText('Save error', adminLang));
     } finally {
       setSaving(false);
     }

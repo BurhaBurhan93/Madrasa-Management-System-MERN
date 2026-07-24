@@ -17,7 +17,7 @@ const validate = (req, res, next) => {
 router.post('/login', 
   body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
   body('password').notEmpty().withMessage('Password is required'),
-  body('role').isIn(['admin', 'student', 'teacher', 'staff']).withMessage('Invalid role'),
+  body('role').optional().isIn(['admin', 'student', 'teacher', 'staff']).withMessage('Invalid role'),
   validate,
   login
 );

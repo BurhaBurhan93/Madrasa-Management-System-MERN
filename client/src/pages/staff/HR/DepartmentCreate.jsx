@@ -7,8 +7,8 @@ const DepartmentCreate = () => {
   const { t } = useTranslation(['staff', 'common']);
   return (
     <FormPage
-      titleCreate={t('staff.hr.departments.createTitle')}
-      titleEdit={t('staff.hr.departments.editTitle')}
+      titleCreate={t('hr.departments.createTitle')}
+      titleEdit={t('hr.departments.editTitle')}
       endpoint={departmentsConfig.endpoint}
       formFields={departmentsConfig.formFields}
       initialForm={departmentsConfig.initialForm}

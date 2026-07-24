@@ -7,7 +7,7 @@ import { libraryBooksConfig } from './Books';
 const BooksView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.library.books.viewTitle')} subtitle={t('staff.library.books.subtitle')} endpoint={libraryBooksConfig.endpoint} id={id} fields={libraryBooksConfig.formFields} listPath="/staff/library/books" editPath={`/staff/library/books/edit/${id}`} />;
+  return <RecordViewPage title={t('library.books.viewTitle')} subtitle={t('library.books.subtitle')} endpoint={libraryBooksConfig.endpoint} id={id} fields={libraryBooksConfig.formFields} listPath="/staff/library/books" editPath={`/staff/library/books/edit/${id}`} />;
 };
 
 export default BooksView;

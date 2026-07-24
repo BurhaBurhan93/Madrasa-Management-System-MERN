@@ -12,12 +12,12 @@ const mapRowToView = (row) => ({
 const GuardianView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  const fields = guardianManagementConfig.formFields.map((field) => ({ name: field.name, label: t(`staff.registrar.guardianManagement.fields.${field.name}`) }));
+  const fields = guardianManagementConfig.formFields.map((field) => ({ name: field.name, label: t(`registrar.guardianManagement.fields.${field.name}`) }));
 
   return (
     <RecordViewPage
-      title={t('staff.registrar.guardianManagement.view.title')}
-      subtitle={t('staff.registrar.guardianManagement.view.subtitle')}
+      title={t('registrar.guardianManagement.view.title')}
+      subtitle={t('registrar.guardianManagement.view.subtitle')}
       endpoint={guardianManagementConfig.endpoint}
       id={id}
       fields={fields}

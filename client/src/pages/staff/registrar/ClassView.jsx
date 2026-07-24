@@ -9,13 +9,13 @@ const ClassView = () => {
   const { id } = useParams();
   return (
     <RecordViewPage
-      title={t('staff.registrar.classManagement.view.title')}
-      subtitle={t('staff.registrar.classManagement.subtitle')}
+      title={t('registrar.classManagement.view.title')}
+      subtitle={t('registrar.classManagement.subtitle')}
       endpoint={classManagementConfig.endpoint}
       id={id}
       fields={classManagementConfig.formFields.map(f => ({
         name: f.name,
-        label: t(`staff.registrar.classManagement.fields.${f.name}`)
+        label: t(`registrar.classManagement.fields.${f.name}`)
       }))}
       listPath="/staff/registrar/classes"
       editPath={`/staff/registrar/classes/edit/${id}`}

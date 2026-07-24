@@ -12,12 +12,12 @@ const mapRowToView = (row) => ({
 const EducationHistoryView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  const fields = educationHistoryConfig.formFields.map((field) => ({ name: field.name, label: t(`staff.registrar.educationHistory.fields.${field.name}`) }));
+  const fields = educationHistoryConfig.formFields.map((field) => ({ name: field.name, label: t(`registrar.educationHistory.fields.${field.name}`) }));
 
   return (
     <RecordViewPage
-      title={t('staff.registrar.educationHistory.view.title')}
-      subtitle={t('staff.registrar.educationHistory.view.subtitle')}
+      title={t('registrar.educationHistory.view.title')}
+      subtitle={t('registrar.educationHistory.view.subtitle')}
       endpoint={educationHistoryConfig.endpoint}
       id={id}
       fields={fields}

@@ -8,8 +8,8 @@ const MealPlaningCreate = () => {
   const config = getBudgetsConfig(t);
   return (
     <FormPage
-      titleCreate={t('staff.kitchen.mealPlaning.titleCreate', 'Create Budget Request')}
-      titleEdit={t('staff.kitchen.mealPlaning.titleEdit', 'Edit Budget Request')}
+      titleCreate={t('kitchen.mealPlaning.titleCreate', 'Create Budget Request')}
+      titleEdit={t('kitchen.mealPlaning.titleEdit', 'Edit Budget Request')}
       endpoint={config.endpoint}
       formFields={config.formFields}
       initialForm={config.initialForm}

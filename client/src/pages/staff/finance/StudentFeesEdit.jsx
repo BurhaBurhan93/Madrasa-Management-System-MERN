@@ -9,8 +9,8 @@ const StudentFeesEdit = () => {
   const { id } = useParams();
   return (
     <FormPage
-      titleCreate={t('staff.finance.studentFees.create')}
-      titleEdit={t('staff.finance.studentFees.edit')}
+      titleCreate={t('finance.studentFees.create')}
+      titleEdit={t('finance.studentFees.edit')}
       endpoint={studentFeesConfig.endpoint}
       formFields={studentFeesConfig.formFields}
       initialForm={studentFeesConfig.initialForm}

@@ -7,7 +7,7 @@ import { libraryCategoriesConfig } from './Categories';
 const CategoriesView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.library.categories.viewTitle')} subtitle={t('staff.library.categories.subtitle')} endpoint={libraryCategoriesConfig.endpoint} id={id} fields={libraryCategoriesConfig.formFields} listPath="/staff/library/categories" editPath={`/staff/library/categories/edit/${id}`} />;
+  return <RecordViewPage title={t('library.categories.viewTitle')} subtitle={t('library.categories.subtitle')} endpoint={libraryCategoriesConfig.endpoint} id={id} fields={libraryCategoriesConfig.formFields} listPath="/staff/library/categories" editPath={`/staff/library/categories/edit/${id}`} />;
 };
 
 export default CategoriesView;

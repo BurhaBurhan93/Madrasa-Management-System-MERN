@@ -151,12 +151,14 @@
     "toggleSidebar": "Toggle sidebar",
     "apply": "Apply",
     "exam": "Exam",
+    "finance": "Finance",
     "na": "N/A",
     "notAvailable": "N/A",
     "total": "Total",
     "code": "Code",
     "viewDetails": "View Details",
     "student": "Student",
+    "currency": "$",
     "email": "Email",
     "phone": "Phone",
     "gender": "Gender",
@@ -210,7 +212,53 @@
     "oct": "Oct",
     "room": "Room",
     "sep": "Sep",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "signIn": "Sign In",
+    "signingIn": "Signing in...",
+    "allRightsReserved": "All rights reserved.",
+    "selectRole": "Select Role",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "invalidCredentials": "Invalid credentials. Please try again.",
+    "usernameRequired": "Username is required",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "adminLabel": "Admin",
+    "teacherLabel": "Teacher",
+    "studentLabel": "Student",
+    "staffLabel": "Staff",
+    "supportStaff": "Support Staff",
+    "financeStaff": "Finance Staff",
+    "registrarStaff": "Registrar Staff",
+    "hrStaff": "HR Staff",
+    "libraryStaff": "Library Staff",
+    "kitchenStaff": "Kitchen Staff",
+    "payrollStaff": "Payroll Staff",
+    "complaintsStaff": "Complaints Staff",
+    "inventoryStaff": "Inventory Staff",
+    "generalManagerStaff": "General Manager",
+    "backToHome": "Back",
+    "madrasaSubtitle": "Madrasa Management System",
+    "searching": "Searching...",
+    "serverError": "Server Error",
+    "correct": "Correct",
+    "minutes": "minutes",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "refresh": "Refresh",
+    "year": "Year",
+    "remarks": "Remarks",
+    "category": "Category",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "month": "Month",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "unnamed": "Unnamed"
   },
   "student": {
     "console": "Student Console",
@@ -221,6 +269,7 @@
     "overview": "Overview",
     "operations": "Operations",
     "dashboard": {
+      "label": "Dashboard",
       "defaultStudentName": "Student",
       "defaultStudentCode": "STU001",
       "defaultStatus": "Active",
@@ -231,6 +280,7 @@
     "academic": "Academic",
     "myCourses": "My Courses",
     "schedule": {
+      "label": "Schedule",
       "title": "Class Schedule",
       "subtitle": "Manage and view your academic commitments",
       "weekly": "Weekly",
@@ -261,6 +311,7 @@
       "offlineError": "Using offline data — API unavailable."
     },
     "attendance": {
+      "label": "Attendance",
       "overallRate": "Overall Rate",
       "daysPresent": "Days Present",
       "daysAbsent": "Days Absent",
@@ -276,6 +327,7 @@
       "offlineError": "Using offline data — API unavailable."
     },
     "exams": {
+      "label": "Exams",
       "title": "Examinations",
       "subtitle": "Track upcoming tests and review your performance",
       "upcoming": "Upcoming",
@@ -310,6 +362,7 @@
       "offlineError": "Using offline data — API unavailable."
     },
     "examResults": {
+      "label": "Exam Results",
       "academic": "Academic",
       "title": "Exam Results",
       "subtitle": "View all your examination results with teacher information",
@@ -342,6 +395,7 @@
       "exam": "Exam"
     },
     "timetable": {
+      "label": "Timetable",
       "totalClasses": "Total Classes",
       "currentClass": "Current Class",
       "academicYearValue": "2023-24",
@@ -380,6 +434,7 @@
     "myDegrees": "My Degrees",
     "eduHistory": "Education History",
     "assignments": {
+      "label": "Assignments",
       "statusSubmitted": "Submitted",
       "statusPending": "Pending",
       "statusOverdue": "Overdue",
@@ -397,14 +452,156 @@
     "feesPayments": "Fees & Payments",
     "transactionHistory": "Transaction History",
     "hostel": {
-      "standard": "Standard"
+      "label": "Hostel",
+      "noActiveHostelResidency": "No Active Hostel Residency",
+      "noHostelResidencyDescription": "You currently don't have an active hostel room. Apply for accommodation or contact student affairs for more information.",
+      "applyForHostel": "Apply for Hostel",
+      "contactStudentAffairs": "Contact Student Affairs",
+      "hostelHelpHint": "Need help? Reach out to the Student Affairs office.",
+      "hostelManagement": "Hostel Management",
+      "welcomeHome": "Welcome home,",
+      "reportIssue": "Report Issue",
+      "hostelPass": "Hostel Pass",
+      "currentAllocation": "Current Allocation",
+      "room": "Room {{number}}",
+      "buildingFloor": "{{building}}, Floor {{floor}}",
+      "mainBuilding": "Main Building",
+      "bedNumber": "Bed Number",
+      "roomType": "Room Type",
+      "standard": "Standard",
+      "checkIn": "Check In",
+      "paymentStatus": "Payment Status",
+      "paid": "Paid",
+      "monthlyRent": "Monthly Rent",
+      "securityDeposit": "Security Deposit",
+      "tabDetails": "Details",
+      "tabDining": "Dining",
+      "tabRules": "Rules",
+      "roomAmenities": "Room Amenities",
+      "amenityWifi": "Wi-Fi",
+      "amenityStudyTable": "Study Table",
+      "amenityAc": "Air Conditioning",
+      "amenityPrivateBathroom": "Private Bathroom",
+      "amenityStorageLocker": "Storage Locker",
+      "amenityBedLinen": "Bed Linen",
+      "emergencyContacts": "Emergency Contacts",
+      "primaryContact": "Primary Contact",
+      "missingInfo": "Missing Emergency Contact Info",
+      "missingInfoDesc": "Please update your emergency contact details to ensure we can reach you in case of an emergency.",
+      "updateNow": "Update Now",
+      "servingTime": "Serving Time",
+      "mainDish": "Main Dish",
+      "side": "Side",
+      "menuPending": "Menu not published yet",
+      "weeklyMealSchedule": "Weekly Meal Schedule",
+      "day": "Day",
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "roomOccupancy": "Room Occupancy",
+      "occupied": "Occupied",
+      "available": "Available",
+      "maintenanceRequests": "Maintenance Requests",
+      "hostelGuidelines": "Hostel Guidelines",
+      "guidelineQuietHours": "Quiet hours are from 10:00 PM to 6:00 AM",
+      "guidelineVisitors": "Visitors allowed only in common areas during daytime",
+      "guidelineModification": "No structural modifications to rooms without permission",
+      "guidelineLock": "Keep your room locked at all times",
+      "guidelineCooking": "Cooking is only allowed in designated areas",
+      "staffDirectory": "Staff Directory",
+      "staffWarden": "Warden",
+      "staffWardenName": "Abdul Rahman",
+      "staffWardenContact": "+93 700 123 456",
+      "staffSecurity": "Security",
+      "staffSecurityName": "Mohammad Karim",
+      "staffSecurityContact": "+93 700 789 012",
+      "staffDining": "Dining Manager",
+      "staffDiningName": "Ahmad Shah",
+      "staffDiningContact": "+93 700 345 678",
+      "helpCenter": "Need Help?",
+      "helpCenterDesc": "Report maintenance issues or concerns to our support team.",
+      "reportNow": "Report Now",
+      "submitRequest": "Submit Request",
+      "reportMaintenanceIssue": "Report Maintenance Issue",
+      "issueCategory": "Issue Category",
+      "issuePlumbing": "Plumbing",
+      "issueElectrical": "Electrical",
+      "issueFurniture": "Furniture",
+      "issueCleaning": "Cleaning",
+      "issueInternet": "Internet",
+      "issueOther": "Other",
+      "priorityLevel": "Priority Level",
+      "priorityLow": "Low",
+      "priorityMedium": "Medium",
+      "priorityHigh": "High",
+      "priorityEmergency": "Emergency",
+      "describeIssue": "Describe the Issue",
+      "issueDescriptionPlaceholder": "Please provide details about the issue...",
+      "reasonForApplying": "Reason for Applying",
+      "reasonPlaceholder": "Tell us why you need hostel accommodation...",
+      "reasonRequired": "Reason is required",
+      "roomPreference": "Room Preference",
+      "roomPreferencePlaceholder": "Any specific room or area you prefer?",
+      "preferredMoveInDate": "Preferred Move-In Date",
+      "additionalNotes": "Additional Notes",
+      "additionalNotesPlaceholder": "Any additional information...",
+      "submitting": "Submitting...",
+      "submitApplication": "Submit Application",
+      "applicationSubmittedSuccessfully": "Application Submitted Successfully!",
+      "applicationReviewSoon": "Your application will be reviewed by the hostel administration.",
+      "existingHostelApplication": "You already have a pending hostel application.",
+      "maintenanceSubmitted": "Maintenance request submitted successfully!",
+      "maintenanceFailed": "Failed to submit maintenance request."
     },
     "leave": {
-      "errorSubmittingLeaveWithMsg": "Error submitting leave: "
+      "label": "Leave",
+      "subtitle": "Manage and track your leave requests",
+      "newLeaveRequest": "New Leave Request",
+      "totalRequests": "Total Requests",
+      "totalDays": "Total Days",
+      "requestHistory": "Leave History",
+      "leavePolicy": "Leave Policy",
+      "policyRule1": "Submit requests at least 3 days in advance.",
+      "policyRule2": "Medical leave requires a doctor's note for 3+ days.",
+      "policyRule3": "Emergency leave can be submitted retroactively.",
+      "policyRule4": "Unused leave days expire at the end of the term.",
+      "needHelp": "Need Help?",
+      "contactStudentAffairs": "Questions about leave policy? Contact Student Affairs.",
+      "contactOffice": "Contact Office",
+      "applyForLeave": "Apply for Leave",
+      "leaveType": "Leave Type",
+      "selectLeaveType": "Select leave type",
+      "selectDate": "Select date",
+      "reasonForLeave": "Reason for Leave",
+      "reasonPlaceholder": "Please provide a detailed reason for your leave request...",
+      "noLeaveRequestsFound": "No leave requests found",
+      "submitting": "Submitting...",
+      "submitRequest": "Submit Request",
+      "leaveRequestSubmitted": "Leave request submitted successfully!",
+      "sickLeave": "Sick Leave",
+      "familyEmergency": "Family Emergency",
+      "personal": "Personal",
+      "religiousObservance": "Religious Observance",
+      "academicEvent": "Academic Event",
+      "otherLeave": "Other",
+      "errorSubmittingLeaveWithMsg": "Error submitting leave: ",
+      "failedToFetchLeaveRecords": "Failed to fetch leave records"
     },
     "communications": "Communications",
     "messages": "Messages",
+    "announcements": "Announcements",
+    "sendMessage": "Send Message",
+    "feedback": "Feedback",
+    "submitFeedback": "Submit Feedback",
+    "previousFeedback": "Previous Feedback",
+    "noMessagesYet": "No messages yet",
+    "noAnnouncementsYet": "No announcements at this time",
+    "manageMessages": "Manage your messages, announcements, and notifications",
+    "messagesAnnouncements": "Messages & Announcements",
+    "sending": "Sending...",
+    "submitting": "Submitting...",
     "complaints": {
+      "label": "Complaints",
       "support": "Support",
       "title": "Help & Feedback",
       "subtitle": "Your voice matters in building our institution",
@@ -461,6 +658,7 @@
       "statusOpen": "OPEN"
     },
     "certificates": {
+      "label": "Certificates",
       "portfolioTitle": "🎓 Student Achievement Portfolio",
       "shareMessage": "Check out my portfolio with {{certificates}} certificates and {{achievements}} achievements!",
       "certificateTitle": "Certificate",
@@ -496,6 +694,35 @@
       "requestHardCopy": "Request Hard Copy"
     },
     "events": {
+      "label": "Events",
+      "subtitle": "Track your academic and personal events",
+      "addEvent": "Add Event",
+      "institutionalTimeline": "Institutional Timeline",
+      "eventStatistics": "Event Statistics",
+      "monthlyActivity": "Monthly Activity",
+      "thisMonth": "This Month",
+      "nextMonth": "Next Month",
+      "quickStats": "Quick Stats",
+      "examinations": "Examinations",
+      "assignments": "Assignments",
+      "needAHall": "Need a Hall?",
+      "requestRoomBooking": "Request a room booking for study groups or events.",
+      "requestBooking": "Request Booking",
+      "systemActive": "System Active",
+      "todaysDate": "Today's Date",
+      "noEventsScheduled": "No events scheduled",
+      "titleDateRequired": "Title and date are required",
+      "addPersonalEvent": "Add Personal Event",
+      "addEventBtn": "Add Event",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter event title",
+      "dateLabel": "Date",
+      "timeLabel": "Time",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Enter location",
+      "typeLabel": "Type",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter event description...",
       "typePersonal": "Personal",
       "typeExamination": "Examination",
       "typeAssignment": "Assignment",
@@ -514,6 +741,7 @@
       "defaultAssignmentDesc": "Submission deadline: {{title}}"
     },
     "profile": {
+      "label": "Profile",
       "personal": "Personal",
       "title": "Student Profile",
       "subtitle": "Verified identification and academic credentials",
@@ -820,6 +1048,109 @@
       "minutes": "minutes",
       "submissionSuccessScore": "You scored {{score}} / {{total}}"
     },
+    "transactions": {
+      "title": "Ledger History",
+      "subtitle": "Detailed audit trail of all financial interactions",
+      "totalInflow": "Total Inflow",
+      "totalOutflow": "Total Outflow",
+      "netBalance": "Net Balance",
+      "search": "Search reference ID or description...",
+      "systemVerified": "System Verified",
+      "systemTransactions": "System Transactions",
+      "colTransaction": "Transaction",
+      "colType": "Type",
+      "colReference": "Reference",
+      "colAmount": "Amount",
+      "colStatus": "Status",
+      "colAction": "Action",
+      "securityProtocol": "Security Protocol",
+      "securityDesc": "Every transaction is cryptographically signed and verified. If you notice any unauthorized activity, please lock your account immediately and contact the bursar's office.",
+      "financialSupport": "Financial Support",
+      "financialSupportDesc": "Questions regarding your balance or payment schedule? Our financial advisors are here to help.",
+      "scheduleConsultation": "Schedule Consultation"
+    },
+    "resourceLibrary": {
+      "title": "Resource Library",
+      "subtitle": "Browse and discover learning materials curated for your courses",
+      "search": "Search resources...",
+      "newCollection": "New Collection",
+      "heritageLibrary": "Heritage Library",
+      "heritageDesc": "Access our curated collection of classical texts, manuscripts, and historical references across various disciplines.",
+      "explore": "Explore",
+      "accessDatabase": "Access Database",
+      "hours": "Hours",
+      "weekdays": "Monday - Friday: 8:00 AM - 6:00 PM",
+      "openNow": "Open Now",
+      "weekends": "Saturday - Thursday: 9:00 AM - 2:00 PM",
+      "selfService": "Self-Service",
+      "researchSupport": "Research Support",
+      "researchSupportDesc": "Need help finding specific materials? Our research librarians are available to assist with your academic inquiries.",
+      "bookAppointment": "Book Appointment"
+    },
+    "borrowedBooks": {
+      "title": "Borrowed Books",
+      "subtitle": "Track and manage your checked-out library materials",
+      "limit": "Limit",
+      "books": "books",
+      "activeLoans": "Active Loans",
+      "reference": "Reference #",
+      "issueDate": "Issue Date",
+      "returnDue": "Return Due",
+      "renew": "Renew",
+      "return": "Return",
+      "noLoans": "No active loans found",
+      "policy": "Library Policy",
+      "policy1": "Books can be borrowed for 14 days.",
+      "policy2": "Late returns incur a fine of $0.50/day.",
+      "policy3": "Reference books cannot be renewed.",
+      "policy4": "Lost books must be reported within 7 days.",
+      "needBook": "Need a Book?",
+      "needBookDesc": "If you need a book that's not in our collection, you can request a new acquisition.",
+      "requestAcquisition": "Request Acquisition"
+    },
+    "purchaseHistoryPage": {
+      "title": "Purchase History",
+      "subtitle": "View your bookstore purchases, receipts, and download invoices",
+      "search": "Search purchases...",
+      "orderHistory": "Order History",
+      "receipt": "Receipt",
+      "noRecords": "No purchase records found",
+      "quickActions": "Quick Actions",
+      "exportRecords": "Export Records",
+      "exportRecordsDesc": "Download your complete purchase history as a CSV file for your records.",
+      "viewInvoices": "View Invoices",
+      "viewInvoicesDesc": "Access and download all your past invoices and receipts.",
+      "storePolicies": "Store Policies",
+      "returns": "Returns",
+      "returnsDesc": "Items can be returned within 30 days of purchase with original receipt.",
+      "delivery": "Delivery",
+      "deliveryDesc": "Standard delivery takes 3-5 business days. Express delivery available.",
+      "digital": "Digital",
+      "digitalDesc": "Digital products are available immediately after purchase confirmation."
+    },
+    "homeworkSubmission": {
+      "submitHomework": "Submit Homework",
+      "submitDesc": "Upload your completed assignments for review",
+      "submitSuccess": "Your homework has been submitted successfully!",
+      "newSubmission": "New Submission",
+      "assignmentTitle": "Assignment Title",
+      "titlePlaceholder": "Enter assignment title",
+      "selectCourse": "Select Course",
+      "selectDueDate": "Select Due Date",
+      "uploadFile": "Upload File",
+      "clickUpload": "Click to Upload",
+      "dragDrop": "or drag and drop",
+      "submitting": "Submitting...",
+      "pendingTasks": "Pending Tasks",
+      "due": "Due",
+      "allCaughtUp": "All caught up! No pending assignments.",
+      "guidelines": "Submission Guidelines",
+      "guideline1": "All files must be in PDF, DOC, or DOCX format.",
+      "guideline2": "Maximum file size is 10 MB per submission.",
+      "guideline3": "Ensure your name and student ID are on the first page.",
+      "guideline4": "Late submissions are subject to a 10% penalty per day.",
+      "descPlaceholder": "Add any notes for your instructor..."
+    },
     "toggleSidebar": "Toggle sidebar",
     "logoutConfirm": "Are you sure you want to logout?",
     "cancel": "Cancel"
@@ -870,6 +1201,7 @@
     "overview": "Overview",
     "teaching": "Teaching",
     "dashboard": {
+      "label": "Dashboard",
       "acrossAllClasses": "Across All Classes",
       "activeClasses": "Active Classes",
       "activeThisTerm": "Active This Term",
@@ -885,7 +1217,8 @@
       "scheduledExamsSessions": "Scheduled Exams Sessions",
       "totalStudents": "Total Students",
       "totalSubjects": "Total Subjects",
-      "upcomingClasses": "Upcoming Classes"
+      "upcomingClasses": "Upcoming Classes",
+      "defaultTime": "Default Time"
     },
     "academic": "Academic",
     "mySubjects": "My Subjects",
@@ -913,6 +1246,7 @@
       "noClasses": "No classes found"
     },
     "assignments": {
+      "label": "Assignments",
       "active": "Active",
       "allStatus": "All Status",
       "allSubjects": "All Subjects",
@@ -937,6 +1271,7 @@
       "updateFailed": "Update Failed"
     },
     "createAssignment": {
+      "label": "Create Assignment",
       "assignmentTitle": "Assignment Title",
       "assignmentTitlePlaceholder": "Assignment Title Placeholder",
       "create": "Create",
@@ -957,6 +1292,7 @@
       "title": "Title"
     },
     "syllabus": {
+      "label": "Syllabus",
       "title": "Syllabus",
       "subtitle": "View course syllabus and topics",
       "allClasses": "All Classes",
@@ -969,6 +1305,7 @@
       "order": "Order"
     },
     "grading": {
+      "label": "Grading",
       "title": "Grading Schemes",
       "subtitle": "Grading criteria and grade boundaries",
       "noSchemes": "No grading schemes found",
@@ -980,6 +1317,7 @@
       "noBoundaries": "No grade boundaries defined"
     },
     "attendance": {
+      "label": "Attendance",
       "absent": "Absent",
       "allAbsent": "All Absent",
       "allExcused": "All Excused",
@@ -1019,6 +1357,7 @@
       "total": "Total"
     },
     "sessions": {
+      "label": "Sessions",
       "title": "Attendance Sessions",
       "subtitle": "View all attendance sessions",
       "newSession": "+ New Session",
@@ -1033,6 +1372,7 @@
     "exams": "Exams",
     "myExams": "My Exams",
     "createExam": {
+      "label": "Create Exam",
       "editExam": "Edit Exam",
       "createExam": "Create New Exam",
       "editSubtitle": "Update the exam details below.",
@@ -1053,6 +1393,7 @@
     },
     "results": "Results",
     "enterMarks": {
+      "label": "Enter Marks",
       "title": "Enter Marks",
       "subtitle": "Select exam, subject, class and enter student marks",
       "examInfo": "Exam Information",
@@ -1092,9 +1433,11 @@
       "saveFailed": "Failed to save marks",
       "examLabel": "Exam: ",
       "subjectLabel": "Subject: ",
-      "classLabel": "Class: "
+      "classLabel": "Class: ",
+      "section": "Section"
     },
     "viewResults": {
+      "label": "View Results",
       "title": "View Results",
       "subtitle": "Browse and search student exam results",
       "filterResults": "Filter Results",
@@ -1117,6 +1460,7 @@
     },
     "communications": "Communications",
     "assignedComplaints": {
+      "label": "Assigned Complaints",
       "title": "Assigned Complaints",
       "subtitle": "Manage and respond to assigned complaints",
       "addComplaint": "Add Complaint",
@@ -1162,7 +1506,11 @@
       "updateStatusFailed": "Failed to update status",
       "feedbackFailed": "Failed to submit feedback",
       "deleteFeedbackConfirm": "Delete this feedback?",
-      "deleteFeedbackFailed": "Failed to delete feedback"
+      "deleteFeedbackFailed": "Failed to delete feedback",
+      "resolve": "Resolve",
+      "edit": "Edit",
+      "view": "View",
+      "delete": "Delete"
     },
     "messages": {
       "title": "Messages",
@@ -1173,6 +1521,7 @@
       "failedToSend": "Failed to send message"
     },
     "feedback": {
+      "label": "Feedback",
       "subjectRequired": "Subject is required",
       "createFailed": "Failed to create feedback",
       "updateFailed": "Failed to update feedback",
@@ -1215,9 +1564,12 @@
         "participation": "Participation",
         "improvement": "Improvement",
         "general": "General"
-      }
+      },
+      "edit": "Edit",
+      "delete": "Delete"
     },
     "announcements": {
+      "label": "Announcements",
       "title": "Announcements",
       "subtitle": "School announcements and notices",
       "highPriority": "High Priority",
@@ -1237,6 +1589,7 @@
     "myLeaves": "My Leaves",
     "applyLeave": "Apply Leave",
     "payslips": {
+      "label": "Payslips",
       "title": "My Payslips",
       "subtitle": "View your salary payment history",
       "totalPayments": "Total Payments",
@@ -1372,7 +1725,9 @@
       "subjects": "Subjects",
       "unnamedSubject": "Unnamed Subject",
       "update": "Update",
-      "weeklyHours": "Weekly Hours"
+      "weeklyHours": "Weekly Hours",
+      "all": "All",
+      "upcoming": "Upcoming"
     },
     "editQuestion": {
       "cancel": "Cancel",
@@ -1506,48 +1861,50 @@
       },
       "title": "Attendance Reports"
     },
-    "teacherProfile": {
-      "buttons": {
-        "cancel": "Cancel",
-        "editProfile": "Edit Profile",
-        "saveChanges": "Save Changes",
-        "saving": "Saving"
-      },
-      "department": "Department",
-      "designation": "Designation",
-      "employeeId": "Employee Id",
-      "fields": {
-        "bloodType": "Blood Type",
-        "district": "District",
-        "email": "Email",
-        "fatherName": "Father Name",
-        "grandfatherName": "Grandfather Name",
-        "idNumber": "Id Number",
-        "name": "Name",
-        "phone": "Phone",
-        "province": "Province",
-        "role": "Role",
-        "village": "Village"
-      },
-      "joined": "Joined",
-      "messages": {
-        "noProfile": "No Profile",
-        "saveFailed": "Save Failed"
-      },
-      "modules": "Modules",
-      "sections": {
-        "addressInformation": "Address Information",
-        "currentAddress": "Current Address",
-        "permanentAddress": "Permanent Address",
-        "personalInformation": "Personal Information"
-      },
-      "status": {
-        "title": "Title",
-        "active": "Active",
-        "inactive": "Inactive"
-      },
-      "subtitle": "Subtitle",
-      "title": "Title"
+    "teacher": {
+      "teacherProfile": {
+        "buttons": {
+          "cancel": "Cancel",
+          "editProfile": "Edit Profile",
+          "saveChanges": "Save Changes",
+          "saving": "Saving"
+        },
+        "department": "Department",
+        "designation": "Designation",
+        "employeeId": "Employee Id",
+        "fields": {
+          "bloodType": "Blood Type",
+          "district": "District",
+          "email": "Email",
+          "fatherName": "Father Name",
+          "grandfatherName": "Grandfather Name",
+          "idNumber": "Id Number",
+          "name": "Name",
+          "phone": "Phone",
+          "province": "Province",
+          "role": "Role",
+          "village": "Village"
+        },
+        "joined": "Joined",
+        "messages": {
+          "noProfile": "No Profile",
+          "saveFailed": "Save Failed"
+        },
+        "modules": "Modules",
+        "sections": {
+          "addressInformation": "Address Information",
+          "currentAddress": "Current Address",
+          "permanentAddress": "Permanent Address",
+          "personalInformation": "Personal Information"
+        },
+        "status": {
+          "title": "Title",
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "subtitle": "Subtitle",
+        "title": "Title"
+      }
     },
     "teacherResults": {
       "enterMarksButton": "Enter Marks Button",
@@ -1604,6 +1961,7 @@
     "operations": "Operations",
     "management": "Management",
     "dashboard": "Dashboard",
+    "print": "Print",
     "dash": {
       "title": "Admin Dashboard",
       "subtitle": "A cleaner command center for enrollment, revenue, staffing, and daily operations.",
@@ -1747,6 +2105,7 @@
     "backup": "Backup & Restore",
     "apiMgmt": "API Management",
     "profile": {
+      "label": "Profile",
       "title": "Admin Profile",
       "subtitle": "Manage your administrator account",
       "saveChanges": "Save Changes",
@@ -2101,7 +2460,6 @@
       "editTeacher": "Edit Teacher",
       "teacherNotFound": "Teacher not found",
       "employmentInfo": "Employment Information",
-      "personalInformation": "Personal Information",
       "contactInformation": "Contact Information",
       "emergencyContact": "Emergency Contact",
       "salaryBankInfo": "Salary & Bank Information",
@@ -2228,7 +2586,8 @@
         "maintenance": "Maintenance",
         "payroll": "Payroll",
         "complaints": "Complaints",
-        "inventory": "Inventory"
+        "inventory": "Inventory",
+        "general-manager": "General Manager"
       },
       "serverError": "Server error",
       "connectionError": "Cannot connect to server. Make sure the server is running.",
@@ -3653,6 +4012,7 @@
     },
     "print": "Print",
     "registrar": {
+      "label": "Registrar",
       "classAssignment": {
         "actions": {
           "assignClass": "Assign Class",
@@ -3662,7 +4022,8 @@
         "charts": {
           "noData": "No Data",
           "statusDistribution": "Status Distribution",
-          "studentsByClass": "Students by Class"
+          "studentsByClass": "Students by Class",
+          "unknown": "Unknown"
         },
         "columns": {
           "currentClass": "Current Class",
@@ -3705,8 +4066,8 @@
           "totalStudents": "Total Students",
           "unassigned": "Unassigned"
         },
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "subtitle": "Assign, promote, and transfer students between classes",
+        "title": "Class Assignment",
         "unassigned": "Unassigned"
       },
       "classManagement": {
@@ -3714,12 +4075,42 @@
           "titleCreate": "Create",
           "titleEdit": "Edit"
         },
+        "columns": {
+          "name": "Class Name",
+          "code": "Code",
+          "type": "Type",
+          "maxStudents": "Max Students",
+          "status": "Status"
+        },
+        "fields": {
+          "name": "Class Name",
+          "code": "Class Code",
+          "type": "Type",
+          "maxStudents": "Max Students",
+          "status": "Status"
+        },
+        "placeholders": {
+          "name": "e.g. Grade 1, Class A",
+          "code": "e.g. GR1-A",
+          "maxStudents": "30"
+        },
+        "options": {
+          "type": {
+            "boys": "Boys",
+            "girls": "Girls",
+            "mixed": "Mixed"
+          },
+          "status": {
+            "active": "Active",
+            "inactive": "Inactive"
+          }
+        },
         "eyebrow": "Class Management Overview",
         "searchPlaceholder": "Search...",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "subtitle": "Create and manage classes for student assignment",
+        "title": "Class Management",
         "view": {
-          "title": "Title"
+          "title": "Class Details"
         }
       },
       "dataCorrection": {
@@ -3766,7 +4157,7 @@
         "reason": "Reason",
         "recentChanges": "Recent Changes",
         "retry": "Retry",
-        "subtitle": "Subtitle",
+        "subtitle": "Correct student data and track changes",
         "success": "Correction submitted successfully",
         "table": {
           "actions": "Actions",
@@ -3781,11 +4172,41 @@
           "studentCode": "Student Code",
           "viewHistory": "View History"
         },
-        "title": "Title",
+        "title": "Data Correction",
         "to": "To",
         "unknown": "Unknown"
       },
       "documentsManagement": {
+        "columns": {
+          "student": "Student",
+          "type": "Document Type",
+          "title": "Title",
+          "description": "Description",
+          "createdAt": "Upload Date",
+          "status": "Status"
+        },
+        "fields": {
+          "student": "Student",
+          "type": "Document Type",
+          "title": "Document Title",
+          "description": "Description",
+          "filePath": "Upload File",
+          "status": "Status"
+        },
+        "options": {
+          "type": {
+            "passport": "Passport Photo",
+            "certificate": "Certificate",
+            "transcript": "Transcript",
+            "id_card": "ID Card",
+            "birth_certificate": "Birth Certificate",
+            "other": "Other"
+          },
+          "status": {
+            "active": "Active",
+            "archived": "Archived"
+          }
+        },
         "charts": {
           "documentDistribution": "Document Distribution",
           "documentsByType": "Documents by Type"
@@ -3804,16 +4225,36 @@
           "storedDocuments": "Stored Documents",
           "totalDocuments": "Total Documents"
         },
+        "title": "Student Documents Management",
+        "subtitle": "Upload, manage, and track student documents and certificates",
         "view": {
           "file": "File",
-          "subtitle": "Subtitle",
-          "title": "Title",
+          "subtitle": "Document Details",
+          "title": "Document Details",
           "viewDownloadFile": "View / Download File"
         }
       },
       "educationHistory": {
+        "columns": {
+          "student": "Student",
+          "previousDegree": "Previous Degree",
+          "previousInstitution": "Institution",
+          "location": "Location",
+          "yearOfCompletion": "Year Completed"
+        },
+        "fields": {
+          "student": "Student",
+          "previousDegree": "Previous Degree",
+          "previousInstitution": "Institution Name",
+          "location": "Institution Location",
+          "yearOfCompletion": "Year of Completion",
+          "grade": "Grade/Marks",
+          "fieldOfStudy": "Field of Study"
+        },
         "charts": {
-          "educationByDegree": "Education by Degree"
+          "educationByDegree": "Education by Degree",
+          "notSpecified": "Not Specified",
+          "unknown": "Unknown"
         },
         "create": {
           "titleCreate": "Create",
@@ -3827,15 +4268,43 @@
           "totalRecords": "Total Records",
           "yearRange": "Year Range"
         },
+        "title": "Student Education History",
+        "subtitle": "Manage previous education records and academic background",
         "view": {
-          "subtitle": "Subtitle",
-          "title": "Title"
+          "subtitle": "Education Record Details",
+          "title": "Education Record Details"
         }
       },
       "guardianManagement": {
+        "columns": {
+          "name": "Guardian Name",
+          "relationship": "Relationship",
+          "phone": "Phone",
+          "email": "Email",
+          "occupation": "Occupation",
+          "isPrimary": "Primary"
+        },
+        "fields": {
+          "student": "Student",
+          "name": "Guardian Name",
+          "relationship": "Relationship with Student",
+          "phone": "Phone Number",
+          "email": "Email Address",
+          "occupation": "Occupation",
+          "address": "Address",
+          "idNumber": "ID Number",
+          "isPrimary": "Primary Guardian"
+        },
+        "options": {
+          "isPrimary": {
+            "true": "Yes",
+            "false": "No"
+          }
+        },
         "charts": {
           "guardiansByRelationship": "Guardians by Relationship",
-          "relationshipDistribution": "Relationship Distribution"
+          "relationshipDistribution": "Relationship Distribution",
+          "other": "Other"
         },
         "create": {
           "titleCreate": "Create",
@@ -3851,9 +4320,11 @@
           "secondary": "Secondary",
           "totalGuardians": "Total Guardians"
         },
+        "title": "Guardian / Guarantor Management",
+        "subtitle": "Manage student guardians and guarantors information",
         "view": {
-          "subtitle": "Subtitle",
-          "title": "Title"
+          "subtitle": "Guardian Details",
+          "title": "Guardian Details"
         }
       },
       "registrarReports": {
@@ -3921,7 +4392,7 @@
           "totalStudents": "Total Students"
         },
         "studentList": "Student List",
-        "subtitle": "Subtitle",
+        "subtitle": "Generate and export student reports",
         "table": {
           "admissionDate": "Admission Date",
           "class": "Class",
@@ -3931,14 +4402,80 @@
           "name": "Name",
           "status": "Status"
         },
-        "title": "Title"
+        "title": "Reports & Export"
       },
       "studentAdmissions": {
+        "columns": {
+          "studentCode": "Student Code",
+          "name": "Student Name",
+          "fatherName": "Father Name",
+          "phone": "Phone",
+          "email": "Email",
+          "degree": "Degree",
+          "currentClass": "Class",
+          "status": "Status",
+          "createdAt": "Applied Date"
+        },
+        "fields": {
+          "user": "User Account (if exists)",
+          "studentCode": "Student Code",
+          "firstName": "First Name",
+          "lastName": "Last Name",
+          "fatherName": "Father Name",
+          "grandfatherName": "Grandfather Name",
+          "dob": "Date of Birth",
+          "bloodType": "Blood Type",
+          "phone": "Phone Number",
+          "whatsapp": "WhatsApp Number",
+          "email": "Email Address",
+          "permanentAddress_province": "Province (Permanent)",
+          "permanentAddress_district": "District (Permanent)",
+          "permanentAddress_village": "Village/Street (Permanent)",
+          "currentAddress_province": "Province (Current)",
+          "currentAddress_district": "District (Current)",
+          "currentAddress_village": "Village/Street (Current)",
+          "guardianName": "Guardian Name",
+          "guardianRelationship": "Relationship with Guardian",
+          "guardianPhone": "Guardian Phone",
+          "guardianEmail": "Guardian Email",
+          "degree": "Enrolled Degree",
+          "currentClass": "Assigned Class",
+          "currentLevel": "Academic Level",
+          "admissionDate": "Admission Date",
+          "status": "Admission Status",
+          "previousDegree": "Previous Degree/Certificate",
+          "previousInstitution": "Previous Institution",
+          "locationOfInstitution": "Institution Location"
+        },
+        "placeholders": {
+          "studentCode": "e.g., STU-2024-001",
+          "guardianRelationship": "e.g., Father, Mother, Uncle",
+          "currentLevel": "e.g., Level 1, Beginner"
+        },
+        "options": {
+          "bloodType": {
+            "": "Select",
+            "A+": "A+",
+            "A-": "A-",
+            "B+": "B+",
+            "B-": "B-",
+            "AB+": "AB+",
+            "AB-": "AB-",
+            "O+": "O+",
+            "O-": "O-"
+          },
+          "status": {
+            "pending": "Pending",
+            "accepted": "Accepted",
+            "rejected": "Rejected"
+          }
+        },
         "charts": {
           "admissionsByDegree": "Admissions by Degree",
           "monthlyAdmissionsTrend": "Monthly Admissions Trend",
           "noDegreeData": "No Degree Data",
-          "noMonthlyData": "No Monthly Data"
+          "noMonthlyData": "No Monthly Data",
+          "notAssigned": "Not Assigned"
         },
         "create": {
           "titleCreate": "Create",
@@ -3954,17 +4491,76 @@
           "rejected": "Rejected",
           "totalApplications": "Total Applications"
         },
+        "title": "Student Admissions",
+        "subtitle": "Manage new student admissions - Complete registration with all required information",
         "view": {
-          "subtitle": "Subtitle",
-          "title": "Title"
+          "subtitle": "Admission Details",
+          "title": "Admission Details"
         }
       },
       "studentProfiles": {
+        "columns": {
+          "image": "Photo",
+          "studentCode": "Student Code",
+          "name": "Student Name",
+          "fatherName": "Father Name",
+          "phone": "Phone",
+          "currentClass": "Class",
+          "currentLevel": "Level",
+          "status": "Status",
+          "admissionDate": "Admission Date"
+        },
+        "fields": {
+          "user": "User Account",
+          "image": "Profile Photo",
+          "studentCode": "Student Code",
+          "firstName": "First Name",
+          "lastName": "Last Name",
+          "fatherName": "Father Name",
+          "grandfatherName": "Grandfather Name",
+          "dob": "Date of Birth",
+          "bloodType": "Blood Type",
+          "phone": "Phone Number",
+          "whatsapp": "WhatsApp Number",
+          "email": "Email Address",
+          "permanentAddress_province": "Province (Permanent)",
+          "permanentAddress_district": "District (Permanent)",
+          "permanentAddress_village": "Village (Permanent)",
+          "currentAddress_province": "Province (Current)",
+          "currentAddress_district": "District (Current)",
+          "currentAddress_village": "Village (Current)",
+          "currentClass": "Current Class",
+          "currentLevel": "Current Level",
+          "admissionDate": "Admission Date",
+          "status": "Status",
+          "guardianName": "Guardian Name",
+          "guardianRelationship": "Relationship with Guardian",
+          "guardianPhone": "Guardian Phone",
+          "guardianEmail": "Guardian Email"
+        },
+        "options": {
+          "bloodType": {
+            "": "Select",
+            "A+": "A+",
+            "A-": "A-",
+            "B+": "B+",
+            "B-": "B-",
+            "AB+": "AB+",
+            "AB-": "AB-",
+            "O+": "O+",
+            "O-": "O-"
+          },
+          "status": {
+            "active": "Active",
+            "inactive": "Inactive"
+          }
+        },
         "charts": {
           "active": "Active",
           "enrollmentStatus": "Enrollment Status",
           "inactive": "Inactive",
-          "studentDistributionByClass": "Student Distribution by Class"
+          "studentDistributionByClass": "Student Distribution by Class",
+          "notAssigned": "Not Assigned"
         },
         "create": {
           "titleCreate": "Create",
@@ -3980,12 +4576,27 @@
           "recentAdmissions": "Recent Admissions",
           "totalStudents": "Total Students"
         },
+        "title": "Student Profile Management",
+        "subtitle": "Manage complete student profiles, personal information, and academic records",
         "view": {
           "profileAlt": "Student Profile",
-          "title": "Title"
+          "title": "Student Profile"
         }
       },
       "studentsList": {
+        "title": "All Students",
+        "subtitle": "Manage enrolled students and their information",
+        "columns": {
+          "image": "Photo",
+          "studentCode": "Student Code",
+          "name": "Student Name",
+          "fatherName": "Father Name",
+          "phone": "Phone",
+          "currentClass": "Class",
+          "currentLevel": "Level",
+          "status": "Status",
+          "admissionDate": "Admission Date"
+        },
         "charts": {
           "active": "Active",
           "inactive": "Inactive",
@@ -4002,6 +4613,83 @@
           "notActive": "Not Active",
           "totalStudents": "Total Students"
         }
+      },
+      "studentRegistration": {
+        "title": "Student Registration",
+        "completeTitle": "Student Registration Complete",
+        "eyebrow": "Registrar",
+        "pageEyebrow": "Registrar / Student Affairs",
+        "pageSubtitle": "Two-phase registration: Student Information + Optional Hostel Assignment",
+        "registrationSuccessful": "Registration Successful!",
+        "registrationSuccessMessage": "The student has been registered successfully.",
+        "redirectingMessage": "Redirecting to students list...",
+        "phase1": "Phase 1: Student Info",
+        "phase2": "Phase 2: Hostel (Optional)",
+        "studentInfo": "Student Information",
+        "basicInfo": "Basic Information",
+        "profilePhoto": "Profile Photo",
+        "previewAlt": "Preview",
+        "profilePhotoHint": "JPG, PNG or GIF. Max 5MB recommended.",
+        "studentCode": "Student Code *",
+        "studentCodePlaceholder": "Enter student code",
+        "firstName": "First Name *",
+        "lastName": "Last Name",
+        "fatherName": "Father Name *",
+        "grandfatherName": "Grandfather Name",
+        "dateOfBirth": "Date of Birth",
+        "dateOfBirthPlaceholder": "Select date of birth",
+        "gender": "Gender",
+        "male": "Male",
+        "female": "Female",
+        "bloodType": "Blood Type",
+        "bloodTypeSelect": "Select blood type",
+        "contactInfo": "Contact Information",
+        "phone": "Phone *",
+        "whatsapp": "WhatsApp",
+        "email": "Email *",
+        "emailPlaceholder": "Enter email address",
+        "password": "Password *",
+        "passwordPlaceholder": "Enter password",
+        "loginRole": "Login Role",
+        "studentRoleValue": "Student",
+        "guardianInfo": "Guardian Information",
+        "guardianName": "Guardian Name *",
+        "relationship": "Relationship *",
+        "relationshipPlaceholder": "Enter relationship",
+        "guardianPhone": "Guardian Phone",
+        "guardianEmail": "Guardian Email",
+        "academicInfo": "Academic Information",
+        "admissionDate": "Admission Date",
+        "admissionDatePlaceholder": "Select admission date",
+        "currentLevel": "Current Level",
+        "currentLevelPlaceholder": "Enter current level",
+        "nextPhase": "Next: Hostel Assignment",
+        "hostelAssignment": "Hostel Assignment (Optional)",
+        "hostelCheckbox": "Student wants hostel accommodation",
+        "selectRoom": "Select Room *",
+        "selectRoomPlaceholder": "Select a room",
+        "roomOption": "Room {{roomNumber}} - {{building}} Floor {{floor}} ({{roomType}}) - ${{rent}}/mo",
+        "noRooms": "No available rooms found",
+        "bedNumber": "Bed Number",
+        "checkinDate": "Check-in Date *",
+        "checkinDatePlaceholder": "Select check-in date",
+        "monthlyRent": "Monthly Rent ($)",
+        "securityDeposit": "Security Deposit ($)",
+        "hostelEmergencyContact": "Hostel Emergency Contact",
+        "emergencyName": "Name *",
+        "emergencyRelationship": "Relationship *",
+        "emergencyPhone": "Phone *",
+        "emergencyEmail": "Email",
+        "back": "Back",
+        "registering": "Registering...",
+        "completeRegistration": "Complete Registration",
+        "imageSizeError": "Image size must be less than 5MB",
+        "validationRequiredFields": "Please fill in all required fields",
+        "validationEmailRequired": "Student account email is required",
+        "validationPasswordRequired": "Student account password is required",
+        "validationPasswordLength": "Student account password must be at least 6 characters",
+        "createStudentFailed": "Failed to create student",
+        "hostelAllocationFailed": "Student created but hostel allocation failed"
       }
     },
     "admissions": "Student Admissions",
@@ -4173,107 +4861,174 @@
       "cancel": "Cancel"
     },
     "library": {
+      "label": "Library",
       "books": {
         "booksByCategory": "Books by Category",
-        "errorFetching": "Error: Fetching",
-        "highRange": "High Stock",
+        "errorFetching": "Error fetching books",
+        "highRange": "High (20+)",
         "inventoryValue": "Inventory Value",
-        "lowRange": "Low Stock",
+        "lowRange": "Low (1-5)",
         "lowStock": "Low Stock",
-        "mediumRange": "Medium Stock",
+        "mediumRange": "Medium (6-20)",
         "outOfStock": "Out of Stock",
-        "searchPlaceholder": "Search...",
+        "searchPlaceholder": "Search books by title, author, or ISBN...",
         "stockDistribution": "Stock Distribution",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "subtitle": "Manage all library books and inventory",
+        "title": "Library Books",
         "titleCreate": "Create",
         "titleEdit": "Edit",
         "totalBooks": "Total Books",
         "totalStock": "Total Stock",
-        "viewTitle": "View Details"
+        "viewTitle": "View Details",
+        "columnTitle": "Title",
+        "columnCategory": "Category",
+        "columnPublisher": "Publisher",
+        "columnPublisherYear": "Pub. Year",
+        "columnPages": "Pages",
+        "columnStock": "Stock",
+        "columnPurchasePrice": "Purchase Price",
+        "columnSalePrice": "Sale Price",
+        "fieldTitle": "Title",
+        "fieldCategory": "Category",
+        "fieldPages": "Pages",
+        "fieldPublisher": "Publisher",
+        "fieldPublisherYear": "Publisher Year",
+        "fieldStock": "Stock",
+        "fieldPurchasePrice": "Purchase Price",
+        "fieldSalePrice": "Sale Price"
       },
       "borrowed": {
         "currentlyBorrowed": "Currently Borrowed",
-        "errorFetching": "Error: Fetching",
-        "inStock": "In Stock",
-        "markReturned": "Mark Returned",
+        "errorFetching": "Error fetching borrowed records",
+        "inStock": "in stock",
+        "markReturned": "Mark as Returned",
         "monthlyTrend": "Monthly Trend",
         "overdue": "Overdue",
         "returned": "Returned",
-        "searchPlaceholder": "Search...",
+        "searchPlaceholder": "Search borrowed records...",
         "statusDistribution": "Status Distribution",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "subtitle": "Track all currently borrowed books",
+        "title": "Borrowed Books",
         "titleCreate": "Create",
         "titleEdit": "Edit",
         "totalRecords": "Total Records",
-        "viewTitle": "View Details"
+        "viewTitle": "View Details",
+        "columnBorrower": "Student",
+        "columnBook": "Book",
+        "columnBorrowedAt": "Borrow Date",
+        "columnReturnDate": "Return Date",
+        "columnStatus": "Status",
+        "fieldBorrower": "Student",
+        "fieldBook": "Book",
+        "fieldStatus": "Status",
+        "fieldReturnDate": "Return Date",
+        "optionBorrowed": "Borrowed",
+        "optionReturned": "Returned"
       },
       "categories": {
-        "avgBooksPerCategory": "Avg Books per Category",
+        "avgBooksPerCategory": "Avg Books / Category",
         "booksPerCategory": "Books per Category",
-        "errorFetching": "Error: Fetching",
-        "searchPlaceholder": "Search...",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "errorFetching": "Error fetching categories",
+        "searchPlaceholder": "Search categories...",
+        "subtitle": "Manage library book categories and classifications",
+        "title": "Book Categories",
         "titleCreate": "Create",
         "titleEdit": "Edit",
         "totalBooks": "Total Books",
         "totalCategories": "Total Categories",
-        "viewTitle": "View Details"
+        "viewTitle": "View Details",
+        "columnName": "Category Name",
+        "columnDescription": "Description",
+        "columnCreatedAt": "Created",
+        "fieldName": "Category Name",
+        "fieldDescription": "Description"
       },
       "purchases": {
         "bySupplier": "By Supplier",
-        "errorFetching": "Error: Fetching",
+        "errorFetching": "Error fetching purchases",
         "monthlyTrend": "Monthly Trend",
-        "searchPlaceholder": "Search...",
-        "subtitle": "Subtitle",
+        "searchPlaceholder": "Search purchases...",
+        "subtitle": "Manage book purchase orders and records",
         "thisMonth": "This Month",
-        "title": "Title",
+        "title": "Book Purchases",
         "titleCreate": "Create",
         "titleEdit": "Edit",
         "totalPurchases": "Total Purchases",
         "totalQuantity": "Total Quantity",
         "totalSpent": "Total Spent",
-        "viewTitle": "View Details"
+        "viewTitle": "View Details",
+        "columnPurchaseCode": "Purchase Code",
+        "columnPurchaseDate": "Purchase Date",
+        "columnSupplierName": "Supplier",
+        "columnInvoiceReference": "Invoice Ref",
+        "columnBook": "Book",
+        "columnQuantity": "Quantity",
+        "columnUnit": "Unit",
+        "columnUnitPrice": "Unit Price",
+        "columnTotalPrice": "Total Price",
+        "columnPaymentMethod": "Payment",
+        "fieldPurchaseCode": "Purchase Code",
+        "fieldSupplierName": "Supplier Name",
+        "fieldInvoiceReference": "Invoice Reference",
+        "fieldBook": "Book",
+        "fieldQuantity": "Quantity",
+        "fieldUnit": "Unit",
+        "fieldUnitPrice": "Unit Price",
+        "fieldPaymentMethod": "Payment Method",
+        "fieldPurchaseDate": "Purchase Date",
+        "optionCash": "Cash",
+        "optionOther": "Other"
       },
       "reports": {
         "available": "Available",
         "bookStatusDistribution": "Book Status Distribution",
         "borrowed": "Borrowed",
         "borrowedRate": "Borrowed Rate",
-        "errorMessage": "Error: Message",
-        "failedToFetch": "Failed to fetch reports",
+        "errorMessage": "An error occurred while loading reports",
+        "failedToFetch": "Failed to fetch library statistics",
         "libraryActivityOverview": "Library Activity Overview",
         "loading": "Loading...",
         "lowStock": "Low Stock",
-        "lowStockLabel": "Low Stock",
+        "lowStockLabel": "Low Stock Items",
         "quickRatios": "Quick Ratios",
         "retry": "Retry",
         "returned": "Returned",
         "returnedRate": "Returned Rate",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "subtitle": "Library usage analytics and statistics",
+        "title": "Library Reports",
         "total": "Total",
         "totalBooks": "Total Books",
         "unableToLoad": "Unable to load reports"
       },
       "sales": {
-        "errorFetching": "Error: Fetching",
+        "errorFetching": "Error fetching sales",
         "monthlyTrend": "Monthly Trend",
         "quantitySold": "Quantity Sold",
-        "searchPlaceholder": "Search...",
+        "searchPlaceholder": "Search sales...",
         "student": "Student",
-        "subtitle": "Subtitle",
+        "subtitle": "Track book sales and disposals",
         "thisMonth": "This Month",
-        "title": "Title",
+        "title": "Book Sales",
         "titleCreate": "Create",
         "titleEdit": "Edit",
         "topBuyers": "Top Buyers",
         "totalRevenue": "Total Revenue",
         "totalSales": "Total Sales",
         "viewTitle": "View Details",
-        "walkIn": "Walk-in"
+        "walkIn": "Walk-in",
+        "columnReceiptNo": "Receipt No",
+        "columnSaleDate": "Sale Date",
+        "columnStudent": "Student",
+        "columnBook": "Book",
+        "columnQuantity": "Quantity",
+        "columnUnitPrice": "Unit Price",
+        "columnTotalAmount": "Total Amount",
+        "fieldReceiptNo": "Receipt No",
+        "fieldStudent": "Student",
+        "fieldBook": "Book",
+        "fieldQuantity": "Quantity",
+        "fieldUnitPrice": "Unit Price",
+        "fieldSaleDate": "Sale Date"
       }
     },
     "categories": "Categories",
@@ -4283,29 +5038,61 @@
     "sales": "Sales",
     "reports": "Reports",
     "complaints": {
+      "label": "Complaints",
       "actions": {
         "completed": "Completed",
         "eyebrow": "Actions Overview",
         "followups": "Follow-ups",
         "monthlyTrend": "Monthly Trend",
         "pending": "Pending",
-        "subtitle": "Subtitle",
-        "title": "Title",
-        "totalActions": "Total Actions"
+        "subtitle": "Manage complaint actions using the same consistent complaints workflow design",
+        "title": "Complaint Actions",
+        "totalActions": "Total Actions",
+        "searchPlaceholder": "Search complaint actions...",
+        "columns": {
+          "complaint": "Complaint",
+          "actionType": "Action Type",
+          "actionDescription": "Action Description",
+          "actionResult": "Action Result",
+          "actionDate": "Action Date",
+          "followUpDate": "Follow Up Date",
+          "nextActionRequired": "Next Action",
+          "visibilityScope": "Visibility"
+        },
+        "fields": {
+          "complaint": "Complaint",
+          "actionType": "Action Type",
+          "actionDescription": "Action Description",
+          "actionResult": "Action Result",
+          "followUpDate": "Follow Up Date",
+          "nextActionRequired": "Next Action Required",
+          "visibilityScope": "Visibility",
+          "remarks": "Remarks"
+        },
+        "options": {
+          "nextActionRequired": {
+            "true": "Yes",
+            "false": "No"
+          },
+          "visibilityScope": {
+            "public": "Public",
+            "private": "Private"
+          }
+        }
       },
       "actionsCreate": {
-        "titleCreate": "Create",
-        "titleEdit": "Edit"
+        "titleCreate": "Create Action",
+        "titleEdit": "Edit Action"
       },
       "actionsView": {
-        "title": "Title"
+        "title": "Action Details"
       },
       "complaintsEdit": {
-        "titleCreate": "Create",
-        "titleEdit": "Edit"
+        "titleCreate": "Create Complaint",
+        "titleEdit": "Edit Complaint"
       },
       "complaintsView": {
-        "title": "Title"
+        "title": "Complaint Details"
       },
       "feedback": {
         "avgSatisfaction": "Avg Satisfaction",
@@ -4313,16 +5100,39 @@
         "monthlyTrend": "Monthly Trend",
         "needsImprovement": "Needs Improvement",
         "satisfactionDistribution": "Satisfaction Distribution",
-        "subtitle": "Subtitle",
-        "title": "Title",
-        "totalFeedback": "Total Feedback"
+        "subtitle": "Manage feedback records with the same reusable complaints table and form system",
+        "title": "Complaint Feedback",
+        "totalFeedback": "Total Feedback",
+        "searchPlaceholder": "Search complaint feedback...",
+        "columns": {
+          "complaint": "Complaint",
+          "satisfactionLevel": "Satisfaction (1-5)",
+          "comments": "Comments",
+          "feedbackDate": "Feedback Date",
+          "resolutionTime": "Resolution Time (hrs)",
+          "escalationRequired": "Escalation"
+        },
+        "fields": {
+          "complaint": "Complaint",
+          "satisfactionLevel": "Satisfaction Level (1-5)",
+          "comments": "Comments",
+          "feedbackDate": "Feedback Date",
+          "resolutionTime": "Resolution Time (hours)",
+          "escalationRequired": "Escalation Required"
+        },
+        "options": {
+          "escalationRequired": {
+            "true": "Yes",
+            "false": "No"
+          }
+        }
       },
       "feedbackCreate": {
-        "titleCreate": "Create",
-        "titleEdit": "Edit"
+        "titleCreate": "Create Feedback",
+        "titleEdit": "Edit Feedback"
       },
       "feedbackView": {
-        "title": "Title"
+        "title": "Feedback Details"
       },
       "list": {
         "byCategory": "By Category",
@@ -4333,15 +5143,58 @@
         "inProgress": "In Progress",
         "markInProgress": "Mark In Progress",
         "open": "Open",
-        "subtitle": "Subtitle",
-        "title": "Title",
-        "total": "Total"
+        "subtitle": "Track and manage complaint records",
+        "title": "Complaints Management",
+        "total": "Total",
+        "searchPlaceholder": "Search complaints...",
+        "columns": {
+          "complaintCode": "Complaint Code",
+          "subject": "Subject",
+          "category": "Category",
+          "priority": "Priority",
+          "status": "Status",
+          "submittedBy": "Submitted By",
+          "assignedTo": "Assigned To",
+          "createdAt": "Submitted Date"
+        },
+        "fields": {
+          "complaintCode": "Complaint Code",
+          "complainantType": "Complainant Type",
+          "complaintCategory": "Category",
+          "subject": "Subject",
+          "description": "Description",
+          "priorityLevel": "Priority Level",
+          "complaintStatus": "Status",
+          "confidentialityLevel": "Confidentiality Level"
+        },
+        "options": {
+          "complainantType": {
+            "student": "Student",
+            "staff": "Staff",
+            "other": "Other"
+          },
+          "priorityLevel": {
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High"
+          },
+          "complaintStatus": {
+            "open": "Open",
+            "in_progress": "In Progress",
+            "closed": "Closed"
+          },
+          "confidentialityLevel": {
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High"
+          }
+        }
       },
       "reports": {
         "closed": "Closed",
         "errorTitle": "Error",
         "fetchError": "Failed to fetch data",
-        "filterInfo": "Filter Info",
+        "filterInfo": "Use the filters below to narrow down complaint data",
         "highPriority": "High Priority",
         "inProgress": "In Progress",
         "loading": "Loading...",
@@ -4350,13 +5203,14 @@
         "recentComplaints": "Recent Complaints",
         "retry": "Retry",
         "statusDistribution": "Status Distribution",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "subtitle": "View detailed reports and analytics for complaints",
+        "title": "Complaints Reports",
         "total": "Total"
       }
     },
     "compList": "Complaints List",
     "actions": {
+      "label": "Actions",
       "view": "View",
       "edit": "Edit",
       "delete": "Delete"
@@ -4365,147 +5219,422 @@
     "support": "Support",
     "supportTickets": "Support Tickets",
     "finance": {
+      "label": "Finance",
       "accounts": {
-        "chartAccountStatusDistribution": "Account Status Distribution",
-        "chartAccountTypeDistribution": "Account Type Distribution",
+        "title": "Accounts",
+        "subtitle": "View and manage financial accounts",
         "create": "Create",
         "edit": "Edit",
-        "errorDescription": "An error occurred while loading data",
-        "errorTitle": "Error",
-        "insightDescription": "Description",
-        "insightEyebrow": "Eyebrow",
-        "insightTitle": "Title",
-        "searchPlaceholder": "Search...",
+        "details": "{{title}} - Details",
+        "errorDescription": "There was a problem loading the account data. Please check your connection and try again.",
+        "errorTitle": "Account Data Error",
+        "insight": {
+          "eyebrow": "Accounts Insight",
+          "title": "Account Health Overview",
+          "description": "Monitor account balances, active versus inactive accounts, and type distribution across your financial structure."
+        },
+        "insightEyebrowUnavailable": "Account Data Unavailable",
+        "searchPlaceholder": "Search by name, code, or currency...",
         "statAccountTypes": "Account Types",
-        "statAccountTypesHelper": "Account Types Helper",
+        "statAccountTypesHelper": "Distinct account categories in use",
         "statActiveAccounts": "Active Accounts",
-        "statActiveAccountsHelper": "Active Accounts Helper",
+        "statActiveAccountsHelper": "Accounts currently marked as active",
         "statInactiveAccounts": "Inactive Accounts",
-        "statInactiveAccountsHelper": "Inactive Accounts Helper",
+        "statInactiveAccountsHelper": "Accounts currently marked as inactive",
         "statTotalAccounts": "Total Accounts",
-        "statTotalAccountsHelper": "Total Accounts Helper",
-        "statTotalBalance": "Total Balance"
+        "statTotalAccountsHelper": "All registered financial accounts",
+        "statTotalBalance": "Total Balance",
+        "statTotalBalanceHelper": "Aggregated balance across all accounts",
+        "chart": {
+          "accountTypeDistribution": "Account Type Distribution",
+          "accountStatusDistribution": "Account Status Distribution"
+        },
+        "column": {
+          "accountCode": "Account Code",
+          "accountName": "Account Name",
+          "accountType": "Account Type",
+          "openingBalance": "Opening Balance",
+          "currentBalance": "Current Balance",
+          "currency": "Currency",
+          "status": "Status"
+        },
+        "formField": {
+          "accountCode": "Account Code",
+          "accountName": "Account Name",
+          "accountType": "Account Type",
+          "openingBalance": "Opening Balance",
+          "currentBalance": "Current Balance",
+          "currency": "Currency",
+          "status": "Status",
+          "option": {
+            "accountType": {
+              "cash": "Cash",
+              "petty_cash": "Petty Cash"
+            },
+            "status": {
+              "active": "Active",
+              "inactive": "Inactive"
+            }
+          }
+        }
       },
       "expenses": {
-        "chartApprovalStatusBreakdown": "Approval Status Breakdown",
-        "chartCategoryDistribution": "Category Distribution",
-        "chartMonthlyExpenseTrend": "Monthly Expense Trend",
+        "title": "Expenses",
+        "subtitle": "View and manage expenses",
         "create": "Create",
         "edit": "Edit",
-        "errorDescription": "An error occurred while loading data",
-        "errorTitle": "Error",
-        "insightDescription": "Description",
-        "insightEyebrow": "Eyebrow",
-        "insightTitle": "Title",
-        "searchPlaceholder": "Search...",
+        "details": "{{title}} - Details",
+        "errorDescription": "There was a problem loading the expense data. Please check your connection and try again.",
+        "errorTitle": "Expense Data Error",
+        "insightEyebrowUnavailable": "Expense Data Unavailable",
+        "searchPlaceholder": "Search by code, category, or payee...",
         "statExpenseCategories": "Expense Categories",
-        "statExpenseCategoriesHelper": "Expense Categories Helper",
+        "statExpenseCategoriesHelper": "Distinct categories with recorded expenses",
         "statPendingApprovals": "Pending Approvals",
-        "statPendingApprovalsHelper": "Pending Approvals Helper",
+        "statPendingApprovalsHelper": "Expenses awaiting approval decision",
         "statRejectedEntries": "Rejected Entries",
-        "statRejectedEntriesHelper": "Rejected Entries Helper",
+        "statRejectedEntriesHelper": "Expenses that were rejected",
         "statThisMonth": "This Month",
-        "statThisMonthHelper": "This Month Helper",
+        "statThisMonthHelper": "Total expenses incurred this month",
         "statTotalExpenses": "Total Expenses",
-        "statTotalExpensesHelper": "Total Expenses Helper"
+        "statTotalExpensesHelper": "Aggregated value of all expense records",
+        "chart": {
+          "categoryDistribution": "Category Distribution",
+          "approvalStatusBreakdown": "Approval Status Breakdown",
+          "monthlyExpenseTrend": "Monthly Expense Trend"
+        },
+        "column": {
+          "expenseCode": "Expense Code",
+          "category": "Category",
+          "title": "Title",
+          "amount": "Amount",
+          "expenseDate": "Expense Date",
+          "paymentMethod": "Payment Method",
+          "approvalStatus": "Approval Status"
+        },
+        "formField": {
+          "expenseCode": "Expense Code",
+          "category": "Category",
+          "title": "Title",
+          "amount": "Amount",
+          "expenseDate": "Expense Date",
+          "paymentMethod": "Payment Method",
+          "referenceNo": "Reference No",
+          "paidTo": "Paid To",
+          "approvalStatus": "Approval Status",
+          "remarks": "Remarks",
+          "option": {
+            "paymentMethod": {
+              "cash": "Cash",
+              "card": "Card",
+              "other": "Other"
+            },
+            "approvalStatus": {
+              "pending": "Pending",
+              "approved": "Approved",
+              "rejected": "Rejected"
+            }
+          }
+        },
+        "insight": {
+          "eyebrow": "Expense Insight",
+          "title": "Spending Analysis",
+          "description": "Track spending patterns, approval workloads, and category distributions to make informed budget decisions."
+        }
       },
       "eyebrow": "Finance Overview",
       "feePayments": {
-        "chartMonthlyCollections": "Monthly Collections",
-        "chartPaymentMethodDistribution": "Payment Method Distribution",
-        "chartPaymentStatusBreakdown": "Payment Status Breakdown",
+        "title": "Fee Payments",
+        "subtitle": "View and manage fee payments",
         "create": "Create",
         "edit": "Edit",
-        "errorDescription": "An error occurred while loading data",
-        "errorTitle": "Error",
-        "insightDescription": "Description",
-        "insightEyebrow": "Eyebrow",
-        "insightTitle": "Title",
-        "searchPlaceholder": "Search...",
+        "details": "{{title}} - Details",
+        "errorDescription": "There was a problem loading the fee payment data. Please check your connection and try again.",
+        "errorTitle": "Fee Payment Data Error",
+        "insightEyebrowUnavailable": "Fee Payment Data Unavailable",
+        "searchPlaceholder": "Search by receipt number, student, or amount...",
         "statFailedPayments": "Failed Payments",
-        "statFailedPaymentsHelper": "Failed Payments Helper",
+        "statFailedPaymentsHelper": "Payments that did not complete successfully",
         "statPendingPayments": "Pending Payments",
-        "statPendingPaymentsHelper": "Pending Payments Helper",
+        "statPendingPaymentsHelper": "Payments awaiting processing or confirmation",
         "statTotalCollected": "Total Collected",
-        "statTotalCollectedHelper": "Total Collected Helper",
+        "statTotalCollectedHelper": "Sum of all successfully completed payments",
         "statTotalPayments": "Total Payments",
-        "statTotalPaymentsHelper": "Total Payments Helper",
+        "statTotalPaymentsHelper": "All payment records including pending and failed",
         "statVerificationQueue": "Verification Queue",
-        "statVerificationQueueHelper": "Verification Queue Helper"
+        "statVerificationQueueHelper": "Payments awaiting verification approval",
+        "chart": {
+          "monthlyCollections": "Monthly Collections",
+          "paymentMethodDistribution": "Payment Method Distribution",
+          "paymentStatusBreakdown": "Payment Status Breakdown"
+        },
+        "column": {
+          "studentFee": "Student Fee",
+          "receiptNo": "Receipt No",
+          "paymentDate": "Payment Date",
+          "paidAmount": "Paid Amount",
+          "paymentMethod": "Payment Method",
+          "paymentStatus": "Payment Status",
+          "verificationStatus": "Verification Status"
+        },
+        "formField": {
+          "studentFee": "Student Fee",
+          "receiptNo": "Receipt No",
+          "paymentDate": "Payment Date",
+          "paidAmount": "Paid Amount",
+          "paymentMethod": "Payment Method",
+          "transactionReference": "Transaction Reference",
+          "paymentStatus": "Payment Status",
+          "verificationStatus": "Verification Status",
+          "paymentChannel": "Payment Channel",
+          "remarks": "Remarks",
+          "option": {
+            "paymentMethod": {
+              "cash": "Cash",
+              "card": "Card"
+            },
+            "paymentStatus": {
+              "completed": "Completed",
+              "pending": "Pending",
+              "failed": "Failed"
+            },
+            "verificationStatus": {
+              "verified": "Verified",
+              "pending": "Pending",
+              "rejected": "Rejected"
+            }
+          }
+        },
+        "insight": {
+          "eyebrow": "Fee Payment Insight",
+          "title": "Collection Performance",
+          "description": "Track collection performance, monitor payment method preferences, and follow up on pending or failed payments."
+        }
       },
       "feeStructures": {
-        "chartFeeTypeDistribution": "Fee Type Distribution",
-        "chartFrequencyBreakdown": "Frequency Breakdown",
+        "title": "Fee Structures",
+        "subtitle": "View and manage fee structures",
         "create": "Create",
         "edit": "Edit",
-        "errorDescription": "An error occurred while loading data",
-        "errorTitle": "Error",
-        "insightDescription": "Description",
-        "insightEyebrow": "Eyebrow",
-        "insightTitle": "Title",
-        "searchPlaceholder": "Search...",
+        "details": "{{title}} - Details",
+        "errorDescription": "There was a problem loading the fee structure data. Please check your connection and try again.",
+        "errorTitle": "Fee Structure Data Error",
+        "insight": {
+          "eyebrow": "Fee Structure Insight",
+          "title": "Pricing Structure Overview",
+          "description": "Review fee categories, pricing frequencies, and active versus mandatory fee configurations across the institution."
+        },
+        "insightEyebrowUnavailable": "Fee Structure Data Unavailable",
+        "searchPlaceholder": "Search by fee name, code, or type...",
         "statActiveStructures": "Active Structures",
-        "statActiveStructuresHelper": "Active Structures Helper",
+        "chart": {
+          "feeTypeDistribution": "Fee Type Distribution",
+          "frequencyBreakdown": "Frequency Breakdown"
+        },
+        "statActiveStructuresHelper": "Fee structure entries currently in use",
         "statAverageFee": "Average Fee",
-        "statAverageFeeHelper": "Average Fee Helper",
+        "statAverageFeeHelper": "Mean fee amount across all structures",
         "statFeeTypes": "Fee Types",
-        "statFeeTypesHelper": "Fee Types Helper",
+        "statFeeTypesHelper": "Distinct fee categories configured",
         "statMandatoryFees": "Mandatory Fees",
-        "statMandatoryFeesHelper": "Mandatory Fees Helper",
+        "statMandatoryFeesHelper": "Fees marked as mandatory for students",
         "statTotalStructures": "Total Structures",
-        "statTotalStructuresHelper": "Total Structures Helper"
+        "statTotalStructuresHelper": "All fee structure records combined",
+        "column": {
+          "feeCode": "Fee Code",
+          "feeName": "Fee Name",
+          "feeType": "Fee Type",
+          "amount": "Amount",
+          "frequency": "Frequency",
+          "isMandatory": "Mandatory",
+          "status": "Status"
+        },
+        "formField": {
+          "feeCode": "Fee Code",
+          "feeName": "Fee Name",
+          "class": "Class",
+          "feeType": "Fee Type",
+          "amount": "Amount",
+          "frequency": "Frequency",
+          "applicableFrom": "Applicable From",
+          "applicableTo": "Applicable To",
+          "isMandatory": "Mandatory",
+          "status": "Status",
+          "option": {
+            "feeType": {
+              "tuition": "Tuition",
+              "admission": "Admission",
+              "other": "Other"
+            },
+            "frequency": {
+              "one-time": "One Time",
+              "monthly": "Monthly",
+              "yearly": "Yearly"
+            },
+            "isMandatory": {
+              "yes": "Yes",
+              "no": "No"
+            },
+            "status": {
+              "active": "Active",
+              "inactive": "Inactive"
+            }
+          }
+        }
       },
       "financialReports": {
+        "title": "Financial Reports",
+        "subtitle": "View and manage financial reports",
         "create": "Create",
         "edit": "Edit",
-        "searchPlaceholder": "Search..."
+        "details": "{{title}} - Details",
+        "searchPlaceholder": "Search by report type, period, or status...",
+        "column": {
+          "reportType": "Report Type",
+          "reportPeriod": "Report Period",
+          "totalIncome": "Total Income",
+          "totalExpense": "Total Expense",
+          "netBalance": "Net Balance",
+          "approvalStatus": "Approval Status"
+        },
+        "formField": {
+          "reportType": "Report Type",
+          "reportPeriod": "Report Period",
+          "totalIncome": "Total Income",
+          "totalExpense": "Total Expense",
+          "netBalance": "Net Balance",
+          "generatedAt": "Generated At",
+          "approvalStatus": "Approval Status",
+          "remarks": "Remarks",
+          "option": {
+            "approvalStatus": {
+              "pending": "Pending",
+              "approved": "Approved",
+              "rejected": "Rejected"
+            }
+          }
+        }
       },
       "studentFees": {
-        "chartAcademicYearMix": "Academic Year Mix",
-        "chartPaymentStatusDistribution": "Payment Status Distribution",
+        "title": "Student Fees",
+        "subtitle": "View and manage student fees",
         "create": "Create",
         "edit": "Edit",
-        "errorDescription": "An error occurred while loading data",
-        "errorTitle": "Error",
-        "insightDescription": "Description",
-        "insightEyebrow": "Eyebrow",
-        "insightTitle": "Title",
-        "searchPlaceholder": "Search...",
+        "details": "{{title}} - Details",
+        "errorDescription": "There was a problem loading the student fee data. Please check your connection and try again.",
+        "errorTitle": "Student Fee Data Error",
+        "insight": {
+          "eyebrow": "Student Fee Insight",
+          "title": "Fee Collection Status",
+          "description": "Track fee assignments, monitor payment completion rates, and identify overdue accounts across academic years."
+        },
+        "insightEyebrowUnavailable": "Student Fee Data Unavailable",
+        "searchPlaceholder": "Search by student name, ID, or academic year...",
         "statFullyPaid": "Fully Paid",
-        "statFullyPaidHelper": "Fully Paid Helper",
+        "chart": {
+          "academicYearMix": "Academic Year Mix",
+          "paymentStatusDistribution": "Payment Status Distribution"
+        },
+        "statFullyPaidHelper": "Students who have paid all assigned fees",
         "statOutstandingBalance": "Outstanding Balance",
-        "statOutstandingBalanceHelper": "Outstanding Balance Helper",
+        "statOutstandingBalanceHelper": "Total unpaid amount across all students",
         "statOverdueAccounts": "Overdue Accounts",
-        "statOverdueAccountsHelper": "Overdue Accounts Helper",
+        "statOverdueAccountsHelper": "Accounts past their due date",
         "statPartiallyPaid": "Partially Paid",
-        "statPartiallyPaidHelper": "Partially Paid Helper",
+        "statPartiallyPaidHelper": "Students with partial fee payments made",
         "statStudentsWithFees": "Students With Fees",
-        "statStudentsWithFeesHelper": "Students With Fees Helper"
+        "statStudentsWithFeesHelper": "Total students assigned fee structures",
+        "column": {
+          "student": "Student",
+          "feeStructure": "Fee Structure",
+          "academicYear": "Academic Year",
+          "totalAmount": "Total Amount",
+          "discountAmount": "Discount Amount",
+          "payableAmount": "Payable Amount",
+          "paymentStatus": "Payment Status"
+        },
+        "formField": {
+          "student": "Student",
+          "feeStructure": "Fee Structure",
+          "academicYear": "Academic Year",
+          "totalAmount": "Total Amount",
+          "discountAmount": "Discount Amount",
+          "payableAmount": "Payable Amount",
+          "dueDate": "Due Date",
+          "paymentStatus": "Payment Status",
+          "remarks": "Remarks",
+          "option": {
+            "paymentStatus": {
+              "pending": "Pending",
+              "paid": "Paid",
+              "partial": "Partial",
+              "overdue": "Overdue"
+            }
+          }
+        }
       },
       "transactions": {
-        "chartIncomeVsExpenseMix": "Income vs Expense Mix",
-        "chartMonthlyTransactionVolume": "Monthly Transaction Volume",
-        "chartVerificationStatusBreakdown": "Verification Status Breakdown",
+        "title": "Transactions",
+        "subtitle": "View and manage financial transactions",
         "create": "Create",
         "edit": "Edit",
-        "errorDescription": "An error occurred while loading data",
-        "errorTitle": "Error",
-        "insightDescription": "Description",
-        "insightEyebrow": "Eyebrow",
-        "insightEyebrowUnavailable": "Eyebrow Unavailable",
-        "insightTitle": "Title",
-        "searchPlaceholder": "Search...",
+        "details": "{{title}} - Details",
+        "errorDescription": "There was a problem loading the transaction data. Please check your connection and try again.",
+        "errorTitle": "Transaction Data Error",
+        "insight": {
+          "eyebrow": "Transaction Insight",
+          "title": "Income & Expense Snapshot",
+          "description": "Review income and expense flows, verification queues, and monthly volume trends to stay on top of your financial position."
+        },
+        "insightEyebrowUnavailable": "Transaction Data Unavailable",
+        "searchPlaceholder": "Search by code, description, or reference...",
         "statNetBalance": "Net Balance",
-        "statNetBalanceNegative": "Net Balance Negative",
-        "statNetBalancePositive": "Net Balance Positive",
+        "statNetBalanceNegative": "Expenses exceed income",
+        "statNetBalancePositive": "Income exceeds expenses",
         "statTotalExpenses": "Total Expenses",
-        "statTotalExpensesHelper": "Total Expenses Helper",
+        "statTotalExpensesHelper": "Sum of all expense-type transactions",
         "statTotalIncome": "Total Income",
-        "statTotalIncomeHelper": "Total Income Helper",
+        "statTotalIncomeHelper": "Sum of all income-type transactions",
         "statTotalTransactions": "Total Transactions",
-        "statTotalTransactionsHelper": "Total Transactions Helper",
+        "statTotalTransactionsHelper": "All income and expense records combined",
         "statVerificationQueue": "Verification Queue",
-        "statVerificationQueueHelper": "Verification Queue Helper"
+        "statVerificationQueueHelper": "Transactions awaiting verification approval",
+        "chart": {
+          "incomeVsExpenseMix": "Income vs Expense Mix",
+          "verificationStatusBreakdown": "Verification Status Breakdown",
+          "monthlyTransactionVolume": "Monthly Transaction Volume",
+          "income": "Income",
+          "expense": "Expense"
+        },
+        "column": {
+          "transactionDate": "Transaction Date",
+          "transactionCode": "Transaction Code",
+          "description": "Description",
+          "transactionType": "Transaction Type",
+          "amount": "Amount",
+          "verificationStatus": "Verification Status"
+        },
+        "formField": {
+          "transactionType": "Transaction Type",
+          "account": "Account",
+          "amount": "Amount",
+          "transactionDate": "Transaction Date",
+          "referenceType": "Reference Type",
+          "description": "Description",
+          "verificationStatus": "Verification Status",
+          "accountCode": "Account Code",
+          "option": {
+            "transactionType": {
+              "income": "Income",
+              "expense": "Expense"
+            },
+            "verificationStatus": {
+              "verified": "Verified",
+              "pending": "Pending",
+              "rejected": "Rejected"
+            }
+          }
+        }
       }
     },
     "transactions": "Transactions",
@@ -4516,37 +5645,163 @@
     "expenses": "Expenses",
     "finReports": "Financial Reports",
     "payroll": {
+      "label": "Payroll",
       "salaryAdvances": {
-        "create": {
-          "titleCreate": "Create",
-          "titleEdit": "Edit"
+        "title": "Salary Advances",
+        "subtitle": "Manage salary advance requests",
+        "eyebrow": "Salary Advances Overview",
+        "loadingSubtitle": "Please wait while we load the data",
+        "searchPlaceholder": "Search salary advances...",
+        "columns": {
+          "employee": "Employee",
+          "advanceAmount": "Advance Amount",
+          "requestDate": "Request Date",
+          "approvalDate": "Approval Date",
+          "remainingBalance": "Remaining Balance",
+          "advanceStatus": "Status"
         },
-        "searchPlaceholder": "Search...",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "fields": {
+          "employee": "Employee",
+          "advanceAmount": "Advance Amount",
+          "requestDate": "Request Date",
+          "approvalDate": "Approval Date",
+          "repaymentStartMonth": "Repayment Start Month",
+          "monthlyDeductionAmount": "Monthly Deduction Amount",
+          "remainingBalance": "Remaining Balance",
+          "advanceStatus": "Status"
+        },
+        "options": {
+          "advanceStatus": {
+            "pending": "Pending",
+            "approved": "Approved",
+            "rejected": "Rejected",
+            "closed": "Closed"
+          }
+        },
+        "cards": {
+          "totalRequests": "Total Requests",
+          "approvedRequests": "Approved",
+          "pendingRequests": "Pending",
+          "totalAdvanced": "Total Advanced",
+          "averageAdvance": "Average Advance"
+        },
+        "charts": {
+          "advanceByStatus": "Advances by Status",
+          "monthlyAdvances": "Monthly Advances",
+          "advanceDistribution": "Advance Distribution"
+        },
+        "create": {
+          "titleCreate": "Create Salary Advance",
+          "titleEdit": "Edit Salary Advance"
+        },
+        "errors": {
+          "loadError": "Load Error",
+          "loadFailed": "Failed to load data"
+        },
         "view": {
-          "details": "Details"
+          "details": "Salary Advance Details"
         }
       },
       "salaryDeductions": {
-        "create": {
-          "titleCreate": "Create",
-          "titleEdit": "Edit"
+        "title": "Salary Deductions",
+        "subtitle": "Manage salary deduction records",
+        "eyebrow": "Salary Deductions Overview",
+        "loadingSubtitle": "Please wait while we load the data",
+        "searchPlaceholder": "Search salary deductions...",
+        "columns": {
+          "employee": "Employee",
+          "deductionType": "Deduction Type",
+          "deductionAmount": "Amount",
+          "deductionMonth": "Month",
+          "deductionYear": "Year",
+          "status": "Status"
         },
-        "searchPlaceholder": "Search...",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "fields": {
+          "employee": "Employee",
+          "deductionType": "Deduction Type",
+          "deductionReason": "Deduction Reason",
+          "deductionAmount": "Deduction Amount",
+          "deductionMonth": "Deduction Month",
+          "deductionYear": "Deduction Year",
+          "status": "Status"
+        },
+        "options": {
+          "status": {
+            "pending": "Pending",
+            "approved": "Approved",
+            "rejected": "Rejected"
+          }
+        },
+        "cards": {
+          "totalDeductions": "Total Deductions",
+          "approvedDeductions": "Approved",
+          "pendingDeductions": "Pending",
+          "totalDeducted": "Total Deducted",
+          "averageDeduction": "Average Deduction"
+        },
+        "charts": {
+          "deductionByType": "Deductions by Type",
+          "monthlyDeductions": "Monthly Deductions",
+          "deductionByStatus": "Deductions by Status"
+        },
+        "create": {
+          "titleCreate": "Create Salary Deduction",
+          "titleEdit": "Edit Salary Deduction"
+        },
+        "errors": {
+          "loadError": "Load Error",
+          "loadFailed": "Failed to load data"
+        },
         "view": {
-          "details": "Details"
+          "details": "Salary Deduction Details"
         }
       },
       "salaryPayments": {
+        "title": "Salary Payments",
+        "subtitle": "Manage salary payment records",
+        "eyebrow": "Salary Payments Overview",
+        "loadingSubtitle": "Please wait while we load the data",
+        "searchPlaceholder": "Search salary payments...",
+        "columns": {
+          "employee": "Employee",
+          "salaryMonth": "Month",
+          "salaryYear": "Year",
+          "grossSalary": "Gross Salary",
+          "netSalary": "Net Salary",
+          "paymentStatus": "Status"
+        },
+        "fields": {
+          "employee": "Employee",
+          "salaryMonth": "Salary Month",
+          "salaryYear": "Salary Year",
+          "grossSalary": "Gross Salary",
+          "totalAllowance": "Total Allowance",
+          "totalDeduction": "Total Deduction",
+          "netSalary": "Net Salary",
+          "paymentDate": "Payment Date",
+          "paymentMethod": "Payment Method",
+          "transactionReference": "Transaction Reference",
+          "paymentStatus": "Payment Status"
+        },
+        "options": {
+          "paymentMethod": {
+            "cash": "Cash",
+            "bank": "Bank",
+            "card": "Card",
+            "other": "Other"
+          },
+          "paymentStatus": {
+            "pending": "Pending",
+            "paid": "Paid",
+            "failed": "Failed"
+          }
+        },
         "cards": {
-          "amountDisbursed": "Amount Disbursed",
-          "failedPayments": "Failed Payments",
-          "nextPayrollDate": "Next Payroll Date",
           "paidThisMonth": "Paid This Month",
-          "pendingPayments": "Pending Payments"
+          "amountDisbursed": "Amount Disbursed",
+          "pendingPayments": "Pending Payments",
+          "failedPayments": "Failed Payments",
+          "nextPayrollDate": "Next Payroll Date"
         },
         "charts": {
           "monthlyPayroll": "Monthly Payroll",
@@ -4554,57 +5809,79 @@
           "paymentStatusBreakdown": "Payment Status Breakdown"
         },
         "create": {
-          "titleCreate": "Create",
-          "titleEdit": "Edit"
+          "titleCreate": "Create Salary Payment",
+          "titleEdit": "Edit Salary Payment"
         },
         "errors": {
           "loadError": "Load Error",
           "loadFailed": "Failed to load data"
         },
-        "eyebrow": "Salary Payments Overview",
         "insights": {
           "noPending": "No Pending Payments"
         },
-        "loadingSubtitle": "Please wait while we load the data",
-        "searchPlaceholder": "Search...",
-        "subtitle": "Subtitle",
-        "title": "Title",
         "view": {
-          "details": "Details"
+          "details": "Salary Payment Details"
         }
       },
       "salaryStructures": {
+        "title": "Salary Structures",
+        "subtitle": "Define salary structures by employee type",
+        "eyebrow": "Salary Structures Overview",
+        "loadingSubtitle": "Please wait while we load the data",
+        "searchPlaceholder": "Search salary structures...",
+        "columns": {
+          "employeeType": "Employee Type",
+          "basicSalary": "Basic Salary",
+          "allowanceAmount": "Allowance",
+          "overtimeRate": "Overtime Rate",
+          "taxPercentage": "Tax %",
+          "status": "Status"
+        },
+        "fields": {
+          "employeeType": "Employee Type",
+          "basicSalary": "Basic Salary",
+          "allowanceAmount": "Allowance Amount",
+          "housingAllowance": "Housing Allowance",
+          "foodAllowance": "Food Allowance",
+          "transportAllowance": "Transport Allowance",
+          "overtimeRate": "Overtime Rate",
+          "deductionType": "Deduction Type",
+          "taxPercentage": "Tax Percentage",
+          "effectiveFrom": "Effective From",
+          "status": "Status"
+        },
+        "options": {
+          "status": {
+            "active": "Active",
+            "inactive": "Inactive"
+          }
+        },
         "cards": {
+          "totalStructures": "Total Structures",
           "activeStructures": "Active Structures",
           "averageBasicSalary": "Average Basic Salary",
-          "employeeTypesCovered": "Employee Types Covered",
           "salaryRange": "Salary Range",
-          "totalStructures": "Total Structures"
+          "employeeTypesCovered": "Employee Types Covered"
         },
         "charts": {
-          "allowanceDistribution": "Allowance Distribution",
-          "allowanceFood": "Allowance Food",
-          "allowanceHousing": "Allowance Housing",
-          "allowanceStandard": "Allowance Standard",
-          "allowanceTransport": "Allowance Transport",
           "salaryByEmployeeType": "Salary by Employee Type",
-          "structureStatus": "Structure Status"
+          "structureStatus": "Structure Status",
+          "allowanceDistribution": "Allowance Distribution",
+          "allowanceStandard": "Standard Allowance",
+          "allowanceHousing": "Housing Allowance",
+          "allowanceFood": "Food Allowance",
+          "allowanceTransport": "Transport Allowance"
         },
         "create": {
-          "titleCreate": "Create",
-          "titleEdit": "Edit"
+          "titleCreate": "Create Salary Structure",
+          "titleEdit": "Edit Salary Structure"
         },
         "errors": {
           "loadError": "Load Error",
           "loadFailed": "Failed to load data"
         },
-        "eyebrow": "Salary Structures Overview",
-        "loadingSubtitle": "Please wait while we load the data",
-        "searchPlaceholder": "Search...",
-        "subtitle": "Subtitle",
-        "title": "Title",
         "view": {
-          "details": "Details"
+          "details": "Salary Structure Details"
         }
       }
     },
@@ -4612,7 +5889,229 @@
     "salaryPayments": "Salary Payments",
     "salaryDeductions": "Salary Deductions",
     "salaryAdvances": "Salary Advances",
-    "kitchen": "Kitchen",
+    "kitchen": {
+      "mealPlanning": "Meal Planning",
+      "planMeals": "Plan and schedule daily meals for students and staff",
+      "mealType": "Meal Type",
+      "servings": "Servings",
+      "cost": "Cost",
+      "mealName": "Meal Name",
+      "type": "Type",
+      "kitchenInventory": "Kitchen Inventory",
+      "trackInventory": "Track ingredients, supplies, and stock levels",
+      "addItem": "Add Item",
+      "itemName": "Item Name",
+      "unit": "Unit",
+      "minStockLevel": "Min Stock Level",
+      "noInventory": "No inventory items",
+      "deleteItemConfirm": "Delete this item?",
+      "weeklyMenu": "Weekly Menu",
+      "manageMenu": "Manage weekly menu schedule",
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snacks": "Snacks",
+      "wasteTracking": {
+        "title": "Waste Tracking",
+        "subtitle": "Monitor and track kitchen waste and disposal",
+        "itemName": "Item Name",
+        "wasteDate": "Waste Date",
+        "reason": "Reason",
+        "spoiled": "Spoiled",
+        "expired": "Expired",
+        "overcooked": "Overcooked",
+        "other": "Other",
+        "searchPlaceholder": "Search waste records...",
+        "titleCreate": "Create Waste Record",
+        "titleEdit": "Edit Waste Record",
+        "viewTitle": "Waste Record Details"
+      },
+      "monitorWaste": "Monitor and track kitchen waste and disposal",
+      "disposalMethod": "Disposal Method",
+      "disposal": "Disposal",
+      "suppliers": {
+        "title": "Suppliers",
+        "subtitle": "Manage kitchen supply vendors",
+        "supplierName": "Supplier Name",
+        "itemsSupplied": "Items Supplied",
+        "searchPlaceholder": "Search suppliers...",
+        "titleCreate": "Create Supplier",
+        "titleEdit": "Edit Supplier",
+        "viewTitle": "Supplier Details"
+      },
+      "manageSuppliers": "Manage kitchen supply vendors",
+      "contactPerson": "Contact Person",
+      "contact": "Contact",
+      "kitchenReports": "Kitchen Reports",
+      "kitchenAnalytics": "Kitchen operations analytics and reporting",
+      "dailyMeals": "Daily Meals",
+      "monthlyCost": "Monthly Cost",
+      "wastePercent": "Waste %",
+      "supplierCount": "Supplier Count",
+      "date": "Date",
+      "description": "Description",
+      "category": "Category",
+      "reason": "Reason",
+      "addNew": "Add New",
+      "day": "Day",
+      "unitKg": "kg",
+      "unitG": "g",
+      "unitLiter": "Liter",
+      "unitMl": "ml",
+      "unitPiece": "Piece",
+      "unitPacket": "Packet",
+      "lowStock": "Low Stock",
+      "outOfStock": "Out Of Stock",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price",
+      "available": "Available",
+      "totalStudents": "Total Students",
+      "totalStaff": "Total Staff",
+      "numberOfStudents": "Number Of Students",
+      "numberOfStaff": "Number Of Staff",
+      "preparedBy": "Prepared By",
+      "supervisedBy": "Supervised By",
+      "filterByDate": "Filter By Date",
+      "weekStart": "Week Start",
+      "weekEnd": "Week End",
+      "menuItems": "Menu Items",
+      "menuItemsHint": "Menu Items Hint",
+      "notes": "Notes",
+      "allDays": "All Days",
+      "totalMeals": "Total Meals",
+      "students": "Students",
+      "staff": "Staff",
+      "totalPurchases": "Total Purchases",
+      "transactions": "Transactions",
+      "totalWaste": "Total Waste",
+      "records": "Records",
+      "inventoryStatus": "Inventory Status",
+      "consumptionSummary": "Consumption Summary",
+      "studentMeals": "Student Meals",
+      "staffMeals": "Staff Meals",
+      "consumptionCount": "Consumption Count",
+      "financialSummary": "Financial Summary",
+      "purchaseCount": "Purchase Count",
+      "inventoryItems": "Inventory Items",
+      "lowStockItems": "Low Stock Items",
+      "itemsSupplied": "Items Supplied",
+      "itemsHint": "Items Hint",
+      "remarks": "Remarks",
+      "mainDish": "Main Dish",
+      "sideDish": "Side Dish",
+      "dessert": "Dessert",
+      "beverage": "Beverage",
+      "inventory": {
+        "title": "Kitchen Inventory",
+        "subtitle": "Track ingredients, supplies, and stock levels",
+        "eyebrow": "Kitchen",
+        "itemName": "Item Name",
+        "available": "Available",
+        "unitPrice": "Unit Price",
+        "stockStatus": "Stock Status",
+        "lowStock": "Low Stock",
+        "outOfStock": "Out of Stock",
+        "itemsInStock": "Items in Stock",
+        "itemsToReorder": "Items to Reorder",
+        "inventoryValue": "Inventory Value",
+        "lowStockAlerts": "Low Stock Alerts",
+        "itemsByCategory": "Items by Category",
+        "topItemsByQuantity": "Top Items by Quantity",
+        "minimumStock": "Min Stock",
+        "searchPlaceholder": "Search inventory items...",
+        "titleCreate": "Create Inventory Item",
+        "titleEdit": "Edit Inventory Item",
+        "viewTitle": "Inventory Item Details",
+        "failedToLoad": "Failed to load inventory",
+        "failedToLoadInsights": "Failed to load inventory insights",
+        "loadingSubtitle": "Loading inventory data..."
+      },
+      "dailyPlaning": {
+        "title": "Daily Consumption",
+        "subtitle": "Track daily food consumption and usage",
+        "itemName": "Item Name",
+        "mealType": "Meal Type",
+        "quantityUsed": "Quantity Used",
+        "date": "Date",
+        "consumptionDate": "Consumption Date",
+        "numberOfStudents": "Number of Students",
+        "numberOfStaff": "Number of Staff",
+        "preparedBy": "Prepared By",
+        "supervisedBy": "Supervised By",
+        "searchPlaceholder": "Search daily consumption...",
+        "titleCreate": "Create Consumption Record",
+        "titleEdit": "Edit Consumption Record",
+        "viewTitle": "Consumption Record Details"
+      },
+      "mealPlaning": {
+        "title": "Meal Planning",
+        "subtitle": "Plan and schedule daily meals for students and staff",
+        "allocated": "Allocated",
+        "allocatedAmount": "Allocated Amount",
+        "approved": "Approved",
+        "approvedAmount": "Approved Amount",
+        "spent": "Spent",
+        "spentAmount": "Spent Amount",
+        "remaining": "Remaining",
+        "remainingAmount": "Remaining Amount",
+        "budgetStatus": "Budget Status",
+        "searchPlaceholder": "Search meal plans...",
+        "titleCreate": "Create Meal Plan",
+        "titleEdit": "Edit Meal Plan",
+        "viewTitle": "Meal Plan Details"
+      },
+      "foodRequest": {
+        "title": "Budget Requests",
+        "subtitle": "Submit and track monthly kitchen budget requests",
+        "eyebrow": "Kitchen",
+        "totalRequests": "Total Requests",
+        "totalRequested": "Total Requested",
+        "totalApproved": "Total Approved",
+        "newBudgetRequest": "New Budget Request",
+        "requestedAmount": "Requested Amount (AFN) *",
+        "remarksReason": "Remarks / Reason",
+        "submitRequest": "Submit Request",
+        "submitting": "Submitting...",
+        "monthYear": "Month/Year",
+        "requested": "Requested",
+        "approved": "Approved",
+        "spent": "Spent",
+        "remaining": "Remaining",
+        "noBudgetRequests": "No budget requests found",
+        "failedToSubmit": "Failed to submit request"
+      },
+      "reports": {
+        "title": "Kitchen Reports",
+        "subtitleDaily": "Daily kitchen summary and analytics",
+        "subtitleWeekly": "Weekly kitchen summary and analytics",
+        "subtitleMonthly": "Monthly kitchen summary and analytics",
+        "eyebrow": "Kitchen",
+        "loading": "Loading report...",
+        "noData": "No data available for this period.",
+        "failedToLoad": "Failed to load report",
+        "totalPurchases": "Total Purchases",
+        "totalMealsServed": "Total Meals Served",
+        "studentMeals": "Student Meals",
+        "staffMeals": "Staff Meals",
+        "totalInventoryItems": "Total Inventory Items",
+        "lowStockItems": "Low Stock Items",
+        "wasteRecords": "Waste Records",
+        "activeStudents": "Active Students",
+        "budget": "Budget",
+        "budgetAllocated": "Allocated",
+        "budgetApproved": "Approved",
+        "budgetSpent": "Spent",
+        "budgetRemaining": "Remaining",
+        "budgetUsage": "Budget Usage"
+      },
+      "label": "Kitchen",
+      "weekStartDate": "Week Start",
+      "weekEndDate": "Week End",
+      "searchPlaceholder": "Search weekly menu...",
+      "titleCreateWeekly": "Create Weekly Menu Entry",
+      "titleEditWeekly": "Edit Weekly Menu Entry",
+      "viewTitleWeekly": "Weekly Menu Details"
+    },
     "kitInventory": "Inventory",
     "mealPlan": "Meal Planning",
     "dailyPurchases": "Daily Purchases",
@@ -4621,43 +6120,321 @@
     "waste": "Waste Tracking",
     "budgetReq": "Budget Requests",
     "hr": {
+      "label": "HR",
       "attendance": {
         "failedSave": "Failed to save attendance",
         "noEmployees": "No employees found",
         "remarksPlaceholder": "Enter remarks...",
         "saveAttendance": "Save Attendance",
         "selectDate": "Select Date",
-        "subtitle": "Subtitle",
+        "status": {
+          "present": "Present",
+          "absent": "Absent",
+          "late": "Late",
+          "half-day": "Half Day",
+          "on-leave": "On Leave"
+        },
+        "subtitle": "Manage daily employee attendance records",
         "tableCheckIn": "Check In",
         "tableCheckOut": "Check Out",
         "tableCode": "Code",
         "tableEmployee": "Employee",
         "tableRemarks": "Remarks",
         "tableStatus": "Status",
-        "title": "Title"
+        "title": "Attendance"
       },
       "departments": {
+        "coldepartmentCode": "Code",
+        "coldepartmentName": "Department Name",
+        "coldepartmentHead": "Department Head",
+        "collocation": "Location",
+        "colstatus": "Status",
         "createTitle": "Create Department",
         "editTitle": "Edit Department",
+        "fielddepartmentName": "Department Name",
+        "fielddepartmentCode": "Department Code",
+        "fielddepartmentHead": "Department Head",
+        "fieldlocation": "Location",
+        "fieldcontactExtension": "Contact Extension",
+        "fieldstatus": "Status",
+        "fielddescription": "Description",
+        "optionstatusActive": "Active",
+        "optionstatusInactive": "Inactive",
         "searchPlaceholder": "Search...",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "subtitle": "Manage organizational departments",
+        "title": "Departments",
         "viewTitle": "Department Details"
       },
       "designations": {
+        "coldesignationTitle": "Designation Title",
+        "coldepartment": "Department",
+        "coljobLevel": "Job Level",
+        "colsalaryRangeMin": "Salary Min",
+        "colsalaryRangeMax": "Salary Max",
+        "colstatus": "Status",
         "createTitle": "Create Designation",
         "editTitle": "Edit Designation",
+        "fielddesignationTitle": "Designation Title",
+        "fielddepartment": "Department",
+        "fieldjobLevel": "Job Level",
+        "fieldsalaryRangeMin": "Salary Range Min",
+        "fieldsalaryRangeMax": "Salary Range Max",
+        "fieldstatus": "Status",
+        "optionstatusActive": "Active",
+        "optionstatusInactive": "Inactive",
         "searchPlaceholder": "Search...",
-        "subtitle": "Subtitle",
-        "title": "Title",
+        "subtitle": "Manage job designations and positions",
+        "title": "Designations",
         "viewTitle": "Designation Details"
       },
       "employees": {
+        "averageSalary": "Average Salary",
+        "byDepartment": "Employees By Department",
+        "byType": "Employees By Type",
+        "colphoto": "Photo",
+        "colemployeeCode": "Code",
+        "colfullName": "Full Name",
+        "coldepartment": "Department",
+        "coldesignation": "Designation",
+        "colphoneNumber": "Phone Number",
+        "colemployeeType": "Employee Type",
+        "colstatus": "Status",
         "createTitle": "Create Employee",
         "editTitle": "Edit Employee",
+        "fielduser": "User Account",
+        "fieldimage": "Employee Photo",
+        "fieldfullName": "Full Name",
+        "fieldfullNameArabic": "Full Name (Arabic)",
+        "fieldfatherName": "Father Name",
+        "fielddateOfBirth": "Date of Birth",
+        "fieldgender": "Gender",
+        "fieldcnic": "CNIC",
+        "fieldphone": "Phone Number",
+        "fieldemail": "Email",
+        "fieldcurrentAddress": "Current Address",
+        "fieldemergencyContactName": "Emergency Contact Name",
+        "fieldemergencyContactPhone": "Emergency Contact Phone",
+        "fieldemployeeType": "Employee Type",
+        "fielddepartment": "Department",
+        "fielddesignation": "Designation",
+        "fieldjoiningDate": "Joining Date",
+        "fieldemploymentType": "Employment Type",
+        "fieldbaseSalary": "Base Salary",
+        "fieldhouseAllowance": "House Allowance",
+        "fieldtransportAllowance": "Transport Allowance",
+        "fieldmedicalAllowance": "Medical Allowance",
+        "fieldpaymentMethod": "Payment Method",
+        "fieldbankName": "Bank Name",
+        "fieldaccountNumber": "Account Number",
+        "fieldstatus": "Status",
+        "genderDistribution": "Gender Distribution",
+        "optiongenderMale": "Male",
+        "optiongenderFemale": "Female",
+        "optionemploymentTypePermanent": "Permanent",
+        "optionemploymentTypeContract": "Contract",
+        "optionemploymentTypePartTime": "Part Time",
+        "optionpaymentMethodCash": "Cash",
+        "optionpaymentMethodBankTransfer": "Bank Transfer",
+        "optionstatusActive": "Active",
+        "optionstatusInactive": "Inactive",
         "profileAlt": "Employee Profile",
-        "subtitle": "Subtitle",
-        "viewTitle": "Employee Details"
+        "recentHires": "Recent Hires",
+        "searchPlaceholder": "Search...",
+        "subtitle": "Manage employee records with complete profiles",
+        "title": "Employees",
+        "viewTitle": "Employee Details",
+        "registration": {
+          "positionTitle": "Position / Role Assignment",
+          "positionDesc": "Select all applicable positions. Click to select, \"Set as Primary\" to make main role.",
+          "primaryRole": "Primary Role",
+          "setAsPrimary": "Set as Primary",
+          "selected": "Selected",
+          "positions": "positions",
+          "primaryRoleLabel": "Primary Role",
+          "loginRole": "Login Role",
+          "loginRoleDesc": "Based on the selected primary position.",
+          "accountInfo": "Account Information",
+          "accountInfoDesc": "Create a login account for the employee. If an account already exists, link it instead.",
+          "linkUser": "Link Existing User Account",
+          "createNewUser": "Create new user account",
+          "personalInfo": "Personal Information",
+          "employeePhoto": "Employee Photo",
+          "profilePreview": "Profile Preview",
+          "noPhoto": "No Photo",
+          "contactInfo": "Contact Information",
+          "emergencyContact": "Emergency Contact",
+          "employmentDetails": "Employment Details",
+          "qualifications": "Qualifications & Experience",
+          "salaryBank": "Salary & Bank Details",
+          "cancel": "Cancel",
+          "selectDefault": "Select",
+          "positionTeacher": "Teacher",
+          "positionTeacherDesc": "Teaching staff for classes and subjects",
+          "positionAdmin": "Admin",
+          "positionAdminDesc": "Administrative and management staff",
+          "positionFinance": "Finance",
+          "positionFinanceDesc": "Finance and accounting staff",
+          "positionRegistrar": "Registrar",
+          "positionRegistrarDesc": "Student affairs and registration",
+          "positionHr": "HR",
+          "positionHrDesc": "Human resources and recruitment",
+          "positionLibrarian": "Librarian",
+          "positionLibrarianDesc": "Library management staff",
+          "positionKitchen": "Kitchen",
+          "positionKitchenDesc": "Kitchen and catering staff",
+          "positionSecurity": "Security",
+          "positionSecurityDesc": "Security and safety personnel",
+          "positionSupport": "Support",
+          "positionSupportDesc": "General support staff",
+          "positionMaintenance": "Maintenance",
+          "positionMaintenanceDesc": "Maintenance and facilities",
+          "positionPayroll": "Payroll",
+          "positionPayrollDesc": "Payroll and salary management staff",
+          "positionComplaints": "Complaints",
+          "positionComplaintsDesc": "Complaint management staff",
+          "positionInventory": "Inventory",
+          "positionInventoryDesc": "Inventory management staff",
+          "positionGeneralManager": "General Manager",
+          "positionGeneralManagerDesc": "Oversees all staff panel operations",
+          "employeeCodePlaceholder": "e.g., EMP-2024-001",
+          "shiftTimingPlaceholder": "e.g., Morning (8AM-2PM)",
+          "highestQualPlaceholder": "e.g., Masters in Islamic Studies",
+          "specializationPlaceholder": "e.g., Quran, Hadith, Fiqh",
+          "accountEmailPlaceholder": "employee@madrasa.edu",
+          "accountPasswordPlaceholder": "At least 6 characters",
+          "selectDepartment": "Select Department",
+          "selectDesignation": "Select Designation",
+          "roleAdmin": "Admin",
+          "roleTeacher": "Teacher",
+          "roleStaff": "Staff"
+        },
+        "fieldemployeeCode": "Employee Code",
+        "fieldsecondaryPhone": "Secondary Phone",
+        "fieldpermanentAddress": "Permanent Address",
+        "fieldemergencyContactRelation": "Relationship",
+        "fieldshiftTiming": "Shift Timing",
+        "fieldhighestQualification": "Highest Qualification",
+        "fieldspecialization": "Specialization / Subject",
+        "fieldpreviousExperience": "Previous Experience (Years)",
+        "fieldaccountTitle": "Account Title",
+        "fieldmaritalStatus": "Marital Status",
+        "fieldbloodGroup": "Blood Group",
+        "optionmaritalSingle": "Single",
+        "optionmaritalMarried": "Married",
+        "optionmaritalDivorced": "Divorced",
+        "optionmaritalWidowed": "Widowed"
+      },
+      "leaveTypes": {
+        "title": "Leave Types",
+        "subtitle": "Manage leave policies and configurations",
+        "colleaveCode": "Code",
+        "colleaveTypeName": "Leave Type",
+        "colmaxDaysAllowed": "Max Days",
+        "colisPaid": "Payment",
+        "colcarryForward": "Carry Forward",
+        "colstatus": "Status",
+        "fieldleaveTypeName": "Leave Type Name",
+        "fieldleaveCode": "Leave Code",
+        "fieldmaxDaysAllowed": "Max Days Allowed",
+        "fieldgenderSpecific": "Gender Specific",
+        "fieldpaidLeave": "Paid Leave",
+        "fieldcarryForward": "Carry Forward",
+        "fieldmedicalCertificateRequired": "Medical Certificate Required",
+        "fieldstatus": "Status",
+        "fielddescription": "Description",
+        "optiongenderSpecificBoth": "Both",
+        "optiongenderSpecificMaleOnly": "Male Only",
+        "optiongenderSpecificFemaleOnly": "Female Only",
+        "optionpaidLeaveYes": "Yes",
+        "optionpaidLeaveNo": "No",
+        "optioncarryForwardYes": "Yes",
+        "optioncarryForwardNo": "No",
+        "optionstatusActive": "Active",
+        "optionstatusInactive": "Inactive",
+        "createTitle": "Create Leave Type",
+        "editTitle": "Edit Leave Type",
+        "viewTitle": "Leave Type Details",
+        "searchPlaceholder": "Search leave types..."
+      },
+      "payroll": {
+        "title": "HR Payroll",
+        "subtitle": "Manage salary payments and payroll records",
+        "colEmployee": "Employee",
+        "colMonth": "Month",
+        "colGrossSalary": "Gross Salary",
+        "colDeductions": "Deductions",
+        "colNetSalary": "Net Salary",
+        "colMethod": "Method",
+        "colStatus": "Status",
+        "amountDisbursed": "Amount Disbursed",
+        "paidThisMonth": "Paid This Month",
+        "pendingPayments": "Pending Payments",
+        "failedPayments": "Failed Payments",
+        "nextPayrollDate": "Next Payroll Date",
+        "noPendingPayroll": "No pending payroll",
+        "paymentMethodChart": "Payment Method Distribution",
+        "paymentStatusBreakdown": "Payment Status Breakdown",
+        "monthlyPayroll": "Monthly Payroll",
+        "payrollHistory": "Payroll History",
+        "searchPlaceholder": "Search salary payments...",
+        "loadingTitle": "Payroll",
+        "loadingSubtitle": "Employee salary payment records, disbursement totals, and payment status monitoring.",
+        "months": [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December"
+        ]
+      },
+      "reports": {
+        "title": "HR Reports",
+        "subtitle": "Attendance, leave, payroll and employee summary",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "loadingReports": "Loading reports...",
+        "employeeOverview": "Employee Overview",
+        "totalEmployees": "Total Employees",
+        "active": "Active",
+        "inactive": "Inactive",
+        "departments": "Departments",
+        "leaveSummary": "Leave Summary",
+        "totalRequests": "Total Requests",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "leaveStatusDistribution": "Leave Status Distribution",
+        "payrollOverview": "Payroll Overview",
+        "netPaid": "Net Paid",
+        "deductions": "Deductions",
+        "hrMetrics": "HR Metrics",
+        "employees": "Employees",
+        "attendance": "Attendance",
+        "leaveRequests": "Leave Requests",
+        "payments": "Payments",
+        "attendanceSummary": "Attendance Summary",
+        "employee": "Employee",
+        "code": "Code",
+        "present": "Present",
+        "absent": "Absent",
+        "late": "Late",
+        "halfDay": "Half Day",
+        "onLeave": "On Leave",
+        "noAttendanceData": "No attendance data for this period",
+        "payrollSummary": "Payroll Summary",
+        "employeesPaid": "Employees Paid",
+        "totalGross": "Total Gross",
+        "totalDeductions": "Total Deductions",
+        "totalNetPaid": "Total Net Paid"
       }
     },
     "departments": "Departments",
@@ -4705,7 +6482,13 @@
       "enterReason": "Enter reason for leave",
       "updateRequest": "Update Request",
       "submitRequest": "Submit Request",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "searchPlaceholder": "Search by employee, leave type, status...",
+      "totalEntries": "total entries",
+      "rejectionReason": "Rejection Reason",
+      "enterRejectionReason": "Enter reason for rejection...",
+      "confirmReject": "Confirm Reject",
+      "deleteConfirm": "Delete this leave request?"
     },
     "profile": {
       "label": "Profile",
@@ -4746,13 +6529,23 @@
       "details": "Details",
       "review": "Review",
       "stepN": "Step {{n}}",
+      "stepOf": "Step {{current}} of {{total}}",
       "onlyNumbers": "Only numbers are allowed",
       "fieldRequired": "This field is required",
       "failedToLoad": "Failed to load data",
       "recordNotFound": "Record not found",
       "loadError": "Error loading data",
       "saveFailed": "Failed to save changes",
-      "preview": "Preview"
+      "preview": "Preview",
+      "correctFields": "Please correct the highlighted fields.",
+      "saveError": "Save error",
+      "editFlow": "Edit Flow",
+      "createFlow": "Create Flow",
+      "flowSubtitle": "A phased entry flow keeps create and edit tasks easier to complete without overwhelming the form.",
+      "nextStep": "Next Step",
+      "saveRecord": "Save Record",
+      "formError": "Form Error",
+      "imageSize": "Image size must be less than 5MB"
     },
     "list": {
       "unknownError": "An unknown error occurred",
@@ -4761,7 +6554,26 @@
       "typeToFilter": "Type to filter...",
       "deletingRecord": "Deleting record...",
       "report": "Report",
-      "searchPlaceholder": "Search..."
+      "searchPlaceholder": "Search...",
+      "rowNum": "#",
+      "actions": "Actions",
+      "unableToLoad": "Unable to Load Data",
+      "noRecords": "No records found",
+      "noMatch": "No matching records",
+      "tryChanging": "Try changing your search or filter criteria.",
+      "loadingData": "Loading data...",
+      "addNew": "Add New",
+      "export": "Export",
+      "exportPdf": "Export PDF",
+      "exportCsv": "Export CSV",
+      "searchAndFilter": "Search & Filter",
+      "filterBy": "Filter By",
+      "recordsTable": "Records Table",
+      "confirmDelete": "Are you sure you want to delete this record?",
+      "quickControls": "Quick controls for finding records faster.",
+      "allColumns": "All Columns",
+      "filterValue": "Filter Value",
+      "tableDescription": "Unified filtering, sorting, pagination, and row actions."
     },
     "recordView": {
       "dash": "-",

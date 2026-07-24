@@ -38,7 +38,7 @@ const toneStyles = {
   },
   slate: {
     card: 'from-slate-50 to-white border-slate-200',
-    icon: 'bg-slate-100 text-slate-600',
+    icon: 'bg-transparent text-slate-600',
     value: 'text-slate-950',
     helper: 'text-slate-600'
   }
@@ -99,7 +99,7 @@ const StaffAnalyticsContent = ({ stats = [], charts = [], insight }) => {
         >
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className={`text-xs font-bold uppercase tracking-[0.2em] ${isDark ? 'text-cyan-300' : 'text-cyan-700'}`}>{insight.eyebrow || t('staff.analytics.snapshot')}</p>
+              <p className={`text-xs font-bold uppercase tracking-[0.2em] ${isDark ? 'text-cyan-300' : 'text-cyan-700'}`}>{insight.eyebrow || t('analytics.snapshot')}</p>
               <h3 className={`mt-2 text-xl font-black tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{insight.title}</h3>
               {insight.description ? <p className={`mt-2 max-w-3xl text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{insight.description}</p> : null}
             </div>
@@ -121,7 +121,7 @@ const StaffAnalyticsContent = ({ stats = [], charts = [], insight }) => {
                 nameKey={chart.nameKey || 'name'}
                 emptyText={chart.emptyText}
                 height={chart.height || 320}
-                className={`rounded-[28px] shadow-none ${isDark ? 'border-slate-700 bg-slate-900/70' : 'border-slate-200 bg-white'}`}
+                className={`rounded-[28px] shadow-none ${isDark ? 'border-slate-700 bg-slate-900/70' : 'border-slate-200 bg-transparent'}`}
               />
             );
           })}
@@ -143,15 +143,20 @@ export const fetchCollectionData = async (endpoint, options = {}) => {
   return Array.isArray(records) ? records : [];
 };
 
+const getIntlLocale = () => {
+  const lang = typeof window !== 'undefined' ? localStorage.getItem('adminLang') || 'en' : 'en';
+  return lang === 'ps' ? 'en' : lang;
+};
+
 export const formatCurrency = (value) =>
-  new Intl.NumberFormat('en-US', {
+  new Intl.NumberFormat(getIntlLocale(), {
     style: 'currency',
     currency: 'USD',
     maximumFractionDigits: 0
   }).format(Number(value || 0));
 
 export const formatCompactNumber = (value) =>
-  new Intl.NumberFormat('en-US', {
+  new Intl.NumberFormat(getIntlLocale(), {
     notation: 'compact',
     maximumFractionDigits: 1
   }).format(Number(value || 0));
@@ -173,7 +178,7 @@ export const groupAmountByMonth = (items, dateKey, amountKey) => {
     .sort(([a], [b]) => a.localeCompare(b))
     .slice(-6)
     .map(([, value]) => ({
-      name: value.date.toLocaleString('en-US', { month: 'short' }),
+      name: value.date.toLocaleString(getIntlLocale(), { month: 'short' }),
       value: Math.round(value.total)
     }));
 };

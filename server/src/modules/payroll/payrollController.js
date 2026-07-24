@@ -123,7 +123,7 @@ exports.listEmployees = async (req, res) => {
 };
 
 // Employee types for dynamic dropdown
-const EMPLOYEE_TYPES = ['teacher','admin','finance','registrar','hr','librarian','kitchen','security','support','maintenance'];
+const EMPLOYEE_TYPES = ['teacher','admin','finance','registrar','hr','librarian','kitchen','security','support','maintenance','payroll','complaints','inventory','general-manager'];
 exports.listEmployeeTypes = (req, res) => {
-  res.json({ success: true, data: EMPLOYEE_TYPES.map((t) => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) })) });
+  res.json({ success: true, data: EMPLOYEE_TYPES.map((t) => ({ value: t, label: t.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') })) });
 };

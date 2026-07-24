@@ -33,12 +33,20 @@ const useECharts = (containerRef, options, onClick) => {
       chart.on('click', onClick);
     }
 
-    // Handle resize
+    // Handle resize via ResizeObserver (detects container size changes)
     const handleResize = () => chart.resize();
     window.addEventListener('resize', handleResize);
+    let resizeObserver;
+    try {
+      resizeObserver = new ResizeObserver(() => chart.resize());
+      resizeObserver.observe(containerRef.current);
+    } catch (e) {
+      // ResizeObserver not supported — fall back to window resize only
+    }
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      if (resizeObserver) resizeObserver.disconnect();
       chart.dispose();
     };
   }, [containerRef, options, onClick]);
@@ -66,7 +74,7 @@ const ChartContainer = ({
   className = ''
 }) => {
   return (
-    <div className={`w-full bg-white/40 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl shadow-md border border-white/60 dark:border-slate-700 p-6 ${className}`}>
+    <div className={`w-full rounded-2xl shadow-md border border-white/60 dark:border-slate-700 p-6 ${className}`}>
       {title && (
         <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100 mb-4">{title}</h3>
       )}

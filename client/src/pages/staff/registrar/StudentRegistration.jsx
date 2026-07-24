@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import StaffPageLayout from '../shared/StaffPageLayout';
 import Card from '../../../components/UIHelper/Card';
@@ -9,6 +10,7 @@ import { apiFetch, parseJsonSafe } from '../../../lib/apiFetch';
 
 const StudentRegistration = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['staff', 'common']);
   const [currentPhase, setCurrentPhase] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -59,7 +61,7 @@ const StudentRegistration = () => {
     if (file) {
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('Image size must be less than 5MB');
+        alert(t('registrar.studentRegistration.imageSizeError'));
         return;
       }
       
@@ -151,19 +153,19 @@ const StudentRegistration = () => {
   
   const validatePhase1 = () => {
     if (!studentData.firstName || !studentData.fatherName || !studentData.phone) {
-      setError('Please fill in all required fields: First Name, Father Name, and Phone');
+      setError(t('registrar.studentRegistration.validationRequiredFields'));
       return false;
     }
     if (!studentData.email?.trim()) {
-      setError('Student account email is required');
+      setError(t('registrar.studentRegistration.validationEmailRequired'));
       return false;
     }
     if (!studentData.accountPassword) {
-      setError('Student account password is required');
+      setError(t('registrar.studentRegistration.validationPasswordRequired'));
       return false;
     }
     if (studentData.accountPassword.length < 6) {
-      setError('Student account password must be at least 6 characters');
+      setError(t('registrar.studentRegistration.validationPasswordLength'));
       return false;
     }
     return true;
@@ -201,7 +203,7 @@ const StudentRegistration = () => {
       const studentResult = await parseJsonSafe(studentRes);
       
       if (!studentRes.ok) {
-        throw new Error(studentResult.message || 'Failed to create student');
+        throw new Error(studentResult.message || t('registrar.studentRegistration.createStudentFailed'));
       }
       
       const studentId = studentResult.data._id;
@@ -225,7 +227,7 @@ const StudentRegistration = () => {
         
         if (!allocationRes.ok) {
           const allocResult = await parseJsonSafe(allocationRes);
-          throw new Error(allocResult.message || 'Student created but hostel allocation failed');
+          throw new Error(allocResult.message || t('registrar.studentRegistration.hostelAllocationFailed'));
         }
       }
       
@@ -243,14 +245,14 @@ const StudentRegistration = () => {
   
   if (success) {
     return (
-      <StaffPageLayout eyebrow="Registrar" title="Student Registration Complete">
-        <Card className="p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <StaffPageLayout eyebrow={t('registrar.studentRegistration.eyebrow')} title={t('registrar.studentRegistration.completeTitle')}>
+        <Card className="p-3 sm:p-4 lg:p-8 text-center">
+          <div className="w-16 h-16 bg-transparent rounded-full flex items-center justify-center mx-auto mb-4">
             <FiCheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Registration Successful!</h2>
-          <p className="text-gray-600">The student has been registered successfully.</p>
-          <p className="text-gray-500 text-sm mt-2">Redirecting to students list...</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('registrar.studentRegistration.registrationSuccessful')}</h2>
+          <p className="text-gray-600">{t('registrar.studentRegistration.registrationSuccessMessage')}</p>
+          <p className="text-gray-500 text-sm mt-2">{t('registrar.studentRegistration.redirectingMessage')}</p>
         </Card>
       </StaffPageLayout>
     );
@@ -258,21 +260,21 @@ const StudentRegistration = () => {
   
   return (
     <StaffPageLayout 
-      eyebrow="Registrar / Student Affairs" 
-      title="Student Registration"
-      subtitle="Two-phase registration: Student Information + Optional Hostel Assignment"
+      eyebrow={t('registrar.studentRegistration.pageEyebrow')} 
+      title={t('registrar.studentRegistration.title')}
+      subtitle={t('registrar.studentRegistration.pageSubtitle')}
     >
       {/* Progress Steps */}
-      <div className="mb-6">
+      <div className="mb-6 overflow-x-auto">
         <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${currentPhase === 1 ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${currentPhase === 1 ? 'bg-cyan-100 text-cyan-700' : 'bg-transparent text-gray-600'}`}>
             <FiUser />
-            <span className="font-medium">Phase 1: Student Info</span>
+            <span className="font-medium">{t('registrar.studentRegistration.phase1')}</span>
           </div>
           <FiChevronRight className="text-gray-400" />
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${currentPhase === 2 ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${currentPhase === 2 ? 'bg-cyan-100 text-cyan-700' : 'bg-transparent text-gray-600'}`}>
             <FiHome />
-            <span className="font-medium">Phase 2: Hostel (Optional)</span>
+            <span className="font-medium">{t('registrar.studentRegistration.phase2')}</span>
           </div>
         </div>
       </div>
@@ -285,24 +287,24 @@ const StudentRegistration = () => {
       
       {currentPhase === 1 ? (
         <Card className="rounded-[28px] border border-slate-200">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Student Information</h3>
+          <div className="p-3 sm:p-4 lg:p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('registrar.studentRegistration.studentInfo')}</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Basic Info */}
               <div className="md:col-span-2">
-                <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">Basic Information</h4>
+                <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">{t('registrar.studentRegistration.basicInfo')}</h4>
               </div>
               
               {/* Profile Image */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Profile Photo</label>
-                <div className="flex items-center gap-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.profilePhoto')}</label>
+                <div className="flex items-center gap-6 flex-col sm:flex-row">
                   <div className="flex-shrink-0">
                     {imagePreview ? (
-                      <img src={imagePreview} alt="Preview" className="h-24 w-24 rounded-full object-cover border-4 border-cyan-200 shadow" />
+                      <img src={imagePreview} alt={t('registrar.studentRegistration.previewAlt')} className="h-24 w-24 rounded-full object-cover border-4 border-cyan-200 shadow" />
                     ) : (
-                      <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-3xl">
+                      <div className="h-24 w-24 rounded-full bg-transparent border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-3xl">
                         👤
                       </div>
                     )}
@@ -314,24 +316,24 @@ const StudentRegistration = () => {
                       onChange={handleImageChange}
                       className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:bg-cyan-50 file:text-cyan-700 file:font-medium file:text-sm"
                     />
-                    <p className="text-xs text-gray-500 mt-1">JPG, PNG or GIF. Max 5MB recommended.</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('registrar.studentRegistration.profilePhotoHint')}</p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Student Code *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.studentCode')}</label>
                 <input
                   type="text"
                   value={studentData.studentCode}
                   onChange={(e) => handleStudentChange('studentCode', e.target.value)}
-                  placeholder="e.g., STU-2024-001"
+                  placeholder={t('registrar.studentRegistration.studentCodePlaceholder')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.firstName')}</label>
                 <input
                   type="text"
                   value={studentData.firstName}
@@ -342,7 +344,7 @@ const StudentRegistration = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.lastName')}</label>
                 <input
                   type="text"
                   value={studentData.lastName}
@@ -352,7 +354,7 @@ const StudentRegistration = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Father Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.fatherName')}</label>
                 <input
                   type="text"
                   value={studentData.fatherName}
@@ -363,7 +365,7 @@ const StudentRegistration = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Grandfather Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.grandfatherName')}</label>
                 <input
                   type="text"
                   value={studentData.grandfatherName}
@@ -373,34 +375,34 @@ const StudentRegistration = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.dateOfBirth')}</label>
                 <CalendarDatePicker
                   value={studentData.dob}
                   onChange={(date) => handleStudentChange('dob', date)}
-                  placeholder="Select date"
+                  placeholder={t('registrar.studentRegistration.dateOfBirthPlaceholder')}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.gender')}</label>
                 <select
                   value={studentData.gender}
                   onChange={(e) => handleStudentChange('gender', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="male">{t('registrar.studentRegistration.male')}</option>
+                  <option value="female">{t('registrar.studentRegistration.female')}</option>
                 </select>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Blood Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.bloodType')}</label>
                 <select
                   value={studentData.bloodType}
                   onChange={(e) => handleStudentChange('bloodType', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 >
-                  <option value="">Select</option>
+                  <option value="">{t('registrar.studentRegistration.bloodTypeSelect')}</option>
                   <option value="A+">A+</option>
                   <option value="A-">A-</option>
                   <option value="B+">B+</option>
@@ -414,11 +416,11 @@ const StudentRegistration = () => {
               
               {/* Contact Info */}
               <div className="md:col-span-2 mt-4">
-                <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">Contact Information</h4>
+                <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">{t('registrar.studentRegistration.contactInfo')}</h4>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.phone')}</label>
                 <input
                   type="tel"
                   value={studentData.phone}
@@ -429,7 +431,7 @@ const StudentRegistration = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.whatsapp')}</label>
                 <input
                   type="tel"
                   value={studentData.whatsapp}
@@ -439,46 +441,46 @@ const StudentRegistration = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.email')}</label>
                 <input
                   type="email"
                   value={studentData.email}
                   onChange={(e) => handleStudentChange('email', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   required
-                  placeholder="student@example.com"
+                  placeholder={t('registrar.studentRegistration.emailPlaceholder')}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.password')}</label>
                 <input
                   type="password"
                   value={studentData.accountPassword}
                   onChange={(e) => handleStudentChange('accountPassword', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   required
-                  placeholder="At least 6 characters"
+                  placeholder={t('registrar.studentRegistration.passwordPlaceholder')}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Login Role</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.loginRole')}</label>
                 <input
                   type="text"
-                  value="Student"
+                  value={t('registrar.studentRegistration.studentRoleValue')}
                   readOnly
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl bg-slate-50 text-slate-500 focus:outline-none"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl bg-transparent text-slate-500 focus:outline-none"
                 />
               </div>
               
               {/* Guardian Info */}
               <div className="md:col-span-2 mt-4">
-                <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">Guardian Information</h4>
+                <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">{t('registrar.studentRegistration.guardianInfo')}</h4>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Guardian Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.guardianName')}</label>
                 <input
                   type="text"
                   value={studentData.guardianName}
@@ -489,19 +491,19 @@ const StudentRegistration = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Relationship *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.relationship')}</label>
                 <input
                   type="text"
                   value={studentData.guardianRelationship}
                   onChange={(e) => handleStudentChange('guardianRelationship', e.target.value)}
-                  placeholder="e.g., Father, Mother, Uncle"
+                  placeholder={t('registrar.studentRegistration.relationshipPlaceholder')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Guardian Phone</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.guardianPhone')}</label>
                 <input
                   type="tel"
                   value={studentData.guardianPhone}
@@ -511,7 +513,7 @@ const StudentRegistration = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Guardian Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.guardianEmail')}</label>
                 <input
                   type="email"
                   value={studentData.guardianEmail}
@@ -522,25 +524,25 @@ const StudentRegistration = () => {
               
               {/* Academic Info */}
               <div className="md:col-span-2 mt-4">
-                <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">Academic Information</h4>
+                <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">{t('registrar.studentRegistration.academicInfo')}</h4>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Admission Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.admissionDate')}</label>
                 <CalendarDatePicker
                   value={studentData.admissionDate}
                   onChange={(date) => handleStudentChange('admissionDate', date)}
-                  placeholder="Select date"
+                  placeholder={t('registrar.studentRegistration.admissionDatePlaceholder')}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Current Level</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.currentLevel')}</label>
                 <input
                   type="text"
                   value={studentData.currentLevel}
                   onChange={(e) => handleStudentChange('currentLevel', e.target.value)}
-                  placeholder="e.g., Level 1, Beginner"
+                  placeholder={t('registrar.studentRegistration.currentLevelPlaceholder')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
@@ -548,7 +550,7 @@ const StudentRegistration = () => {
             
             <div className="mt-6 flex justify-end">
               <Button variant="primary" onClick={handleNext} className="flex items-center gap-2">
-                Next: Hostel Assignment
+                {t('registrar.studentRegistration.nextPhase')}
                 <FiChevronRight />
               </Button>
             </div>
@@ -556,18 +558,18 @@ const StudentRegistration = () => {
         </Card>
       ) : (
         <Card className="rounded-[28px] border border-slate-200">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Hostel Assignment (Optional)</h3>
+          <div className="p-3 sm:p-4 lg:p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('registrar.studentRegistration.hostelAssignment')}</h3>
             
             <div className="mb-6">
-              <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
+              <label className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-transparent">
                 <input
                   type="checkbox"
                   checked={hostelData.wantsHostel}
                   onChange={(e) => handleHostelChange('wantsHostel', e.target.checked)}
                   className="w-5 h-5 text-cyan-600"
                 />
-                <span className="font-medium text-gray-700">Student wants hostel accommodation</span>
+                <span className="font-medium text-gray-700">{t('registrar.studentRegistration.hostelCheckbox')}</span>
               </label>
             </div>
             
@@ -575,27 +577,27 @@ const StudentRegistration = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Room *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.selectRoom')}</label>
                     <select
                       value={hostelData.room}
                       onChange={(e) => handleHostelChange('room', e.target.value)}
                       className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
                       required={hostelData.wantsHostel}
                     >
-                      <option value="">Select a room</option>
+                      <option value="">{t('registrar.studentRegistration.selectRoomPlaceholder')}</option>
                       {availableRooms.map(room => (
                         <option key={room._id} value={room._id}>
-                          {room.roomNumber} - {room.building} (Floor {room.floor}) - {room.roomType} - ${room.monthlyRent}/month
+                          {t('registrar.studentRegistration.roomOption', { roomNumber: room.roomNumber, building: room.building, floor: room.floor, roomType: room.roomType, rent: room.monthlyRent })}
                         </option>
                       ))}
                     </select>
                     {availableRooms.length === 0 && (
-                      <p className="text-sm text-red-500 mt-1">No available rooms found</p>
+                      <p className="text-sm text-red-500 mt-1">{t('registrar.studentRegistration.noRooms')}</p>
                     )}
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Bed Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.bedNumber')}</label>
                     <input
                       type="number"
                       min="1"
@@ -606,16 +608,16 @@ const StudentRegistration = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Check-in Date *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.checkinDate')}</label>
                     <CalendarDatePicker
                       value={hostelData.checkInDate}
                       onChange={(date) => handleHostelChange('checkInDate', date)}
-                      placeholder="Select date"
+                      placeholder={t('registrar.studentRegistration.checkinDatePlaceholder')}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.monthlyRent')}</label>
                     <input
                       type="number"
                       value={hostelData.monthlyRent}
@@ -625,7 +627,7 @@ const StudentRegistration = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Security Deposit ($)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.securityDeposit')}</label>
                     <input
                       type="number"
                       value={hostelData.securityDeposit}
@@ -636,10 +638,10 @@ const StudentRegistration = () => {
                 </div>
                 
                 <div className="mt-4">
-                  <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">Hostel Emergency Contact</h4>
+                  <h4 className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wider">{t('registrar.studentRegistration.hostelEmergencyContact')}</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.emergencyName')}</label>
                       <input
                         type="text"
                         value={hostelData.emergencyContact.name}
@@ -650,7 +652,7 @@ const StudentRegistration = () => {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Relationship *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.emergencyRelationship')}</label>
                       <input
                         type="text"
                         value={hostelData.emergencyContact.relationship}
@@ -661,7 +663,7 @@ const StudentRegistration = () => {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.emergencyPhone')}</label>
                       <input
                         type="tel"
                         value={hostelData.emergencyContact.phone}
@@ -672,7 +674,7 @@ const StudentRegistration = () => {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('registrar.studentRegistration.emergencyEmail')}</label>
                       <input
                         type="email"
                         value={hostelData.emergencyContact.email}
@@ -688,7 +690,7 @@ const StudentRegistration = () => {
             <div className="mt-6 flex justify-between">
               <Button variant="secondary" onClick={handleBack} className="flex items-center gap-2">
                 <FiChevronLeft />
-                Back
+                {t('common:back')}
               </Button>
               <Button 
                 variant="primary" 
@@ -696,7 +698,7 @@ const StudentRegistration = () => {
                 disabled={loading}
                 className="flex items-center gap-2"
               >
-                {loading ? 'Registering...' : 'Complete Registration'}
+                {loading ? t('registrar.studentRegistration.registering') : t('registrar.studentRegistration.completeRegistration')}
                 {!loading && <FiCheckCircle />}
               </Button>
             </div>

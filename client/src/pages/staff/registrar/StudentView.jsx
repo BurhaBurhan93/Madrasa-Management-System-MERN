@@ -23,12 +23,12 @@ const StudentView = () => {
 
   const viewFields = studentProfilesConfig.formFields.map(field => ({
     name: field.name,
-    label: t(`staff.registrar.studentProfiles.fields.${field.name}`),
+    label: t(`registrar.studentProfiles.fields.${field.name}`),
     renderView: field.name === 'image'
       ? (value, item) => {
           const imgSrc = value || item?.user?.image;
           return imgSrc
-            ? <img src={imgSrc} alt={t('staff.registrar.studentProfiles.view.profileAlt')} className="h-24 w-24 rounded-lg object-cover border border-slate-200" />
+            ? <img src={imgSrc} alt={t('registrar.studentProfiles.view.profileAlt')} className="h-24 w-24 rounded-lg object-cover border border-slate-200" />
             : '-';
         }
       : undefined
@@ -36,7 +36,7 @@ const StudentView = () => {
 
   return (
     <RecordViewPage
-      title={t('staff.registrar.studentProfiles.view.title')}
+      title={t('registrar.studentProfiles.view.title')}
       endpoint={studentProfilesConfig.endpoint}
       id={id}
       fields={viewFields}

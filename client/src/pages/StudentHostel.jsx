@@ -97,7 +97,7 @@ const StudentHostel = () => {
   const handleApplySubmit = async (e) => {
     e.preventDefault();
     if (!applyData.reason.trim()) {
-      setApplyStatus({ loading: false, success: false, error: t('student.hostel.reasonRequired') });
+      setApplyStatus({ loading: false, success: false, error: t('hostel.reasonRequired') });
       return;
     }
     setApplyStatus({ loading: true, success: false, error: '' });
@@ -131,11 +131,11 @@ const StudentHostel = () => {
       });
       const data = await parseJsonSafe(res);
       if (!res.ok) throw new Error(data.message);
-      alert(t('student.hostel.maintenanceSubmitted'));
+      alert(t('hostel.maintenanceSubmitted'));
       setIsReportModalOpen(false);
       setReportData({ issueType: 'plumbing', description: '', priority: 'medium' });
     } catch (error) {
-      alert(t('student.hostel.maintenanceFailed'));
+      alert(t('hostel.maintenanceFailed'));
     }
   };
 
@@ -149,7 +149,7 @@ const StudentHostel = () => {
     );
   }
 
-  const isResident = hostelData && hostelData.isResident;
+  const isResident = hostelData && (hostelData.isResident || (hostelData.room && hostelData.allocation));
   const { room, allocation } = hostelData || {};
 
   // Helper function to render both modals
@@ -161,19 +161,19 @@ const StudentHostel = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-8">
               <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
-              <FiHome className="text-cyan-600" /> {t('student.hostel.applyForHostel')}
+              <FiHome className="text-cyan-600" /> {t('hostel.applyForHostel')}
             </h2>
 
             {applyStatus.success && (
               <div className="mb-6 p-4 bg-emerald-50 text-emerald-800 rounded-2xl border border-emerald-200">
-                <p className="font-bold">{t('student.hostel.applicationSubmittedSuccessfully')}</p>
-                <p className="text-sm mt-1">{t('student.hostel.applicationReviewSoon')}</p>
+                <p className="font-bold">{t('hostel.applicationSubmittedSuccessfully')}</p>
+                <p className="text-sm mt-1">{t('hostel.applicationReviewSoon')}</p>
               </div>
             )}
 
             {existingApplication && (
               <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-2xl border border-blue-200">
-                <p className="font-bold">{t('student.hostel.existingHostelApplication')}</p>
+                <p className="font-bold">{t('hostel.existingHostelApplication')}</p>
               </div>
             )}
 
@@ -185,27 +185,27 @@ const StudentHostel = () => {
 
             <form onSubmit={handleApplySubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('student.hostel.reasonForApplying')}</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('hostel.reasonForApplying')}</label>
                 <textarea
                   required
                   value={applyData.reason}
                   onChange={e => setApplyData(p => ({...p, reason: e.target.value}))}
                   className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder={t('student.hostel.reasonPlaceholder')}
+                  placeholder={t('hostel.reasonPlaceholder')}
                   rows={3}
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('student.hostel.roomPreference')}</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('hostel.roomPreference')}</label>
                 <input
                   value={applyData.roomPreference}
                   onChange={e => setApplyData(p => ({...p, roomPreference: e.target.value}))}
                   className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder={t('student.hostel.roomPreferencePlaceholder')}
+                  placeholder={t('hostel.roomPreferencePlaceholder')}
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('student.hostel.preferredMoveInDate')}</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('hostel.preferredMoveInDate')}</label>
                 <input
                   type="date"
                   value={applyData.moveInDate}
@@ -214,12 +214,12 @@ const StudentHostel = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('student.hostel.additionalNotes')}</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('hostel.additionalNotes')}</label>
                 <textarea
                   value={applyData.notes}
                   onChange={e => setApplyData(p => ({...p, notes: e.target.value}))}
                   className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder={t('student.hostel.additionalNotesPlaceholder')}
+                  placeholder={t('hostel.additionalNotesPlaceholder')}
                   rows={2}
                 />
               </div>
@@ -230,7 +230,7 @@ const StudentHostel = () => {
                     setIsApplyModalOpen(false);
                     setApplyStatus({ loading: false, success: false, error: '' });
                   }}
-                  className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50"
+                  className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-transparent"
                 >
                   {t('cancel', { ns: 'common' })}
                 </button>
@@ -239,7 +239,7 @@ const StudentHostel = () => {
                   disabled={applyStatus.loading}
                   className="flex-1 py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 disabled:opacity-50"
                 >
-                  {applyStatus.loading ? t('student.hostel.submitting') : t('student.hostel.submitApplication')}
+                  {applyStatus.loading ? t('hostel.submitting') : t('hostel.submitApplication')}
                 </button>
               </div>
             </form>
@@ -251,45 +251,45 @@ const StudentHostel = () => {
       <Modal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
-        title={t('student.hostel.reportMaintenanceIssue')}
+        title={t('hostel.reportMaintenanceIssue')}
       >
         <form onSubmit={handleReportSubmit} className="space-y-6">
           <div className="space-y-4">
             <Select
-              label={t('student.hostel.issueCategory')}
+              label={t('hostel.issueCategory')}
               options={[
-                { value: 'plumbing', label: t('student.hostel.issuePlumbing') },
-                { value: 'electrical', label: t('student.hostel.issueElectrical') },
-                { value: 'furniture', label: t('student.hostel.issueFurniture') },
-                { value: 'cleaning', label: t('student.hostel.issueCleaning') },
-                { value: 'internet', label: t('student.hostel.issueInternet') },
-                { value: 'other', label: t('student.hostel.issueOther') }
+                { value: 'plumbing', label: t('hostel.issuePlumbing') },
+                { value: 'electrical', label: t('hostel.issueElectrical') },
+                { value: 'furniture', label: t('hostel.issueFurniture') },
+                { value: 'cleaning', label: t('hostel.issueCleaning') },
+                { value: 'internet', label: t('hostel.issueInternet') },
+                { value: 'other', label: t('hostel.issueOther') }
               ]}
               value={reportData.issueType}
               onChange={(e) => setReportData({...reportData, issueType: e.target.value})}
             />
             
             <Select
-              label={t('student.hostel.priorityLevel')}
+              label={t('hostel.priorityLevel')}
               options={[
-                { value: 'low', label: t('student.hostel.priorityLow') },
-                { value: 'medium', label: t('student.hostel.priorityMedium') },
-                { value: 'high', label: t('student.hostel.priorityHigh') },
-                { value: 'emergency', label: t('student.hostel.priorityEmergency') }
+                { value: 'low', label: t('hostel.priorityLow') },
+                { value: 'medium', label: t('hostel.priorityMedium') },
+                { value: 'high', label: t('hostel.priorityHigh') },
+                { value: 'emergency', label: t('hostel.priorityEmergency') }
               ]}
               value={reportData.priority}
               onChange={(e) => setReportData({...reportData, priority: e.target.value})}
             />
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 ml-1">{t('student.hostel.describeIssue')}</label>
+              <label className="text-sm font-bold text-slate-700 ml-1">{t('hostel.describeIssue')}</label>
               <textarea
                 required
                 rows="4"
                 value={reportData.description}
                 onChange={(e) => setReportData({...reportData, description: e.target.value})}
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 focus:ring-2 focus:ring-cyan-500 outline-none transition-all resize-none font-medium"
-                placeholder={t('student.hostel.issueDescriptionPlaceholder')}
+                className="w-full bg-transparent border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 focus:ring-2 focus:ring-cyan-500 outline-none transition-all resize-none font-medium"
+                placeholder={t('hostel.issueDescriptionPlaceholder')}
               ></textarea>
             </div>
           </div>
@@ -308,7 +308,7 @@ const StudentHostel = () => {
               variant="primary" 
               className="flex-1 rounded-2xl py-4 font-black bg-cyan-600 hover:bg-cyan-700 shadow-lg shadow-cyan-100"
             >
-              {t('student.hostel.submitRequest')}
+              {t('hostel.submitRequest')}
             </Button>
           </div>
         </form>
@@ -322,13 +322,13 @@ const StudentHostel = () => {
     <>
       {!isResident ? (
         <div className="max-w-4xl mx-auto py-12">
-          <Card className="text-center py-16 border-dashed border-2 border-slate-200 bg-slate-50/50">
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100">
+          <Card className="text-center py-16 border-dashed border-2 border-slate-200 bg-transparent">
+            <div className="w-24 h-24 bg-transparent rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm ring-8 ring-slate-100">
               <FiHome className="w-12 h-12 text-slate-300" />
             </div>
-            <h2 className="text-3xl font-black text-slate-900 mb-4">{t('student.hostel.noActiveHostelResidency')}</h2>
+            <h2 className="text-3xl font-black text-slate-900 mb-4">{t('hostel.noActiveHostelResidency')}</h2>
             <p className="text-slate-500 mb-8 max-w-md mx-auto text-lg leading-relaxed">
-              {t('student.hostel.noHostelResidencyDescription')}
+              {t('hostel.noHostelResidencyDescription')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
@@ -336,19 +336,19 @@ const StudentHostel = () => {
                 className="px-8 py-3 rounded-2xl font-bold"
                 onClick={() => setIsApplyModalOpen(true)}
               >
-                {t('student.hostel.applyForHostel')}
+                {t('hostel.applyForHostel')}
               </Button>
               <Button 
                 variant="outline" 
                 className="px-8 py-3 rounded-2xl font-bold"
                 onClick={() => navigate('/student/communications')}
               >
-                {t('student.hostel.contactStudentAffairs')}
+                {t('hostel.contactStudentAffairs')}
               </Button>
             </div>
             <div className="mt-12 flex items-center justify-center gap-2 text-slate-400">
               <FiInfo className="w-5 h-5" />
-              <span className="text-sm font-medium">{t('student.hostel.hostelHelpHint')}</span>
+              <span className="text-sm font-medium">{t('hostel.hostelHelpHint')}</span>
             </div>
           </Card>
         </div>
@@ -357,24 +357,24 @@ const StudentHostel = () => {
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('hostel', { ns: 'student' })}</p>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('student.hostel.hostelManagement')}</h1>
-              <p className="text-slate-500 mt-1 font-medium italic">{t('student.hostel.welcomeHome')} {hostelData?.student?.firstName || 'Student'}</p>
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('hostel.label')}</p>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('hostel.hostelManagement')}</h1>
+              <p className="text-slate-500 mt-1 font-medium italic">{t('hostel.welcomeHome')} {hostelData?.student?.firstName || 'Student'}</p>
             </div>
             <div className="flex gap-3">
               <Button 
                 variant="outline" 
-                className="rounded-2xl border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-2"
+                className="rounded-2xl border-slate-200 hover:bg-transparent flex items-center gap-2"
                 onClick={() => setIsReportModalOpen(true)}
               >
-                <FiTool className="w-4 h-4" /> {t('student.hostel.reportIssue')}
+                <FiTool className="w-4 h-4" /> {t('hostel.reportIssue')}
               </Button>
               <Button
                 variant="primary"
                 className="rounded-2xl bg-cyan-600 hover:bg-cyan-700 shadow-lg shadow-cyan-200/50 flex items-center gap-2"
                 onClick={() => window.print()}
               >
-                <FiFileText className="w-4 h-4" /> {t('student.hostel.hostelPass')}
+                <FiFileText className="w-4 h-4" /> {t('hostel.hostelPass')}
               </Button>
             </div>
           </div>
@@ -386,11 +386,11 @@ const StudentHostel = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <Badge className="bg-white/20 text-white border-none backdrop-blur-md mb-4 px-4 py-1.5 font-black uppercase tracking-widest text-[10px]">
-                      {t('student.hostel.currentAllocation')}
+                      {t('hostel.currentAllocation')}
                     </Badge>
-                    <h2 className="text-5xl font-black tracking-tight mb-2">{t('student.hostel.room', {number: room?.roomNumber || t('common.na')})}</h2>
+                    <h2 className="text-5xl font-black tracking-tight mb-2">{t('hostel.room', {number: room?.roomNumber || t('common:na')})}</h2>
                     <p className="text-cyan-50 font-medium text-lg flex items-center gap-2">
-                      <FiMapPin className="w-5 h-5" /> {t('student.hostel.buildingFloor', {building: room?.building || t('student.hostel.mainBuilding'), floor: room?.floor || '0'})}
+                      <FiMapPin className="w-5 h-5" /> {t('hostel.buildingFloor', {building: room?.building || t('hostel.mainBuilding'), floor: room?.floor || '0'})}
                     </p>
                   </div>
                   <div className="w-20 h-20 bg-white/10 rounded-[24px] backdrop-blur-xl flex items-center justify-center text-4xl shadow-inner border border-white/20">
@@ -400,15 +400,15 @@ const StudentHostel = () => {
                 
                 <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-8">
                   <div>
-                  <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">{t('student.hostel.bedNumber')}</p>
+                  <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">{t('hostel.bedNumber')}</p>
                     <p className="text-2xl font-black">{allocation?.bedNumber || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">{t('student.hostel.roomType')}</p>
-                    <p className="text-2xl font-black capitalize">{room?.roomType || t('student.hostel.standard')}</p>
+                    <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">{t('hostel.roomType')}</p>
+                    <p className="text-2xl font-black capitalize">{room?.roomType || t('hostel.standard')}</p>
                   </div>
                   <div className="hidden md:block">
-                    <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">{t('student.hostel.checkIn')}</p>
+                    <p className="text-cyan-200 text-xs font-bold uppercase tracking-widest mb-1">{t('hostel.checkIn')}</p>
                     <p className="text-2xl font-black">{allocation?.checkInDate ? new Date(allocation.checkInDate).toLocaleDateString() : '-'}</p>
                   </div>
                 </div>
@@ -422,17 +422,17 @@ const StudentHostel = () => {
             <Card className="rounded-[32px] p-8 border-none bg-white shadow-xl shadow-slate-200/50 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-black text-slate-900">{t('student.hostel.paymentStatus')}</h3>
-                  <Badge variant="success" className="px-3 py-1 font-bold">{t('student.hostel.paid')}</Badge>
+                  <h3 className="text-xl font-black text-slate-900">{t('hostel.paymentStatus')}</h3>
+                  <Badge variant="success" className="px-3 py-1 font-bold">{t('hostel.paid')}</Badge>
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">{t('student.hostel.monthlyRent')}</span>
-                    <span className="text-xl font-black text-slate-900">{t('common.currency')}{allocation?.monthlyRent || t('common.na')}</span>
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">{t('hostel.monthlyRent')}</span>
+                    <span className="text-xl font-black text-slate-900">{t('common:currency')}{allocation?.monthlyRent || t('common:na')}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">{t('student.hostel.securityDeposit')}</span>
-                    <span className="text-xl font-black text-slate-900">{t('common.currency')}{allocation?.securityDeposit || t('common.na')}</span>
+                    <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">{t('hostel.securityDeposit')}</span>
+                    <span className="text-xl font-black text-slate-900">{t('common:currency')}{allocation?.securityDeposit || t('common:na')}</span>
                   </div>
                 </div>
               </div>
@@ -451,9 +451,9 @@ const StudentHostel = () => {
           {/* Tabs Navigation */}
           <div className="flex p-1.5 bg-white rounded-3xl shadow-sm border border-slate-200 max-w-md mx-auto">
             {[
-              { id: 'room', label: t('student.hostel.tabDetails'), icon: <FiInfo /> },
-              { id: 'meals', label: t('student.hostel.tabDining'), icon: <FiCoffee /> },
-              { id: 'info', label: t('student.hostel.tabRules'), icon: <FiShield /> },
+              { id: 'room', label: t('hostel.tabDetails'), icon: <FiInfo /> },
+              { id: 'meals', label: t('hostel.tabDining'), icon: <FiCoffee /> },
+              { id: 'info', label: t('hostel.tabRules'), icon: <FiShield /> },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -474,21 +474,21 @@ const StudentHostel = () => {
           <div className="mt-8 min-h-[400px]">
             {activeTab === 'room' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-bottom-4 duration-500">
-                <Card title={t('student.hostel.roomAmenities')} className="rounded-[32px] p-8">
+                <Card title={t('hostel.roomAmenities')} className="rounded-[32px] p-8">
                   <div className="grid grid-cols-2 gap-4">
                     {room?.amenities?.length > 0 ? (
                       room.amenities.map((amenity, i) => (
-                        <div key={i} className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-cyan-200 hover:bg-cyan-50 transition-all">
-                          <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-cyan-600 shadow-sm">
+                        <div key={i} className="flex items-center gap-3 p-4 bg-transparent rounded-2xl border border-slate-100 group hover:border-cyan-200 hover:bg-cyan-50 transition-all">
+                          <div className="w-8 h-8 rounded-xl bg-transparent flex items-center justify-center text-cyan-600 shadow-sm">
                             <FiCheckCircle className="w-4 h-4" />
                           </div>
                           <span className="text-sm font-bold text-slate-700 capitalize">{amenity}</span>
                         </div>
                       ))
                     ) : (
-                      [t('student.hostel.amenityWifi'), t('student.hostel.amenityStudyTable'), t('student.hostel.amenityAc'), t('student.hostel.amenityPrivateBathroom'), t('student.hostel.amenityStorageLocker'), t('student.hostel.amenityBedLinen')].map((item, i) => (
-                        <div key={i} className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                          <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-slate-300 shadow-sm">
+                      [t('hostel.amenityWifi'), t('hostel.amenityStudyTable'), t('hostel.amenityAc'), t('hostel.amenityPrivateBathroom'), t('hostel.amenityStorageLocker'), t('hostel.amenityBedLinen')].map((item, i) => (
+                        <div key={i} className="flex items-center gap-3 p-4 bg-transparent rounded-2xl border border-slate-100">
+                          <div className="w-8 h-8 rounded-xl bg-transparent flex items-center justify-center text-slate-300 shadow-sm">
                             <FiCheckCircle className="w-4 h-4" />
                           </div>
                           <span className="text-sm font-bold text-slate-500">{item}</span>
@@ -498,11 +498,11 @@ const StudentHostel = () => {
                   </div>
                 </Card>
 
-                <Card title={t('student.hostel.emergencyContacts')} className="rounded-[32px] p-8">
+                <Card title={t('hostel.emergencyContacts')} className="rounded-[32px] p-8">
                   {allocation?.emergencyContact ? (
                     <div className="space-y-4">
                       <div className="p-6 bg-slate-900 rounded-[24px] text-white">
-                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">{t('student.hostel.primaryContact')}</p>
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">{t('hostel.primaryContact')}</p>
                         <p className="text-xl font-black">{allocation.emergencyContact.name}</p>
                         <p className="text-cyan-400 font-medium text-sm mt-1">{allocation.emergencyContact.relationship}</p>
                         <div className="mt-6 flex items-center gap-3">
@@ -521,14 +521,14 @@ const StudentHostel = () => {
                             <FiAlertTriangle />
                           </div>
                           <div>
-                            <h4 className="text-rose-900 font-black">{t('student.hostel.missingInfo')}</h4>
-                            <p className="text-rose-600 text-sm font-medium mt-1">{t('student.hostel.missingInfoDesc')}</p>
+                            <h4 className="text-rose-900 font-black">{t('hostel.missingInfo')}</h4>
+                            <p className="text-rose-600 text-sm font-medium mt-1">{t('hostel.missingInfoDesc')}</p>
                             <Button
                               variant="danger"
                               className="mt-4 px-6 py-2 rounded-xl text-xs font-black"
                               onClick={() => setIsReportModalOpen(true)}
                             >
-                              {t('student.hostel.updateNow')}
+                              {t('hostel.updateNow')}
                             </Button>
                           </div>
                         </div>
@@ -552,7 +552,7 @@ const StudentHostel = () => {
                         <div className="flex justify-between items-start mb-6">
                           <div className="text-4xl">{icons[mealType]}</div>
                           <div className="text-right">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('student.hostel.servingTime')}</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('hostel.servingTime')}</p>
                             <p className="text-sm font-black text-slate-900">{times[mealType]}</p>
                           </div>
                         </div>
@@ -560,18 +560,18 @@ const StudentHostel = () => {
                         {meal ? (
                           <div className="space-y-3">
                             <div className="p-3 bg-cyan-50 rounded-2xl border border-cyan-100">
-                              <p className="text-xs font-bold text-cyan-600 uppercase tracking-widest mb-1">{t('student.hostel.mainDish')}</p>
+                              <p className="text-xs font-bold text-cyan-600 uppercase tracking-widest mb-1">{t('hostel.mainDish')}</p>
                               <p className="text-slate-800 font-bold">{meal.menu.mainDish}</p>
                             </div>
-                            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{t('student.hostel.side')}</p>
+                            <div className="p-3 bg-transparent rounded-2xl border border-slate-100">
+                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{t('hostel.side')}</p>
                               <p className="text-slate-600 font-medium text-sm">{meal.menu.sideDish}</p>
                             </div>
                           </div>
                         ) : (
-                          <div className="p-8 bg-slate-50 rounded-[24px] border-dashed border-2 border-slate-200 flex flex-col items-center justify-center text-center">
+                          <div className="p-8 bg-transparent rounded-[24px] border-dashed border-2 border-slate-200 flex flex-col items-center justify-center text-center">
                             <FiClock className="w-8 h-8 text-slate-300 mb-2" />
-                            <p className="text-slate-400 font-bold text-xs">{t('student.hostel.menuPending')}</p>
+                            <p className="text-slate-400 font-bold text-xs">{t('hostel.menuPending')}</p>
                           </div>
                         )}
                       </Card>
@@ -579,15 +579,15 @@ const StudentHostel = () => {
                   })}
                 </div>
 
-                <Card title={t('student.hostel.weeklyMealSchedule')} className="rounded-[32px] p-8 overflow-hidden">
+                <Card title={t('hostel.weeklyMealSchedule')} className="rounded-[32px] p-8 overflow-hidden">
                   <div className="overflow-x-auto -mx-8">
                     <table className="w-full text-left">
-                      <thead className="bg-slate-50">
+                      <thead className="bg-transparent">
                         <tr>
-                          <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{t('student.hostel.day')}</th>
-                          <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{t('student.hostel.breakfast')}</th>
-                          <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{t('student.hostel.lunch')}</th>
-                          <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{t('student.hostel.dinner')}</th>
+                          <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{t('hostel.day')}</th>
+                          <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{t('hostel.breakfast')}</th>
+                          <th className="hidden md:table-cell px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{t('hostel.lunch')}</th>
+                          <th className="hidden md:table-cell px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{t('hostel.dinner')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
@@ -597,7 +597,7 @@ const StudentHostel = () => {
                           const dayMeals = meals.filter(m => new Date(m.date).toDateString() === date.toDateString());
                           
                           return (
-                            <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                            <tr key={i} className="hover:bg-transparent transition-colors">
                               <td className="px-8 py-5">
                                 <p className="font-black text-slate-900">{date.toLocaleDateString('en-US', { weekday: 'long' })}</p>
                                 <p className="text-xs text-slate-400 font-bold">{date.toLocaleDateString()}</p>
@@ -605,10 +605,10 @@ const StudentHostel = () => {
                               <td className="px-8 py-5 text-sm font-medium text-slate-600">
                                 {dayMeals.find(m => m.mealType === 'breakfast')?.menu.mainDish || <span className="text-slate-300">-</span>}
                               </td>
-                              <td className="px-8 py-5 text-sm font-medium text-slate-600">
+                              <td className="hidden md:table-cell px-8 py-5 text-sm font-medium text-slate-600">
                                 {dayMeals.find(m => m.mealType === 'lunch')?.menu.mainDish || <span className="text-slate-300">-</span>}
                               </td>
-                              <td className="px-8 py-5 text-sm font-medium text-slate-600">
+                              <td className="hidden md:table-cell px-8 py-5 text-sm font-medium text-slate-600">
                                 {dayMeals.find(m => m.mealType === 'dinner')?.menu.mainDish || <span className="text-slate-300">-</span>}
                               </td>
                             </tr>
@@ -624,23 +624,23 @@ const StudentHostel = () => {
             {activeTab === 'info' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-bottom-4 duration-500">
                 {/* Hostel Occupancy Chart */}
-                <Card title={t('student.hostel.roomOccupancy')} className="rounded-[32px] p-8">
+                <Card title={t('hostel.roomOccupancy')} className="rounded-[32px] p-8">
                   <PieChartComponent 
                     data={[
-                      { name: t('student.hostel.occupied'), value: 85, color: '#10B981' },
-                      { name: t('student.hostel.available'), value: 15, color: '#3B82F6' }
+                      { name: t('hostel.occupied'), value: 85, color: '#10B981' },
+                      { name: t('hostel.available'), value: 15, color: '#3B82F6' }
                     ]}
                     height={250}
                   />
                 </Card>
 
-                <Card title={t('student.hostel.maintenanceRequests')} className="rounded-[32px] p-8">
+                <Card title={t('hostel.maintenanceRequests')} className="rounded-[32px] p-8">
                   <BarChartComponent 
                     data={[
-                      { name: t('student.hostel.issuePlumbing'), value: 12 },
-                      { name: t('student.hostel.issueElectrical'), value: 8 },
-                      { name: t('student.hostel.issueFurniture'), value: 15 },
-                      { name: t('student.hostel.issueCleaning'), value: 20 }
+                      { name: t('hostel.issuePlumbing'), value: 12 },
+                      { name: t('hostel.issueElectrical'), value: 8 },
+                      { name: t('hostel.issueFurniture'), value: 15 },
+                      { name: t('hostel.issueCleaning'), value: 20 }
                     ]}
                     dataKey="value"
                     nameKey="name"
@@ -648,14 +648,14 @@ const StudentHostel = () => {
                   />
                 </Card>
 
-                <Card title={t('student.hostel.hostelGuidelines')} className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20 md:col-span-2">
+                <Card title={t('hostel.hostelGuidelines')} className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20 md:col-span-2">
                   <div className="space-y-4">
                     {[
-                      { icon: <FiClock />, text: t('student.hostel.guidelineQuietHours') },
-                      { icon: <FiUsers />, text: t('student.hostel.guidelineVisitors') },
-                      { icon: <FiTool />, text: t('student.hostel.guidelineModification') },
-                      { icon: <FiShield />, text: t('student.hostel.guidelineLock') },
-                      { icon: <FiAlertTriangle />, text: t('student.hostel.guidelineCooking') },
+                      { icon: <FiClock />, text: t('hostel.guidelineQuietHours') },
+                      { icon: <FiUsers />, text: t('hostel.guidelineVisitors') },
+                      { icon: <FiTool />, text: t('hostel.guidelineModification') },
+                      { icon: <FiShield />, text: t('hostel.guidelineLock') },
+                      { icon: <FiAlertTriangle />, text: t('hostel.guidelineCooking') },
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
                         <div className="text-cyan-400 text-xl">{item.icon}</div>
@@ -667,19 +667,19 @@ const StudentHostel = () => {
 
                 <div className="space-y-6">
                   <Card className="rounded-[32px] p-8 border-none bg-white shadow-xl shadow-slate-200/50">
-                    <h3 className="text-xl font-black text-slate-900 mb-6">{t('student.hostel.staffDirectory')}</h3>
+                    <h3 className="text-xl font-black text-slate-900 mb-6">{t('hostel.staffDirectory')}</h3>
                     <div className="space-y-4">
                       {[
-                        { role: t('student.hostel.staffWarden'), name: t('student.hostel.staffWardenName'), contact: t('student.hostel.staffWardenContact'), color: 'cyan' },
-                        { role: t('student.hostel.staffSecurity'), name: t('student.hostel.staffSecurityName'), contact: t('student.hostel.staffSecurityContact'), color: 'rose' },
-                        { role: t('student.hostel.staffDining'), name: t('student.hostel.staffDiningName'), contact: t('student.hostel.staffDiningContact'), color: 'amber' }
+                        { role: t('hostel.staffWarden'), name: t('hostel.staffWardenName'), contact: t('hostel.staffWardenContact'), color: 'cyan' },
+                        { role: t('hostel.staffSecurity'), name: t('hostel.staffSecurityName'), contact: t('hostel.staffSecurityContact'), color: 'rose' },
+                        { role: t('hostel.staffDining'), name: t('hostel.staffDiningName'), contact: t('hostel.staffDiningContact'), color: 'amber' }
                       ].map((staff, i) => (
-                        <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div key={i} className="flex items-center justify-between p-4 bg-transparent rounded-2xl border border-slate-100">
                           <div>
                             <p className={`text-[10px] font-bold text-${staff.color}-600 uppercase tracking-widest mb-1`}>{staff.role}</p>
                             <p className="font-black text-slate-900">{staff.name}</p>
                           </div>
-                          <Button variant="outline" className="h-10 w-10 p-0 rounded-xl border-slate-200 bg-white">
+                          <Button variant="outline" className="h-10 w-10 p-0 rounded-xl border-slate-200">
                             <FiPhone className="w-4 h-4" />
                           </Button>
                         </div>
@@ -689,14 +689,14 @@ const StudentHostel = () => {
 
                   <div className="p-8 bg-gradient-to-r from-amber-500 to-orange-600 rounded-[32px] text-white shadow-xl shadow-amber-200/50 flex items-center justify-between">
                     <div>
-                      <h4 className="text-xl font-black">{t('student.hostel.helpCenter')}</h4>
-                      <p className="text-amber-100 font-medium text-sm mt-1">{t('student.hostel.helpCenterDesc')}</p>
+                      <h4 className="text-xl font-black">{t('hostel.helpCenter')}</h4>
+                      <p className="text-amber-100 font-medium text-sm mt-1">{t('hostel.helpCenterDesc')}</p>
                     </div>
                     <Button 
-                      className="bg-white text-orange-600 rounded-2xl font-black px-6 py-3 hover:bg-amber-50 shadow-lg"
+                      className="bg-transparent text-orange-600 rounded-2xl font-black px-6 py-3 hover:bg-amber-50 shadow-lg"
                       onClick={() => setIsReportModalOpen(true)}
                     >
-                      {t('student.hostel.reportNow')}
+                      {t('hostel.reportNow')}
                     </Button>
                   </div>
                 </div>

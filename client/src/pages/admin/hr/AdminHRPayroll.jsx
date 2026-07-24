@@ -7,7 +7,7 @@ import CalendarDatePicker from '../../../components/UIHelper/CalendarDatePicker'
 
 const LIMIT = 10;
 
-const EMPLOYEE_TYPES = ['teacher','admin','finance','registrar','hr','librarian','kitchen','security','support','maintenance'];
+const EMPLOYEE_TYPES = ['teacher','admin','finance','registrar','hr','librarian','kitchen','security','support','maintenance','payroll','complaints','inventory','general-manager'];
 
 const HRPayroll = () => {
   const { t } = useTranslation('admin');

@@ -49,12 +49,12 @@ const StudentLeave = () => {
   });
 
   const leaveTypes = [
-    { value: 'sick', label: t('student.leave.sickLeave') },
-    { value: 'family', label: t('student.leave.familyEmergency') },
-    { value: 'personal', label: t('student.leave.personal') },
-    { value: 'religious', label: t('student.leave.religiousObservance') },
-    { value: 'academic', label: t('student.leave.academicEvent') },
-    { value: 'other', label: t('student.leave.otherLeave') }
+    { value: 'sick', label: t('leave.sickLeave') },
+    { value: 'family', label: t('leave.familyEmergency') },
+    { value: 'personal', label: t('leave.personal') },
+    { value: 'religious', label: t('leave.religiousObservance') },
+    { value: 'academic', label: t('leave.academicEvent') },
+    { value: 'other', label: t('leave.otherLeave') }
   ];
 
   useEffect(() => {
@@ -88,7 +88,7 @@ const StudentLeave = () => {
       });
     } catch (err) {
       console.error('Error fetching leave data:', err);
-      setError(t('student.leave.failedToFetchLeaveRecords'));
+      setError(t('leave.failedToFetchLeaveRecords'));
       setLeaveHistory([]); // Set empty array on error
     } finally {
       setLoading(false);
@@ -111,10 +111,10 @@ const StudentLeave = () => {
       await fetchLeaveData();
       setIsModalOpen(false);
       setFormData({ leaveType: '', startDate: '', endDate: '', reason: '' });
-      alert(t('student.leave.leaveRequestSubmitted'));
+      alert(t('leave.leaveRequestSubmitted'));
     } catch (err) {
       console.error('Error creating leave:', err);
-      alert(t('student.leave.errorSubmittingLeaveWithMsg', { message: err.response?.data?.message || err.message }));
+      alert(t('leave.errorSubmittingLeaveWithMsg', { message: err.response?.data?.message || err.message }));
     } finally {
       setLoading(false);
     }
@@ -143,26 +143,26 @@ const StudentLeave = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('attendance', { ns: 'student' })}</p>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('leave', { ns: 'student' })}</h1>
-          <p className="text-slate-500 mt-1 font-medium italic">{t('student.leave.subtitle')}</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('attendance.label', { ns: 'student' })}</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('leave.label', { ns: 'student' })}</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">{t('leave.subtitle')}</p>
         </div>
         <Button 
           variant="primary" 
           className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2"
           onClick={() => setIsModalOpen(true)}
         >
-          <FiPlus /> {t('student.leave.newLeaveRequest')}
+          <FiPlus /> {t('leave.newLeaveRequest')}
         </Button>
       </div>
 
       {/* Stats Summary Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: t('student.leave.totalRequests'), value: stats.totalRequests, icon: <FiFileText />, color: 'blue' },
+          { label: t('leave.totalRequests'), value: stats.totalRequests, icon: <FiFileText />, color: 'blue' },
           { label: t('approved', { ns: 'common' }), value: stats.approved, icon: <FiCheckCircle />, color: 'emerald' },
           { label: t('pending', { ns: 'common' }), value: stats.pending, icon: <FiClock />, color: 'amber' },
-          { label: t('student.leave.totalDays'), value: stats.totalDays, icon: <FiCalendar />, color: 'cyan' }
+          { label: t('leave.totalDays'), value: stats.totalDays, icon: <FiCalendar />, color: 'cyan' }
         ].map((stat, i) => (
           <div key={i} className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50">
             <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
@@ -177,13 +177,13 @@ const StudentLeave = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Leave History List */}
         <div className="lg:col-span-2">
-          <Card title={t('student.leave.requestHistory')} className="rounded-[32px] p-8">
+          <Card title={t('leave.requestHistory')} className="rounded-[32px] p-8">
             <div className="space-y-4">
               {leaveHistory.length > 0 ? (
                 leaveHistory.map((leave, i) => (
-                  <div key={i} className="flex flex-col md:flex-row md:items-center justify-between p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:border-cyan-200 transition-colors group">
+                  <div key={i} className="flex flex-col md:flex-row md:items-center justify-between p-6 rounded-2xl bg-transparent border border-slate-100 hover:border-cyan-200 transition-colors group">
                     <div className="flex items-center gap-6 mb-4 md:mb-0">
-                      <div className={`w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl ${
+                      <div className={`w-14 h-14 rounded-2xl bg-transparent shadow-sm flex items-center justify-center text-2xl ${
                         leave.approvalStatus === 'approved' ? 'text-emerald-500' : 
                         leave.approvalStatus === 'rejected' ? 'text-rose-500' : 'text-amber-500'
                       }`}>
@@ -213,7 +213,7 @@ const StudentLeave = () => {
               ) : (
                 <div className="text-center py-20">
                   <FiFileText className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('student.leave.noLeaveRequestsFound')}</p>
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('leave.noLeaveRequestsFound')}</p>
                 </div>
               )}
             </div>
@@ -222,13 +222,13 @@ const StudentLeave = () => {
 
         {/* Sidebar Info */}
         <div className="space-y-8">
-          <Card title={t('student.leave.leavePolicy')} className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20">
+          <Card title={t('leave.leavePolicy')} className="rounded-[32px] p-8 bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20">
             <div className="space-y-4">
               {[
-                { icon: <FiInfo />, text: t('student.leave.policyRule1') },
-                { icon: <FiActivity />, text: t('student.leave.policyRule2') },
-                { icon: <FiCheckCircle />, text: t('student.leave.policyRule3') },
-                { icon: <FiAlertCircle />, text: t('student.leave.policyRule4') }
+                { icon: <FiInfo />, text: t('leave.policyRule1') },
+                { icon: <FiActivity />, text: t('leave.policyRule2') },
+                { icon: <FiCheckCircle />, text: t('leave.policyRule3') },
+                { icon: <FiAlertCircle />, text: t('leave.policyRule4') }
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
                   <div className="text-cyan-400 text-lg mt-0.5">{item.icon}</div>
@@ -240,14 +240,14 @@ const StudentLeave = () => {
 
           <div className="p-8 bg-gradient-to-br from-cyan-600 to-blue-700 rounded-[32px] text-white shadow-xl shadow-cyan-200/50 relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="text-xl font-black mb-2">{t('student.leave.needHelp')}</h4>
-              <p className="text-cyan-100 text-sm font-medium mb-6">{t('student.leave.contactStudentAffairs')}</p>
+              <h4 className="text-xl font-black mb-2">{t('leave.needHelp')}</h4>
+              <p className="text-cyan-100 text-sm font-medium mb-6">{t('leave.contactStudentAffairs')}</p>
               <Button
                 variant="outline"
                 className="w-full rounded-2xl py-4 border-white/20 bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-widest transition-all"
                 onClick={() => navigate('/student/communications')}
               >
-                {t('student.leave.contactOffice')}
+                {t('leave.contactOffice')}
               </Button>
             </div>
             <FiClock className="absolute -right-6 -bottom-6 w-32 h-32 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />
@@ -259,34 +259,34 @@ const StudentLeave = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={t('student.leave.applyForLeave')}
+        title={t('leave.applyForLeave')}
       >
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <Select
-              label={t('student.leave.leaveType')}
+              label={t('leave.leaveType')}
               name="leaveType"
               value={formData.leaveType}
               onChange={handleInputChange}
-              options={[{ value: '', label: t('student.leave.selectLeaveType') }, ...leaveTypes]}
+              options={[{ value: '', label: t('leave.selectLeaveType') }, ...leaveTypes]}
               required
             />
             
             <div className="grid grid-cols-2 gap-4">
-              <CalendarDatePicker value={formData.startDate} name="startDate" onChange={handleInputChange} placeholder={t('student.leave.selectDate')} />
-              <CalendarDatePicker value={formData.endDate} name="endDate" onChange={handleInputChange} placeholder={t('student.leave.selectDate')} />
+              <CalendarDatePicker value={formData.startDate} name="startDate" onChange={handleInputChange} placeholder={t('leave.selectDate')} />
+              <CalendarDatePicker value={formData.endDate} name="endDate" onChange={handleInputChange} placeholder={t('leave.selectDate')} />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 ml-1">{t('student.leave.reasonForLeave')}</label>
+              <label className="text-sm font-bold text-slate-700 ml-1">{t('leave.reasonForLeave')}</label>
               <textarea
                 name="reason"
                 required
                 rows="4"
                 value={formData.reason}
                 onChange={handleInputChange}
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 focus:ring-2 focus:ring-cyan-500 outline-none transition-all resize-none font-medium"
-                placeholder={t('student.leave.reasonPlaceholder')}
+                className="w-full bg-transparent border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 focus:ring-2 focus:ring-cyan-500 outline-none transition-all resize-none font-medium"
+                placeholder={t('leave.reasonPlaceholder')}
               ></textarea>
             </div>
           </div>
@@ -306,7 +306,7 @@ const StudentLeave = () => {
               className="flex-1 rounded-2xl py-4 font-black bg-slate-900 hover:bg-slate-800 shadow-lg shadow-slate-200"
               disabled={loading}
             >
-              {loading ? t('student.leave.submitting') : t('student.leave.submitRequest')}
+              {loading ? t('leave.submitting') : t('leave.submitRequest')}
             </Button>
           </div>
         </form>

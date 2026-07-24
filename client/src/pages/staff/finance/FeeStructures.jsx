@@ -6,29 +6,29 @@ import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupCountB
 import { staffApi } from '../../../api/staffApi';
 
 export const feeStructuresConfig = {
-  title: 'Fee Structure',
-  subtitle: 'Manage fee categories, frequencies, and active pricing structure.',
+  title: 'finance.feeStructures.title',
+  subtitle: 'finance.feeStructures.subtitle',
   endpoint: staffApi.finance.feeStructures,
   columns: [
-    { key: 'feeCode', header: 'Fee Code' },
-    { key: 'feeName', header: 'Fee Name' },
-    { key: 'feeType', header: 'Fee Type' },
-    { key: 'amount', header: 'Amount' },
-    { key: 'frequency', header: 'Frequency' },
-    { key: 'isMandatory', header: 'Mandatory' },
-    { key: 'status', header: 'Status' }
+    { key: 'feeCode', header: 'finance.feeStructures.column.feeCode' },
+    { key: 'feeName', header: 'finance.feeStructures.column.feeName' },
+    { key: 'feeType', header: 'finance.feeStructures.column.feeType' },
+    { key: 'amount', header: 'finance.feeStructures.column.amount' },
+    { key: 'frequency', header: 'finance.feeStructures.column.frequency' },
+    { key: 'isMandatory', header: 'finance.feeStructures.column.isMandatory' },
+    { key: 'status', header: 'finance.feeStructures.column.status' }
   ],
   formFields: [
-    { name: 'feeCode', label: 'Fee Code' },
-    { name: 'feeName', label: 'Fee Name' },
-    { name: 'class', label: 'Class', type: 'relation', relationEndpoint: '/academic/classes', relationLabel: (r) => `${r.name} - ${r.section || ''}` },
-    { name: 'feeType', label: 'Fee Type', type: 'select', options: [{ value: 'tuition', label: 'Tuition' }, { value: 'admission', label: 'Admission' }, { value: 'other', label: 'Other' }] },
-    { name: 'amount', label: 'Amount', type: 'number' },
-    { name: 'frequency', label: 'Frequency', type: 'select', options: [{ value: 'one-time', label: 'One-Time' }, { value: 'monthly', label: 'Monthly' }, { value: 'yearly', label: 'Yearly' }] },
-    { name: 'applicableFrom', label: 'Applicable From', type: 'date' },
-    { name: 'applicableTo', label: 'Applicable To', type: 'date' },
-    { name: 'isMandatory', label: 'Mandatory', type: 'select', options: [{ value: true, label: 'Yes' }, { value: false, label: 'No' }] },
-    { name: 'status', label: 'Status', type: 'select', options: [{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }] }
+    { name: 'feeCode', label: 'finance.feeStructures.formField.feeCode' },
+    { name: 'feeName', label: 'finance.feeStructures.formField.feeName' },
+    { name: 'class', label: 'finance.feeStructures.formField.class', type: 'relation', relationEndpoint: '/academic/classes', relationLabel: (r) => `${r.name} - ${r.section || ''}` },
+    { name: 'feeType', label: 'finance.feeStructures.formField.feeType', type: 'select', options: [{ value: 'tuition', label: 'finance.feeStructures.formField.feeType.tuition' }, { value: 'admission', label: 'finance.feeStructures.formField.feeType.admission' }, { value: 'other', label: 'finance.feeStructures.formField.feeType.other' }] },
+    { name: 'amount', label: 'finance.feeStructures.formField.amount', type: 'number' },
+    { name: 'frequency', label: 'finance.feeStructures.formField.frequency', type: 'select', options: [{ value: 'one-time', label: 'finance.feeStructures.formField.frequency.one-time' }, { value: 'monthly', label: 'finance.feeStructures.formField.frequency.monthly' }, { value: 'yearly', label: 'finance.feeStructures.formField.frequency.yearly' }] },
+    { name: 'applicableFrom', label: 'finance.feeStructures.formField.applicableFrom', type: 'date' },
+    { name: 'applicableTo', label: 'finance.feeStructures.formField.applicableTo', type: 'date' },
+    { name: 'isMandatory', label: 'finance.feeStructures.formField.isMandatory', type: 'select', options: [{ value: true, label: 'finance.feeStructures.formField.isMandatory.yes' }, { value: false, label: 'finance.feeStructures.formField.isMandatory.no' }] },
+    { name: 'status', label: 'finance.feeStructures.formField.status', type: 'select', options: [{ value: 'active', label: 'finance.feeStructures.formField.status.active' }, { value: 'inactive', label: 'finance.feeStructures.formField.status.inactive' }] }
   ],
   initialForm: {
     feeCode: '',
@@ -64,25 +64,25 @@ const FeeStructures = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: t('staff.finance.feeStructures.statTotalStructures'), value: structures.length, helper: t('staff.finance.feeStructures.statTotalStructuresHelper'), tone: 'blue', icon: FiLayers },
-            { label: t('staff.finance.feeStructures.statActiveStructures'), value: activeCount, helper: t('staff.finance.feeStructures.statActiveStructuresHelper'), tone: 'emerald', icon: FiCheckSquare },
-            { label: t('staff.finance.feeStructures.statAverageFee'), value: formatCurrency(averageAmount), helper: t('staff.finance.feeStructures.statAverageFeeHelper'), tone: 'violet', icon: FiPercent },
-            { label: t('staff.finance.feeStructures.statMandatoryFees'), value: mandatoryCount, helper: t('staff.finance.feeStructures.statMandatoryFeesHelper'), tone: 'amber', icon: FiTag },
-            { label: t('staff.finance.feeStructures.statFeeTypes'), value: groupCountByKey(structures, 'feeType').length, helper: t('staff.finance.feeStructures.statFeeTypesHelper'), tone: 'rose', icon: FiBarChart2 }
+            { label: t('finance.feeStructures.statTotalStructures'), value: structures.length, helper: t('finance.feeStructures.statTotalStructuresHelper'), tone: 'blue', icon: FiLayers },
+            { label: t('finance.feeStructures.statActiveStructures'), value: activeCount, helper: t('finance.feeStructures.statActiveStructuresHelper'), tone: 'emerald', icon: FiCheckSquare },
+            { label: t('finance.feeStructures.statAverageFee'), value: formatCurrency(averageAmount), helper: t('finance.feeStructures.statAverageFeeHelper'), tone: 'violet', icon: FiPercent },
+            { label: t('finance.feeStructures.statMandatoryFees'), value: mandatoryCount, helper: t('finance.feeStructures.statMandatoryFeesHelper'), tone: 'amber', icon: FiTag },
+            { label: t('finance.feeStructures.statFeeTypes'), value: groupCountByKey(structures, 'feeType').length, helper: t('finance.feeStructures.statFeeTypesHelper'), tone: 'rose', icon: FiBarChart2 }
           ],
           charts: [
-            { title: t('staff.finance.feeStructures.chartFeeTypeDistribution'), type: 'pie', data: groupCountByKey(structures, 'feeType') },
-            { title: t('staff.finance.feeStructures.chartFrequencyBreakdown'), type: 'bar', data: groupCountByKey(structures, 'frequency') }
+            { title: t('finance.feeStructures.chart.feeTypeDistribution'), type: 'pie', data: groupCountByKey(structures, 'feeType') },
+            { title: t('finance.feeStructures.chart.frequencyBreakdown'), type: 'bar', data: groupCountByKey(structures, 'frequency') }
           ],
           insight: {
-            eyebrow: t('staff.finance.feeStructures.insightEyebrow'),
-            title: t('staff.finance.feeStructures.insightTitle'),
-            description: t('staff.finance.feeStructures.insightDescription')
+            eyebrow: t('finance.feeStructures.insight.eyebrow'),
+            title: t('finance.feeStructures.insight.title'),
+            description: t('finance.feeStructures.insight.description')
           }
         });
       } catch (error) {
         if (!active) return;
-        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('staff.finance.feeStructures.errorTitle'), description: error.message || t('staff.finance.feeStructures.errorDescription') } });
+        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('finance.feeStructures.errorTitle'), description: error.message || t('finance.feeStructures.errorDescription') } });
       }
     };
     load();
@@ -93,7 +93,7 @@ const FeeStructures = () => {
 
   return (
     <ListPage
-      eyebrow={t('staff.finance.eyebrow')}
+      eyebrow={t('finance.eyebrow')}
       title={feeStructuresConfig.title}
       subtitle={feeStructuresConfig.subtitle}
       endpoint={feeStructuresConfig.endpoint}
@@ -101,7 +101,7 @@ const FeeStructures = () => {
       createPath="/staff/finance/fee-structures/create"
       editPathForRow={(row) => `/staff/finance/fee-structures/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/fee-structures/view/${row._id}`}
-      searchPlaceholder={t('staff.finance.feeStructures.searchPlaceholder')}
+      searchPlaceholder={t('finance.feeStructures.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

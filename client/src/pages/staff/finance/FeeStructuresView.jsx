@@ -7,7 +7,8 @@ import { feeStructuresConfig } from './FeeStructures';
 const FeeStructuresView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.finance.feeStructures.details', { title: feeStructuresConfig.title })} subtitle={feeStructuresConfig.subtitle} endpoint={feeStructuresConfig.endpoint} id={id} fields={feeStructuresConfig.formFields} listPath="/staff/finance/fee-structures" editPath={'/staff/finance/fee-structures/edit/' + id} />;
+  const resolvedTitle = t(feeStructuresConfig.title);
+  return <RecordViewPage title={t('finance.feeStructures.details', { title: resolvedTitle })} subtitle={feeStructuresConfig.subtitle} endpoint={feeStructuresConfig.endpoint} id={id} fields={feeStructuresConfig.formFields} listPath="/staff/finance/fee-structures" editPath={'/staff/finance/fee-structures/edit/' + id} />;
 };
 
 export default FeeStructuresView;

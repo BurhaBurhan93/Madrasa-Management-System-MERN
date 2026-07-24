@@ -176,7 +176,7 @@ const StudentAdmissions = () => {
       
       const degreeMap = {};
       admissions.forEach(a => {
-        const degreeName = a.degree?.degreeName || 'Not Assigned';
+        const degreeName = a.degree?.degreeName || t('registrar.studentAdmissions.charts.notAssigned');
         degreeMap[degreeName] = (degreeMap[degreeName] || 0) + 1;
       });
       const byDegree = Object.entries(degreeMap).map(([name, count]) => ({ name, value: count }));
@@ -216,7 +216,7 @@ const StudentAdmissions = () => {
 
   const columns = studentAdmissionsConfig.columns.map(col => ({
     ...col,
-    header: t(`staff.registrar.studentAdmissions.columns.${col.key}`)
+    header: t(`registrar.studentAdmissions.columns.${col.key}`)
   }));
 
   return (
@@ -229,10 +229,10 @@ const StudentAdmissions = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-xl">📚</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentAdmissions.stats.totalApplications')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentAdmissions.stats.totalApplications')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">{admissionStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentAdmissions.stats.allTimeAdmissions')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentAdmissions.stats.allTimeAdmissions')}</p>
           </div>
         </Card>
 
@@ -243,10 +243,10 @@ const StudentAdmissions = () => {
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
                 <span className="text-xl">⏳</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentAdmissions.stats.pendingReview')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentAdmissions.stats.pendingReview')}</span>
             </div>
             <p className="text-3xl font-black text-amber-600">{admissionStats.pending}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentAdmissions.stats.awaitingDecision')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentAdmissions.stats.awaitingDecision')}</p>
           </div>
         </Card>
 
@@ -257,10 +257,10 @@ const StudentAdmissions = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <span className="text-xl">✅</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentAdmissions.stats.accepted')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentAdmissions.stats.accepted')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{admissionStats.accepted}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentAdmissions.stats.approvedAdmissions')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentAdmissions.stats.approvedAdmissions')}</p>
           </div>
         </Card>
 
@@ -271,38 +271,38 @@ const StudentAdmissions = () => {
               <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
                 <span className="text-xl">❌</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentAdmissions.stats.rejected')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentAdmissions.stats.rejected')}</span>
             </div>
             <p className="text-3xl font-black text-red-600">{admissionStats.rejected}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentAdmissions.stats.declinedApplications')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentAdmissions.stats.declinedApplications')}</p>
           </div>
         </Card>
       </div>
 
       {(admissionStats.byDegree.length > 0 || admissionStats.byMonth.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card title={t('staff.registrar.studentAdmissions.charts.admissionsByDegree')}>
+          <Card title={t('registrar.studentAdmissions.charts.admissionsByDegree')}>
             {admissionStats.byDegree.length > 0 ? (
               <PieChartComponent data={admissionStats.byDegree} height={300} />
             ) : (
               <div className="h-[300px] flex items-center justify-center text-slate-400">
-                {t('staff.registrar.studentAdmissions.charts.noDegreeData')}
+                {t('registrar.studentAdmissions.charts.noDegreeData')}
               </div>
             )}
           </Card>
-          <Card title={t('staff.registrar.studentAdmissions.charts.monthlyAdmissionsTrend')}>
+          <Card title={t('registrar.studentAdmissions.charts.monthlyAdmissionsTrend')}>
             {admissionStats.byMonth.length > 0 ? (
               <BarChartComponent data={admissionStats.byMonth} dataKey="value" nameKey="name" height={300} />
             ) : (
               <div className="h-[300px] flex items-center justify-center text-slate-400">
-                {t('staff.registrar.studentAdmissions.charts.noMonthlyData')}
+                {t('registrar.studentAdmissions.charts.noMonthlyData')}
               </div>
             )}
           </Card>
         </div>
       )}
 
-      <ListPage {...studentAdmissionsConfig} columns={columns} />
+      <ListPage {...studentAdmissionsConfig} title={t('registrar.studentAdmissions.title')} subtitle={t('registrar.studentAdmissions.subtitle')} columns={columns} />
     </div>
   );
 };

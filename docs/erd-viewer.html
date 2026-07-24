@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Madrasa Management System — ERD Diagrams</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; padding: 20px; }
+  h1 { text-align: center; color: #1e293b; margin-bottom: 8px; font-size: 28px; }
+  .subtitle { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 14px; }
+  .section { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.1); margin-bottom: 30px; padding: 24px; overflow: hidden; }
+  .section h2 { color: #0f172a; font-size: 20px; margin-bottom: 4px; }
+  .section .count { color: #64748b; font-size: 13px; margin-bottom: 16px; }
+  .mermaid { max-width: 100%; overflow-x: auto; }
+  .btn-bar { text-align: center; margin-bottom: 20px; }
+  .btn-bar button { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 0 6px; font-size: 14px; }
+  .btn-bar button:hover { background: #1d4ed8; }
+  @media print { .btn-bar { display: none; } body { background: white; padding: 0; } .section { box-shadow: none; break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<h1>Madrasa Management System</h1>
+<p class="subtitle">Entity-Relationship Diagrams — 79 Mongoose Models</p>
+
+<div class="btn-bar">
+  <button onclick="window.print()">Print / Save as PDF</button>
+  <button onclick="document.querySelectorAll('.mermaid svg').forEach(s=>{const l=(new XMLSerializer()).serializeToString(s);const b=new Blob([l],{type:'image/svg+xml'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=s.closest('.section').querySelector('h2').textContent.replace(/[^a-z0-9]/gi,'_')+'.svg';a.click()})">Download All as SVG</button>
+</div>
+
+<div class="section">
+<h2>1. User &amp; Authentication</h2>
+<p class="count">4 models: User, Role, Permission, UserDocument</p>
+<div class="mermaid">
+erDiagram
+    User { ObjectId _id PK String name String email UK String password String role "admin|student|teacher|staff" Array roles "ref: Role" String idNumber Object permanentAddress Object currentAddress String phone String whatsapp String bloodType String image String status "active|inactive" Date deletedAt }
+    Role { ObjectId _id PK String name UK String description Array permissions "ref: Permission" Date deletedAt }
+    Permission { ObjectId _id PK String name UK String description Date deletedAt }
+    UserDocument { ObjectId _id PK ObjectId student FK "ref: Student" String type String filePath String status "active|archived" }
+    User ||--o{ Role : has
+    Role ||--o{ Permission : has
+    Student ||--o{ UserDocument : has
+</div>
+</div>
+
+<div class="section">
+<h2>2. Academic Core</h2>
+<p class="count">9 models: Class, Subject, Degree, DegreeSubject, Department, Designation, Syllabus, Timetable, Grading</p>
+<div class="mermaid">
+erDiagram
+    Class { ObjectId _id PK String code UK String name String type "boys|girls|mixed" ObjectId teacher FK "ref: User" Number maxStudents String status "active|inactive" }
+    Subject { ObjectId _id PK String name UK String field }
+    Degree { ObjectId _id PK String name UK String duration String level ObjectId department FK "ref: Department" }
+    DegreeSubject { ObjectId teacher FK "ref: User" ObjectId degree FK "ref: Degree" ObjectId subject FK "ref: Subject" String academicYear String status "active|inactive" }
+    Department { ObjectId _id PK String departmentName String departmentCode UK ObjectId departmentHead FK "ref: Employee" String status "active|inactive" }
+    Designation { ObjectId _id PK String designationTitle ObjectId department FK "ref: Department" String jobLevel "entry|mid|senior|manager" String status "active|inactive" }
+    Syllabus { ObjectId _id PK String className String subject String topic Number order }
+    Timetable { ObjectId _id PK ObjectId classId FK "ref: Class" String day String period String subject String teacher }
+    Grading { ObjectId _id PK String name Array grades }
+    Degree ||--o{ DegreeSubject : offers
+    Subject ||--o{ DegreeSubject : includes
+    Class ||--o{ Timetable : schedules
+    Department ||--o{ Degree : offers
+    Department ||--o{ Designation : has
+</div>
+</div>
+
+<div class="section">
+<h2>3. Student &amp; Admissions</h2>
+<p class="count">6 models: Student, Admission, Guardian, Guarantor, StudentDegree, StudentEducation</p>
+<div class="mermaid">
+erDiagram
+    Student { ObjectId _id PK ObjectId user FK "ref: User" String firstName String lastName String fatherName String studentCode UK ObjectId currentClass FK "ref: Class" Boolean isHostelResident ObjectId hostelRoom FK "ref: HostelRoom" String status "active|inactive" }
+    Admission { ObjectId _id PK String firstName String lastName String phone String email ObjectId user FK "ref: User" ObjectId degree FK "ref: Degree" String status "pending|accepted|rejected" }
+    Guardian { ObjectId _id PK ObjectId student FK "ref: Student" String name String relationship String phone Boolean isPrimary }
+    Guarantor { ObjectId _id PK ObjectId user FK "ref: User" String fullName String relationship Boolean isPrimary }
+    StudentDegree { ObjectId _id PK ObjectId student FK "ref: Student" ObjectId degree FK "ref: Degree" String academicYear String status "active|inactive" }
+    StudentEducation { ObjectId _id PK ObjectId student FK "ref: Student" String previousDegree String previousInstitution String yearOfCompletion }
+    User ||--|| Student : has
+    Student ||--o{ Guardian : has
+    Student ||--o{ Guarantor : has
+    Student ||--o{ StudentDegree : enrolls
+    Student ||--o{ StudentEducation : has
+</div>
+</div>
+
+<div class="section">
+<h2>4. Employee / HR</h2>
+<p class="count">5 models: Employee, EmployeeAttendance, LeaveType, Leave, StudentLeave</p>
+<div class="mermaid">
+erDiagram
+    Employee { ObjectId _id PK ObjectId user FK "ref: User" String employeeCode UK String fullName String gender "male|female" String employeeType "teacher|admin|finance|hr|librarian|kitchen|security|support" ObjectId department FK "ref: Department" ObjectId designation FK "ref: Designation" Date joiningDate Number baseSalary Number houseAllowance String employmentType "permanent|contract|part-time" String status "active|inactive" }
+    EmployeeAttendance { ObjectId _id PK ObjectId employee FK "ref: Employee" Date date String status "present|absent|late|half-day|on-leave" Number lateMinutes ObjectId markedBy FK "ref: User" }
+    LeaveType { ObjectId _id PK String leaveTypeName String leaveCode UK Number maxDaysAllowed Boolean isPaid String genderSpecific "male|female|both" String status "active|inactive" }
+    Leave { ObjectId _id PK ObjectId employee FK "ref: Employee" ObjectId leaveType FK "ref: LeaveType" Date startDate Date endDate Number leaveDays String status "pending|approved|rejected" ObjectId approvedBy FK "ref: Employee" }
+    StudentLeave { ObjectId _id PK ObjectId student FK "ref: Student" Date startDate Date endDate String approvalStatus "pending|approved|rejected" ObjectId approvedBy FK "ref: Employee" }
+    Employee ||--o{ EmployeeAttendance : has
+    Employee ||--o{ Leave : requests
+    LeaveType ||--o{ Leave : categorizes
+    Student ||--o{ StudentLeave : requests
+</div>
+</div>
+
+<div class="section">
+<h2>5. Attendance</h2>
+<p class="count">7 models: AttendanceSession, AttendanceRecord, AttendanceSummary, AttendanceWarning, AttendanceCorrection, AttendanceCalendar, AttendanceSetting</p>
+<div class="mermaid">
+erDiagram
+    AttendanceSession { ObjectId _id PK ObjectId class FK "ref: Class" ObjectId teacher FK "ref: User" Date sessionDate String sessionType "lecture|exam" Number period Boolean isLocked }
+    AttendanceRecord { ObjectId _id PK ObjectId session FK "ref: AttendanceSession" ObjectId student FK "ref: Student" String status "present|absent|late|excused" ObjectId markedBy FK "ref: User" }
+    AttendanceSummary { ObjectId _id PK ObjectId student FK "ref: Student" Number month Number year Number totalSessions Number presentCount Number absentCount Number attendancePercentage }
+    AttendanceWarning { ObjectId _id PK ObjectId student FK "ref: Student" String warningType "low_attendance|excessive_late" Number threshold Number currentValue String status "active|notified|dismissed" }
+    AttendanceCorrection { ObjectId _id PK ObjectId employee FK "ref: Employee" Date date String oldStatus String newStatus String status "pending|approved|rejected" }
+    AttendanceCalendar { ObjectId _id PK Date date UK String dayType "class|holiday|special" }
+    AttendanceSetting { ObjectId _id PK String key UK Array workingDays Number lateThreshold Number absenceThreshold Number periodDuration }
+    AttendanceSession ||--o{ AttendanceRecord : has
+    Student ||--o{ AttendanceRecord : has
+    Student ||--o{ AttendanceSummary : summarizes
+    Student ||--o{ AttendanceWarning : warns
+</div>
+</div>
+
+<div class="section">
+<h2>6. Exam &amp; Assessment</h2>
+<p class="count">6 models: ExamType, Exam, ExamQuestion, ExamAnswer, FinalResult, Assignment</p>
+<div class="mermaid">
+erDiagram
+    ExamType { ObjectId _id PK String name UK }
+    Exam { ObjectId _id PK String title ObjectId examType FK "ref: ExamType" ObjectId subject FK "ref: Subject" ObjectId class FK "ref: Class" ObjectId createdBy FK "ref: User" Number duration Number totalMarks Date startDate Date endDate String status "draft|published|ongoing|finished|cancelled" }
+    ExamQuestion { ObjectId _id PK ObjectId exam FK "ref: Exam" String question String questionType "mcq|truefalse|short|essay" Array options String correctAnswer Number marks }
+    ExamAnswer { ObjectId _id PK ObjectId exam FK "ref: Exam" ObjectId student FK "ref: Student" Map answers Number score Number totalMarks }
+    FinalResult { ObjectId _id PK ObjectId student FK "ref: Student" ObjectId exam FK "ref: Exam" ObjectId subject FK "ref: Subject" Number totalScore String status "pass|fail" String grade }
+    Assignment { ObjectId _id PK String title String description ObjectId courseId FK "ref: Subject" Date dueDate Number maxPoints String status "active|completed|cancelled" }
+    ExamType ||--o{ Exam : categorizes
+    Exam ||--o{ ExamQuestion : contains
+    Exam ||--o{ ExamAnswer : has
+    Exam ||--o{ FinalResult : produces
+    Student ||--o{ ExamAnswer : submits
+    Student ||--o{ FinalResult : receives
+</div>
+</div>
+
+<div class="section">
+<h2>7. Finance</h2>
+<p class="count">7 models: Account, Transaction, FeeStructure, StudentFee, FeePayment, Expense, FinancialReport</p>
+<div class="mermaid">
+erDiagram
+    Account { ObjectId _id PK String accountCode UK String accountName String accountType "cash|petty_cash" Number openingBalance Number currentBalance String status "active|inactive" }
+    Transaction { ObjectId _id PK String transactionCode UK ObjectId account FK "ref: Account" String transactionType "income|expense" Number amount Date transactionDate String verificationStatus "pending|verified|rejected" }
+    FeeStructure { ObjectId _id PK String feeCode UK String feeName ObjectId class FK "ref: Class" String feeType "tuition|admission|other" Number amount String frequency "one-time|monthly|yearly" Boolean isMandatory String status "active|inactive" }
+    StudentFee { ObjectId _id PK ObjectId student FK "ref: Student" ObjectId feeStructure FK "ref: FeeStructure" String academicYear Number totalAmount Number payableAmount String paymentStatus "pending|paid|partial|overdue" }
+    FeePayment { ObjectId _id PK ObjectId studentFee FK "ref: StudentFee" String receiptNo UK Number paidAmount String paymentMethod "cash|card" String paymentStatus "completed|pending|failed" }
+    Expense { ObjectId _id PK String expenseCode UK String category Number amount String approvalStatus "pending|approved|rejected" }
+    FinancialReport { ObjectId _id PK String reportType String reportPeriod Number totalIncome Number totalExpense Number netBalance }
+    Account ||--o{ Transaction : has
+    FeeStructure ||--o{ StudentFee : generates
+    Student ||--o{ StudentFee : owes
+    StudentFee ||--o{ FeePayment : pays
+</div>
+</div>
+
+<div class="section">
+<h2>8. Payroll</h2>
+<p class="count">4 models: SalaryStructure, SalaryPayment, SalaryDeduction, SalaryAdvance</p>
+<div class="mermaid">
+erDiagram
+    SalaryStructure { ObjectId _id PK String employeeType Number basicSalary Number housingAllowance Number transportAllowance Number medicalAllowance Number taxPercentage Date effectiveFrom String status "active|inactive" }
+    SalaryPayment { ObjectId _id PK ObjectId employee FK "ref: Employee" Number salaryMonth Number salaryYear Number grossSalary Number netSalary String paymentMethod "cash|bank|card|other" String paymentStatus "pending|paid|failed" }
+    SalaryDeduction { ObjectId _id PK ObjectId employee FK "ref: Employee" String deductionType Number deductionAmount Number deductionMonth Number deductionYear String status "pending|approved|rejected" }
+    SalaryAdvance { ObjectId _id PK ObjectId employee FK "ref: Employee" Number advanceAmount Number remainingBalance String advanceStatus "pending|approved|rejected|closed" }
+    Employee ||--o{ SalaryPayment : receives
+    Employee ||--o{ SalaryDeduction : has
+    Employee ||--o{ SalaryAdvance : requests
+</div>
+</div>
+
+<div class="section">
+<h2>9. Library</h2>
+<p class="count">5 models: BookCategory, Book, BookPurchase, BookSale, BorrowedBook</p>
+<div class="mermaid">
+erDiagram
+    BookCategory { ObjectId _id PK String name UK String description }
+    Book { ObjectId _id PK String title ObjectId category FK "ref: BookCategory" Number pages String publisher Number stock Number purchasePrice Number salePrice }
+    BookPurchase { ObjectId _id PK String purchaseCode UK ObjectId book FK "ref: Book" Number quantity Number unitPrice Number totalPrice String supplierName }
+    BookSale { ObjectId _id PK String receiptNo UK ObjectId student FK "ref: Student" ObjectId book FK "ref: Book" Number quantity Number unitPrice Number totalAmount }
+    BorrowedBook { ObjectId _id PK ObjectId book FK "ref: Book" ObjectId borrower FK "ref: Student" Date returnDate String status "borrowed|returned" }
+    BookCategory ||--o{ Book : categorizes
+    Book ||--o{ BookPurchase : purchases
+    Book ||--o{ BookSale : sells
+    Book ||--o{ BorrowedBook : lends
+</div>
+</div>
+
+<div class="section">
+<h2>10. Hostel</h2>
+<p class="count">4 models: HostelRoom, HostelAllocation, HostelMeal, HostelMealAttendance</p>
+<div class="mermaid">
+erDiagram
+    HostelRoom { ObjectId _id PK String roomNumber String building Number floor Number capacity String roomType "single|double|triple|quad" Array amenities String status "available|occupied|maintenance|reserved" Number monthlyRent }
+    HostelAllocation { ObjectId _id PK ObjectId student FK "ref: Student" ObjectId room FK "ref: HostelRoom" Date checkInDate Date expectedCheckOutDate String status "active|pending|checked-out|suspended" Number monthlyRent Number securityDeposit }
+    HostelMeal { ObjectId _id PK String mealType "breakfast|lunch|dinner|snack" Date date Object menu Number costPerPerson Boolean isVegetarian }
+    HostelMealAttendance { ObjectId _id PK ObjectId student FK "ref: Student" ObjectId meal FK "ref: HostelMeal" String status "present|absent|excused" }
+    HostelRoom ||--o{ HostelAllocation : houses
+    Student ||--|| HostelAllocation : allocated
+    HostelMeal ||--o{ HostelMealAttendance : tracks
+</div>
+</div>
+
+<div class="section">
+<h2>11. Kitchen</h2>
+<p class="count">8 models: KitchenInventory, KitchenPurchase, KitchenExpense, KitchenBudget, KitchenWaste, DailyFoodConsumption, WeeklyMenu, Supplier</p>
+<div class="mermaid">
+erDiagram
+    KitchenInventory { ObjectId _id PK String itemName UK String category Number quantity String unit Number minimumStock Number unitPrice String status "available|low|out" }
+    KitchenPurchase { ObjectId _id PK String itemName String category Number quantity Number unitPrice Number totalPrice Date purchaseDate String supplier String paymentMethod "cash|credit|other" }
+    KitchenExpense { ObjectId _id PK Date expenseDate String expenseType ObjectId relatedPurchase FK "ref: KitchenPurchase" Number amount String expenseStatus "pending|approved|rejected" }
+    KitchenBudget { ObjectId _id PK Number month Number year Number allocatedAmount Number spentAmount Number remainingAmount String budgetStatus "pending|approved|rejected" }
+    KitchenWaste { ObjectId _id PK String itemName Number quantity String unit Date wasteDate String reason "spoiled|expired|overcooked|other" }
+    DailyFoodConsumption { ObjectId _id PK Date consumptionDate String mealType Number numberOfStudents Number numberOfStaff Number quantityUsed }
+    WeeklyMenu { ObjectId _id PK Date weekStartDate String day String mealType Array menuItems }
+    Supplier { ObjectId _id PK String supplierName String contactPerson String phone String status "active|inactive" }
+    KitchenPurchase ||--o{ KitchenExpense : generates
+</div>
+</div>
+
+<div class="section">
+<h2>12. Complaints</h2>
+<p class="count">4 models: Complaint, ComplaintAction, ComplaintEscalation, ComplaintFeedback</p>
+<div class="mermaid">
+erDiagram
+    Complaint { ObjectId _id PK String complaintCode UK String complainantType "student|staff|other" ObjectId complainant String complaintCategory String subject String priorityLevel "low|medium|high" String complaintStatus "open|in_progress|closed" ObjectId assignedTo FK "ref: User" }
+    ComplaintAction { ObjectId _id PK ObjectId complaint FK "ref: Complaint" String actionType String actionDescription ObjectId actionTakenBy FK "ref: User" Boolean nextActionRequired }
+    ComplaintEscalation { ObjectId _id PK ObjectId complaint FK "ref: Complaint" ObjectId escalatedFrom FK "ref: User" ObjectId escalatedTo FK "ref: User" String escalationStatus "pending|resolved|ignored" }
+    ComplaintFeedback { ObjectId _id PK ObjectId complaint FK "ref: Complaint" Number rating "1-5" String comment Boolean isAnonymous }
+    Complaint ||--o{ ComplaintAction : has
+    Complaint ||--o{ ComplaintEscalation : escalates
+    Complaint ||--o{ ComplaintFeedback : receives
+</div>
+</div>
+
+<div class="section">
+<h2>13. Communications</h2>
+<p class="count">3 models: Message, Announcement, Notification</p>
+<div class="mermaid">
+erDiagram
+    Message { ObjectId _id PK ObjectId sender FK "ref: User" Array receivers "ref: User" String subject String message Array attachments }
+    Announcement { ObjectId _id PK String title String content String audience "all|teachers|students|staff|parents" String priority "low|normal|high|urgent" ObjectId createdBy FK "ref: User" }
+    Notification { ObjectId _id PK ObjectId recipient FK "ref: User" String title String message Boolean isRead Object relatedTo }
+    User ||--o{ Message : sends
+    User ||--o{ Notification : receives
+</div>
+</div>
+
+<div class="section">
+<h2>14. Other Models</h2>
+<p class="count">6 models: Event, SupportTicket, TeacherFeedback, MadrasaInfo, SystemSetting, AuditLog</p>
+<div class="mermaid">
+erDiagram
+    Event { ObjectId _id PK String title String description Date startDate Date endDate String type "academic|cultural|sports|holiday|other" ObjectId createdBy FK "ref: User" }
+    SupportTicket { ObjectId _id PK String subject String description String priority "low|medium|high|critical" String status "open|in_progress|resolved|closed" ObjectId assignedTo FK "ref: User" }
+    TeacherFeedback { ObjectId _id PK ObjectId teacher FK "ref: User" ObjectId student FK "ref: Student" Number rating "1-5" String comment }
+    MadrasaInfo { ObjectId _id PK String madrasaName String logo String address String phone String email String website Number establishedYear }
+    SystemSetting { ObjectId _id PK String key UK Mixed value String description String category }
+    AuditLog { ObjectId _id PK String action String entity ObjectId userId FK "ref: User" Object changes Date createdAt }
+</div>
+</div>
+
+<div class="section" style="text-align:center;color:#64748b;font-size:13px;">
+  <p><strong>Total:</strong> 79 Mongoose Models across 14 modules</p>
+  <p style="margin-top:4px;">Generated from <code>server/src/models/</code></p>
+</div>
+
+<script>mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#e0f2fe', primaryBorderColor: '#0ea5e9', lineColor: '#64748b', secondaryColor: '#f0fdf4', tertiaryColor: '#faf5ff', fontSize: '13px' } });</script>
+</body>
+</html>

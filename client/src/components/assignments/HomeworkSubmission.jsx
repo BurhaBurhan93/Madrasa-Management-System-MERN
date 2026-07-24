@@ -7,6 +7,7 @@ import Badge from '../UIHelper/Badge';
 import { apiFetch, parseJsonSafe } from '../../lib/apiFetch';
 import { FiUpload, FiFile, FiCheckCircle, FiClock, FiBook } from 'react-icons/fi';
 import CalendarDatePicker from "../UIHelper/CalendarDatePicker";
+import { useTranslation } from 'react-i18next';
 
 const MOCK_COURSES = [
   { _id: '000000000000000000000001', name: 'Mathematics', teacher: { name: 'Dr. Ahmed' } },
@@ -26,6 +27,7 @@ const MOCK_ASSIGNMENTS = [
 ];
 
 const HomeworkSubmission = () => {
+  const { t } = useTranslation(['student', 'common']);
   const [searchParams] = useSearchParams();
   const assignmentId = searchParams.get('id');
   const [homeworkData, setHomeworkData] = useState({
@@ -162,15 +164,15 @@ const HomeworkSubmission = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">Assignments</p>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Submit Homework</h1>
-          <p className="text-slate-500 mt-1 font-medium italic">Upload your coursework and assignments</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('academic')}</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('homeworkSubmission.submitHomework')}</h1>
+          <p className="text-slate-500 mt-1 font-medium italic">{t('homeworkSubmission.submitDesc')}</p>
         </div>
       </div>
 
       {submitSuccess && (
         <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-700 font-medium">
-          <FiCheckCircle size={18} /> Homework submitted successfully!
+          <FiCheckCircle size={18} /> {t('homeworkSubmission.submitSuccess')}
         </div>
       )}
       {submitError && (
@@ -184,21 +186,21 @@ const HomeworkSubmission = () => {
         <div className="lg:col-span-2">
           <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
             <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3">
-              <FiUpload className="text-cyan-600" /> New Submission
+              <FiUpload className="text-cyan-600" /> {t('homeworkSubmission.newSubmission')}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
-                  label="Assignment Title"
+                  label={t('homeworkSubmission.assignmentTitle')}
                   name="title"
                   value={homeworkData.title}
                   onChange={handleInputChange}
-                  placeholder="Enter assignment title"
+                  placeholder={t('homeworkSubmission.titlePlaceholder')}
                   required
                   className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
                 />
                 <div>
-                  <label className="block text-sm font-black text-slate-700 uppercase tracking-widest mb-2">Course</label>
+                  <label className="block text-sm font-black text-slate-700 uppercase tracking-widest mb-2">{t('common:course')}</label>
                   <select
                     name="course"
                     value={homeworkData.course}
@@ -206,7 +208,7 @@ const HomeworkSubmission = () => {
                     required
                     className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-cyan-500 focus:bg-white font-medium transition-all"
                   >
-                    <option value="">Select a course...</option>
+                    <option value="">{t('homeworkSubmission.selectCourse')}</option>
                     {courses.map(c => (
                       <option key={c._id} value={c._id}>{c.name || c.subjectName}</option>
                     ))}
@@ -217,18 +219,18 @@ const HomeworkSubmission = () => {
               <CalendarDatePicker
                 value={homeworkData.dueDate}
                 onChange={(date) => setHomeworkData(prev => ({ ...prev, dueDate: date }))}
-                placeholder="Select due date"
+                placeholder={t('homeworkSubmission.selectDueDate')}
               />
               
               <div className="space-y-2">
                 <label className="block text-sm font-black text-slate-700 uppercase tracking-widest">
-                  Description
+                  {t('common:description')}
                 </label>
                 <textarea
                   name="description"
                   value={homeworkData.description}
                   onChange={handleInputChange}
-                  placeholder="Describe your submission or add notes..."
+                  placeholder={t('homeworkSubmission.descPlaceholder')}
                   rows={4}
                   className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-slate-50 font-medium resize-none"
                 />
@@ -236,13 +238,13 @@ const HomeworkSubmission = () => {
               
               <div className="space-y-2">
                 <label className="block text-sm font-black text-slate-700 uppercase tracking-widest">
-                  Upload File
+                  {t('homeworkSubmission.uploadFile')}
                 </label>
                 <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer bg-slate-50 hover:bg-white hover:border-cyan-300 transition-all group">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <FiUpload className="w-8 h-8 mb-4 text-slate-400 group-hover:text-cyan-500 transition-colors" />
                     <p className="mb-2 text-sm text-slate-600 font-medium">
-                      <span className="font-black text-cyan-600">Click to upload</span> or drag and drop
+                      <span className="font-black text-cyan-600">{t('homeworkSubmission.clickUpload')}</span> {t('homeworkSubmission.dragDrop')}
                     </p>
                     <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
                       PDF, DOC, DOCX, TXT (MAX. 10MB)
@@ -270,7 +272,7 @@ const HomeworkSubmission = () => {
                   className="w-full rounded-2xl bg-slate-900 hover:bg-slate-800 py-4 font-black text-xs uppercase tracking-widest"
                   disabled={submitting}
                 >
-                  {submitting ? 'Submitting...' : 'Submit Homework'}
+                    {submitting ? t('homeworkSubmission.submitting') : t('homeworkSubmission.submitHomework')}
                 </Button>
               </div>
             </form>
@@ -281,7 +283,7 @@ const HomeworkSubmission = () => {
         <div className="space-y-6">
           <Card className="rounded-[32px] p-8 border-none shadow-xl shadow-slate-200/50">
             <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3">
-              <FiClock className="text-amber-500" /> Pending Tasks
+              <FiClock className="text-amber-500" /> {t('homeworkSubmission.pendingTasks')}
             </h2>
             <div className="space-y-4">
               {loading ? (
@@ -301,9 +303,9 @@ const HomeworkSubmission = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-black text-slate-900 text-sm truncate">{assignment.title || 'Untitled'}</h4>
-                        <p className="text-xs text-slate-400 font-medium mt-1">
-                          Due: {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No date'}
-                        </p>
+                          <p className="text-xs text-slate-400 font-medium mt-1">
+                            {t('homeworkSubmission.due')}: {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : t('common:na')}
+                          </p>
                       </div>
                     </div>
                   </div>
@@ -311,7 +313,7 @@ const HomeworkSubmission = () => {
               ) : (
                 <div className="text-center py-8 bg-slate-50 rounded-2xl">
                   <FiCheckCircle className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
-                  <p className="text-slate-400 font-medium text-sm">All caught up!</p>
+                  <p className="text-slate-400 font-medium text-sm">{t('homeworkSubmission.allCaughtUp')}</p>
                 </div>
               )}
             </div>
@@ -319,12 +321,12 @@ const HomeworkSubmission = () => {
 
           {/* Guidelines Card */}
           <div className="p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-[32px] text-white shadow-2xl shadow-slate-200/50">
-            <h4 className="text-lg font-black mb-4">Submission Guidelines</h4>
+            <h4 className="text-lg font-black mb-4">{t('homeworkSubmission.guidelines')}</h4>
             <div className="space-y-3 text-sm">
-              <p className="text-slate-400">• Ensure files are properly named</p>
-              <p className="text-slate-400">• Check file format requirements</p>
-              <p className="text-slate-400">• Submit before deadline</p>
-              <p className="text-slate-400">• Include all required components</p>
+              <p className="text-slate-400">• {t('homeworkSubmission.guideline1')}</p>
+              <p className="text-slate-400">• {t('homeworkSubmission.guideline2')}</p>
+              <p className="text-slate-400">• {t('homeworkSubmission.guideline3')}</p>
+              <p className="text-slate-400">• {t('homeworkSubmission.guideline4')}</p>
             </div>
           </div>
         </div>

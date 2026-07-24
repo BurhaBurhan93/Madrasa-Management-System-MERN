@@ -13,6 +13,7 @@ const EMPLOYEE_TYPES = [
   { value: 'security' }, { value: 'support' },
   { value: 'maintenance' }, { value: 'payroll' },
   { value: 'complaints' }, { value: 'inventory' },
+  { value: 'general-manager' },
 ];
 
 const Field = ({ label, value, onChange, type = 'text', options, placeholder }) => (

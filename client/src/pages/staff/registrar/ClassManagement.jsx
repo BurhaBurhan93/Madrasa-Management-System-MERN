@@ -7,19 +7,19 @@ const ClassManagement = () => {
   const { t } = useTranslation(['staff', 'common']);
   const columns = classManagementConfig.columns.map(col => ({
     ...col,
-    header: t(`staff.registrar.classManagement.columns.${col.key}`)
+    header: t(`registrar.classManagement.columns.${col.key}`)
   }));
   return (
     <ListPage
-      eyebrow={t('staff.registrar.classManagement.eyebrow')}
-      title={t('staff.registrar.classManagement.title')}
-      subtitle={t('staff.registrar.classManagement.subtitle')}
+      eyebrow={t('registrar.classManagement.eyebrow')}
+      title={t('registrar.classManagement.title')}
+      subtitle={t('registrar.classManagement.subtitle')}
       endpoint={classManagementConfig.endpoint}
       columns={columns}
       createPath={classManagementConfig.createPath}
       editPathForRow={classManagementConfig.editPathForRow}
       viewPathForRow={classManagementConfig.viewPathForRow}
-      searchPlaceholder={t('staff.registrar.classManagement.searchPlaceholder')}
+      searchPlaceholder={t('registrar.classManagement.searchPlaceholder')}
       clientSidePagination={true}
       enableExport={true}
     />

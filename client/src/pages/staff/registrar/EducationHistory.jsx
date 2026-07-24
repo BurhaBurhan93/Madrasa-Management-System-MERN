@@ -77,7 +77,7 @@ const EducationHistory = () => {
       
       const degreeMap = {};
       records.forEach(r => {
-        const degree = r.previousDegree || 'Not Specified';
+        const degree = r.previousDegree || t('registrar.educationHistory.charts.notSpecified');
         degreeMap[degree] = (degreeMap[degree] || 0) + 1;
       });
       const byDegree = Object.entries(degreeMap)
@@ -87,7 +87,7 @@ const EducationHistory = () => {
       
       const yearMap = {};
       records.forEach(r => {
-        const year = r.yearOfCompletion || 'Unknown';
+        const year = r.yearOfCompletion || t('registrar.educationHistory.charts.unknown');
         yearMap[year] = (yearMap[year] || 0) + 1;
       });
       const byYear = Object.entries(yearMap)
@@ -109,7 +109,7 @@ const EducationHistory = () => {
 
   const columns = educationHistoryConfig.columns.map(col => ({
     ...col,
-    header: t(`staff.registrar.educationHistory.columns.${col.key}`)
+    header: t(`registrar.educationHistory.columns.${col.key}`)
   }));
 
   return (
@@ -122,10 +122,10 @@ const EducationHistory = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-xl">🎓</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.educationHistory.stats.totalRecords')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.educationHistory.stats.totalRecords')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">{educationStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.educationHistory.stats.educationEntries')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.educationHistory.stats.educationEntries')}</p>
           </div>
         </Card>
 
@@ -136,10 +136,10 @@ const EducationHistory = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <span className="text-xl">📚</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.educationHistory.stats.degreeTypes')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.educationHistory.stats.degreeTypes')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{educationStats.byDegree.length}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.educationHistory.stats.differentQualifications')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.educationHistory.stats.differentQualifications')}</p>
           </div>
         </Card>
 
@@ -150,21 +150,21 @@ const EducationHistory = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <span className="text-xl">📅</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.educationHistory.stats.yearRange')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.educationHistory.stats.yearRange')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{educationStats.byYear.length}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.educationHistory.stats.differentYears')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.educationHistory.stats.differentYears')}</p>
           </div>
         </Card>
       </div>
 
       {educationStats.byDegree.length > 0 && (
-        <Card title={t('staff.registrar.educationHistory.charts.educationByDegree')}>
+        <Card title={t('registrar.educationHistory.charts.educationByDegree')}>
           <BarChartComponent data={educationStats.byDegree} dataKey="value" nameKey="name" height={300} />
         </Card>
       )}
 
-      <ListPage {...educationHistoryConfig} columns={columns} />
+      <ListPage {...educationHistoryConfig} title={t('registrar.educationHistory.title')} subtitle={t('registrar.educationHistory.subtitle')} columns={columns} />
     </div>
   );
 };

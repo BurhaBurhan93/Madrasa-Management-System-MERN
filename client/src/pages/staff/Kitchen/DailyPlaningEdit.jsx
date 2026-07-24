@@ -8,7 +8,7 @@ const DailyPlaningEdit = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
   const config = getConsumptionConfig(t);
-  return <FormPage titleCreate={t('staff.kitchen.dailyPlaning.titleCreate', 'Create Consumption Record')} titleEdit={t('staff.kitchen.dailyPlaning.titleEdit', 'Edit Consumption Record')} endpoint={config.endpoint} formFields={config.formFields} initialForm={config.initialForm} mapRowToForm={config.mapRowToForm} mapFormToPayload={config.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/kitchen/menu" readMode="collection" readEndpoint={config.endpoint} />;
+  return <FormPage titleCreate={t('kitchen.dailyPlaning.titleCreate', 'Create Consumption Record')} titleEdit={t('kitchen.dailyPlaning.titleEdit', 'Edit Consumption Record')} endpoint={config.endpoint} formFields={config.formFields} initialForm={config.initialForm} mapRowToForm={config.mapRowToForm} mapFormToPayload={config.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/kitchen/menu" readMode="collection" readEndpoint={config.endpoint} />;
 };
 
 export default DailyPlaningEdit;

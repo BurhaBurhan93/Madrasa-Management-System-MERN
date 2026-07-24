@@ -53,7 +53,7 @@ const StudentCourses = () => {
       setCourses(coursesData.length > 0 ? coursesData : MOCK_COURSES);
     } catch (err) {
       console.error('Error fetching courses:', err);
-      setError(t('student.courses.offlineError'));
+      setError(t('courses.offlineError'));
       setCourses(MOCK_COURSES);
     } finally {
       setLoading(false);
@@ -87,11 +87,11 @@ const StudentCourses = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'active':
-        return <Badge variant="primary" className="font-black uppercase tracking-widest text-[10px]">{t('common.active')}</Badge>;
+        return <Badge variant="primary" className="font-black uppercase tracking-widest text-[10px]">{t('common:active')}</Badge>;
       case 'completed':
-        return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('common.completed')}</Badge>;
+        return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('common:completed')}</Badge>;
       case 'dropped':
-        return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">{t('common.dropped')}</Badge>;
+        return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">{t('common:dropped')}</Badge>;
       default:
         return <Badge className="font-black uppercase tracking-widest text-[10px]">{status}</Badge>;
     }
@@ -106,9 +106,9 @@ const StudentCourses = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('student.academic')}</p>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('student.myCourses')}</h1>
-          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('student.courses.managingCourses', { count: courses.length })}</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('academic')}</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('myCourses')}</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('courses.managingCourses', { count: courses.length })}</p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -117,7 +117,7 @@ const StudentCourses = () => {
             onClick={() => navigate('/student/schedule')}
           >
             <FiClock className="w-4 h-4" />
-            {t('student.viewSchedule')}
+            {t('viewSchedule')}
           </Button>
           <div className={`h-12 px-6 rounded-2xl border flex items-center gap-3 ${
             courseStats.dropped > 0
@@ -128,7 +128,7 @@ const StudentCourses = () => {
           }`}>
             <FiTrendingUp className="w-5 h-5" />
             <span className="text-sm font-black uppercase tracking-widest">
-              {t('student.courses.avgProgressValue', { value: courseStats.avgProgress })}
+              {t('courses.avgProgressValue', { value: courseStats.avgProgress })}
             </span>
           </div>
         </div>
@@ -143,10 +143,10 @@ const StudentCourses = () => {
               <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
                 <FiGrid className="w-5 h-5 text-cyan-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">{t('student.courses.totalCourses')}</span>
+              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">{t('courses.totalCourses')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900 dark:text-white">{courseStats.total}</p>
-            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{t('student.courses.thisSemester')}</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{t('courses.thisSemester')}</p>
           </div>
         </Card>
 
@@ -157,10 +157,10 @@ const StudentCourses = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                 <FiPlayCircle className="w-5 h-5 text-emerald-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">{t('common.active')}</span>
+              <span className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">{t('common:active')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{courseStats.active}</p>
-            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{t('student.courses.inProgress')}</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">{t('courses.inProgress')}</p>
           </div>
         </Card>
 
@@ -171,10 +171,10 @@ const StudentCourses = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <FiAward className="w-5 h-5 text-purple-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('common.completed')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('common:completed')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{courseStats.completed}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('student.courses.finishedCourses')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('courses.finishedCourses')}</p>
           </div>
         </Card>
 
@@ -185,7 +185,7 @@ const StudentCourses = () => {
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
                 <FiTrendingUp className="w-5 h-5 text-amber-600" />
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('student.courses.avgProgress')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('courses.avgProgress')}</span>
             </div>
             <p className="text-3xl font-black text-amber-600">{courseStats.avgProgress}%</p>
             <div className="mt-2">
@@ -198,21 +198,21 @@ const StudentCourses = () => {
       {/* Charts Section */}
       {courses.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card title={t('student.courses.statusDistribution')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('courses.statusDistribution')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <PieChartComponent
               data={[
-                { name: t('common.active'), value: courseStats.active },
-                { name: t('common.completed'), value: courseStats.completed },
-                { name: t('common.notStarted'), value: courseStats.total - courseStats.active - courseStats.completed }
+                { name: t('common:active'), value: courseStats.active },
+                { name: t('common:completed'), value: courseStats.completed },
+                { name: t('common:notStarted'), value: courseStats.total - courseStats.active - courseStats.completed }
               ].filter(item => item.value > 0)}
               height={300}
             />
           </Card>
 
-          <Card title={t('student.courses.progressOverview')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('courses.progressOverview')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <BarChartComponent
               data={courses.slice(0, 6).map(course => ({
-                name: course.name?.substring(0, 10) || t('student.courses.defaultCourseName'),
+                name: course.name?.substring(0, 10) || t('courses.defaultCourseName'),
                 progress: course.progress || 0
               }))}
               dataKey="progress"
@@ -226,15 +226,15 @@ const StudentCourses = () => {
       {/* Filters and Search */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-gray-400 mb-1">{t('student.courses.browseCourses')}</p>
-          <h2 className="text-2xl font-black text-slate-900 dark:text-white">{t('student.courses.courseCatalog')}</h2>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-gray-400 mb-1">{t('courses.browseCourses')}</p>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">{t('courses.courseCatalog')}</h2>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
               type="text" 
-              placeholder={t('student.courses.search')} 
+              placeholder={t('courses.search')} 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-12 pr-6 py-3.5 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none w-full sm:w-64 font-medium text-sm transition-all shadow-sm dark:text-gray-100"
@@ -249,7 +249,7 @@ const StudentCourses = () => {
                   filter === f ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
-                {t('common.' + f)}
+                {t('common:' + f)}
               </button>
             ))}
           </div>
@@ -264,7 +264,7 @@ const StudentCourses = () => {
               {/* Card Header Decoration */}
               <div className="h-24 bg-gradient-to-br from-slate-900 to-slate-800 p-8 flex justify-between items-start relative overflow-hidden">
                 <div className="relative z-10">
-                  <p className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] mb-1">{course.courseCode || t('common.na')}</p>
+                  <p className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] mb-1">{course.courseCode || t('common:na')}</p>
                   <h3 className="text-white font-black text-lg line-clamp-1">{course.name}</h3>
                 </div>
                 <div className="relative z-10">
@@ -283,8 +283,8 @@ const StudentCourses = () => {
                       <FiUser />
                     </div>
                     <div>
-                  <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('student.instructor')}</p>
-                  <p className="text-sm font-black text-slate-900 dark:text-white">{course.teacher?.name || course.teacherName || t('student.courses.notAssigned')}</p>
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('instructor')}</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-white">{course.teacher?.name || course.teacherName || t('courses.notAssigned')}</p>
                     </div>
                   </div>
                   
@@ -293,13 +293,13 @@ const StudentCourses = () => {
                       <FiClock />
                     </div>
                     <div>
-                  <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('common.schedule')}</p>
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('common:schedule')}</p>
                   <p className="text-sm font-black text-slate-900 dark:text-white">
                         {course.startTime && course.endTime
                           ? `${course.startTime} - ${course.endTime}`
                           : course.studyDaysPerWeek
-                          ? t('student.courses.daysPerWeek', { days: course.studyDaysPerWeek })
-                          : t('student.courses.seeTimetable')}
+                          ? t('courses.daysPerWeek', { days: course.studyDaysPerWeek })
+                          : t('courses.seeTimetable')}
                       </p>
                     </div>
                   </div>
@@ -307,7 +307,7 @@ const StudentCourses = () => {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-end">
-                    <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('student.courses.progressLabel')}</p>
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('courses.progressLabel')}</p>
                     <p className="text-sm font-black text-cyan-600">{course.progress || 0}%</p>
                   </div>
                   <Progress value={course.progress || 0} max={100} className="h-2 rounded-full" />
@@ -319,7 +319,7 @@ const StudentCourses = () => {
                     className="flex-1 rounded-2xl py-4 font-black text-xs uppercase tracking-widest bg-slate-900 hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
                     onClick={() => navigate(`/student/courses/${course._id}`)}
                   >
-                    {t('student.courses.courseHub')}
+                    {t('courses.courseHub')}
                   </Button>
                   <Button 
                     variant="outline" 
@@ -337,14 +337,14 @@ const StudentCourses = () => {
             <div className="w-24 h-24 bg-slate-50 dark:bg-gray-800 rounded-[32px] flex items-center justify-center text-slate-200 dark:text-gray-600 text-5xl mb-6 border border-slate-100 dark:border-gray-700">
               <FiBook />
             </div>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{t('student.courses.noCourses')}</h3>
-            <p className="text-slate-500 dark:text-gray-400 font-medium max-w-xs mx-auto">{t('student.courses.noCoursesDesc')}</p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{t('courses.noCourses')}</h3>
+            <p className="text-slate-500 dark:text-gray-400 font-medium max-w-xs mx-auto">{t('courses.noCoursesDesc')}</p>
             <Button 
               variant="outline" 
               className="mt-8 rounded-2xl px-8 font-black text-xs uppercase tracking-widest border-slate-200"
               onClick={() => { setFilter('all'); setSearchTerm(''); }}
             >
-              {t('student.courses.clearFilters')}
+              {t('courses.clearFilters')}
             </Button>
           </div>
         )}

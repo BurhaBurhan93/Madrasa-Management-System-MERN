@@ -64,12 +64,12 @@ const StudentSchedule = () => {
         
         formattedSchedule[day].push({
           id: course._id || index,
-          course: course.name || course.subjectName || t('student.academic'),
+          course: course.name || course.subjectName || t('academic'),
           time: course.startTime && course.endTime
             ? `${course.startTime} - ${course.endTime}`
-            : t('student.schedule.defaultTime'),
-          room: t('common.na'),
-          instructor: course.teacher?.name || course.teacherName || t('student.instructor'),
+            : t('schedule.defaultTime'),
+          room: t('common:na'),
+          instructor: course.teacher?.name || course.teacherName || t('instructor'),
           type: index % 2 === 0 ? 'lecture' : 'tutorial'
         });
       });
@@ -78,11 +78,11 @@ const StudentSchedule = () => {
         // Use mock schedule data when API returns empty
         const mockDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
         const mockSchedule = {
-          monday: [{ id: 'm1', course: 'Advanced Mathematics', time: t('student.schedule.mockTime1'), room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'lecture' }, { id: 'm2', course: 'Quranic Studies', time: t('student.schedule.mockTime2'), room: 'Room 203', instructor: 'Sheikh Abdullah', type: 'tutorial' }],
-          tuesday: [{ id: 't1', course: 'Arabic Literature', time: t('student.schedule.mockTime3'), room: 'Lecture Hall B', instructor: 'Prof. Fatima', type: 'lecture' }],
-          wednesday: [{ id: 'w1', course: 'Islamic History', time: t('student.schedule.mockTime4'), room: 'Room 105', instructor: 'Dr. Hassan', type: 'lecture' }, { id: 'w2', course: 'Computer Science', time: t('student.schedule.mockTime5'), room: 'Lab 3', instructor: 'Ms. Aisha', type: 'tutorial' }],
-          thursday: [{ id: 'th1', course: 'English Language', time: t('student.schedule.mockTime6'), room: 'Lecture Hall C', instructor: 'Mr. John', type: 'lecture' }],
-          friday: [{ id: 'f1', course: 'Advanced Mathematics', time: t('student.schedule.mockTime7'), room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'tutorial' }]
+          monday: [{ id: 'm1', course: 'Advanced Mathematics', time: t('schedule.mockTime1'), room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'lecture' }, { id: 'm2', course: 'Quranic Studies', time: t('schedule.mockTime2'), room: 'Room 203', instructor: 'Sheikh Abdullah', type: 'tutorial' }],
+          tuesday: [{ id: 't1', course: 'Arabic Literature', time: t('schedule.mockTime3'), room: 'Lecture Hall B', instructor: 'Prof. Fatima', type: 'lecture' }],
+          wednesday: [{ id: 'w1', course: 'Islamic History', time: t('schedule.mockTime4'), room: 'Room 105', instructor: 'Dr. Hassan', type: 'lecture' }, { id: 'w2', course: 'Computer Science', time: t('schedule.mockTime5'), room: 'Lab 3', instructor: 'Ms. Aisha', type: 'tutorial' }],
+          thursday: [{ id: 'th1', course: 'English Language', time: t('schedule.mockTime6'), room: 'Lecture Hall C', instructor: 'Mr. John', type: 'lecture' }],
+          friday: [{ id: 'f1', course: 'Advanced Mathematics', time: t('schedule.mockTime7'), room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'tutorial' }]
         };
         setScheduleData(mockSchedule);
       } else {
@@ -90,8 +90,8 @@ const StudentSchedule = () => {
       }
     } catch (err) {
       console.error('[StudentSchedule] Error fetching schedule:', err);
-      setError(t('student.schedule.offlineError'));
-      setScheduleData({ monday: [{ id: 'm1', course: 'Advanced Mathematics', time: t('student.schedule.defaultTime'), room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'lecture' }], tuesday: [], wednesday: [], thursday: [], friday: [] });
+      setError(t('schedule.offlineError'));
+      setScheduleData({ monday: [{ id: 'm1', course: 'Advanced Mathematics', time: t('schedule.defaultTime'), room: 'Lecture Hall A', instructor: 'Dr. Ahmed', type: 'lecture' }], tuesday: [], wednesday: [], thursday: [], friday: [] });
     } finally {
       setLoading(false);
     }
@@ -131,23 +131,23 @@ const StudentSchedule = () => {
 
     days.forEach((day, i) => {
       (scheduleData[day] || []).forEach(item => {
-        tableData.push([t('common.' + day), item.course, item.time, item.room, item.instructor, t('student.schedule.' + item.type, item.type)]);
+        tableData.push([t('common:' + day), item.course, item.time, item.room, item.instructor, t('schedule.' + item.type, item.type)]);
       });
     });
 
     const doc = new jsPDF({ orientation: 'landscape' });
     doc.setFontSize(18);
-    doc.text(t('student.schedule.pdfTitle'), 14, 20);
+    doc.text(t('schedule.pdfTitle'), 14, 20);
     doc.setFontSize(10);
-    doc.text(`${t('student.schedule.pdfGenerated')}: ${new Date().toLocaleDateString()}`, 14, 28);
+    doc.text(`${t('schedule.pdfGenerated')}: ${new Date().toLocaleDateString()}`, 14, 28);
     autoTable(doc, {
       startY: 34,
-      head: [[t('common.day'), t('common.course'), t('common.time'), t('student.schedule.pdfRoom'), t('student.instructor'), t('student.schedule.pdfType')]],
+      head: [[t('common:day'), t('common:course'), t('common:time'), t('schedule.pdfRoom'), t('instructor'), t('schedule.pdfType')]],
       body: tableData,
       styles: { fontSize: 9 },
       headStyles: { fillColor: [14, 165, 233] },
     });
-    doc.save(t('student.schedule.pdfFileName'));
+    doc.save(t('schedule.pdfFileName'));
   };
 
   if (loading) {
@@ -155,20 +155,20 @@ const StudentSchedule = () => {
   }
 
   const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-  const dayNames = [t('common.monday'), t('common.tuesday'), t('common.wednesday'), t('common.thursday'), t('common.friday')];
+  const dayNames = [t('common:monday'), t('common:tuesday'), t('common:wednesday'), t('common:thursday'), t('common:friday')];
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500 dark:text-gray-100">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('student.academic')}</p>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('student.schedule.title')}</h1>
-          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('student.schedule.subtitle')}</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('academic')}</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('schedule.title')}</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('schedule.subtitle')}</p>
         </div>
         <div className="flex gap-3">
           <Button variant="primary" className="rounded-2xl bg-slate-900 hover:bg-slate-800 font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center gap-2" onClick={handleExport}>
-            <FiDownload /> {t('student.exportSchedule')}
+            <FiDownload /> {t('exportSchedule')}
           </Button>
         </div>
       </div>
@@ -182,7 +182,7 @@ const StudentSchedule = () => {
               viewMode === 'weekly' ? 'bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-lg' : 'text-slate-400 dark:text-gray-500 hover:text-slate-600'
             }`}
           >
-            <FiGrid /> {t('student.schedule.weekly')}
+            <FiGrid /> {t('schedule.weekly')}
           </button>
           <button
             onClick={() => setViewMode('daily')}
@@ -190,7 +190,7 @@ const StudentSchedule = () => {
               viewMode === 'daily' ? 'bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-lg' : 'text-slate-400 dark:text-gray-500 hover:text-slate-600'
             }`}
           >
-            <FiList /> {t('student.schedule.daily')}
+            <FiList /> {t('schedule.daily')}
           </button>
         </div>
 
@@ -200,7 +200,7 @@ const StudentSchedule = () => {
           </button>
           <div className="text-center min-w-[240px]">
             <p className="text-[10px] font-black text-cyan-600 uppercase tracking-[0.3em] mb-1">
-              {viewMode === 'weekly' ? t('student.schedule.selectedWeek') : t('student.schedule.selectedDay')}
+              {viewMode === 'weekly' ? t('schedule.selectedWeek') : t('schedule.selectedDay')}
             </p>
               <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
               {viewMode === 'weekly' 
@@ -215,7 +215,7 @@ const StudentSchedule = () => {
         </div>
 
         <div className="hidden lg:flex items-center gap-2 pr-4">
-          <Badge variant="success" className="font-black px-4 py-2">{t('student.schedule.normalSchedule')}</Badge>
+          <Badge variant="success" className="font-black px-4 py-2">{t('schedule.normalSchedule')}</Badge>
         </div>
       </div>
 
@@ -224,7 +224,7 @@ const StudentSchedule = () => {
         {daysOfWeek.map((day, index) => (
           <div key={day} className={`space-y-6 ${viewMode === 'daily' && dayNames[index] !== selectedDate.toLocaleDateString('en-US', { weekday: 'long' }) ? 'hidden' : ''} ${viewMode === 'daily' ? 'lg:col-span-5' : ''}`}>
             <div className="text-center lg:text-left px-2">
-              <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('common.' + daysOfWeek[index])}</h3>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('common:' + daysOfWeek[index])}</h3>
               <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mt-1">
                 {getCurrentWeekDates()[index].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </p>
@@ -238,7 +238,7 @@ const StudentSchedule = () => {
                       <div className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest ${
                         item.type === 'lecture' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
                       }`}>
-                        {t('student.schedule.' + item.type, item.type)}
+                        {t('schedule.' + item.type, item.type)}
                       </div>
                       <FiClock className="text-slate-200 group-hover:text-cyan-500 transition-colors" />
                     </div>
@@ -261,7 +261,7 @@ const StudentSchedule = () => {
               ) : (
                 <div className="py-12 flex flex-col items-center justify-center text-center bg-slate-50/50 dark:bg-gray-800/50 rounded-[32px] border border-dashed border-slate-200 dark:border-gray-700 opacity-60">
                   <FiActivity className="w-10 h-10 text-slate-200 dark:text-gray-600 mb-2" />
-                  <p className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('student.schedule.freeDay')}</p>
+                  <p className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">{t('schedule.freeDay')}</p>
                 </div>
               )}
             </div>
@@ -276,8 +276,8 @@ const StudentSchedule = () => {
             <FiInfo />
           </div>
           <div>
-            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1">{t('student.schedule.roomChanges')}</h4>
-            <p className="text-slate-500 dark:text-gray-400 font-medium">{t('student.schedule.roomChangesDesc')}</p>
+            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1">{t('schedule.roomChanges')}</h4>
+            <p className="text-slate-500 dark:text-gray-400 font-medium">{t('schedule.roomChangesDesc')}</p>
           </div>
         </Card>
 
@@ -286,8 +286,8 @@ const StudentSchedule = () => {
             <FiCheckCircle />
           </div>
           <div>
-            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1">{t('student.schedule.academicSupport')}</h4>
-            <p className="text-slate-500 dark:text-gray-400 font-medium">{t('student.schedule.academicSupportDesc')}</p>
+            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-1">{t('schedule.academicSupport')}</h4>
+            <p className="text-slate-500 dark:text-gray-400 font-medium">{t('schedule.academicSupportDesc')}</p>
           </div>
         </Card>
       </div>

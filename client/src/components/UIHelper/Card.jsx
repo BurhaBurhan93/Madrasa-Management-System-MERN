@@ -9,8 +9,8 @@ const Card = ({ children, className = '', title, subtitle }) => {
   const adminLang = readStoredLanguage('adminLang', 'en');
 
   const surfaceClasses = isDark
-    ? 'border-slate-700 bg-slate-900/60 text-slate-100 shadow-[0_20px_45px_-22px_rgba(0,0,0,0.55)] backdrop-blur-xl'
-    : 'border-white/60 bg-white/40 text-slate-900 shadow-[0_12px_35px_-24px_rgba(15,23,42,0.12)] backdrop-blur-xl';
+    ? 'border-slate-700 text-slate-100'
+    : 'border-white/60 text-slate-900';
 
   return (
     <div className={`overflow-hidden rounded-2xl border ${surfaceClasses} ${className}`}>

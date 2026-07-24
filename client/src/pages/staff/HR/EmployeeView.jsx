@@ -16,7 +16,7 @@ const EmployeeView = () => {
       ? (value, item) => {
           const photo = value || item?.photo;
           return photo 
-            ? <img src={photo} alt={t('staff.hr.employees.profileAlt')} className="h-32 w-32 rounded-lg object-cover border border-slate-200" /> 
+            ? <img src={photo} alt={t('hr.employees.profileAlt')} className="h-32 w-32 rounded-lg object-cover border border-slate-200" /> 
             : '-';
         }
       : undefined
@@ -24,8 +24,8 @@ const EmployeeView = () => {
 
   return (
     <RecordViewPage 
-      title={t('staff.hr.employees.viewTitle')} 
-      subtitle={t('staff.hr.employees.subtitle')} 
+      title={t('hr.employees.viewTitle')} 
+      subtitle={t('hr.employees.subtitle')} 
       endpoint={employeesConfig.endpoint} 
       id={id} 
       fields={viewFields} 

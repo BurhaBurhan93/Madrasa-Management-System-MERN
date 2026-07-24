@@ -8,7 +8,7 @@ const InventoryEdit = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
   const config = getInventoryConfig(t);
-  return <FormPage titleCreate={t('staff.kitchen.inventory.titleCreate', 'Create Inventory Item')} titleEdit={t('staff.kitchen.inventory.titleEdit', 'Edit Inventory Item')} endpoint={config.endpoint} formFields={config.formFields} initialForm={config.initialForm} mapRowToForm={config.mapRowToForm} mapFormToPayload={config.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/kitchen/inventory" readMode="collection" readEndpoint={config.endpoint} />;
+  return <FormPage titleCreate={t('kitchen.inventory.titleCreate', 'Create Inventory Item')} titleEdit={t('kitchen.inventory.titleEdit', 'Edit Inventory Item')} endpoint={config.endpoint} formFields={config.formFields} initialForm={config.initialForm} mapRowToForm={config.mapRowToForm} mapFormToPayload={config.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/kitchen/inventory" readMode="collection" readEndpoint={config.endpoint} />;
 };
 
 export default InventoryEdit;

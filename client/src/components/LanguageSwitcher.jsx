@@ -13,7 +13,7 @@ const LanguageSwitcher = ({ onChange, dark }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
-  const current = i18n.language || 'en';
+  const current = i18n.language || 'prs';
 
   useEffect(() => {
     const handleClickOutside = (e) => {

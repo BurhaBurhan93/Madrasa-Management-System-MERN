@@ -24,11 +24,11 @@ const StaffLibraryReports = () => {
       setError(null);
       const res = await apiFetch("/staff/library/stats");
       const result = await parseJsonSafe(res);
-      if (!res.ok) throw new Error(result.message || t('staff.library.reports.failedToFetch'));
+      if (!res.ok) throw new Error(result.message || t('library.reports.failedToFetch'));
       setData(result.data || result);
     } catch (err) {
       console.error("Error fetching library stats:", err);
-      setError(t('staff.library.reports.errorMessage'));
+      setError(t('library.reports.errorMessage'));
     } finally {
       setLoading(false);
     }
@@ -51,8 +51,8 @@ const StaffLibraryReports = () => {
   return (
     <div className="w-full min-h-screen">
       <div className="py-6 mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">{t('staff.library.reports.title')}</h1>
-        <p className="text-gray-600 dark:text-slate-400">{t('staff.library.reports.subtitle')}</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">{t('library.reports.title')}</h1>
+        <p className="text-gray-600 dark:text-slate-400">{t('library.reports.subtitle')}</p>
       </div>
 
       {error && !loading && (
@@ -65,9 +65,9 @@ const StaffLibraryReports = () => {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-rose-900 dark:text-rose-300">{t('staff.library.reports.unableToLoad')}</h3>
+                <h3 className="text-sm font-semibold text-rose-900 dark:text-rose-300">{t('library.reports.unableToLoad')}</h3>
                 <p className="mt-1 text-sm text-rose-700 dark:text-rose-400">{error}</p>
-                <button onClick={fetchLibraryStats} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">{t('staff.library.reports.retry')}</button>
+                <button onClick={fetchLibraryStats} className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors">{t('library.reports.retry')}</button>
               </div>
             </div>
           </div>
@@ -77,65 +77,65 @@ const StaffLibraryReports = () => {
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-slate-400">{t('staff.library.reports.loading')}</p>
+          <p className="mt-4 text-gray-600 dark:text-slate-400">{t('library.reports.loading')}</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card className="text-center">
               <div className="text-2xl font-bold text-blue-600">{data.totalBooks}</div>
-              <div className="text-sm text-gray-600 dark:text-slate-400">{t('staff.library.reports.totalBooks')}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{t('library.reports.totalBooks')}</div>
             </Card>
             <Card className="text-center">
               <div className="text-2xl font-bold text-yellow-600">{data.borrowed}</div>
-              <div className="text-sm text-gray-600 dark:text-slate-400">{t('staff.library.reports.borrowed')}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{t('library.reports.borrowed')}</div>
             </Card>
             <Card className="text-center">
               <div className="text-2xl font-bold text-green-600">{data.returned}</div>
-              <div className="text-sm text-gray-600 dark:text-slate-400">{t('staff.library.reports.returned')}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{t('library.reports.returned')}</div>
             </Card>
             <Card className="text-center">
               <div className="text-2xl font-bold text-red-600">{data.lowStock}</div>
-              <div className="text-sm text-gray-600 dark:text-slate-400">{t('staff.library.reports.lowStock')}</div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">{t('library.reports.lowStock')}</div>
             </Card>
           </div>
 
           <Card>
-            <h2 className="text-xl font-semibold dark:text-slate-200 mb-4">{t('staff.library.reports.quickRatios')}</h2>
+            <h2 className="text-xl font-semibold dark:text-slate-200 mb-4">{t('library.reports.quickRatios')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <p className="text-sm text-blue-700 dark:text-blue-300">{t('staff.library.reports.borrowedRate')}</p>
+                <p className="text-sm text-blue-700 dark:text-blue-300">{t('library.reports.borrowedRate')}</p>
                 <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{borrowedRate}%</p>
               </div>
               <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                <p className="text-sm text-green-700 dark:text-green-300">{t('staff.library.reports.returnedRate')}</p>
+                <p className="text-sm text-green-700 dark:text-green-300">{t('library.reports.returnedRate')}</p>
                 <p className="text-2xl font-bold text-green-700 dark:text-green-300">{returnedRate}%</p>
               </div>
               <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                <p className="text-sm text-red-700 dark:text-red-300">{t('staff.library.reports.lowStockLabel')}</p>
+                <p className="text-sm text-red-700 dark:text-red-300">{t('library.reports.lowStockLabel')}</p>
                 <p className="text-2xl font-bold text-red-700 dark:text-red-300">{data.lowStock}</p>
               </div>
             </div>
           </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-            <Card title={t('staff.library.reports.bookStatusDistribution')}>
+            <Card title={t('library.reports.bookStatusDistribution')}>
               <PieChartComponent
                 data={[
-                  { name: t('staff.library.reports.available'), value: data.totalBooks - data.borrowed, color: "#10B981" },
-                  { name: t('staff.library.reports.borrowed'), value: data.borrowed, color: "#F59E0B" },
-                  { name: t('staff.library.reports.lowStock'), value: data.lowStock, color: "#EF4444" },
+                  { name: t('library.reports.available'), value: data.totalBooks - data.borrowed, color: "#10B981" },
+                  { name: t('library.reports.borrowed'), value: data.borrowed, color: "#F59E0B" },
+                  { name: t('library.reports.lowStock'), value: data.lowStock, color: "#EF4444" },
                 ].filter((d) => d.value > 0)}
                 dataKey="value" nameKey="name" height={300}
               />
             </Card>
-            <Card title={t('staff.library.reports.libraryActivityOverview')}>
+            <Card title={t('library.reports.libraryActivityOverview')}>
               <BarChartComponent
                 data={[
-                  { name: t('staff.library.reports.total'), value: data.totalBooks },
-                  { name: t('staff.library.reports.borrowed'), value: data.borrowed },
-                  { name: t('staff.library.reports.returned'), value: data.returned },
-                  { name: t('staff.library.reports.lowStock'), value: data.lowStock },
+                  { name: t('library.reports.total'), value: data.totalBooks },
+                  { name: t('library.reports.borrowed'), value: data.borrowed },
+                  { name: t('library.reports.returned'), value: data.returned },
+                  { name: t('library.reports.lowStock'), value: data.lowStock },
                 ]}
                 dataKey="value" nameKey="name" height={300}
               />

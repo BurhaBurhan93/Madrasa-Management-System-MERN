@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../../../lib/api';
 import StaffPageLayout from '../shared/StaffPageLayout';
 import StaffPagination from '../shared/StaffPagination';
@@ -16,6 +17,7 @@ const EMPTY_FORM = {
 };
 
 const LeaveManagement = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [leaves, setLeaves]         = useState([]);
   const [employees, setEmployees]   = useState([]);
   const [leaveTypes, setLeaveTypes] = useState([]);
@@ -89,7 +91,7 @@ const LeaveManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this leave request?')) return;
+    if (!window.confirm(t('leaveManagement.deleteConfirm'))) return;
     try {
       await api.delete(`/hr/leaves/${id}`);
       notify('Leave request deleted');
@@ -112,8 +114,8 @@ const LeaveManagement = () => {
 
   return (
     <StaffPageLayout
-      title="Leave Management"
-      subtitle="Manage employee leave requests — approve, reject, or create new requests."
+      title={t('leaveManagement.title')}
+      subtitle={t('leaveManagement.subtitle')}
       actions={
         <button
           onClick={() => setShowForm(s => !s)}
@@ -122,7 +124,7 @@ const LeaveManagement = () => {
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
             <line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/>
           </svg>
-          New Request
+          {t('leaveManagement.addLeaveRequest')}
         </button>
       }
     >
@@ -143,57 +145,57 @@ const LeaveManagement = () => {
 
       {/* Create Form */}
       {showForm && (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-transparent dark:bg-slate-800/50 shadow-sm">
           <div className="h-1 w-full rounded-t-2xl bg-gradient-to-r from-cyan-500 to-sky-500" />
           <div className="p-6">
-            <h2 className="mb-5 text-base font-semibold text-slate-900">New Leave Request</h2>
+            <h2 className="mb-5 text-base font-semibold text-slate-900">{t('leaveManagement.addLeaveRequest')}</h2>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 {/* Employee */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Employee <span className="text-rose-500">*</span></label>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('leaveManagement.employee')} <span className="text-rose-500">*</span></label>
                   <select required value={form.employee} onChange={e => set('employee', e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 outline-none transition focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-cyan-100">
-                    <option value="">Select Employee</option>
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 outline-none transition focus:border-cyan-400 focus:bg-transparent dark:focus:bg-slate-700 focus:ring-2 focus:ring-cyan-100">
+                    <option value="">{t('leaveManagement.selectEmployee')}</option>
                     {employees.map(e => <option key={e._id} value={e._id}>{e.fullName} ({e.employeeCode})</option>)}
                   </select>
                 </div>
                 {/* Leave Type */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Leave Type <span className="text-rose-500">*</span></label>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('leaveManagement.leaveType')} <span className="text-rose-500">*</span></label>
                   <select required value={form.leaveType} onChange={e => set('leaveType', e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 outline-none transition focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-cyan-100">
-                    <option value="">Select Leave Type</option>
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 outline-none transition focus:border-cyan-400 focus:bg-transparent dark:focus:bg-slate-700 focus:ring-2 focus:ring-cyan-100">
+                    <option value="">{t('leaveManagement.selectLeaveType')}</option>
                     {leaveTypes.map(lt => <option key={lt._id} value={lt._id}>{lt.leaveTypeName} ({lt.leaveCode})</option>)}
                   </select>
                 </div>
                 {/* Days */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Number of Days <span className="text-rose-500">*</span></label>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('leaveManagement.totalDaysLabel')} <span className="text-rose-500">*</span></label>
                   <input required type="number" min="1" value={form.leaveDays} onChange={e => set('leaveDays', e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100" />
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-transparent focus:ring-2 focus:ring-cyan-100" />
                 </div>
                 {/* Request Date */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Request Date</label>
-                  <CalendarDatePicker value={form.requestDate} onChange={(date) => set('requestDate', date)} placeholder="Select date" />
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('common.selectDate')}</label>
+                  <CalendarDatePicker value={form.requestDate} onChange={(date) => set('requestDate', date)} placeholder={t('common.selectDate')} />
                 </div>
                 {/* Reason */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Reason</label>
-                  <textarea rows={3} value={form.leaveReason} onChange={e => set('leaveReason', e.target.value)} placeholder="Leave reason..."
-                    className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-2 focus:ring-cyan-100" />
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('leaveManagement.reason')}</label>
+                  <textarea rows={3} value={form.leaveReason} onChange={e => set('leaveReason', e.target.value)} placeholder={t('leaveManagement.enterReason')}
+                    className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-transparent focus:ring-2 focus:ring-cyan-100" />
                 </div>
               </div>
               <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-5">
                 <button type="button" onClick={() => { setShowForm(false); setForm(EMPTY_FORM); }}
-                  className="rounded-2xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-6 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-600">
-                  Cancel
+                  className="rounded-2xl border border-slate-200 dark:border-slate-600 bg-transparent dark:bg-slate-700 px-6 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-600">
+                  {t('leaveManagement.cancel')}
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex items-center gap-2 rounded-2xl bg-cyan-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-700 disabled:opacity-60">
                   {saving && <svg className="animate-spin" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="7" cy="7" r="5" strokeOpacity=".25"/><path d="M7 2a5 5 0 0 1 5 5" strokeLinecap="round"/></svg>}
-                  {saving ? 'Submitting...' : 'Submit Request'}
+                  {saving ? t('common.saving') : t('leaveManagement.submitRequest')}
                 </button>
               </div>
             </form>
@@ -202,7 +204,7 @@ const LeaveManagement = () => {
       )}
 
       {/* Filter + Search Bar */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-transparent dark:bg-slate-800/50 p-4 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           {/* Search */}
           <div className="flex-1">
@@ -210,15 +212,15 @@ const LeaveManagement = () => {
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="6.5" cy="6.5" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/>
               </svg>
-              <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="Search by employee, leave type, status..."
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 py-2.5 pl-9 pr-4 text-sm text-slate-700 dark:text-slate-200 outline-none transition focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-cyan-100" />
+              <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder={t('leaveManagement.searchPlaceholder')}
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50 py-2.5 pl-9 pr-4 text-sm text-slate-700 dark:text-slate-200 outline-none transition focus:border-cyan-400 focus:bg-transparent dark:focus:bg-slate-700 focus:ring-2 focus:ring-cyan-100" />
             </div>
           </div>
           {/* Status Tabs */}
           <div className="flex gap-2">
-            {[['', 'All'], ['pending', 'Pending'], ['approved', 'Approved'], ['rejected', 'Rejected']].map(([val, label]) => (
+            {[['', t('leaveManagement.all')], ['pending', t('leaveManagement.pending')], ['approved', t('leaveManagement.approved')], ['rejected', t('leaveManagement.rejected')]].map(([val, label]) => (
               <button key={val} onClick={() => { setFilterStatus(val); setPage(1); }}
-                className={`rounded-xl px-4 py-2 text-sm font-medium transition ${filterStatus === val ? 'bg-cyan-600 text-white shadow-sm' : 'border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:border-cyan-300 hover:bg-cyan-50 dark:hover:bg-slate-600'}`}>
+                className={`rounded-xl px-4 py-2 text-sm font-medium transition ${filterStatus === val ? 'bg-cyan-600 text-white shadow-sm' : 'border border-slate-200 dark:border-slate-600 bg-transparent dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:border-cyan-300 hover:bg-cyan-50 dark:hover:bg-slate-600'}`}>
                 {label}
               </button>
             ))}
@@ -227,18 +229,18 @@ const LeaveManagement = () => {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-transparent dark:bg-slate-800/50 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <div>
-            <h2 className="text-base font-semibold text-slate-900">Leave Requests</h2>
-            <p className="mt-0.5 text-xs text-slate-500">{total} total entries</p>
+            <h2 className="text-base font-semibold text-slate-900">{t('leaveManagement.leaveRequests')}</h2>
+            <p className="mt-0.5 text-xs text-slate-500">{total} {t('leaveManagement.totalEntries')}</p>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-                {['#', 'Employee', 'Leave Type', 'Days', 'Request Date', 'Reason', 'Status', 'Actions'].map(h => (
+                {['#', t('leaveManagement.employee'), t('leaveManagement.leaveType'), t('leaveManagement.duration'), t('common.selectDate'), t('leaveManagement.reason'), t('leaveManagement.status'), t('leaveManagement.actions')].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -248,11 +250,11 @@ const LeaveManagement = () => {
                 <tr><td colSpan="8" className="px-4 py-12 text-center">
                   <div className="flex items-center justify-center gap-3 text-slate-400">
                     <svg className="animate-spin" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="10" cy="10" r="8" strokeOpacity=".25"/><path d="M10 2a8 8 0 0 1 8 8" strokeLinecap="round"/></svg>
-                    Loading...
+                    {t('common.loading')}
                   </div>
                 </td></tr>
               ) : visible.length === 0 ? (
-                <tr><td colSpan="8" className="px-4 py-12 text-center text-slate-400">No leave requests found</td></tr>
+                <tr><td colSpan="8" className="px-4 py-12 text-center text-slate-400">{t('leaveManagement.noLeaveRequestsFound')}</td></tr>
               ) : visible.map((leave, idx) => (
                 <tr key={leave._id} className="border-b border-slate-50 transition hover:bg-cyan-50/40">
                   <td className="px-4 py-3 text-xs text-slate-400">{(page - 1) * limit + idx + 1}</td>
@@ -265,24 +267,24 @@ const LeaveManagement = () => {
                   <td className="px-4 py-3 text-slate-500 max-w-[180px] truncate">{leave.leaveReason || '—'}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusVariant(leave.status)}`}>
-                      {leave.status?.replace(/\b\w/g, c => c.toUpperCase())}
+                      {t(`leaveManagement.${leave.status}`)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
                       {leave.status === 'pending' && (
                         <>
-                          <button onClick={() => handleApprove(leave._id)} title="Approve"
+                          <button onClick={() => handleApprove(leave._id)} title={t('leaveManagement.approve')}
                             className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 transition hover:bg-emerald-100">
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="2 7 5.5 10.5 12 4"/></svg>
                           </button>
-                          <button onClick={() => { setRejectId(leave._id); setRejectReason(''); }} title="Reject"
+                          <button onClick={() => { setRejectId(leave._id); setRejectReason(''); }} title={t('leaveManagement.reject')}
                             className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-50 text-rose-600 transition hover:bg-rose-100">
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="3" x2="11" y2="11"/><line x1="11" y1="3" x2="3" y2="11"/></svg>
                           </button>
                         </>
                       )}
-                      <button onClick={() => handleDelete(leave._id)} title="Delete"
+                      <button onClick={() => handleDelete(leave._id)} title={t('leaveManagement.delete')}
                         className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
                         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="1 3 12 3"/><path d="M4 3V2h5v1"/><path d="M2 3l.8 8h6.4L10 3"/></svg>
                       </button>
@@ -300,20 +302,20 @@ const LeaveManagement = () => {
       {/* Reject Modal */}
       {rejectId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-transparent dark:bg-slate-800 shadow-xl">
             <div className="h-1 w-full rounded-t-2xl bg-gradient-to-r from-rose-500 to-rose-400" />
             <div className="p-6 space-y-4">
-              <h3 className="text-base font-semibold text-slate-900">Rejection Reason</h3>
-              <textarea rows={3} value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Enter reason for rejection..."
-                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-rose-400 focus:bg-white focus:ring-2 focus:ring-rose-100" />
+              <h3 className="text-base font-semibold text-slate-900">{t('leaveManagement.rejectionReason')}</h3>
+              <textarea rows={3} value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder={t('leaveManagement.enterRejectionReason')}
+                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-rose-400 focus:bg-transparent focus:ring-2 focus:ring-rose-100" />
               <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
                 <button onClick={() => setRejectId(null)}
-                  className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50">
-                  Cancel
+                  className="rounded-2xl border border-slate-200 bg-transparent px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50">
+                  {t('leaveManagement.cancel')}
                 </button>
                 <button onClick={handleReject}
                   className="rounded-2xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700">
-                  Confirm Reject
+                  {t('leaveManagement.confirmReject')}
                 </button>
               </div>
             </div>

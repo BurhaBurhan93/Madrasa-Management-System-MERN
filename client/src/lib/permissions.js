@@ -246,6 +246,18 @@ export const canDo = (module, action) => {
   const user = getUser();
   if (!user) return false;
 
+  // A general manager is a staff user with responsibility for every staff
+  // workspace.  Their account role remains "staff", so handle this before
+  // the normal staff capability map (which intentionally limits departments).
+  const employeeType = String(user.employeeType || '').trim().toLowerCase();
+  const staffRoleNames = Array.isArray(user.staffRoleNames)
+    ? user.staffRoleNames.map((name) => String(name).trim().toLowerCase())
+    : [];
+  const isGeneralManager = user.role === 'staff' &&
+    (employeeType === 'general-manager' || employeeType === 'general manager' ||
+      staffRoleNames.includes('general-manager') || staffRoleNames.includes('general manager'));
+  if (isGeneralManager) return true;
+
   const perms = getRolePermissions(user.role);
 
   // Staff module-level gating

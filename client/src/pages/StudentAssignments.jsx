@@ -82,11 +82,11 @@ const StudentAssignments = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'submitted':
-        return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('student.assignments.statusSubmitted')}</Badge>;
+        return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('assignments.statusSubmitted')}</Badge>;
       case 'pending':
-        return <Badge variant="primary" className="font-black uppercase tracking-widest text-[10px]">{t('student.assignments.statusPending')}</Badge>;
+        return <Badge variant="primary" className="font-black uppercase tracking-widest text-[10px]">{t('assignments.statusPending')}</Badge>;
       case 'overdue':
-        return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">{t('student.assignments.statusOverdue')}</Badge>;
+        return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">{t('assignments.statusOverdue')}</Badge>;
       default:
         return <Badge className="font-black uppercase tracking-widest text-[10px]">{status}</Badge>;
     }
@@ -102,7 +102,7 @@ const StudentAssignments = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('academic', { ns: 'student' })}</p>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('assignments', { ns: 'student' })}</h1>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('assignments.label', { ns: 'student' })}</h1>
           <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('assignmentSubtitle', 'Track and submit your coursework')}</p>
         </div>
         <div className="flex items-center gap-3">
@@ -261,16 +261,16 @@ const StudentAssignments = () => {
                   <div className="flex-1 text-center md:text-left">
                     <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-2">{assignment.title}</h3>
                     <p className="text-slate-500 dark:text-gray-400 text-sm font-medium line-clamp-2 italic mb-4">
-                      {assignment.description || t('student.assignments.defaultDescription')}
+                      {assignment.description || t('assignments.defaultDescription')}
                     </p>
                     <div className="flex flex-wrap justify-center md:justify-start gap-6">
                       <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
                         <FiCalendar className="text-cyan-500" />
-                        {t('student.assignments.dueLabel')} {formatDate(assignment.dueDate)}
+                        {t('assignments.dueLabel')} {formatDate(assignment.dueDate)}
                       </div>
                       <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
                         <FiClock className="text-cyan-500" />
-                        {t('student.assignments.timeLabel')}
+                        {t('assignments.timeLabel')}
                       </div>
                     </div>
                   </div>

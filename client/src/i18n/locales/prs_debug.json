@@ -1,0 +1,57 @@
+"finance": "مالیه",
+    "feesPayments": "فیس و پرداخت‌ها",
+    "transactionHistory": "تاریخچه معاملات",
+    "hostel": {
+      "label": "خوابگاه",
+      "standard": "استاندارد"
+    },
+    "leave": {
+      "label": "رخصتی",
+      "errorSubmittingLeaveWithMsg": "خطا در ارسال رخصتی: "
+    },
+    "communications": "ارتباطات",
+    "messages": "پیام‌ها",
+    "complaints": {
+      "label": "شکایات",
+      "support": "پشتیبانی",
+      "title": "Help & Feedback",
+      "subtitle": "Your voice matters in building our institution",
+      "newTicket": "New Ticket",
+      "totalTickets": "Total Tickets",
+      "activeIssues": "Active Issues",
+      "resolved": "Resolved",
+      "responseRate": "Response Rate",
+      "myTickets": "My Support Tickets",
+      "ref": "Ref: #",
+      "opened": "Opened ",
+      "viewThread": "View Thread",
+      "noTickets": "No active tickets found",
+      "policy": "Institutional Policy",
+      "anonymousTip": "Anonymous Tip?",
+      "anonymousTipDesc": "Want to report something without revealing your identity?",
+      "submitAnonymous": "Submit Anonymously",
+      "submitTicket": "Submit Support Ticket",
+      "subject": "Subject / Title",
+      "category": "دسته",
+      "priority": "Priority",
+      "description": "Detailed Description",
+      "subjectPlaceholder": "Brief summary of the issue",
+      "descriptionPlaceholder": "Describe your concern in detail...",
+      "sendTicket": "Send Ticket",
+      "ticketSubmitted": "Your ticket has been registered successfully.",
+      "submissionFailed": "Submission failed.",
+      "loadFailed": "Failed to load complaints tracking system.",
+      "cat": {
+        "Academic": "اکادمیک",
+        "Facility": "Facility",
+        "Environment": "Environment",
+        "General": "General"
+      },
+      "priority_level": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "status": {
+        "OPEN": "Open",
+        "IN_P

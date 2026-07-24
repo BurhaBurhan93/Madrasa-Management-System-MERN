@@ -6,7 +6,7 @@ import { readStoredLanguage } from '../../../lib/languageStorage';
 import BasicPageTemplate from '../../../templates/BasicPageTemplate';
 import api from '../../../lib/api';
 
-const NON_TEACHER_TYPES = ['admin', 'finance', 'registrar', 'hr', 'librarian', 'kitchen', 'security', 'support', 'maintenance', 'payroll', 'complaints', 'inventory'];
+const NON_TEACHER_TYPES = ['admin', 'finance', 'registrar', 'hr', 'librarian', 'kitchen', 'security', 'support', 'maintenance', 'payroll', 'complaints', 'inventory', 'general-manager'];
 
 const Staff = () => {
   const { t } = useTranslation('admin');

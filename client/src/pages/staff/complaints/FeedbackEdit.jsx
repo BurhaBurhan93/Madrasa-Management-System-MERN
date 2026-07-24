@@ -7,7 +7,12 @@ import { complaintFeedbackConfig } from './Feedback';
 const ComplaintFeedbackEdit = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <FormPage titleCreate={t('staff.complaints.feedbackCreate.titleCreate')} titleEdit={t('staff.complaints.feedbackCreate.titleEdit')} endpoint={complaintFeedbackConfig.endpoint} formFields={complaintFeedbackConfig.formFields} initialForm={complaintFeedbackConfig.initialForm} mapRowToForm={complaintFeedbackConfig.mapRowToForm} mapFormToPayload={complaintFeedbackConfig.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/complaints/feedback" />;
+  const formFields = complaintFeedbackConfig.formFields.map(field => ({
+    ...field,
+    label: t(`staff.complaints.feedback.fields.${field.name}`),
+    options: field.options?.map(opt => ({ ...opt, label: t(`staff.complaints.feedback.options.${field.name}.${opt.value}`) }))
+  }));
+  return <FormPage titleCreate={t('staff.complaints.feedbackCreate.titleCreate')} titleEdit={t('staff.complaints.feedbackCreate.titleEdit')} endpoint={complaintFeedbackConfig.endpoint} formFields={formFields} initialForm={complaintFeedbackConfig.initialForm} mapRowToForm={complaintFeedbackConfig.mapRowToForm} mapFormToPayload={complaintFeedbackConfig.mapFormToPayload} mode="edit" id={id} onSavedPath="/staff/complaints/feedback" />;
 };
 
 export default ComplaintFeedbackEdit;

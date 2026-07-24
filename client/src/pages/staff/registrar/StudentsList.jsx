@@ -24,11 +24,11 @@ export const studentsConfig = {
             {img ? (
               <img 
                 src={img} 
-                alt="Student" 
+                alt="Profile" 
                 className="h-10 w-10 rounded-full object-cover border border-slate-200" 
               />
             ) : (
-              <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+              <div className="h-10 w-10 rounded-full bg-transparent flex items-center justify-center text-slate-400">
                 👤
               </div>
             )}
@@ -117,7 +117,7 @@ const StudentsList = () => {
 
   const columns = studentsConfig.columns.map(col => ({
     ...col,
-    header: t(`staff.registrar.studentsList.columns.${col.key}`)
+    header: t(`registrar.studentsList.columns.${col.key}`)
   }));
 
   return (
@@ -130,10 +130,10 @@ const StudentsList = () => {
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <span className="text-xl">👥</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentsList.stats.totalStudents')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentsList.stats.totalStudents')}</span>
             </div>
             <p className="text-3xl font-black text-slate-900">{studentStats.total}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentsList.stats.allStudents')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentsList.stats.allStudents')}</p>
           </div>
         </Card>
 
@@ -144,24 +144,24 @@ const StudentsList = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <span className="text-xl">✅</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentsList.stats.active')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentsList.stats.active')}</span>
             </div>
             <p className="text-3xl font-black text-emerald-600">{studentStats.active}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentsList.stats.currentlyActive')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentsList.stats.currentlyActive')}</p>
           </div>
         </Card>
 
         <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gray-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-transparent rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center">
                 <span className="text-xl">⏸️</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentsList.stats.inactive')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentsList.stats.inactive')}</span>
             </div>
             <p className="text-3xl font-black text-gray-600">{studentStats.inactive}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentsList.stats.notActive')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentsList.stats.notActive')}</p>
           </div>
         </Card>
 
@@ -172,29 +172,31 @@ const StudentsList = () => {
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                 <span className="text-xl">🏠</span>
               </div>
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('staff.registrar.studentsList.stats.hostelResidents')}</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('registrar.studentsList.stats.hostelResidents')}</span>
             </div>
             <p className="text-3xl font-black text-purple-600">{studentStats.hostelResidents}</p>
-            <p className="text-sm text-slate-500 mt-1">{t('staff.registrar.studentsList.stats.livingInHostel')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('registrar.studentsList.stats.livingInHostel')}</p>
           </div>
         </Card>
       </div>
 
-      <Card title={t('staff.registrar.studentsList.charts.studentStatusDistribution')} className="max-w-2xl">
+      <Card title={t('registrar.studentsList.charts.studentStatusDistribution')} className="max-w-2xl">
         <PieChartComponent data={[
-          { name: t('staff.registrar.studentsList.charts.active'), value: studentStats.active },
-          { name: t('staff.registrar.studentsList.charts.inactive'), value: studentStats.inactive }
+          { name: t('registrar.studentsList.charts.active'), value: studentStats.active },
+          { name: t('registrar.studentsList.charts.inactive'), value: studentStats.inactive }
         ].filter(item => item.value > 0)} height={250} />
       </Card>
 
       <ListPage 
         {...studentsConfig} 
+        title={t('registrar.studentsList.title')}
+        subtitle={t('registrar.studentsList.subtitle')}
         columns={columns}
         createPath="/staff/registrar/student-registration"
         editPathForRow={(row) => `/staff/registrar/students/edit/${row._id}`}
         viewPathForRow={(row) => `/staff/registrar/students/view/${row._id}`}
         deleteEnabled={true}
-        eyebrow={t('staff.registrar.studentsList.eyebrow')}
+        eyebrow={t('registrar.studentsList.eyebrow')}
         enableExport={true}
       />
     </div>

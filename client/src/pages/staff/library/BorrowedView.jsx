@@ -7,7 +7,7 @@ import { libraryBorrowedConfig } from './Borrowed';
 const BorrowedView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.library.borrowed.viewTitle')} subtitle={t('staff.library.borrowed.subtitle')} endpoint={libraryBorrowedConfig.endpoint} id={id} fields={libraryBorrowedConfig.formFields} listPath="/staff/library/borrowed" editPath={`/staff/library/borrowed/edit/${id}`} />;
+  return <RecordViewPage title={t('library.borrowed.viewTitle')} subtitle={t('library.borrowed.subtitle')} endpoint={libraryBorrowedConfig.endpoint} id={id} fields={libraryBorrowedConfig.formFields} listPath="/staff/library/borrowed" editPath={`/staff/library/borrowed/edit/${id}`} />;
 };
 
 export default BorrowedView;

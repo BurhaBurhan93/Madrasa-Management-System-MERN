@@ -15,6 +15,7 @@ const DEMO_ACCOUNTS = {
 
 const STAFF_MODULES_BY_EMPLOYEE_TYPE = {
   admin: ['dashboard', 'profile', 'registrar', 'students', 'inventory', 'library', 'complaints', 'finance', 'payroll', 'kitchen', 'hr', 'support'],
+  'general-manager': ['dashboard', 'profile', 'registrar', 'students', 'inventory', 'library', 'complaints', 'finance', 'payroll', 'kitchen', 'hr', 'support'],
   support: ['dashboard', 'profile', 'support', 'students', 'inventory', 'complaints'],
   finance: ['dashboard', 'profile', 'finance'],
   registrar: ['dashboard', 'profile', 'registrar'],
@@ -38,16 +39,53 @@ const getPermissionNames = (user) => {
   return [...new Set(permissions)];
 };
 
+const getStaffRoleType = (user) => {
+  const roleNames = (user.roles || [])
+    .map((role) => String(role?.name || '').trim().toLowerCase());
+
+  if (roleNames.some((name) => name === 'general manager' || name === 'general-manager')) {
+    return 'general-manager';
+  }
+  if (roleNames.some((name) => name.includes('payroll'))) return 'payroll';
+  if (roleNames.some((name) => name.includes('finance'))) return 'finance';
+  if (roleNames.some((name) => name.includes('registrar'))) return 'registrar';
+  if (roleNames.some((name) => name.includes('support'))) return 'support';
+  if (roleNames.some((name) => name.includes('library'))) return 'librarian';
+  if (roleNames.some((name) => name.includes('kitchen'))) return 'kitchen';
+  if (roleNames.some((name) => name.includes('inventory'))) return 'inventory';
+  if (roleNames.some((name) => name.includes('complaint'))) return 'complaints';
+  if (roleNames.some((name) => name === 'hr staff' || name.includes('human resources'))) return 'hr';
+  return null;
+};
+
 const getStaffModules = (user, employee) => {
   if (user.role === 'admin') return STAFF_MODULES_BY_EMPLOYEE_TYPE.admin;
   if (user.role !== 'staff') return [];
 
-  const employeeType = employee?.employeeType;
-  const employeeTypeModules = STAFF_MODULES_BY_EMPLOYEE_TYPE[employeeType];
-  if (employeeTypeModules) {
-    return employeeTypeModules;
+  const employeeType = String(employee?.employeeType || '').trim().toLowerCase();
+  const designation = String(
+    employee?.designation?.designationTitle || employee?.designation || ''
+  ).trim().toLowerCase();
+  const accountName = String(user.name || '').trim().toLowerCase();
+  const staffRoleType = getStaffRoleType(user);
+
+  // General Manager is a full staff workspace role.  It must take precedence
+  // over any leftover department permission (for example, Complaints Staff).
+  if (
+    employeeType === 'general-manager' ||
+    employeeType === 'general manager' ||
+    designation === 'general-manager' ||
+    designation === 'general manager' ||
+    accountName === 'general-manager' ||
+    accountName === 'general manager' ||
+    staffRoleType === 'general-manager'
+  ) {
+    return STAFF_MODULES_BY_EMPLOYEE_TYPE['general-manager'];
   }
 
+  // Role permissions are assigned specifically to the staff account.  Prefer
+  // them over an employee record so an old/mistyped employeeType cannot turn a
+  // Payroll Staff account into a Finance Staff account.
   const permissionNames = getPermissionNames(user);
   const modulePermissions = permissionNames
     .filter((name) => name.startsWith('staff:'))
@@ -56,6 +94,13 @@ const getStaffModules = (user, employee) => {
 
   if (modulePermissions.length) {
     return [...new Set(['dashboard', 'profile', ...modulePermissions])];
+  }
+
+  if (staffRoleType) return STAFF_MODULES_BY_EMPLOYEE_TYPE[staffRoleType];
+
+  const employeeTypeModules = STAFF_MODULES_BY_EMPLOYEE_TYPE[employeeType];
+  if (employeeTypeModules) {
+    return employeeTypeModules;
   }
 
   return STAFF_MODULES_BY_EMPLOYEE_TYPE.support;
@@ -69,6 +114,7 @@ const buildAuthUser = (user, profile = {}, staffModules = []) => ({
   image: user.image || null,
   phone: user.phone || null,
   permissions: getPermissionNames(user),
+  staffRoleNames: (user.roles || []).map((role) => role.name).filter(Boolean),
   staffModules,
   ...profile
 });
@@ -121,7 +167,7 @@ const login = async (req, res) => {
 
     // Sanitize inputs using validator
     const sanitizedEmail = validator.normalizeEmail(email);
-    const sanitizedRole = validator.trim(role);
+    const sanitizedRole = role ? validator.trim(role) : undefined;
 
     // Find user by email
     const user = await User.findOne({ email: sanitizedEmail }).populate({
@@ -138,8 +184,8 @@ const login = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    // Verify role matches
-    if (user.role !== sanitizedRole) {
+    // Verify role matches (only if role was provided)
+    if (sanitizedRole && user.role !== sanitizedRole) {
       return res.status(403).json({ success: false, message: `Access denied. You are not registered as ${sanitizedRole}.` });
     }
 
@@ -228,7 +274,7 @@ const logout = (req, res) => {
 // Register user (for testing purposes)
 const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, employeeType } = req.body;
 
     // Sanitize inputs
     const sanitizedName = validator.trim(name);
@@ -274,7 +320,7 @@ const register = async (req, res) => {
         gender: 'male',
         phoneNumber: 'N/A',
         email: sanitizedEmail,
-        employeeType: sanitizedRole === 'teacher' ? 'teacher' : 'support',
+        employeeType: sanitizedRole === 'teacher' ? 'teacher' : (employeeType || 'support'),
         joiningDate: new Date(),
         baseSalary: 0,
         status: 'active'

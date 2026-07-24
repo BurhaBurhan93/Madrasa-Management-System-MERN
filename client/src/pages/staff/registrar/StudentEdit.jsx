@@ -9,13 +9,13 @@ const StudentEdit = () => {
   const { id } = useParams();
   return (
     <FormPage
-      titleCreate={t('staff.registrar.studentProfiles.create.titleCreate')}
-      titleEdit={t('staff.registrar.studentProfiles.create.titleEdit')}
+      titleCreate={t('registrar.studentProfiles.create.titleCreate')}
+      titleEdit={t('registrar.studentProfiles.create.titleEdit')}
       endpoint={studentProfilesConfig.endpoint}
       formFields={studentProfilesConfig.formFields.map(f => ({
         ...f,
-        label: t(`staff.registrar.studentProfiles.fields.${f.name}`),
-        options: f.options?.map(opt => ({ ...opt, label: t(`staff.registrar.studentProfiles.options.${f.name}.${opt.value}`) }))
+        label: t(`registrar.studentProfiles.fields.${f.name}`),
+        options: f.options?.map(opt => ({ ...opt, label: t(`registrar.studentProfiles.options.${f.name}.${opt.value}`) }))
       }))}
       initialForm={studentProfilesConfig.initialForm}
       mapRowToForm={studentProfilesConfig.mapRowToForm}

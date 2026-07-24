@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ListPage from '../shared/ListPage';
 
 export const weeklyMenuConfig = {
@@ -29,6 +30,22 @@ export const weeklyMenuConfig = {
   mapRowToForm: (row) => ({ weekStartDate: row.weekStartDate ? new Date(row.weekStartDate).toISOString().slice(0, 10) : '', weekEndDate: row.weekEndDate ? new Date(row.weekEndDate).toISOString().slice(0, 10) : '', day: row.day || 'Monday', mealType: row.mealType || 'breakfast', menuItems: Array.isArray(row.menuItems) ? row.menuItems.join(', ') : '', notes: row.notes || '' })
 };
 
-const WeeklyMenuPage = () => <ListPage title={weeklyMenuConfig.title} subtitle={weeklyMenuConfig.subtitle} endpoint={weeklyMenuConfig.endpoint} columns={weeklyMenuConfig.columns} createPath="/staff/kitchen/weekly-menu/create" editPathForRow={(row) => `/staff/kitchen/weekly-menu/edit/${row._id}`} viewPathForRow={(row) => `/staff/kitchen/weekly-menu/view/${row._id}`} searchPlaceholder="Search weekly menu..." clientSidePagination={true} />;
+const WeeklyMenuPage = () => {
+  const { t } = useTranslation(['staff', 'common']);
+  return (
+    <ListPage
+      eyebrow={t('kitchen.label')}
+      title={t('kitchen.weeklyMenu')}
+      subtitle={t('kitchen.manageMenu')}
+      endpoint={weeklyMenuConfig.endpoint}
+      columns={weeklyMenuConfig.columns.map(col => ({ ...col, header: t(`kitchen.${col.key}`, col.header) }))}
+      createPath="/staff/kitchen/weekly-menu/create"
+      editPathForRow={(row) => `/staff/kitchen/weekly-menu/edit/${row._id}`}
+      viewPathForRow={(row) => `/staff/kitchen/weekly-menu/view/${row._id}`}
+      searchPlaceholder={t('common.search', 'Search weekly menu...')}
+      clientSidePagination={true}
+    />
+  );
+};
 
 export default WeeklyMenuPage;

@@ -7,7 +7,8 @@ import { studentFeesConfig } from './StudentFees';
 const StudentFeesView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.finance.studentFees.details', { title: studentFeesConfig.title })} subtitle={studentFeesConfig.subtitle} endpoint={studentFeesConfig.endpoint} id={id} fields={studentFeesConfig.formFields} listPath="/staff/finance/student-fees" editPath={'/staff/finance/student-fees/edit/' + id} />;
+  const resolvedTitle = t(studentFeesConfig.title);
+  return <RecordViewPage title={t('finance.studentFees.details', { title: resolvedTitle })} subtitle={studentFeesConfig.subtitle} endpoint={studentFeesConfig.endpoint} id={id} fields={studentFeesConfig.formFields} listPath="/staff/finance/student-fees" editPath={'/staff/finance/student-fees/edit/' + id} />;
 };
 
 export default StudentFeesView;

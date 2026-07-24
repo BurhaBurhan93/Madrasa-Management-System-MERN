@@ -277,3 +277,40 @@ html.dark .approval-pending  { color: #fbbf24; background: rgba(217,119,6,0.15);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
+
+/* Mobile responsive helpers */
+@media (max-width: 767px) {
+  /* Keep panel sidebars off canvas until the header menu button opens them. */
+  .panel-sidebar {
+    transform: translateX(-100%);
+    width: min(85vw, 300px) !important;
+  }
+
+  .panel-sidebar.panel-sidebar-open {
+    transform: translateX(0);
+  }
+
+  [dir="rtl"] .panel-sidebar {
+    transform: translateX(100%);
+  }
+
+  [dir="rtl"] .panel-sidebar.panel-sidebar-open {
+    transform: translateX(0);
+  }
+
+  .panel-main {
+    overflow-x: hidden;
+  }
+  .panel-content {
+    min-width: 0;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Prevent table overflow on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+}

@@ -77,7 +77,7 @@ const StatCard = ({ label, value, note, accentClass, iconText }) => (
         <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{value}</p>
         <p className="mt-2 text-sm text-slate-500">{note}</p>
       </div>
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-sm font-semibold text-slate-700">
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-sm font-semibold text-slate-700">
         {iconText}
       </div>
     </div>
@@ -391,8 +391,7 @@ const StaffDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.12),_transparent_30%),linear-gradient(180deg,_#f8fafc_0%,_#eef7f7_100%)]">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen w-full p-6">
         <section className="mt-2">
           <Panel
             title="Finance And Payroll Snapshot"
@@ -466,7 +465,7 @@ const StaffDashboard = () => {
                   {profitLossStatus}
                 </span>
               </div>
-              <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-3 overflow-hidden rounded-full">
                 <div
                   className={`h-full rounded-full ${
                     metrics.profitLoss >= 0
@@ -515,10 +514,10 @@ const StaffDashboard = () => {
         </section>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="rounded-[28px] border border-slate-200 p-3 shadow-sm">
             <DoughnutChartComponent title="Money Mix" data={moneyMixData} height={330} showLegend={false} />
           </div>
-          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="rounded-[28px] border border-slate-200 p-3 shadow-sm">
             <RadarChartComponent
               title="Operations Radar"
               data={performanceRadarData}
@@ -533,7 +532,7 @@ const StaffDashboard = () => {
             <div className="space-y-4">
               {recentRows.length > 0 ? (
                 recentRows.map((row) => (
-                  <div key={row.id} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div key={row.id} className="flex items-start gap-4 rounded-2xl border border-slate-200 p-4">
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-xs font-semibold text-white">
                       <FiFileText size={16} />
                     </div>
@@ -554,7 +553,7 @@ const StaffDashboard = () => {
             </div>
           </Panel>
 
-          <div className="rounded-[28px] border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="rounded-[28px] border border-slate-200 p-3 shadow-sm">
             <BarChartComponent
               title="Module Coverage"
               data={moduleCoverageData}
@@ -604,7 +603,6 @@ const StaffDashboard = () => {
             </div>
           </Panel>
         </section>
-      </div>
     </div>
   );
 };

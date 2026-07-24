@@ -9,12 +9,12 @@ const EducationHistoryEdit = () => {
   const { id } = useParams();
   return (
     <FormPage
-      titleCreate={t('staff.registrar.educationHistory.create.titleCreate')}
-      titleEdit={t('staff.registrar.educationHistory.create.titleEdit')}
+      titleCreate={t('registrar.educationHistory.create.titleCreate')}
+      titleEdit={t('registrar.educationHistory.create.titleEdit')}
       endpoint={educationHistoryConfig.endpoint}
       formFields={educationHistoryConfig.formFields.map(f => ({
         ...f,
-        label: t(`staff.registrar.educationHistory.fields.${f.name}`)
+        label: t(`registrar.educationHistory.fields.${f.name}`)
       }))}
       initialForm={educationHistoryConfig.initialForm}
       mapRowToForm={educationHistoryConfig.mapRowToForm}

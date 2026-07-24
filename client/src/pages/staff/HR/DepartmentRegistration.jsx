@@ -49,14 +49,14 @@ const DepartmentRegistration = () => {
   const { t } = useTranslation(['staff', 'common']);
   return (
     <ListPage
-      title={t('staff.hr.departments.title')}
-      subtitle={t('staff.hr.departments.subtitle')}
+      title={t('hr.departments.title')}
+      subtitle={t('hr.departments.subtitle')}
       endpoint={departmentsConfig.endpoint}
-      columns={departmentsConfig.columns.map(col => ({ ...col, header: t(`staff.hr.departments.col${col.key}`) }))}
+      columns={departmentsConfig.columns.map(col => ({ ...col, header: t(`hr.departments.col${col.key}`) }))}
       createPath="/staff/hr/departments/create"
       editPathForRow={(row) => `/staff/hr/departments/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/hr/departments/view/${row._id}`}
-      searchPlaceholder={t('staff.hr.departments.searchPlaceholder')}
+      searchPlaceholder={t('hr.departments.searchPlaceholder')}
       clientSidePagination={true}
     />
   );

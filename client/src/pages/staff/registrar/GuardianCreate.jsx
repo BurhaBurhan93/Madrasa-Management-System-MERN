@@ -7,13 +7,13 @@ const GuardianCreate = () => {
   const { t } = useTranslation(['staff', 'common']);
   return (
     <FormPage
-      titleCreate={t('staff.registrar.guardianManagement.create.titleCreate')}
-      titleEdit={t('staff.registrar.guardianManagement.create.titleEdit')}
+      titleCreate={t('registrar.guardianManagement.create.titleCreate')}
+      titleEdit={t('registrar.guardianManagement.create.titleEdit')}
       endpoint={guardianManagementConfig.endpoint}
       formFields={guardianManagementConfig.formFields.map(f => ({
         ...f,
-        label: t(`staff.registrar.guardianManagement.fields.${f.name}`),
-        options: f.options?.map(opt => ({ ...opt, label: t(`staff.registrar.guardianManagement.options.${f.name}.${opt.value}`) }))
+        label: t(`registrar.guardianManagement.fields.${f.name}`),
+        options: f.options?.map(opt => ({ ...opt, label: t(`registrar.guardianManagement.options.${f.name}.${opt.value}`) }))
       }))}
       initialForm={guardianManagementConfig.initialForm}
       mapRowToForm={guardianManagementConfig.mapRowToForm}

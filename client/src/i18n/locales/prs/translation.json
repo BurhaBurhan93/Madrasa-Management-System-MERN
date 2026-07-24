@@ -156,6 +156,7 @@
     "code": "کد",
     "viewDetails": "مشاهده جزئیات",
     "student": "شاگرد",
+    "currency": "$",
     "email": "ایمیل",
     "phone": "تلفن",
     "gender": "جنسیت",
@@ -210,7 +211,53 @@
     "sep": "سپتمبر",
     "uncategorized": "دسته‌بندی نشده",
     "logo": "لوگو",
-    "currentPageCapture": "گرفت صفحه جاری"
+    "currentPageCapture": "گرفت صفحه جاری",
+    "password": "رمز عبور",
+    "rememberMe": "مرا به خاطر بسپار",
+    "signIn": "ورود",
+    "signingIn": "در حال ورود...",
+    "allRightsReserved": "تمام حقوق محفوظ است.",
+    "selectRole": "نقش را انتخاب کنید",
+    "enterEmail": "ایمیل خود را وارد کنید",
+    "enterPassword": "رمز عبور خود را وارد کنید",
+    "invalidCredentials": "مدارک نامعتبر است. لطفاً دوباره تلاش کنید.",
+    "usernameRequired": "نام کاربری الزامی است",
+    "passwordRequired": "رمز عبور الزامی است",
+    "passwordMinLength": "رمز عبور باید حداقل ۶ کاراکتر باشد",
+    "adminLabel": "ادمین",
+    "teacherLabel": "استاد",
+    "studentLabel": "شاگرد",
+    "staffLabel": "کارمند",
+    "supportStaff": "کارمند پشتیبانی",
+    "financeStaff": "کارمند مالی",
+    "registrarStaff": "کارمند ثبت نام",
+    "hrStaff": "کارمند منابع بشری",
+    "libraryStaff": "کارمند کتابخانه",
+    "kitchenStaff": "کارمند آشپزخانه",
+    "payrollStaff": "کارمند معاشات",
+    "complaintsStaff": "کارمند شکایات",
+    "inventoryStaff": "کارمند موجودی",
+    "generalManagerStaff": "مدیر عمومی",
+    "backToHome": "بازگشت",
+    "madrasaSubtitle": "سیستم مدیریت مدرسه",
+    "searching": "در حال جستجو...",
+    "serverError": "خطای سرور",
+    "correct": "صحیح",
+    "minutes": "دقیقه",
+    "daily": "روزانه",
+    "weekly": "هفتگی",
+    "monthly": "ماهانه",
+    "refresh": "تازه کردن",
+    "year": "سال",
+    "remarks": "ملاحظات",
+    "category": "دسته",
+    "quantity": "تعداد",
+    "unit": "واحد",
+    "month": "ماه",
+    "breakfast": "صبحانه",
+    "lunch": "ناهار",
+    "dinner": "شام",
+    "unnamed": "بی نام"
   },
   "roles": {
     "admin": "ادمین",
@@ -227,6 +274,7 @@
     "overview": "مرور کلی",
     "operations": "عملیات",
     "dashboard": {
+      "label": "داشبورد",
       "defaultStudentName": "شاگرد",
       "defaultStudentCode": "STU001",
       "defaultStatus": "فعال",
@@ -237,6 +285,7 @@
     "academic": "علمی",
     "myCourses": "درس‌های من",
     "schedule": {
+      "label": "Schedule",
       "title": "جدول صنف",
       "subtitle": "مدیریت و مشاهده تعهدات علمی شما",
       "weekly": "هفتگی",
@@ -267,6 +316,7 @@
       "offlineError": "Using offline data — API unavailable."
     },
     "attendance": {
+      "label": "Attendance",
       "overallRate": "نرخ کلی",
       "daysPresent": "روزهای حاضر",
       "daysAbsent": "روزهای غایب",
@@ -282,6 +332,7 @@
       "offlineError": "Using offline data — API unavailable."
     },
     "exams": {
+      "label": "Exams",
       "title": "امتحانات",
       "subtitle": "پیگیری امتحانات آینده و بررسی عملکرد شما",
       "upcoming": "آینده",
@@ -316,6 +367,7 @@
       "offlineError": "Using offline data — API unavailable."
     },
     "examResults": {
+      "label": "Exam Results",
       "academic": "اکادمیک",
       "title": "Exam Results",
       "subtitle": "View all your examination results with teacher information",
@@ -348,6 +400,7 @@
       "exam": "Exam"
     },
     "timetable": {
+      "label": "Timetable",
       "totalClasses": "مجموع صنف‌ها",
       "currentClass": "صنف فعلی",
       "academicYearValue": "۲۰۲۳-۲۴",
@@ -386,12 +439,13 @@
     "myDegrees": "درجه‌های من",
     "eduHistory": "تاریخچه تعلیمی",
     "assignments": {
-      "statusSubmitted": "Submitted",
-      "statusPending": "Pending",
-      "statusOverdue": "Overdue",
-      "defaultDescription": "No description available",
-      "dueLabel": "Due:",
-      "timeLabel": "Time: 11:59 PM"
+      "label": "تکالیف",
+      "statusSubmitted": "ارسال شده",
+      "statusPending": "در انتظار",
+      "statusOverdue": "تأخیر",
+      "defaultDescription": "توضیحی موجود نیست",
+      "dueLabel": "تاریخ تحویل:",
+      "timeLabel": "وقت: ۱۱:۵۹ شب"
     },
     "allAssignments": "همه تکالیف",
     "submitHomework": "تسلیم خانه‌تکلیف",
@@ -403,14 +457,17 @@
     "feesPayments": "فیس و پرداخت‌ها",
     "transactionHistory": "تاریخچه معاملات",
     "hostel": {
-      "standard": "Standard"
+      "label": "خوابگاه",
+      "standard": "استاندارد"
     },
     "leave": {
-      "errorSubmittingLeaveWithMsg": "Error submitting leave: "
+      "label": "رخصتی",
+      "errorSubmittingLeaveWithMsg": "خطا در ارسال رخصتی: "
     },
     "communications": "ارتباطات",
     "messages": "پیام‌ها",
     "complaints": {
+      "label": "شکایات",
       "support": "پشتیبانی",
       "title": "Help & Feedback",
       "subtitle": "Your voice matters in building our institution",
@@ -467,6 +524,7 @@
       "statusOpen": "OPEN"
     },
     "certificates": {
+      "label": "گواهینامه‌ها",
       "portfolioTitle": "🎓 Student Achievement Portfolio",
       "shareMessage": "Check out my portfolio with {{certificates}} certificates and {{achievements}} achievements!",
       "certificateTitle": "تصدیق نامه",
@@ -502,6 +560,7 @@
       "requestHardCopy": "Request Hard Copy"
     },
     "events": {
+      "label": "رویدادها",
       "typePersonal": "Personal",
       "typeExamination": "Examination",
       "typeAssignment": "Assignment",
@@ -520,6 +579,7 @@
       "defaultAssignmentDesc": "Submission deadline: {{title}}"
     },
     "profile": {
+      "label": "پروفایل",
       "personal": "Personal",
       "title": "Student Profile",
       "subtitle": "Verified identification and academic credentials",
@@ -876,6 +936,7 @@
     "overview": "مرور کلی",
     "teaching": "تدریس",
     "dashboard": {
+      "label": "داشبورد",
       "acrossAllClasses": "در تمام صنف‌ها",
       "activeClasses": "صنف‌های فعال",
       "activeThisTerm": "فعال در این ترم",
@@ -891,7 +952,8 @@
       "scheduledExamsSessions": "جلسات امتحانی برنامه‌ریزی شده",
       "totalStudents": "مجموع شاگردان",
       "totalSubjects": "مجموع مضامین",
-      "upcomingClasses": "صنف‌های آینده"
+      "upcomingClasses": "صنف‌های آینده",
+      "defaultTime": "وقت پیش‌فرض"
     },
     "academic": "علمی",
     "mySubjects": "مضامین من",
@@ -904,6 +966,7 @@
       "noClasses": "هیچ صنفی یافت نشد"
     },
     "assignments": {
+      "label": "تکالیف",
       "active": "فعال",
       "allStatus": "تمام وضعیت‌ها",
       "allSubjects": "تمام مضامین",
@@ -928,6 +991,7 @@
       "updateFailed": "به‌روزرسانی ناموفق بود"
     },
     "createAssignment": {
+      "label": "ایجاد تکلیف",
       "assignmentTitle": "عنوان تکلیف",
       "assignmentTitlePlaceholder": "مثال: تکلیف ریاضی فصل سوم",
       "create": "ایجاد",
@@ -948,6 +1012,7 @@
       "title": "عنوان"
     },
     "syllabus": {
+      "label": "نصاب",
       "title": "نصاب تعلیمی",
       "subtitle": "مشاهده نصاب درسی و موضوعات",
       "allClasses": "تمام صنف‌ها",
@@ -960,6 +1025,7 @@
       "order": "ترتیب"
     },
     "grading": {
+      "label": "نمره‌دهی",
       "title": "نظام نمرات",
       "subtitle": "معیارهای نمره‌دهی و حدود نمرات",
       "noSchemes": "هیچ طرح نمره‌دهی یافت نشد",
@@ -971,6 +1037,7 @@
       "noBoundaries": "هیچ حد نمره‌ای تعریف نشده"
     },
     "attendance": {
+      "label": "حاضری",
       "absent": "غایب",
       "allAbsent": "همه غایب",
       "allExcused": "همه معذور",
@@ -1010,6 +1077,7 @@
       "total": "مجموع"
     },
     "sessions": {
+      "label": "جلسات",
       "title": "جلسات حاضری",
       "subtitle": "مشاهده تمام جلسات حاضری",
       "newSession": "+ جلسه جدید",
@@ -1024,6 +1092,7 @@
     "exams": "امتحانات",
     "myExams": "امتحانات من",
     "createExam": {
+      "label": "ایجاد امتحان",
       "editExam": "ویرایش امتحان",
       "createExam": "ایجاد امتحان جدید",
       "editSubtitle": "جزئیات امتحان را در زیر به‌روزرسانی کنید.",
@@ -1044,6 +1113,7 @@
     },
     "results": "نتایج",
     "enterMarks": {
+      "label": "درج نمرات",
       "title": "درج نمرات",
       "subtitle": "امتحان، مضمون، صنف را انتخاب کنید و نمرات شاگردان را وارد کنید",
       "examInfo": "معلومات امتحان",
@@ -1083,9 +1153,11 @@
       "saveFailed": "ذخیره نمرات انجام نشد",
       "examLabel": "امتحان: ",
       "subjectLabel": "مضمون: ",
-      "classLabel": "صنف: "
+      "classLabel": "صنف: ",
+      "section": "بخش"
     },
     "viewResults": {
+      "label": "مشاهده نتایج",
       "title": "مشاهده نتایج",
       "subtitle": "مرور و جستجوی نتایج امتحانات شاگردان",
       "filterResults": "فیلتر نتایج",
@@ -1108,6 +1180,7 @@
     },
     "communications": "ارتباطات",
     "assignedComplaints": {
+      "label": "شکایات محوله",
       "title": "شکایات محوله",
       "subtitle": "مدیریت و پاسخ به شکایات محوله",
       "addComplaint": "افزودن شکایت",
@@ -1153,7 +1226,11 @@
       "updateStatusFailed": "به‌روزرسانی وضعیت ناموفق بود",
       "feedbackFailed": "ارسال بازخورد ناموفق بود",
       "deleteFeedbackConfirm": "این بازخورد حذف شود؟",
-      "deleteFeedbackFailed": "حذف بازخورد ناموفق بود"
+      "deleteFeedbackFailed": "حذف بازخورد ناموفق بود",
+      "resolve": "حل کردن",
+      "edit": "ویرایش",
+      "view": "مشاهده",
+      "delete": "حذف"
     },
     "messages": {
       "title": "پیام‌ها",
@@ -1179,6 +1256,7 @@
       "fail": "ناکام"
     },
     "feedback": {
+      "label": "بازخورد",
       "subjectRequired": "مضمون ضروری است",
       "createFailed": "ایجاد بازخورد ناموفق بود",
       "updateFailed": "به‌روزرسانی بازخورد ناموفق بود",
@@ -1221,9 +1299,12 @@
         "participation": "اشتراک",
         "improvement": "بهبود",
         "general": "عمومی"
-      }
+      },
+      "edit": "ویرایش",
+      "delete": "حذف"
     },
     "announcements": {
+      "label": "اعلانیه‌ها",
       "title": "اعلانیه‌ها",
       "subtitle": "اعلانیه‌ها و اطلاعیه‌های مکتب",
       "highPriority": "اولویت بالا",
@@ -1243,6 +1324,7 @@
     "myLeaves": "رخصتی‌های من",
     "applyLeave": "درخواست رخصتی",
     "payslips": {
+      "label": "تنخواه",
       "title": "تنخواه‌های من",
       "subtitle": "مشاهده تاریخچه پرداخت معاش شما",
       "totalPayments": "مجموع پرداخت‌ها",
@@ -1378,7 +1460,9 @@
       "subjects": "مضامین",
       "unnamedSubject": "مضمون بدون نام",
       "update": "به‌روزرسانی",
-      "weeklyHours": "ساعات هفتگی"
+      "weeklyHours": "ساعات هفتگی",
+      "all": "همه",
+      "upcoming": "آینده"
     },
     "editQuestion": {
       "cancel": "لغو",
@@ -1512,48 +1596,50 @@
       },
       "title": "گزارش‌های حاضری"
     },
-    "teacherProfile": {
-      "buttons": {
-        "cancel": "لغو",
-        "editProfile": "ویرایش پروفایل",
-        "saveChanges": "ذخیره تغییرات",
-        "saving": "در حال ذخیره"
-      },
-      "department": "دیپارتمنت",
-      "designation": "عنوان وظیفه",
-      "employeeId": "آیدی کارمند",
-      "fields": {
-        "bloodType": "گروپ خون",
-        "district": "ولسوالی",
-        "email": "ایمیل",
-        "fatherName": "نام پدر",
-        "grandfatherName": "نام پدرکلان",
-        "idNumber": "شماره تذکره",
-        "name": "نام",
-        "phone": "تلفن",
-        "province": "ولایت",
-        "role": "نقش",
-        "village": "قریه"
-      },
-      "joined": "تاریخ پیوستن",
-      "messages": {
-        "noProfile": "هیچ پروفایلی وجود ندارد",
-        "saveFailed": "ذخیره ناموفق بود"
-      },
-      "modules": "ماژول‌ها",
-      "sections": {
-        "addressInformation": "معلومات آدرس",
-        "currentAddress": "آدرس فعلی",
-        "permanentAddress": "آدرس دایمی",
-        "personalInformation": "معلومات شخصی"
-      },
-      "status": {
-        "title": "عنوان",
-        "active": "فعال",
-        "inactive": "غیرفعال"
-      },
-      "subtitle": "زیرنویس",
-      "title": "عنوان"
+    "teacher": {
+      "teacherProfile": {
+        "buttons": {
+          "cancel": "لغو",
+          "editProfile": "ویرایش پروفایل",
+          "saveChanges": "ذخیره تغییرات",
+          "saving": "در حال ذخیره"
+        },
+        "department": "دیپارتمنت",
+        "designation": "عنوان وظیفه",
+        "employeeId": "آیدی کارمند",
+        "fields": {
+          "bloodType": "گروپ خون",
+          "district": "ولسوالی",
+          "email": "ایمیل",
+          "fatherName": "نام پدر",
+          "grandfatherName": "نام پدرکلان",
+          "idNumber": "شماره تذکره",
+          "name": "نام",
+          "phone": "تلفن",
+          "province": "ولایت",
+          "role": "نقش",
+          "village": "قریه"
+        },
+        "joined": "تاریخ پیوستن",
+        "messages": {
+          "noProfile": "هیچ پروفایلی وجود ندارد",
+          "saveFailed": "ذخیره ناموفق بود"
+        },
+        "modules": "ماژول‌ها",
+        "sections": {
+          "addressInformation": "معلومات آدرس",
+          "currentAddress": "آدرس فعلی",
+          "permanentAddress": "آدرس دایمی",
+          "personalInformation": "معلومات شخصی"
+        },
+        "status": {
+          "title": "عنوان",
+          "active": "فعال",
+          "inactive": "غیرفعال"
+        },
+        "subtitle": "زیرنویس",
+        "title": "عنوان"
+      }
     },
     "teacherResults": {
       "enterMarksButton": "دکمه درج نمرات",
@@ -1610,6 +1696,7 @@
     "operations": "عملیات",
     "management": "مدیریت",
     "dashboard": "داشبورد",
+    "print": "چاپ",
     "dash": {
       "title": "داشبورد مدیریتی",
       "subtitle": "یک مرکز فرماندهی تمیزتر برای ثبت‌نام، درآمد، کارمندان و عملیات روزانه.",
@@ -1674,7 +1761,6 @@
       "operations": "عملیات"
     },
     "navMadrasaInfo": "معلومات مدرسه",
-    "print": "چاپ",
     "userMgmt": "مدیریت کاربران",
     "allUsers": "همه کاربران",
     "students": "شاگردان",
@@ -1754,6 +1840,7 @@
     "backup": "پشتیبان‌گیری و بازیابی",
     "apiMgmt": "مدیریت API",
     "profile": {
+      "label": "پروفایل",
       "title": "پروفایل مدیریت",
       "subtitle": "حساب مدیریتی خود را مدیریت کنید",
       "saveChanges": "ذخیره تغییرات",
@@ -2116,7 +2203,6 @@
       "editTeacher": "ویرایش معلم",
       "teacherNotFound": "معلم یافت نشد",
       "employmentInfo": "معلومات استخدام",
-      "personalInformation": "معلومات شخصی",
       "contactInformation": "معلومات تماس",
       "emergencyContact": "تماس اضطراری",
       "salaryBankInfo": "معلومات معاش و بانک",
@@ -2235,7 +2321,8 @@
         "maintenance": "نگهداری",
         "payroll": "معاش",
         "complaints": "شکایات",
-        "inventory": "موجودی"
+        "inventory": "موجودی",
+        "general-manager": "مدیر عمومی"
       },
       "serverError": "خطای سرور",
       "connectionError": "نمیتوان به سرور وصل شد. لطفاً مطمئن شوید که سرور در حال اجرا است.",
@@ -3652,6 +3739,7 @@
     },
     "print": "چاپ",
     "registrar": {
+      "label": "ثبت‌کننده",
       "classAssignment": {
         "actions": {
           "assignClass": "تخصیص صنف",
@@ -3661,7 +3749,8 @@
         "charts": {
           "noData": "دیتا موجود نیست",
           "statusDistribution": "توزیع وضعیت",
-          "studentsByClass": "شاگردان بر اساس صنف"
+          "studentsByClass": "شاگردان بر اساس صنف",
+          "unknown": "ناشناس"
         },
         "columns": {
           "currentClass": "صنف فعلی",
@@ -3704,21 +3793,51 @@
           "totalStudents": "مجموع شاگردان",
           "unassigned": "تخصیص نشده"
         },
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "subtitle": "تخصیص، ارتقا و انتقال شاگردان بین صنف‌ها",
+        "title": "تخصیص صنف",
         "unassigned": "تخصیص نشده"
       },
       "classManagement": {
+        "columns": {
+          "name": "نام صنف",
+          "code": "کد",
+          "type": "نوع",
+          "maxStudents": "حداکثر شاگردان",
+          "status": "وضعیت"
+        },
         "create": {
           "titleCreate": "ایجاد",
           "titleEdit": "ویرایش"
         },
         "eyebrow": "بررسی مدیریت صنف‌ها",
+        "fields": {
+          "name": "نام صنف",
+          "code": "کد صنف",
+          "type": "نوع",
+          "maxStudents": "حداکثر شاگردان",
+          "status": "وضعیت"
+        },
+        "options": {
+          "type": {
+            "boys": "پسرانه",
+            "girls": "دخترانه",
+            "mixed": "مختلط"
+          },
+          "status": {
+            "active": "فعال",
+            "inactive": "غیر فعال"
+          }
+        },
+        "placeholders": {
+          "name": "مثلاً صنف اول، صنف الف",
+          "code": "مثلاً GR1-A",
+          "maxStudents": "۳۰"
+        },
         "searchPlaceholder": "جستجو...",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "subtitle": "ایجاد و مدیریت صنف‌ها برای تخصیص شاگردان",
+        "title": "مدیریت صنف‌ها",
         "view": {
-          "title": "عنوان"
+          "title": "جزئیات صنف"
         }
       },
       "dataCorrection": {
@@ -3765,7 +3884,7 @@
         "reason": "دلیل",
         "recentChanges": "تغییرات اخیر",
         "retry": "تلاش دوباره",
-        "subtitle": "عنوان فرعی",
+        "subtitle": "تصحیح اطلاعات شاگردان و پیگیری تغییرات",
         "success": "تصحیح با موفقیت ارسال شد",
         "table": {
           "actions": "عمل‌ها",
@@ -3780,11 +3899,43 @@
           "studentCode": "کد شاگرد",
           "viewHistory": "مشاهده تاریخچه"
         },
-        "title": "عنوان",
+        "title": "تصحیح اطلاعات",
         "to": "به",
         "unknown": "ناشناس"
       },
       "documentsManagement": {
+        "title": "مدیریت اسناد شاگردان",
+        "subtitle": "بارگذاری، مدیریت و پیگیری اسناد و تصدیق‌نامه‌های شاگردان",
+        "columns": {
+          "student": "شاگرد",
+          "type": "نوع سند",
+          "title": "عنوان",
+          "description": "توضیحات",
+          "createdAt": "تاریخ بارگذاری",
+          "status": "وضعیت"
+        },
+        "fields": {
+          "student": "شاگرد",
+          "type": "نوع سند",
+          "title": "عنوان سند",
+          "description": "توضیحات",
+          "filePath": "فایل",
+          "status": "وضعیت"
+        },
+        "options": {
+          "type": {
+            "passport": "عکس پاسپورت",
+            "certificate": "تصدیق‌نامه",
+            "transcript": "کارنامه",
+            "id_card": "کارت شناسایی",
+            "birth_certificate": "تصدیق تولد",
+            "other": "دیگر"
+          },
+          "status": {
+            "active": "فعال",
+            "archived": "آرشیف شده"
+          }
+        },
         "charts": {
           "documentDistribution": "توزیع اسناد",
           "documentsByType": "اسناد بر اساس نوع"
@@ -3811,6 +3962,24 @@
         }
       },
       "educationHistory": {
+        "title": "تاریخچه تحصیلی شاگردان",
+        "subtitle": "مدیریت سوابق تحصیلی قبلی و پیشینه علمی",
+        "columns": {
+          "student": "شاگرد",
+          "previousDegree": "مدرک قبلی",
+          "previousInstitution": "مؤسسه",
+          "location": "موقعیت",
+          "yearOfCompletion": "سال فراغت"
+        },
+        "fields": {
+          "student": "شاگرد",
+          "previousDegree": "مدرک قبلی",
+          "previousInstitution": "مؤسسه تحصیلی",
+          "location": "موقعیت",
+          "yearOfCompletion": "سال فراغت",
+          "grade": "نمره",
+          "fieldOfStudy": "رشته تحصیلی"
+        },
         "charts": {
           "educationByDegree": "تحصیلات بر اساس مدرک"
         },
@@ -3832,6 +4001,33 @@
         }
       },
       "guardianManagement": {
+        "title": "مدیریت سرپرستان",
+        "subtitle": "مدیریت اطلاعات سرپرستان و ضامنان شاگردان",
+        "columns": {
+          "name": "نام سرپرست",
+          "relationship": "رابطه",
+          "phone": "تلفن",
+          "email": "ایمیل",
+          "occupation": "شغل",
+          "isPrimary": "اصلی"
+        },
+        "fields": {
+          "student": "شاگرد",
+          "name": "نام سرپرست",
+          "relationship": "رابطه با شاگرد",
+          "phone": "شماره تلفن",
+          "email": "ایمیل",
+          "occupation": "شغل",
+          "address": "آدرس",
+          "idNumber": "شماره شناسایی",
+          "isPrimary": "اصلی است"
+        },
+        "options": {
+          "isPrimary": {
+            "true": "بلی",
+            "false": "خیر"
+          }
+        },
         "charts": {
           "guardiansByRelationship": "سرپرستان بر اساس رابطه",
           "relationshipDistribution": "توزیع رابطه"
@@ -3920,7 +4116,7 @@
           "totalStudents": "مجموع شاگردان"
         },
         "studentList": "لیست شاگردان",
-        "subtitle": "عنوان فرعی",
+        "subtitle": "تولید و استخراج گزارش‌های شاگردان",
         "table": {
           "admissionDate": "تاریخ پذیرش",
           "class": "صنف",
@@ -3930,14 +4126,82 @@
           "name": "اسم",
           "status": "وضعیت"
         },
-        "title": "عنوان"
+        "title": "گزارش‌ها و استخراج"
       },
       "studentAdmissions": {
+        "title": "پذیرش شاگردان",
+        "subtitle": "مدیریت پذیرش شاگردان جدید - ثبت‌نام کامل با تمام اطلاعات مورد نیاز",
+        "columns": {
+          "studentCode": "کد شاگرد",
+          "name": "نام شاگرد",
+          "fatherName": "نام پدر",
+          "phone": "تلفن",
+          "email": "ایمیل",
+          "degree": "مدرک",
+          "currentClass": "صنف",
+          "status": "وضعیت",
+          "createdAt": "تاریخ درخواست"
+        },
+        "fields": {
+          "user": "حساب کاربری (در صورت وجود)",
+          "studentCode": "کد شاگرد",
+          "firstName": "نام",
+          "lastName": "نام خانوادگی",
+          "fatherName": "نام پدر",
+          "grandfatherName": "نام پدرکلان",
+          "dob": "تاریخ تولد",
+          "bloodType": "گروه خون",
+          "phone": "شماره تلفن",
+          "whatsapp": "شماره واتساپ",
+          "email": "آدرس ایمیل",
+          "permanentAddress_province": "ولایت (دائمی)",
+          "permanentAddress_district": "ولسوالی (دائمی)",
+          "permanentAddress_village": "قریه/سرک (دائمی)",
+          "currentAddress_province": "ولایت (فعلی)",
+          "currentAddress_district": "ولسوالی (فعلی)",
+          "currentAddress_village": "قریه/سرک (فعلی)",
+          "guardianName": "نام سرپرست",
+          "guardianRelationship": "نسبت با سرپرست",
+          "guardianPhone": "تلفن سرپرست",
+          "guardianEmail": "ایمیل سرپرست",
+          "degree": "مدرک تحصیلی",
+          "currentClass": "صنف تعیین شده",
+          "currentLevel": "سطح تحصیلی",
+          "admissionDate": "تاریخ پذیرش",
+          "status": "وضعیت پذیرش",
+          "previousDegree": "مدرک/تصدیق قبلی",
+          "previousInstitution": "موسسه قبلی",
+          "locationOfInstitution": "موقعیت موسسه"
+        },
+        "placeholders": {
+          "studentCode": "مثلاً STU-2024-001",
+          "guardianRelationship": "مثلاً پدر، مادر، کاکا",
+          "currentLevel": "مثلاً سطح ۱، مبتدی"
+        },
+        "options": {
+          "bloodType": {
+            "": "انتخاب",
+            "A+": "A+",
+            "A-": "A-",
+            "B+": "B+",
+            "B-": "B-",
+            "AB+": "AB+",
+            "AB-": "AB-",
+            "O+": "O+",
+            "O-": "O-"
+          },
+          "status": {
+            "pending": "در انتظار",
+            "accepted": "قبول شده",
+            "rejected": "رد شده"
+          }
+        },
         "charts": {
           "admissionsByDegree": "پذیرش‌ها بر اساس مدرک",
           "monthlyAdmissionsTrend": "روند ماهانه پذیرش",
           "noDegreeData": "دیتای مدرک موجود نیست",
-          "noMonthlyData": "دیتای ماهانه موجود نیست"
+          "noMonthlyData": "دیتای ماهانه موجود نیست",
+          "notAssigned": "تعیین نشده"
         },
         "create": {
           "titleCreate": "ایجاد",
@@ -3959,6 +4223,19 @@
         }
       },
       "studentProfiles": {
+        "title": "مدیریت پروفایل شاگردان",
+        "subtitle": "مدیریت پروفایل‌های کامل شاگردان، اطلاعات شخصی و سوابق تحصیلی",
+        "columns": {
+          "image": "عکس",
+          "studentCode": "کد شاگرد",
+          "name": "نام شاگرد",
+          "fatherName": "نام پدر",
+          "phone": "تلفن",
+          "currentClass": "صنف",
+          "currentLevel": "سطح",
+          "status": "وضعیت",
+          "admissionDate": "تاریخ پذیرش"
+        },
         "charts": {
           "active": "فعال",
           "enrollmentStatus": "وضعیت ثبت‌نام",
@@ -3984,7 +4261,97 @@
           "title": "عنوان"
         }
       },
+      "studentRegistration": {
+        "title": "ثبت‌نام شاگرد",
+        "completeTitle": "ثبت‌نام شاگرد تکمیل شد",
+        "eyebrow": "ثبت‌نام",
+        "pageEyebrow": "ثبت‌نام / امور شاگردان",
+        "pageSubtitle": "ثبت‌نام دو مرحله‌ای: اطلاعات شاگرد + تعیین هاستل (اختیاری)",
+        "registrationSuccessful": "ثبت‌نام موفقانه!",
+        "registrationSuccessMessage": "شاگرد با موفقیت ثبت‌نام شد.",
+        "redirectingMessage": "در حال انتقال به لیست شاگردان...",
+        "phase1": "مرحله ۱: اطلاعات شاگرد",
+        "phase2": "مرحله ۲: هاستل (اختیاری)",
+        "studentInfo": "اطلاعات شاگرد",
+        "basicInfo": "اطلاعات پایه",
+        "profilePhoto": "عکس پروفایل",
+        "previewAlt": "پیش‌نمایش",
+        "profilePhotoHint": "JPG، PNG یا GIF. حداکثر ۵MB توصیه می‌شود.",
+        "studentCode": "کد شاگرد *",
+        "studentCodePlaceholder": "کد شاگرد را وارد کنید",
+        "firstName": "نام *",
+        "lastName": "نام خانوادگی",
+        "fatherName": "نام پدر *",
+        "grandfatherName": "نام پدرکلان",
+        "dateOfBirth": "تاریخ تولد",
+        "dateOfBirthPlaceholder": "تاریخ تولد را انتخاب کنید",
+        "gender": "جنسیت",
+        "male": "مرد",
+        "female": "زن",
+        "bloodType": "گروه خون",
+        "bloodTypeSelect": "گروه خون را انتخاب کنید",
+        "contactInfo": "اطلاعات تماس",
+        "phone": "تلفن *",
+        "whatsapp": "واتساپ",
+        "email": "ایمیل *",
+        "emailPlaceholder": "آدرس ایمیل را وارد کنید",
+        "password": "رمز عبور *",
+        "passwordPlaceholder": "رمز عبور را وارد کنید",
+        "loginRole": "نقش ورود",
+        "studentRoleValue": "شاگرد",
+        "guardianInfo": "اطلاعات سرپرست",
+        "guardianName": "نام سرپرست *",
+        "relationship": "نسبت *",
+        "relationshipPlaceholder": "نسبت را وارد کنید",
+        "guardianPhone": "تلفن سرپرست",
+        "guardianEmail": "ایمیل سرپرست",
+        "academicInfo": "اطلاعات تحصیلی",
+        "admissionDate": "تاریخ پذیرش",
+        "admissionDatePlaceholder": "تاریخ پذیرش را انتخاب کنید",
+        "currentLevel": "سطح فعلی",
+        "currentLevelPlaceholder": "سطح فعلی را وارد کنید",
+        "nextPhase": "بعدی: تعیین هاستل",
+        "hostelAssignment": "تعیین هاستل (اختیاری)",
+        "hostelCheckbox": "شاگرد خواهان اقامت در هاستل است",
+        "selectRoom": "اتاق را انتخاب کنید *",
+        "selectRoomPlaceholder": "یک اتاق انتخاب کنید",
+        "roomOption": "اتاق {{roomNumber}} - {{building}} طبقه {{floor}} ({{roomType}}) - ${{rent}}/ماه",
+        "noRooms": "اتاق موجود یافت نشد",
+        "bedNumber": "شماره بستر",
+        "checkinDate": "تاریخ ورود *",
+        "checkinDatePlaceholder": "تاریخ ورود را انتخاب کنید",
+        "monthlyRent": "اجاره ماهانه ($)",
+        "securityDeposit": "پیش پرداخت ($)",
+        "hostelEmergencyContact": "تماس اضطراری هاستل",
+        "emergencyName": "نام *",
+        "emergencyRelationship": "نسبت *",
+        "emergencyPhone": "تلفن *",
+        "emergencyEmail": "ایمیل",
+        "back": "بازگشت",
+        "registering": "در حال ثبت‌نام...",
+        "completeRegistration": "تکمیل ثبت‌نام",
+        "imageSizeError": "اندازه عکس باید کمتر از ۵MB باشد",
+        "validationRequiredFields": "لطفاً تمام فیلدهای ضروری را پر کنید",
+        "validationEmailRequired": "ایمیل حساب شاگرد ضروری است",
+        "validationPasswordRequired": "رمز عبور حساب شاگرد ضروری است",
+        "validationPasswordLength": "رمز عبور حساب شاگرد باید حداقل ۶ حرف باشد",
+        "createStudentFailed": "ایجاد شاگرد ناموفق بود",
+        "hostelAllocationFailed": "شاگرد ایجاد شد اما تخصیص هاستل ناموفق بود"
+      },
       "studentsList": {
+        "title": "همه شاگردان",
+        "subtitle": "مدیریت شاگردان ثبت‌نام شده و اطلاعات آن‌ها",
+        "columns": {
+          "image": "عکس",
+          "studentCode": "کد شاگرد",
+          "name": "نام شاگرد",
+          "fatherName": "نام پدر",
+          "phone": "تلفن",
+          "currentClass": "صنف",
+          "currentLevel": "سطح",
+          "status": "وضعیت",
+          "admissionDate": "تاریخ پذیرش"
+        },
         "charts": {
           "active": "فعال",
           "inactive": "غیر فعال",
@@ -4172,107 +4539,174 @@
       "cancel": "لغو"
     },
     "library": {
+      "label": "کتابخانه",
       "books": {
-        "booksByCategory": "کتاب‌ها بر اساس دسته‌بندی",
-        "errorFetching": "خطا: در حال دریافت",
-        "highRange": "موجودی زیاد",
+        "booksByCategory": "کتاب‌ها بر اساس دسته",
+        "errorFetching": "خطا در بارگیری کتاب‌ها",
+        "highRange": "زیاد (۲۰+)",
         "inventoryValue": "ارزش موجودی",
-        "lowRange": "موجودی کم",
-        "lowStock": "کم‌موجودی",
-        "mediumRange": "موجودی متوسط",
+        "lowRange": "کم (۱-۵)",
+        "lowStock": "موجودی کم",
+        "mediumRange": "متوسط (۶-۲۰)",
         "outOfStock": "تمام شده",
-        "searchPlaceholder": "جستجو...",
+        "searchPlaceholder": "جستجوی کتاب بر اساس عنوان، نویسنده یا ISBN...",
         "stockDistribution": "توزیع موجودی",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "subtitle": "مدیریت تمام کتاب‌ها و موجودی کتابخانه",
+        "title": "کتاب‌های کتابخانه",
         "titleCreate": "ایجاد",
         "titleEdit": "ویرایش",
         "totalBooks": "مجموع کتاب‌ها",
         "totalStock": "مجموع موجودی",
-        "viewTitle": "مشاهده جزئیات"
+        "viewTitle": "مشاهده جزئیات",
+        "columnTitle": "عنوان",
+        "columnCategory": "دسته",
+        "columnPublisher": "ناشر",
+        "columnPublisherYear": "سال نشر",
+        "columnPages": "صفحات",
+        "columnStock": "موجودی",
+        "columnPurchasePrice": "قیمت خرید",
+        "columnSalePrice": "قیمت فروش",
+        "fieldTitle": "عنوان",
+        "fieldCategory": "دسته",
+        "fieldPages": "صفحات",
+        "fieldPublisher": "ناشر",
+        "fieldPublisherYear": "سال نشر",
+        "fieldStock": "موجودی",
+        "fieldPurchasePrice": "قیمت خرید",
+        "fieldSalePrice": "قیمت فروش"
       },
       "borrowed": {
-        "currentlyBorrowed": "در حال مستعار",
-        "errorFetching": "خطا: در حال دریافت",
-        "inStock": "در موجودی",
-        "markReturned": "علامت برگشت",
+        "currentlyBorrowed": "در حال حاضر قرض شده",
+        "errorFetching": "خطا در بارگیری records قرض شده",
+        "inStock": "در انبار",
+        "markReturned": "علامت به عنوان بازگشته",
         "monthlyTrend": "روند ماهانه",
         "overdue": "تاخیری",
-        "returned": "برگشت داده شده",
-        "searchPlaceholder": "جستجو...",
+        "returned": "بازگردانده شده",
+        "searchPlaceholder": "جستجوی records قرض شده...",
         "statusDistribution": "توزیع وضعیت",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "subtitle": "پیگیری تمام کتاب‌های قرض شده فعلی",
+        "title": "کتاب‌های قرض شده",
         "titleCreate": "ایجاد",
         "titleEdit": "ویرایش",
-        "totalRecords": "مجموع ریکاردها",
-        "viewTitle": "مشاهده جزئیات"
+        "totalRecords": "مجموع records",
+        "viewTitle": "مشاهده جزئیات",
+        "columnBorrower": "شاگرد",
+        "columnBook": "کتاب",
+        "columnBorrowedAt": "تاریخ قرض",
+        "columnReturnDate": "تاریخ بازگشت",
+        "columnStatus": "وضعیت",
+        "fieldBorrower": "شاگرد",
+        "fieldBook": "کتاب",
+        "fieldStatus": "وضعیت",
+        "fieldReturnDate": "تاریخ بازگشت",
+        "optionBorrowed": "قرض شده",
+        "optionReturned": "بازگردانده شده"
       },
       "categories": {
-        "avgBooksPerCategory": "میانگین کتاب‌ها در هر دسته",
+        "avgBooksPerCategory": "میانگین کتاب / دسته",
         "booksPerCategory": "کتاب‌ها در هر دسته",
-        "errorFetching": "خطا: در حال دریافت",
-        "searchPlaceholder": "جستجو...",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "errorFetching": "خطا در بارگیری دسته‌بندی‌ها",
+        "searchPlaceholder": "جستجوی دسته‌بندی‌ها...",
+        "subtitle": "مدیریت دسته‌بندی‌ها و طبقه‌بندی کتاب‌های کتابخانه",
+        "title": "دسته‌بندی کتاب‌ها",
         "titleCreate": "ایجاد",
         "titleEdit": "ویرایش",
         "totalBooks": "مجموع کتاب‌ها",
-        "totalCategories": "مجموع دسته‌بندی‌ها",
-        "viewTitle": "مشاهده جزئیات"
+        "totalCategories": "مجموع دسته‌ها",
+        "viewTitle": "مشاهده جزئیات",
+        "columnName": "نام دسته",
+        "columnDescription": "توضیحات",
+        "columnCreatedAt": "ایجاد شده",
+        "fieldName": "نام دسته",
+        "fieldDescription": "توضیحات"
       },
       "purchases": {
-        "bySupplier": "بر اساس عرضه‌کننده",
-        "errorFetching": "خطا: در حال دریافت",
+        "bySupplier": "بر اساس تامین کننده",
+        "errorFetching": "خطا در بارگیری خریداری‌ها",
         "monthlyTrend": "روند ماهانه",
-        "searchPlaceholder": "جستجو...",
-        "subtitle": "عنوان فرعی",
+        "searchPlaceholder": "جستجوی خریداری‌ها...",
+        "subtitle": "مدیریت سفارشات خرید و records کتاب",
         "thisMonth": "این ماه",
-        "title": "عنوان",
+        "title": "خریداری کتاب‌ها",
         "titleCreate": "ایجاد",
         "titleEdit": "ویرایش",
-        "totalPurchases": "مجموع خریداری‌ها",
-        "totalQuantity": "مجموع مقدار",
-        "totalSpent": "مجموع مصرف شده",
-        "viewTitle": "مشاهده جزئیات"
+        "totalPurchases": "مجموع خریدها",
+        "totalQuantity": "مجموع تعداد",
+        "totalSpent": "مجموع هزینه",
+        "viewTitle": "مشاهده جزئیات",
+        "columnPurchaseCode": "کد خرید",
+        "columnPurchaseDate": "تاریخ خرید",
+        "columnSupplierName": "تامین کننده",
+        "columnInvoiceReference": "مرجع فاکتور",
+        "columnBook": "کتاب",
+        "columnQuantity": "تعداد",
+        "columnUnit": "واحد",
+        "columnUnitPrice": "قیمت واحد",
+        "columnTotalPrice": "قیمت کل",
+        "columnPaymentMethod": "پرداخت",
+        "fieldPurchaseCode": "کد خرید",
+        "fieldSupplierName": "نام تامین کننده",
+        "fieldInvoiceReference": "مرجع فاکتور",
+        "fieldBook": "کتاب",
+        "fieldQuantity": "تعداد",
+        "fieldUnit": "واحد",
+        "fieldUnitPrice": "قیمت واحد",
+        "fieldPaymentMethod": "روش پرداخت",
+        "fieldPurchaseDate": "تاریخ خرید",
+        "optionCash": "نقد",
+        "optionOther": "سایر"
       },
       "reports": {
         "available": "موجود",
-        "bookStatusDistribution": "توزیع وضعیت کتاب",
-        "borrowed": "مستعار",
-        "borrowedRate": "نرخ مستعار",
-        "errorMessage": "خطا: پیام",
-        "failedToFetch": "دریافت گزارش‌ها ناکام ماند",
-        "libraryActivityOverview": "بررسی فعالیت کتابخانه",
-        "loading": "در حال بارگذاری...",
-        "lowStock": "کم‌موجودی",
-        "lowStockLabel": "کم‌موجودی",
+        "bookStatusDistribution": "توزیع وضعیت کتاب‌ها",
+        "borrowed": "قرض گرفته شده",
+        "borrowedRate": "نرخ قرض‌گیری",
+        "errorMessage": "هنگام بارگیری گزارش‌ها خطایی رخ داد",
+        "failedToFetch": "بارگیری آمار کتابخانه موفق نشد",
+        "libraryActivityOverview": "نمای کلی فعالیت کتابخانه",
+        "loading": "در حال بارگیری...",
+        "lowStock": "موجودی کم",
+        "lowStockLabel": "موارد کم موجودی",
         "quickRatios": "نسبت‌های سریع",
         "retry": "تلاش دوباره",
-        "returned": "برگشت داده شده",
-        "returnedRate": "نرخ برگشت",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "returned": "بازگردانده شده",
+        "returnedRate": "نرخ بازگشت",
+        "subtitle": "تحلیل‌ها و آمار استفاده از کتابخانه",
+        "title": "گزارش‌های کتابخانه",
         "total": "مجموع",
         "totalBooks": "مجموع کتاب‌ها",
-        "unableToLoad": "قادر به بارگذاری گزارش‌ها نیست"
+        "unableToLoad": "قادر به بارگیری گزارش‌ها نیست"
       },
       "sales": {
-        "errorFetching": "خطا: در حال دریافت",
+        "errorFetching": "خطا در بارگیری فروش‌ها",
         "monthlyTrend": "روند ماهانه",
-        "quantitySold": "مقدار فروخته شده",
-        "searchPlaceholder": "جستجو...",
+        "quantitySold": "تعداد فروخته شده",
+        "searchPlaceholder": "جستجوی فروش‌ها...",
         "student": "شاگرد",
-        "subtitle": "عنوان فرعی",
+        "subtitle": "پیگیری فروش کتاب و disposals",
         "thisMonth": "این ماه",
-        "title": "عنوان",
+        "title": "فروش کتاب",
         "titleCreate": "ایجاد",
         "titleEdit": "ویرایش",
         "topBuyers": "خریداران برتر",
-        "totalRevenue": "مجموع عواید",
+        "totalRevenue": "مجموع درآمد",
         "totalSales": "مجموع فروش",
         "viewTitle": "مشاهده جزئیات",
-        "walkIn": "مراجعه حضوری"
+        "walkIn": "مراجعه کننده",
+        "columnReceiptNo": "شماره رسید",
+        "columnSaleDate": "تاریخ فروش",
+        "columnStudent": "شاگرد",
+        "columnBook": "کتاب",
+        "columnQuantity": "تعداد",
+        "columnUnitPrice": "قیمت واحد",
+        "columnTotalAmount": "مبلغ کل",
+        "fieldReceiptNo": "شماره رسید",
+        "fieldStudent": "شاگرد",
+        "fieldBook": "کتاب",
+        "fieldQuantity": "تعداد",
+        "fieldUnitPrice": "قیمت واحد",
+        "fieldSaleDate": "تاریخ فروش"
       }
     },
     "categories": "دسته‌بندی‌ها",
@@ -4282,29 +4716,61 @@
     "sales": "فروش",
     "reports": "گزارش‌ها",
     "complaints": {
+      "label": "شکایات",
       "actions": {
         "completed": "تکمیل شده",
         "eyebrow": "بررسی عمل‌ها",
         "followups": "پیگیری‌ها",
         "monthlyTrend": "روند ماهانه",
         "pending": "در انتظار",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
-        "totalActions": "مجموع عمل‌ها"
+        "subtitle": "مدیریت اقدامات شکایت با استفاده از طراحی یکسان گردش کار شکایات",
+        "title": "اقدامات شکایت",
+        "totalActions": "مجموع عمل‌ها",
+        "searchPlaceholder": "جستجوی اقدامات شکایت...",
+        "columns": {
+          "complaint": "شکایت",
+          "actionType": "نوع اقدام",
+          "actionDescription": "توضیحات اقدام",
+          "actionResult": "نتیجه اقدام",
+          "actionDate": "تاریخ اقدام",
+          "followUpDate": "تاریخ پیگیری",
+          "nextActionRequired": "اقدام بعدی",
+          "visibilityScope": "دید"
+        },
+        "fields": {
+          "complaint": "شکایت",
+          "actionType": "نوع اقدام",
+          "actionDescription": "توضیحات اقدام",
+          "actionResult": "نتیجه اقدام",
+          "followUpDate": "تاریخ پیگیری",
+          "nextActionRequired": "اقدام بعدی ضروری",
+          "visibilityScope": "دید",
+          "remarks": "ملاحظات"
+        },
+        "options": {
+          "nextActionRequired": {
+            "true": "بلی",
+            "false": "خیر"
+          },
+          "visibilityScope": {
+            "public": "عمومی",
+            "private": "خصوصی"
+          }
+        }
       },
       "actionsCreate": {
-        "titleCreate": "ایجاد",
-        "titleEdit": "ویرایش"
+        "titleCreate": "ایجاد اقدام",
+        "titleEdit": "ویرایش اقدام"
       },
       "actionsView": {
-        "title": "عنوان"
+        "title": "جزئیات اقدام"
       },
       "complaintsEdit": {
-        "titleCreate": "ایجاد",
-        "titleEdit": "ویرایش"
+        "titleCreate": "ایجاد شکایت",
+        "titleEdit": "ویرایش شکایت"
       },
       "complaintsView": {
-        "title": "عنوان"
+        "title": "جزئیات شکایت"
       },
       "feedback": {
         "avgSatisfaction": "میانگین رضایت",
@@ -4312,16 +4778,39 @@
         "monthlyTrend": "روند ماهانه",
         "needsImprovement": "نیاز به بهبود",
         "satisfactionDistribution": "توزیع رضایت",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
-        "totalFeedback": "مجموع بازخورد"
+        "subtitle": "مدیریت ریکاردهای بازخورد با سیستم جدول و فرم شکایات قابل استفاده مجدد",
+        "title": "بازخورد شکایت",
+        "totalFeedback": "مجموع بازخورد",
+        "searchPlaceholder": "جستجوی بازخورد شکایت...",
+        "columns": {
+          "complaint": "شکایت",
+          "satisfactionLevel": "رضایت (1-5)",
+          "comments": "نظرات",
+          "feedbackDate": "تاریخ بازخورد",
+          "resolutionTime": "زمان حل (ساعت)",
+          "escalationRequired": "ارجاع"
+        },
+        "fields": {
+          "complaint": "شکایت",
+          "satisfactionLevel": "سطح رضایت (1-5)",
+          "comments": "نظرات",
+          "feedbackDate": "تاریخ بازخورد",
+          "resolutionTime": "زمان حل (ساعت)",
+          "escalationRequired": "ارجاع ضروری"
+        },
+        "options": {
+          "escalationRequired": {
+            "true": "بلی",
+            "false": "خیر"
+          }
+        }
       },
       "feedbackCreate": {
-        "titleCreate": "ایجاد",
-        "titleEdit": "ویرایش"
+        "titleCreate": "ایجاد بازخورد",
+        "titleEdit": "ویرایش بازخورد"
       },
       "feedbackView": {
-        "title": "عنوان"
+        "title": "جزئیات بازخورد"
       },
       "list": {
         "byCategory": "بر اساس دسته‌بندی",
@@ -4332,15 +4821,58 @@
         "inProgress": "در جریان",
         "markInProgress": "علامت در جریان",
         "open": "باز",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
-        "total": "مجموع"
+        "subtitle": "ردیابی و مدیریت ریکاردهای شکایات",
+        "title": "مدیریت شکایات",
+        "total": "مجموع",
+        "searchPlaceholder": "جستجوی شکایات...",
+        "columns": {
+          "complaintCode": "کد شکایت",
+          "subject": "موضوع",
+          "category": "دسته‌بندی",
+          "priority": "اولویت",
+          "status": "وضعیت",
+          "submittedBy": "ارسال شده توسط",
+          "assignedTo": "محول شده به",
+          "createdAt": "تاریخ ارسال"
+        },
+        "fields": {
+          "complaintCode": "کد شکایت",
+          "complainantType": "نوع شاکی",
+          "complaintCategory": "دسته‌بندی",
+          "subject": "موضوع",
+          "description": "توضیحات",
+          "priorityLevel": "سطح اولویت",
+          "complaintStatus": "وضعیت",
+          "confidentialityLevel": "سطح محرمانگی"
+        },
+        "options": {
+          "complainantType": {
+            "student": "شاگرد",
+            "staff": "کارمند",
+            "other": "سایر"
+          },
+          "priorityLevel": {
+            "low": "کم",
+            "medium": "متوسط",
+            "high": "زیاد"
+          },
+          "complaintStatus": {
+            "open": "باز",
+            "in_progress": "در جریان",
+            "closed": "بسته"
+          },
+          "confidentialityLevel": {
+            "low": "کم",
+            "medium": "متوسط",
+            "high": "زیاد"
+          }
+        }
       },
       "reports": {
         "closed": "بسته شده",
         "errorTitle": "خطا",
         "fetchError": "دریافت داده ناکام ماند",
-        "filterInfo": "اطلاعات فیلتر",
+        "filterInfo": "از فیلترهای زیر برای محدود کردن داده‌های شکایت استفاده کنید",
         "highPriority": "اولویت بالا",
         "inProgress": "در جریان",
         "loading": "در حال بارگذاری...",
@@ -4349,13 +4881,14 @@
         "recentComplaints": "شکایات اخیر",
         "retry": "تلاش دوباره",
         "statusDistribution": "توزیع وضعیت",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "subtitle": "مشاهده گزارش‌ها و تحلیل‌های تفصیلی شکایات",
+        "title": "گزارش‌های شکایات",
         "total": "مجموع"
       }
     },
     "compList": "لیست شکایات",
     "actions": {
+      "label": "عمل‌ها",
       "view": "مشاهده",
       "edit": "ویرایش",
       "delete": "حذف"
@@ -4364,147 +4897,422 @@
     "support": "پشتیبانی",
     "supportTickets": "تیکت‌های پشتیبانی",
     "finance": {
+      "label": "مالیه",
       "accounts": {
-        "chartAccountStatusDistribution": "توزیع وضعیت حساب",
-        "chartAccountTypeDistribution": "توزیع نوع حساب",
+        "title": "حساب‌ها",
+        "subtitle": "مشاهده و مدیریت حساب‌های مالی",
         "create": "ایجاد",
         "edit": "ویرایش",
-        "errorDescription": "هنگام بارگذاری داده خطایی رخ داد",
-        "errorTitle": "خطا",
-        "insightDescription": "توضیحات",
-        "insightEyebrow": "بررسی",
-        "insightTitle": "عنوان",
-        "searchPlaceholder": "جستجو...",
+        "details": "{{title}} - جزئیات",
+        "errorDescription": "در بارگذاری اطلاعات حساب مشکلی پیش آمد. لطفاً اتصال خود را بررسی کرده و دوباره تلاش کنید.",
+        "errorTitle": "خطای اطلاعات حساب",
+        "insight": {
+          "eyebrow": "بینش حساب‌ها",
+          "title": "بررسی سلامت حساب",
+          "description": "موجودی حساب‌ها، حساب‌های فعال در مقابل غیرفعال و توزیع نوع حساب‌ها را در ساختار مالی خود نظارت کنید."
+        },
+        "insightEyebrowUnavailable": "اطلاعات حساب در دسترس نیست",
+        "searchPlaceholder": "جستجو بر اساس نام، کد یا واحد پول...",
         "statAccountTypes": "انواع حساب",
-        "statAccountTypesHelper": "راهنمای انواع حساب",
+        "statAccountTypesHelper": "دسته‌بندی‌های مجزای حساب در حال استفاده",
         "statActiveAccounts": "حساب‌های فعال",
-        "statActiveAccountsHelper": "راهنمای حساب‌های فعال",
+        "statActiveAccountsHelper": "حساب‌هایی که در حال حاضر فعال هستند",
         "statInactiveAccounts": "حساب‌های غیر فعال",
-        "statInactiveAccountsHelper": "راهنمای حساب‌های غیر فعال",
+        "statInactiveAccountsHelper": "حساب‌هایی که در حال حاضر غیرفعال هستند",
         "statTotalAccounts": "مجموع حساب‌ها",
-        "statTotalAccountsHelper": "راهنمای مجموع حساب‌ها",
-        "statTotalBalance": "مجموع موجودی"
+        "statTotalAccountsHelper": "تمام حساب‌های مالی ثبت شده",
+        "statTotalBalance": "مجموع موجودی",
+        "statTotalBalanceHelper": "مجموع موجودی تمام حساب‌ها",
+        "chart": {
+          "accountTypeDistribution": "توزیع نوع حساب",
+          "accountStatusDistribution": "توزیع وضعیت حساب"
+        },
+        "column": {
+          "accountCode": "کد حساب",
+          "accountName": "نام حساب",
+          "accountType": "نوع حساب",
+          "openingBalance": "موجودی افتتاحیه",
+          "currentBalance": "موجودی جاری",
+          "currency": "واحد پول",
+          "status": "وضعیت"
+        },
+        "formField": {
+          "accountCode": "کد حساب",
+          "accountName": "نام حساب",
+          "accountType": "نوع حساب",
+          "openingBalance": "موجودی افتتاحیه",
+          "currentBalance": "موجودی جاری",
+          "currency": "واحد پول",
+          "status": "وضعیت",
+          "option": {
+            "accountType": {
+              "cash": "نقد",
+              "petty_cash": "صندوق خرد"
+            },
+            "status": {
+              "active": "فعال",
+              "inactive": "غیرفعال"
+            }
+          }
+        }
       },
       "expenses": {
-        "chartApprovalStatusBreakdown": "تجزیه وضعیت تأیید",
-        "chartCategoryDistribution": "توزیع دسته‌بندی",
-        "chartMonthlyExpenseTrend": "روند ماهانه مصارف",
+        "title": "مصارف",
+        "subtitle": "مشاهده و مدیریت مصارف",
         "create": "ایجاد",
         "edit": "ویرایش",
-        "errorDescription": "هنگام بارگذاری داده خطایی رخ داد",
-        "errorTitle": "خطا",
-        "insightDescription": "توضیحات",
-        "insightEyebrow": "بررسی",
-        "insightTitle": "عنوان",
-        "searchPlaceholder": "جستجو...",
+        "details": "{{title}} - جزئیات",
+        "errorDescription": "در بارگذاری اطلاعات مصارف مشکلی پیش آمد. لطفاً اتصال خود را بررسی کرده و دوباره تلاش کنید.",
+        "errorTitle": "خطای اطلاعات مصارف",
+        "insightEyebrowUnavailable": "اطلاعات مصارف در دسترس نیست",
+        "searchPlaceholder": "جستجو بر اساس کد، دسته‌بندی یا گیرنده...",
         "statExpenseCategories": "دسته‌بندی‌های مصارف",
-        "statExpenseCategoriesHelper": "راهنمای دسته‌بندی مصارف",
+        "statExpenseCategoriesHelper": "دسته‌بندی‌های مجزا با مصارف ثبت شده",
         "statPendingApprovals": "تأییدهای در انتظار",
-        "statPendingApprovalsHelper": "راهنمای تأییدهای در انتظار",
+        "statPendingApprovalsHelper": "مصارف منتظر تصمیم تأیید",
         "statRejectedEntries": "ورودی‌های رد شده",
-        "statRejectedEntriesHelper": "راهنمای ورودی‌های رد شده",
+        "statRejectedEntriesHelper": "مصارفی که رد شده‌اند",
         "statThisMonth": "این ماه",
-        "statThisMonthHelper": "راهنمای این ماه",
+        "statThisMonthHelper": "مجموع مصارف انجام شده در این ماه",
         "statTotalExpenses": "مجموع مصارف",
-        "statTotalExpensesHelper": "راهنمای مجموع مصارف"
+        "statTotalExpensesHelper": "ارزش تجمیعی تمام رکوردهای مصرف",
+        "chart": {
+          "categoryDistribution": "توزیع دسته‌بندی",
+          "approvalStatusBreakdown": "تجزیه وضعیت تأیید",
+          "monthlyExpenseTrend": "روند ماهانه مصارف"
+        },
+        "column": {
+          "expenseCode": "کد مصرف",
+          "category": "دسته‌بندی",
+          "title": "عنوان",
+          "amount": "مقدار",
+          "expenseDate": "تاریخ مصرف",
+          "paymentMethod": "روش پرداخت",
+          "approvalStatus": "وضعیت تأیید"
+        },
+        "formField": {
+          "expenseCode": "کد مصرف",
+          "category": "دسته‌بندی",
+          "title": "عنوان",
+          "amount": "مقدار",
+          "expenseDate": "تاریخ مصرف",
+          "paymentMethod": "روش پرداخت",
+          "referenceNo": "شماره مرجع",
+          "paidTo": "پرداخت به",
+          "approvalStatus": "وضعیت تأیید",
+          "remarks": "ملاحظات",
+          "option": {
+            "paymentMethod": {
+              "cash": "نقد",
+              "card": "کارت",
+              "other": "سایر"
+            },
+            "approvalStatus": {
+              "pending": "در انتظار",
+              "approved": "تأیید شد",
+              "rejected": "رد شد"
+            }
+          }
+        },
+        "insight": {
+          "eyebrow": "بینش مصارف",
+          "title": "تحلیل مصارف",
+          "description": "الگوهای مصرف، بار کاری تصویب و توزیع دسته‌بندی‌ها را برای تصمیم‌گیری آگاهانه بودجه追踪 کنید."
+        }
       },
       "eyebrow": "بررسی مالیه",
       "feePayments": {
-        "chartMonthlyCollections": "جمع‌آوری‌های ماهانه",
-        "chartPaymentMethodDistribution": "توزیع روش پرداخت",
-        "chartPaymentStatusBreakdown": "تجزیه وضعیت پرداخت",
+        "title": "پرداخت‌های فیس",
+        "subtitle": "مشاهده و مدیریت پرداخت‌های فیس",
         "create": "ایجاد",
         "edit": "ویرایش",
-        "errorDescription": "هنگام بارگذاری داده خطایی رخ داد",
-        "errorTitle": "خطا",
-        "insightDescription": "توضیحات",
-        "insightEyebrow": "بررسی",
-        "insightTitle": "عنوان",
-        "searchPlaceholder": "جستجو...",
+        "details": "{{title}} - جزئیات",
+        "errorDescription": "در بارگذاری اطلاعات پرداخت فیس مشکلی پیش آمد. لطفاً اتصال خود را بررسی کرده و دوباره تلاش کنید.",
+        "errorTitle": "خطای اطلاعات پرداخت فیس",
+        "insightEyebrowUnavailable": "اطلاعات پرداخت فیس در دسترس نیست",
+        "searchPlaceholder": "جستجو بر اساس شماره رسید، شاگرد یا مقدار...",
         "statFailedPayments": "پرداخت‌های ناموفق",
-        "statFailedPaymentsHelper": "راهنمای پرداخت‌های ناموفق",
+        "statFailedPaymentsHelper": "پرداخت‌هایی که با موفقیت تکمیل نشدند",
         "statPendingPayments": "پرداخت‌های در انتظار",
-        "statPendingPaymentsHelper": "راهنمای پرداخت‌های در انتظار",
+        "statPendingPaymentsHelper": "پرداخت‌های منتظر پردازش یا تأیید",
         "statTotalCollected": "مجموع جمع‌آوری شده",
-        "statTotalCollectedHelper": "راهنمای مجموع جمع‌آوری شده",
+        "statTotalCollectedHelper": "مجموع تمام پرداخت‌های موفق",
         "statTotalPayments": "مجموع پرداخت‌ها",
-        "statTotalPaymentsHelper": "راهنمای مجموع پرداخت‌ها",
+        "statTotalPaymentsHelper": "تمام رکوردهای پرداخت شامل در انتظار و ناموفق",
         "statVerificationQueue": "صف تأیید",
-        "statVerificationQueueHelper": "راهنمای صف تأیید"
+        "statVerificationQueueHelper": "پرداخت‌های منتظر تأیید",
+        "chart": {
+          "monthlyCollections": "جمع‌آوری‌های ماهانه",
+          "paymentMethodDistribution": "توزیع روش پرداخت",
+          "paymentStatusBreakdown": "تجزیه وضعیت پرداخت"
+        },
+        "column": {
+          "studentFee": "فیس شاگرد",
+          "receiptNo": "شماره رسید",
+          "paymentDate": "تاریخ پرداخت",
+          "paidAmount": "مبلغ پرداخت شده",
+          "paymentMethod": "روش پرداخت",
+          "paymentStatus": "وضعیت پرداخت",
+          "verificationStatus": "وضعیت تأیید"
+        },
+        "formField": {
+          "studentFee": "فیس شاگرد",
+          "receiptNo": "شماره رسید",
+          "paymentDate": "تاریخ پرداخت",
+          "paidAmount": "مبلغ پرداخت شده",
+          "paymentMethod": "روش پرداخت",
+          "transactionReference": "مرجع معامله",
+          "paymentStatus": "وضعیت پرداخت",
+          "verificationStatus": "وضعیت تأیید",
+          "paymentChannel": "کانال پرداخت",
+          "remarks": "ملاحظات",
+          "option": {
+            "paymentMethod": {
+              "cash": "نقد",
+              "card": "کارت"
+            },
+            "paymentStatus": {
+              "completed": "تکمیل شد",
+              "pending": "در انتظار",
+              "failed": "ناموفق"
+            },
+            "verificationStatus": {
+              "verified": "تأیید شد",
+              "pending": "در انتظار",
+              "rejected": "رد شد"
+            }
+          }
+        },
+        "insight": {
+          "eyebrow": "بینش پرداخت فیس",
+          "title": "عملکرد جمع‌آوری",
+          "description": "عملکرد جمع‌آوری، ترجیحات روش پرداخت و پیگیری پرداخت‌های در انتظار یا ناموفق را بررسی کنید."
+        }
       },
       "feeStructures": {
-        "chartFeeTypeDistribution": "توزیع نوع فیس",
-        "chartFrequencyBreakdown": "تجزیه تکرار",
+        "title": "ساختارهای فیس",
+        "subtitle": "مشاهده و مدیریت ساختارهای فیس",
         "create": "ایجاد",
         "edit": "ویرایش",
-        "errorDescription": "هنگام بارگذاری داده خطایی رخ داد",
-        "errorTitle": "خطا",
-        "insightDescription": "توضیحات",
-        "insightEyebrow": "بررسی",
-        "insightTitle": "عنوان",
-        "searchPlaceholder": "جستجو...",
+        "details": "{{title}} - جزئیات",
+        "errorDescription": "در بارگذاری اطلاعات ساختار فیس مشکلی پیش آمد. لطفاً اتصال خود را بررسی کرده و دوباره تلاش کنید.",
+        "errorTitle": "خطای اطلاعات ساختار فیس",
+        "insight": {
+          "eyebrow": "بینش ساختار فیس",
+          "title": "بررسی ساختار قیمت‌گذاری",
+          "description": "دسته‌بندی فیس‌ها، فراوانی قیمت‌گذاری و پیکربندی فیس‌های فعال و اجباری را در سراسر مؤسسه بررسی کنید."
+        },
+        "insightEyebrowUnavailable": "اطلاعات ساختار فیس در دسترس نیست",
+        "searchPlaceholder": "جستجو بر اساس نام فیس، کد یا نوع...",
         "statActiveStructures": "ساختارهای فعال",
-        "statActiveStructuresHelper": "راهنمای ساختارهای فعال",
+        "statActiveStructuresHelper": "ورودی‌های ساختار فیس که در حال حاضر استفاده می‌شوند",
         "statAverageFee": "میانگین فیس",
-        "statAverageFeeHelper": "راهنمای میانگین فیس",
+        "statAverageFeeHelper": "میانگین مقدار فیس در تمام ساختارها",
         "statFeeTypes": "انواع فیس",
-        "statFeeTypesHelper": "راهنمای انواع فیس",
+        "statFeeTypesHelper": "دسته‌بندی‌های مجزای فیس پیکربندی شده",
         "statMandatoryFees": "فیس‌های اجباری",
-        "statMandatoryFeesHelper": "راهنمای فیس‌های اجباری",
+        "statMandatoryFeesHelper": "فیس‌هایی که برای شاگردان اجباری هستند",
         "statTotalStructures": "مجموع ساختارها",
-        "statTotalStructuresHelper": "راهنمای مجموع ساختارها"
+        "statTotalStructuresHelper": "تمام رکوردهای ساختار فیس",
+        "chart": {
+          "feeTypeDistribution": "توزیع نوع فیس",
+          "frequencyBreakdown": "تجزیه تکرار"
+        },
+        "column": {
+          "feeCode": "کد فیس",
+          "feeName": "نام فیس",
+          "feeType": "نوع فیس",
+          "amount": "مقدار",
+          "frequency": "تکرار",
+          "isMandatory": "اجباری",
+          "status": "وضعیت"
+        },
+        "formField": {
+          "feeCode": "کد فیس",
+          "feeName": "نام فیس",
+          "class": "صنف",
+          "feeType": "نوع فیس",
+          "amount": "مقدار",
+          "frequency": "تکرار",
+          "applicableFrom": "قابل اجرا از",
+          "applicableTo": "قابل اجرا تا",
+          "isMandatory": "اجباری",
+          "status": "وضعیت",
+          "option": {
+            "feeType": {
+              "tuition": "شهریه",
+              "admission": "ورودی",
+              "other": "سایر"
+            },
+            "frequency": {
+              "one-time": "یک بار",
+              "monthly": "ماهانه",
+              "yearly": "سالانه"
+            },
+            "isMandatory": {
+              "yes": "بلی",
+              "no": "نخیر"
+            },
+            "status": {
+              "active": "فعال",
+              "inactive": "غیرفعال"
+            }
+          }
+        }
       },
       "financialReports": {
+        "title": "گزارش‌های مالی",
+        "subtitle": "مشاهده و مدیریت گزارش‌های مالی",
         "create": "ایجاد",
         "edit": "ویرایش",
-        "searchPlaceholder": "جستجو..."
+        "details": "{{title}} - جزئیات",
+        "searchPlaceholder": "جستجو بر اساس نوع گزارش، دوره یا وضعیت...",
+        "column": {
+          "reportType": "نوع گزارش",
+          "reportPeriod": "دوره گزارش",
+          "totalIncome": "مجموع درآمد",
+          "totalExpense": "مجموع مصرف",
+          "netBalance": "خالص موجودی",
+          "approvalStatus": "وضعیت تأیید"
+        },
+        "formField": {
+          "reportType": "نوع گزارش",
+          "reportPeriod": "دوره گزارش",
+          "totalIncome": "مجموع درآمد",
+          "totalExpense": "مجموع مصرف",
+          "netBalance": "خالص موجودی",
+          "generatedAt": "تولید شده در",
+          "approvalStatus": "وضعیت تأیید",
+          "remarks": "ملاحظات",
+          "option": {
+            "approvalStatus": {
+              "pending": "در انتظار",
+              "approved": "تأیید شد",
+              "rejected": "رد شد"
+            }
+          }
+        }
       },
       "studentFees": {
-        "chartAcademicYearMix": "ترکیب سال تحصیلی",
-        "chartPaymentStatusDistribution": "توزیع وضعیت پرداخت",
+        "title": "فیس شاگردان",
+        "subtitle": "مشاهده و مدیریت فیس شاگردان",
         "create": "ایجاد",
         "edit": "ویرایش",
-        "errorDescription": "هنگام بارگذاری داده خطایی رخ داد",
-        "errorTitle": "خطا",
-        "insightDescription": "توضیحات",
-        "insightEyebrow": "بررسی",
-        "insightTitle": "عنوان",
-        "searchPlaceholder": "جستجو...",
+        "details": "{{title}} - جزئیات",
+        "errorDescription": "در بارگذاری اطلاعات فیس شاگردان مشکلی پیش آمد. لطفاً اتصال خود را بررسی کرده و دوباره تلاش کنید.",
+        "errorTitle": "خطای اطلاعات فیس شاگردان",
+        "insight": {
+          "eyebrow": "بینش فیس شاگردان",
+          "title": "وضعیت جمع‌آوری فیس",
+          "description": "تخصیص فیس‌ها، نرخ تکمیل پرداخت و حساب‌های تأخیری را در طول سال‌های تحصیلی پیگیری کنید."
+        },
+        "insightEyebrowUnavailable": "اطلاعات فیس شاگردان در دسترس نیست",
+        "searchPlaceholder": "جستجو بر اساس نام شاگرد، آیدی یا سال تحصیلی...",
         "statFullyPaid": "کاملاً پرداخت شده",
-        "statFullyPaidHelper": "راهنمای کاملاً پرداخت شده",
+        "statFullyPaidHelper": "شاگردانی که تمام فیس‌های تعیین شده را پرداخت کرده‌اند",
         "statOutstandingBalance": "موجودی باقی‌مانده",
-        "statOutstandingBalanceHelper": "راهنمای موجودی باقی‌مانده",
+        "statOutstandingBalanceHelper": "مجموع مبلغ پرداخت نشده تمام شاگردان",
         "statOverdueAccounts": "حساب‌های تاخیری",
-        "statOverdueAccountsHelper": "راهنمای حساب‌های تاخیری",
+        "statOverdueAccountsHelper": "حساب‌هایی که از تاریخ نهایی گذشته‌اند",
         "statPartiallyPaid": "تا قسمتی پرداخت شده",
-        "statPartiallyPaidHelper": "راهنمای تا قسمتی پرداخت شده",
+        "statPartiallyPaidHelper": "شاگردانی که پرداخت جزیی داشته‌اند",
         "statStudentsWithFees": "شاگردان دارای فیس",
-        "statStudentsWithFeesHelper": "راهنمای شاگردان دارای فیس"
+        "statStudentsWithFeesHelper": "تعداد شاگردانی که ساختار فیس برایشان تعیین شده",
+        "chart": {
+          "academicYearMix": "ترکیب سال تحصیلی",
+          "paymentStatusDistribution": "توزیع وضعیت پرداخت"
+        },
+        "column": {
+          "student": "شاگرد",
+          "feeStructure": "ساختار فیس",
+          "academicYear": "سال تحصیلی",
+          "totalAmount": "مجموع مبلغ",
+          "discountAmount": "مقدار تخفیف",
+          "payableAmount": "مبلغ قابل پرداخت",
+          "paymentStatus": "وضعیت پرداخت"
+        },
+        "formField": {
+          "student": "شاگرد",
+          "feeStructure": "ساختار فیس",
+          "academicYear": "سال تحصیلی",
+          "totalAmount": "مجموع مبلغ",
+          "discountAmount": "مقدار تخفیف",
+          "payableAmount": "مبلغ قابل پرداخت",
+          "dueDate": "تاریخ نهایی",
+          "paymentStatus": "وضعیت پرداخت",
+          "remarks": "ملاحظات",
+          "option": {
+            "paymentStatus": {
+              "pending": "در انتظار",
+              "paid": "پرداخت شد",
+              "partial": "جزئی",
+              "overdue": "تاخیری"
+            }
+          }
+        }
       },
       "transactions": {
-        "chartIncomeVsExpenseMix": "ترکیب درآمد در مقابل مصارف",
-        "chartMonthlyTransactionVolume": "حجم معاملات ماهانه",
-        "chartVerificationStatusBreakdown": "تجزیه وضعیت تأیید",
+        "title": "معاملات",
+        "subtitle": "مشاهده و مدیریت معاملات مالی",
         "create": "ایجاد",
         "edit": "ویرایش",
-        "errorDescription": "هنگام بارگذاری داده خطایی رخ داد",
-        "errorTitle": "خطا",
-        "insightDescription": "توضیحات",
-        "insightEyebrow": "بررسی",
-        "insightEyebrowUnavailable": "بررسی در دسترس نیست",
-        "insightTitle": "عنوان",
-        "searchPlaceholder": "جستجو...",
+        "details": "{{title}} - جزئیات",
+        "errorDescription": "در بارگذاری اطلاعات معاملات مشکلی پیش آمد. لطفاً اتصال خود را بررسی کرده و دوباره تلاش کنید.",
+        "errorTitle": "خطای اطلاعات معاملات",
+        "insight": {
+          "eyebrow": "بینش معاملات",
+          "title": "بررسی عاید و مصرف",
+          "description": "جریان عاید و مصارف، صف‌های تأیید و روند حجم معاملات ماهانه را برای آگاهی از وضعیت مالی خود بررسی کنید."
+        },
+        "insightEyebrowUnavailable": "اطلاعات معاملات در دسترس نیست",
+        "searchPlaceholder": "جستجو بر اساس کد، توضیحات یا مرجع...",
         "statNetBalance": "خالص موجودی",
-        "statNetBalanceNegative": "خالص موجودی منفی",
-        "statNetBalancePositive": "خالص موجودی مثبت",
+        "statNetBalanceNegative": "مصارف بیشتر از عاید است",
+        "statNetBalancePositive": "عاید بیشتر از مصارف است",
         "statTotalExpenses": "مجموع مصارف",
-        "statTotalExpensesHelper": "راهنمای مجموع مصارف",
+        "statTotalExpensesHelper": "مجموع تمام معاملات نوع مصرف",
         "statTotalIncome": "مجموع درآمد",
-        "statTotalIncomeHelper": "راهنمای مجموع درآمد",
+        "statTotalIncomeHelper": "مجموع تمام معاملات نوع عاید",
         "statTotalTransactions": "مجموع معاملات",
-        "statTotalTransactionsHelper": "راهنمای مجموع معاملات",
+        "statTotalTransactionsHelper": "تمام رکوردهای عاید و مصرف",
         "statVerificationQueue": "صف تأیید",
-        "statVerificationQueueHelper": "راهنمای صف تأیید"
+        "statVerificationQueueHelper": "معاملات منتظر تأیید",
+        "chart": {
+          "incomeVsExpenseMix": "ترکیب درآمد در مقابل مصارف",
+          "verificationStatusBreakdown": "تجزیه وضعیت تأیید",
+          "monthlyTransactionVolume": "حجم معاملات ماهانه",
+          "income": "عاید",
+          "expense": "مصرف"
+        },
+        "column": {
+          "transactionDate": "تاریخ معامله",
+          "transactionCode": "کد معامله",
+          "description": "توضیحات",
+          "transactionType": "نوع معامله",
+          "amount": "مقدار",
+          "verificationStatus": "وضعیت تأیید"
+        },
+        "formField": {
+          "transactionType": "نوع معامله",
+          "account": "حساب",
+          "amount": "مقدار",
+          "transactionDate": "تاریخ معامله",
+          "referenceType": "نوع مرجع",
+          "description": "توضیحات",
+          "verificationStatus": "وضعیت تأیید",
+          "accountCode": "کد حساب",
+          "option": {
+            "transactionType": {
+              "income": "عاید",
+              "expense": "مصرف"
+            },
+            "verificationStatus": {
+              "verified": "تأیید شد",
+              "pending": "در انتظار",
+              "rejected": "رد شد"
+            }
+          }
+        }
       }
     },
     "transactions": "معاملات",
@@ -4515,37 +5323,163 @@
     "expenses": "مصارف",
     "finReports": "گزارش‌های مالی",
     "payroll": {
+      "label": "معاش",
       "salaryAdvances": {
-        "create": {
-          "titleCreate": "ایجاد",
-          "titleEdit": "ویرایش"
+        "title": "پیش‌پرداخت معاش",
+        "subtitle": "مدیریت درخواست‌های پیش‌پرداخت معاش",
+        "eyebrow": "بررسی پیش‌پرداخت‌های معاش",
+        "loadingSubtitle": "لطفاً صبر کنید تا داده بارگذاری شود",
+        "searchPlaceholder": "جستجوی پیش‌پرداخت معاش...",
+        "columns": {
+          "employee": "کارمند",
+          "advanceAmount": "مبلغ پیش‌پرداخت",
+          "requestDate": "تاریخ درخواست",
+          "approvalDate": "تاریخ تصویب",
+          "remainingBalance": "باقی‌مانده",
+          "advanceStatus": "وضعیت"
         },
-        "searchPlaceholder": "جستجو...",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "fields": {
+          "employee": "کارمند",
+          "advanceAmount": "مبلغ پیش‌پرداخت",
+          "requestDate": "تاریخ درخواست",
+          "approvalDate": "تاریخ تصویب",
+          "repaymentStartMonth": "ماه شروع بازپرداخت",
+          "monthlyDeductionAmount": "مبلغ کسر ماهانه",
+          "remainingBalance": "باقی‌مانده",
+          "advanceStatus": "وضعیت"
+        },
+        "options": {
+          "advanceStatus": {
+            "pending": "در انتظار",
+            "approved": "تصویب شده",
+            "rejected": "رد شده",
+            "closed": "بسته شده"
+          }
+        },
+        "cards": {
+          "totalRequests": "مجموع درخواست‌ها",
+          "approvedRequests": "تصویب شده",
+          "pendingRequests": "در انتظار",
+          "totalAdvanced": "مجموع پیش‌پرداخت",
+          "averageAdvance": "میانگین پیش‌پرداخت"
+        },
+        "charts": {
+          "advanceByStatus": "پیش‌پرداخت بر اساس وضعیت",
+          "monthlyAdvances": "پیش‌پرداخت‌های ماهانه",
+          "advanceDistribution": "توزیع پیش‌پرداخت"
+        },
+        "create": {
+          "titleCreate": "ایجاد پیش‌پرداخت معاش",
+          "titleEdit": "ویرایش پیش‌پرداخت معاش"
+        },
+        "errors": {
+          "loadError": "خطای بارگذاری",
+          "loadFailed": "بارگذاری داده ناکام ماند"
+        },
         "view": {
-          "details": "جزئیات"
+          "details": "جزئیات پیش‌پرداخت معاش"
         }
       },
       "salaryDeductions": {
-        "create": {
-          "titleCreate": "ایجاد",
-          "titleEdit": "ویرایش"
+        "title": "کسرات معاش",
+        "subtitle": "مدیریت سوابق کسر معاش",
+        "eyebrow": "بررسی کسرات معاش",
+        "loadingSubtitle": "لطفاً صبر کنید تا داده بارگذاری شود",
+        "searchPlaceholder": "جستجوی کسر معاش...",
+        "columns": {
+          "employee": "کارمند",
+          "deductionType": "نوع کسر",
+          "deductionAmount": "مبلغ",
+          "deductionMonth": "ماه",
+          "deductionYear": "سال",
+          "status": "وضعیت"
         },
-        "searchPlaceholder": "جستجو...",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "fields": {
+          "employee": "کارمند",
+          "deductionType": "نوع کسر",
+          "deductionReason": "دلیل کسر",
+          "deductionAmount": "مبلغ کسر",
+          "deductionMonth": "ماه کسر",
+          "deductionYear": "سال کسر",
+          "status": "وضعیت"
+        },
+        "options": {
+          "status": {
+            "pending": "در انتظار",
+            "approved": "تصویب شده",
+            "rejected": "رد شده"
+          }
+        },
+        "cards": {
+          "totalDeductions": "مجموع کسرات",
+          "approvedDeductions": "تصویب شده",
+          "pendingDeductions": "در انتظار",
+          "totalDeducted": "مجموع کسر شده",
+          "averageDeduction": "میانگین کسر"
+        },
+        "charts": {
+          "deductionByType": "کسر بر اساس نوع",
+          "monthlyDeductions": "کسرات ماهانه",
+          "deductionByStatus": "کسر بر اساس وضعیت"
+        },
+        "create": {
+          "titleCreate": "ایجاد کسر معاش",
+          "titleEdit": "ویرایش کسر معاش"
+        },
+        "errors": {
+          "loadError": "خطای بارگذاری",
+          "loadFailed": "بارگذاری داده ناکام ماند"
+        },
         "view": {
-          "details": "جزئیات"
+          "details": "جزئیات کسر معاش"
         }
       },
       "salaryPayments": {
+        "title": "پرداخت‌های معاش",
+        "subtitle": "مدیریت سوابق پرداخت معاش",
+        "eyebrow": "بررسی پرداخت‌های معاش",
+        "loadingSubtitle": "لطفاً صبر کنید تا داده بارگذاری شود",
+        "searchPlaceholder": "جستجوی پرداخت معاش...",
+        "columns": {
+          "employee": "کارمند",
+          "salaryMonth": "ماه",
+          "salaryYear": "سال",
+          "grossSalary": "معاش ناخالص",
+          "netSalary": "معاش خالص",
+          "paymentStatus": "وضعیت"
+        },
+        "fields": {
+          "employee": "کارمند",
+          "salaryMonth": "ماه معاش",
+          "salaryYear": "سال معاش",
+          "grossSalary": "معاش ناخالص",
+          "totalAllowance": "مجموع کمک‌هزینه",
+          "totalDeduction": "مجموع کسر",
+          "netSalary": "معاش خالص",
+          "paymentDate": "تاریخ پرداخت",
+          "paymentMethod": "روش پرداخت",
+          "transactionReference": "مرجع تراکنش",
+          "paymentStatus": "وضعیت پرداخت"
+        },
+        "options": {
+          "paymentMethod": {
+            "cash": "نقد",
+            "bank": "بانک",
+            "card": "کارت",
+            "other": "سایر"
+          },
+          "paymentStatus": {
+            "pending": "در انتظار",
+            "paid": "پرداخت شده",
+            "failed": "ناموفق"
+          }
+        },
         "cards": {
-          "amountDisbursed": "مبلغ پرداخت شده",
-          "failedPayments": "پرداخت‌های ناموفق",
-          "nextPayrollDate": "تاریخ معاش بعدی",
           "paidThisMonth": "پرداخت شده این ماه",
-          "pendingPayments": "پرداخت‌های در انتظار"
+          "amountDisbursed": "مبلغ پرداخت شده",
+          "pendingPayments": "پرداخت‌های در انتظار",
+          "failedPayments": "پرداخت‌های ناموفق",
+          "nextPayrollDate": "تاریخ معاش بعدی"
         },
         "charts": {
           "monthlyPayroll": "معاش ماهانه",
@@ -4553,57 +5487,79 @@
           "paymentStatusBreakdown": "تجزیه وضعیت پرداخت"
         },
         "create": {
-          "titleCreate": "ایجاد",
-          "titleEdit": "ویرایش"
+          "titleCreate": "ایجاد پرداخت معاش",
+          "titleEdit": "ویرایش پرداخت معاش"
         },
         "errors": {
           "loadError": "خطای بارگذاری",
           "loadFailed": "بارگذاری داده ناکام ماند"
         },
-        "eyebrow": "بررسی پرداخت‌های معاش",
         "insights": {
           "noPending": "پرداخت در انتظار نیست"
         },
-        "loadingSubtitle": "لطفاً صبر کنید تا داده بارگذاری شود",
-        "searchPlaceholder": "جستجو...",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
         "view": {
-          "details": "جزئیات"
+          "details": "جزئیات پرداخت معاش"
         }
       },
       "salaryStructures": {
+        "title": "ساختارهای معاش",
+        "subtitle": "تعریف ساختارهای معاش بر اساس نوع کارمند",
+        "eyebrow": "بررسی ساختارهای معاش",
+        "loadingSubtitle": "لطفاً صبر کنید تا داده بارگذاری شود",
+        "searchPlaceholder": "جستجوی ساختار معاش...",
+        "columns": {
+          "employeeType": "نوع کارمند",
+          "basicSalary": "معاش پایه",
+          "allowanceAmount": "کمک‌هزینه",
+          "overtimeRate": "نرخ اضافه‌کاری",
+          "taxPercentage": "درصد مالیات",
+          "status": "وضعیت"
+        },
+        "fields": {
+          "employeeType": "نوع کارمند",
+          "basicSalary": "معاش پایه",
+          "allowanceAmount": "مبلغ کمک‌هزینه",
+          "housingAllowance": "کمک‌هزینه مسکن",
+          "foodAllowance": "کمک‌هزینه غذا",
+          "transportAllowance": "کمک‌هزینه حمل و نقل",
+          "overtimeRate": "نرخ اضافه‌کاری",
+          "deductionType": "نوع کسر",
+          "taxPercentage": "درصد مالیات",
+          "effectiveFrom": "تاریخ اجرا",
+          "status": "وضعیت"
+        },
+        "options": {
+          "status": {
+            "active": "فعال",
+            "inactive": "غیرفعال"
+          }
+        },
         "cards": {
+          "totalStructures": "مجموع ساختارها",
           "activeStructures": "ساختارهای فعال",
           "averageBasicSalary": "میانگین معاش پایه",
-          "employeeTypesCovered": "انواع کارمندان تحت پوشش",
           "salaryRange": "محدوده معاش",
-          "totalStructures": "مجموع ساختارها"
+          "employeeTypesCovered": "انواع کارمندان تحت پوشش"
         },
         "charts": {
-          "allowanceDistribution": "توزیع کمک‌ هزینه",
-          "allowanceFood": "کمک هزینه غذا",
-          "allowanceHousing": "کمک هزینه مسکن",
-          "allowanceStandard": "کمک هزینه استاندارد",
-          "allowanceTransport": "کمک هزینه حمل و نقل",
           "salaryByEmployeeType": "معاش بر اساس نوع کارمند",
-          "structureStatus": "وضعیت ساختار"
+          "structureStatus": "وضعیت ساختار",
+          "allowanceDistribution": "توزیع کمک‌هزینه",
+          "allowanceStandard": "کمک‌هزینه استاندارد",
+          "allowanceHousing": "کمک‌هزینه مسکن",
+          "allowanceFood": "کمک‌هزینه غذا",
+          "allowanceTransport": "کمک‌هزینه حمل و نقل"
         },
         "create": {
-          "titleCreate": "ایجاد",
-          "titleEdit": "ویرایش"
+          "titleCreate": "ایجاد ساختار معاش",
+          "titleEdit": "ویرایش ساختار معاش"
         },
         "errors": {
           "loadError": "خطای بارگذاری",
           "loadFailed": "بارگذاری داده ناکام ماند"
         },
-        "eyebrow": "بررسی ساختارهای معاش",
-        "loadingSubtitle": "لطفاً صبر کنید تا داده بارگذاری شود",
-        "searchPlaceholder": "جستجو...",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
         "view": {
-          "details": "جزئیات"
+          "details": "جزئیات ساختار معاش"
         }
       }
     },
@@ -4611,7 +5567,229 @@
     "salaryPayments": "پرداخت‌های معاش",
     "salaryDeductions": "کسرات معاش",
     "salaryAdvances": "پیش‌پرداخت معاش",
-    "kitchen": "آشپزخانه",
+    "kitchen": {
+      "mealPlanning": "برنامه‌ریزی غذا",
+      "planMeals": "برنامه‌ریزی و تنظیم غذاهای روزانه برای شاگردان و کارمندان",
+      "mealType": "نوع غذا",
+      "servings": "پرس",
+      "cost": "هزینه",
+      "mealName": "نام غذا",
+      "type": "نوع",
+      "kitchenInventory": "موجودی مطبخ",
+      "trackInventory": "ردیابی مواد، لوازم و سطوح موجودی",
+      "addItem": "افزودن مورد",
+      "itemName": "نام مورد",
+      "unit": "واحد",
+      "minStockLevel": "حداقل سطح موجودی",
+      "noInventory": "هیچ مورد موجودی نیست",
+      "deleteItemConfirm": "این مورد حذف شود؟",
+      "weeklyMenu": "منوی هفتگی",
+      "manageMenu": "مدیریت برنامه منوی هفتگی",
+      "breakfast": "صبحانه",
+      "lunch": "ناهار",
+      "dinner": "شام",
+      "snacks": "تنقلات",
+      "wasteTracking": {
+        "title": "پیگیری ضایعات",
+        "subtitle": "نظارت و پیگیری ضایعات و دفع آشپزخانه",
+        "itemName": "نام آیتم",
+        "wasteDate": "تاریخ ضایعات",
+        "reason": "دلیل",
+        "spoiled": "فاسد شده",
+        "expired": "تاریخ گذشته",
+        "overcooked": "بیش از حد پخته شده",
+        "other": "سایر",
+        "searchPlaceholder": "جستجوی رکوردهای ضایعات...",
+        "titleCreate": "ایجاد رکورد ضایعات",
+        "titleEdit": "ویرایش رکورد ضایعات",
+        "viewTitle": "جزئیات رکورد ضایعات"
+      },
+      "monitorWaste": "نظارت و ردیابی ضایعات و دفع مطبخ",
+      "disposalMethod": "روش دفع",
+      "disposal": "دفع",
+      "suppliers": {
+        "title": "تامین کنندگان",
+        "subtitle": "مدیریت فروشندگان لوازم آشپزخانه",
+        "supplierName": "نام تامین کننده",
+        "itemsSupplied": "آیتم‌های تامین شده",
+        "searchPlaceholder": "جستجوی تامین کنندگان...",
+        "titleCreate": "ایجاد تامین کننده",
+        "titleEdit": "ویرایش تامین کننده",
+        "viewTitle": "جزئیات تامین کننده"
+      },
+      "manageSuppliers": "مدیریت فروشندگان لوازم مطبخ",
+      "contactPerson": "شخص تماس",
+      "contact": "تماس",
+      "kitchenReports": "گزارش‌های مطبخ",
+      "kitchenAnalytics": "تحلیل و گزارش‌دهی عملیات مطبخ",
+      "dailyMeals": "وعده‌های روزانه",
+      "monthlyCost": "هزینه ماهانه",
+      "wastePercent": "فیصدی ضایعات",
+      "supplierCount": "تعداد تأمین‌کنندگان",
+      "date": "تاریخ",
+      "description": "توضیحات",
+      "category": "دسته",
+      "reason": "دلیل",
+      "addNew": "افزودن جدید",
+      "day": "روز",
+      "unitKg": "کیلوګرام",
+      "unitG": "ګرام",
+      "unitLiter": "لیتر",
+      "unitMl": "میلی لیتر",
+      "unitPiece": "عدد",
+      "unitPacket": "بسته",
+      "lowStock": "موجودی کم",
+      "outOfStock": "تمام شده",
+      "quantity": "تعداد",
+      "unitPrice": "قیمت واحد",
+      "available": "موجود",
+      "totalStudents": "مجموع شاگردان",
+      "totalStaff": "مجموع کارکنان",
+      "numberOfStudents": "تعداد شاگردان",
+      "numberOfStaff": "تعداد کارکنان",
+      "preparedBy": "تهیه شده توسط",
+      "supervisedBy": "نظارت شده توسط",
+      "filterByDate": "فیلتر بر اساس تاریخ",
+      "weekStart": "شروع هفته",
+      "weekEnd": "ختم هفته",
+      "menuItems": "آیتم‌های منو",
+      "menuItemsHint": "نکته موارد منو",
+      "notes": "یادداشت‌ها",
+      "allDays": "تمام روزها",
+      "totalMeals": "مجموع وعده‌ها",
+      "students": "شاگردان",
+      "staff": "کارکنان",
+      "totalPurchases": "مجموع خریدها",
+      "transactions": "معاملات",
+      "totalWaste": "مجموع ضایعات",
+      "records": "ریکاردها",
+      "inventoryStatus": "وضعیت موجودی",
+      "consumptionSummary": "خلاصه مصرف",
+      "studentMeals": "وعده‌های شاگردان",
+      "staffMeals": "وعده‌های کارکنان",
+      "consumptionCount": "تعداد مصرف",
+      "financialSummary": "خلاصه مالی",
+      "purchaseCount": "تعداد خرید",
+      "inventoryItems": "موارد موجودی",
+      "lowStockItems": "موارد کم موجودی",
+      "itemsSupplied": "موارد تأمین شده",
+      "itemsHint": "نکته موارد",
+      "remarks": "ملاحظات",
+      "mainDish": "غذای اصلی",
+      "sideDish": "غذای جانبی",
+      "dessert": "دسر",
+      "beverage": "نوشیدنی",
+      "inventory": {
+        "title": "موجودی آشپزخانه",
+        "subtitle": "پیگیری مواد اولیه، لوازم و سطوح موجودی",
+        "eyebrow": "آشپزخانه",
+        "itemName": "نام آیتم",
+        "available": "موجود",
+        "unitPrice": "قیمت واحد",
+        "stockStatus": "وضعیت موجودی",
+        "lowStock": "موجودی کم",
+        "outOfStock": "تمام شده",
+        "itemsInStock": "آیتم‌های موجود",
+        "itemsToReorder": "آیتم‌های نیاز به سفارش",
+        "inventoryValue": "ارزش موجودی",
+        "lowStockAlerts": "هشدار موجودی کم",
+        "itemsByCategory": "آیتم‌ها بر اساس دسته",
+        "topItemsByQuantity": "آیتم‌های برتر بر اساس تعداد",
+        "minimumStock": "حداقل موجودی",
+        "searchPlaceholder": "جستجوی آیتم‌های موجودی...",
+        "titleCreate": "ایجاد آیتم موجودی",
+        "titleEdit": "ویرایش آیتم موجودی",
+        "viewTitle": "جزئیات آیتم موجودی",
+        "failedToLoad": "بارگیری موجودی موفق نشد",
+        "failedToLoadInsights": "بارگیری insights موجودی موفق نشد",
+        "loadingSubtitle": "در حال بارگیری داده‌های موجودی..."
+      },
+      "dailyPlaning": {
+        "title": "مصرف روزانه",
+        "subtitle": "پیگیری مصرف و استفاده روزانه غذا",
+        "itemName": "نام آیتم",
+        "mealType": "نوع غذا",
+        "quantityUsed": "مقدار مصرف شده",
+        "date": "تاریخ",
+        "consumptionDate": "تاریخ مصرف",
+        "numberOfStudents": "تعداد شاگردان",
+        "numberOfStaff": "تعداد کارمندان",
+        "preparedBy": "تهیه شده توسط",
+        "supervisedBy": "نظارت شده توسط",
+        "searchPlaceholder": "جستجوی مصرف روزانه...",
+        "titleCreate": "ایجاد رکورد مصرف",
+        "titleEdit": "ویرایش رکورد مصرف",
+        "viewTitle": "جزئیات رکورد مصرف"
+      },
+      "mealPlaning": {
+        "title": "برنامه‌ریزی غذا",
+        "subtitle": "برنامه‌ریزی و تنظیم وعده‌های روزانه برای شاگردان و کارمندان",
+        "allocated": "تخصیص یافته",
+        "allocatedAmount": "مقدار تخصیص یافته",
+        "approved": "تأیید شده",
+        "approvedAmount": "مقدار تأیید شده",
+        "spent": "مصرف شده",
+        "spentAmount": "مقدار مصرف شده",
+        "remaining": "باقی مانده",
+        "remainingAmount": "مقدار باقی مانده",
+        "budgetStatus": "وضعیت بودجه",
+        "searchPlaceholder": "جستجوی برنامه‌های غذا...",
+        "titleCreate": "ایجاد برنامه غذا",
+        "titleEdit": "ویرایش برنامه غذا",
+        "viewTitle": "جزئیات برنامه غذا"
+      },
+      "foodRequest": {
+        "title": "درخواست‌های بودجه",
+        "subtitle": "ارسال و پیگیری درخواست‌های بودجه ماهانه آشپزخانه",
+        "eyebrow": "آشپزخانه",
+        "totalRequests": "مجموع درخواست‌ها",
+        "totalRequested": "مجموع درخواست شده",
+        "totalApproved": "مجموع تأیید شده",
+        "newBudgetRequest": "درخواست بودجه جدید",
+        "requestedAmount": "مقدار درخواستی (AFN) *",
+        "remarksReason": "ملاحظات / دلیل",
+        "submitRequest": "ارسال درخواست",
+        "submitting": "در حال ارسال...",
+        "monthYear": "ماه/سال",
+        "requested": "درخواست شده",
+        "approved": "تأیید شده",
+        "spent": "مصرف شده",
+        "remaining": "باقی مانده",
+        "noBudgetRequests": "هیچ درخواست بودجه‌ای یافت نشد",
+        "failedToSubmit": "ارسال درخواست موفق نشد"
+      },
+      "reports": {
+        "title": "گزارش‌های آشپزخانه",
+        "subtitleDaily": "خلاصه و تحلیل روزانه آشپزخانه",
+        "subtitleWeekly": "خلاصه و تحلیل هفتگی آشپزخانه",
+        "subtitleMonthly": "خلاصه و تحلیل ماهانه آشپزخانه",
+        "eyebrow": "آشپزخانه",
+        "loading": "در حال بارگیری گزارش...",
+        "noData": "داده‌ای برای این دوره موجود نیست",
+        "failedToLoad": "بارگیری گزارش موفق نشد",
+        "totalPurchases": "مجموع خریدها",
+        "totalMealsServed": "مجموع وعده‌های سرو شده",
+        "studentMeals": "وعده‌های شاگردان",
+        "staffMeals": "وعده‌های کارمندان",
+        "totalInventoryItems": "مجموع آیتم‌های موجودی",
+        "lowStockItems": "آیتم‌های کم موجودی",
+        "wasteRecords": "رکوردهای ضایعات",
+        "activeStudents": "شاگردان فعال",
+        "budget": "بودجه",
+        "budgetAllocated": "تخصیص یافته",
+        "budgetApproved": "تأیید شده",
+        "budgetSpent": "مصرف شده",
+        "budgetRemaining": "باقی مانده",
+        "budgetUsage": "مصرف بودجه"
+      },
+      "label": "آشپزخانه",
+      "weekStartDate": "شروع هفته",
+      "weekEndDate": "پایان هفته",
+      "searchPlaceholder": "جستجوی منوی هفتگی...",
+      "titleCreateWeekly": "ایجاد ورودیه منوی هفتگی",
+      "titleEditWeekly": "ویرایش ورودیه منوی هفتگی",
+      "viewTitleWeekly": "جزئیات منوی هفتگی"
+    },
     "kitInventory": "موجودی",
     "mealPlan": "برنامه‌ریزی غذا",
     "dailyPurchases": "خریداری روزانه",
@@ -4620,43 +5798,321 @@
     "waste": "ردیابی ضایعات",
     "budgetReq": "درخواست‌های بودجه",
     "hr": {
+      "label": "منابع بشری",
       "attendance": {
         "failedSave": "ذخیره حاضری ناکام ماند",
         "noEmployees": "هیچ کارمندی یافت نشد",
         "remarksPlaceholder": "ملاحظات را وارد کنید...",
         "saveAttendance": "ذخیره حاضری",
         "selectDate": "انتخاب تاریخ",
-        "subtitle": "عنوان فرعی",
+        "status": {
+          "present": "حاضر",
+          "absent": "غایب",
+          "late": "تأخیر",
+          "half-day": "نیم روز",
+          "on-leave": "در رخصتی"
+        },
+        "subtitle": "مدیریت سوابق حاضری روزانه کارمندان",
         "tableCheckIn": "ورود",
         "tableCheckOut": "خروج",
         "tableCode": "کد",
         "tableEmployee": "کارمند",
         "tableRemarks": "ملاحظات",
         "tableStatus": "وضعیت",
-        "title": "عنوان"
+        "title": "حاضری"
       },
       "departments": {
+        "coldepartmentCode": "کد",
+        "coldepartmentName": "نام دیپارتمنت",
+        "coldepartmentHead": "رئیس دیپارتمنت",
+        "collocation": "موقعیت",
+        "colstatus": "وضعیت",
         "createTitle": "ایجاد دیپارتمنت",
         "editTitle": "ویرایش دیپارتمنت",
+        "fielddepartmentName": "نام دیپارتمنت",
+        "fielddepartmentCode": "کد دیپارتمنت",
+        "fielddepartmentHead": "رئیس دیپارتمنت",
+        "fieldlocation": "موقعیت",
+        "fieldcontactExtension": "تمدید تماس",
+        "fieldstatus": "وضعیت",
+        "fielddescription": "توضیحات",
+        "optionstatusActive": "فعال",
+        "optionstatusInactive": "غیر فعال",
         "searchPlaceholder": "جستجو...",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "subtitle": "مدیریت دیپارتمنت‌های سازمانی",
+        "title": "دیپارتمنت‌ها",
         "viewTitle": "جزئیات دیپارتمنت"
       },
       "designations": {
+        "coldesignationTitle": "عنوان رتبه",
+        "coldepartment": "دیپارتمنت",
+        "coljobLevel": "سطح وظیفه",
+        "colsalaryRangeMin": "حداقل معاش",
+        "colsalaryRangeMax": "حداکثر معاش",
+        "colstatus": "وضعیت",
         "createTitle": "ایجاد رتبه",
         "editTitle": "ویرایش رتبه",
+        "fielddesignationTitle": "عنوان رتبه",
+        "fielddepartment": "دیپارتمنت",
+        "fieldjobLevel": "سطح وظیفه",
+        "fieldsalaryRangeMin": "حداقل معاش",
+        "fieldsalaryRangeMax": "حداکثر معاش",
+        "fieldstatus": "وضعیت",
+        "optionstatusActive": "فعال",
+        "optionstatusInactive": "غیر فعال",
         "searchPlaceholder": "جستجو...",
-        "subtitle": "عنوان فرعی",
-        "title": "عنوان",
+        "subtitle": "مدیریت رتبه‌ها و موقعیت‌های شغلی",
+        "title": "رتبه‌ها",
         "viewTitle": "جزئیات رتبه"
       },
       "employees": {
+        "averageSalary": "میانگین معاش",
+        "byDepartment": "کارمندان بر اساس دیپارتمنت",
+        "byType": "کارمندان بر اساس نوع",
+        "colphoto": "عکس",
+        "colemployeeCode": "کد",
+        "colfullName": "نام کامل",
+        "coldepartment": "دیپارتمنت",
+        "coldesignation": "رتبه",
+        "colphoneNumber": "شماره تلفن",
+        "colemployeeType": "نوع کارمند",
+        "colstatus": "وضعیت",
         "createTitle": "ایجاد کارمند",
         "editTitle": "ویرایش کارمند",
+        "fielduser": "حساب کاربری",
+        "fieldimage": "عکس کارمند",
+        "fieldfullName": "نام کامل",
+        "fieldfullNameArabic": "نام کامل (عربی)",
+        "fieldfatherName": "نام پدر",
+        "fielddateOfBirth": "تاریخ تولد",
+        "fieldgender": "جنسیت",
+        "fieldcnic": "شماره تذکره",
+        "fieldphone": "شماره تلفن",
+        "fieldemail": "ایمیل",
+        "fieldcurrentAddress": "آدرس فعلی",
+        "fieldemergencyContactName": "نام شخص اضطراری",
+        "fieldemergencyContactPhone": "تلفن شخص اضطراری",
+        "fieldemployeeType": "نوع کارمند",
+        "fielddepartment": "دیپارتمنت",
+        "fielddesignation": "رتبه",
+        "fieldjoiningDate": "تاریخ استخدام",
+        "fieldemploymentType": "نوع استخدام",
+        "fieldbaseSalary": "معاش پایه",
+        "fieldhouseAllowance": "اجازه منزل",
+        "fieldtransportAllowance": "اجازه حمل و نقل",
+        "fieldmedicalAllowance": "اجازه طبی",
+        "fieldpaymentMethod": "روش پرداخت",
+        "fieldbankName": "نام بانک",
+        "fieldaccountNumber": "شماره حساب",
+        "fieldstatus": "وضعیت",
+        "genderDistribution": "توزیع جنسیت",
+        "optiongenderMale": "مرد",
+        "optiongenderFemale": "زن",
+        "optionemploymentTypePermanent": "دایمی",
+        "optionemploymentTypeContract": "قراردادی",
+        "optionemploymentTypePartTime": "نیمه وقت",
+        "optionpaymentMethodCash": "نقد",
+        "optionpaymentMethodBankTransfer": "انتقال بانکی",
+        "optionstatusActive": "فعال",
+        "optionstatusInactive": "غیر فعال",
         "profileAlt": "پروفایل کارمند",
-        "subtitle": "عنوان فرعی",
-        "viewTitle": "جزئیات کارمند"
+        "recentHires": "استخدام‌های اخیر",
+        "searchPlaceholder": "جستجو...",
+        "subtitle": "مدیریت سوابق کارمندان با پروفایل‌های کامل",
+        "title": "کارمندان",
+        "viewTitle": "جزئیات کارمند",
+        "registration": {
+          "positionTitle": "تعیین موقعیت / نقش",
+          "positionDesc": "تمام موقعیت‌های قابل تطبیق را انتخاب کنید. برای انتخاب کلیک کنید، \"تعیین به عنوان اصلی\" برای نقش اصلی.",
+          "primaryRole": "نقش اصلی",
+          "setAsPrimary": "تعیین به عنوان اصلی",
+          "selected": "انتخاب شده",
+          "positions": "موقعیت",
+          "primaryRoleLabel": "نقش اصلی",
+          "loginRole": "نقش ورود",
+          "loginRoleDesc": "بر اساس موقعیت اصلی انتخاب شده.",
+          "accountInfo": "اطلاعات حساب",
+          "accountInfoDesc": "برای کارمند یک حساب ورود ایجاد کنید. اگر حساب قبلاً وجود دارد، آن را لینک کنید.",
+          "linkUser": "لینک حساب کاربری موجود",
+          "createNewUser": "ایجاد حساب کاربری جدید",
+          "personalInfo": "اطلاعات شخصی",
+          "employeePhoto": "عکس کارمند",
+          "profilePreview": "پیش‌نمایش پروفایل",
+          "noPhoto": "عکس نیست",
+          "contactInfo": "اطلاعات تماس",
+          "emergencyContact": "تماس اضطراری",
+          "employmentDetails": "جزئیات استخدام",
+          "qualifications": "مدارک و تجربه",
+          "salaryBank": "جزئیات معاش و بانک",
+          "cancel": "لغو",
+          "selectDefault": "انتخاب",
+          "positionTeacher": "معلم",
+          "positionTeacherDesc": "کارمندان آموزشی برای کلاس‌ها و دروس",
+          "positionAdmin": "مدیر",
+          "positionAdminDesc": "کارمندان اداری و مدیریتی",
+          "positionFinance": "مالی",
+          "positionFinanceDesc": "کارمندان مالی و حساب‌داری",
+          "positionRegistrar": "ثبت‌نام",
+          "positionRegistrarDesc": "امور شاگردان و ثبت‌نام",
+          "positionHr": "منابع بشری",
+          "positionHrDesc": "منابع بشری و استخدام",
+          "positionLibrarian": "کتابدار",
+          "positionLibrarianDesc": "کارمندان مدیریت کتابخانه",
+          "positionKitchen": "آشپزخانه",
+          "positionKitchenDesc": "کارمندان آشپزخانه و تغذیه",
+          "positionSecurity": "امنیت",
+          "positionSecurityDesc": "پرسنل امنیت و ایمنی",
+          "positionSupport": "پشتیبانی",
+          "positionSupportDesc": "کارمندان پشتیبانی عمومی",
+          "positionMaintenance": "تعمیرات",
+          "positionMaintenanceDesc": "تعمیرات و تسهیلات",
+          "positionPayroll": "معاش",
+          "positionPayrollDesc": "کارمندان مدیریت معاش و تنخواه",
+          "positionComplaints": "شکایات",
+          "positionComplaintsDesc": "کارمندان مدیریت شکایات",
+          "positionInventory": "موجودی",
+          "positionInventoryDesc": "کارمندان مدیریت موجودی",
+          "positionGeneralManager": "مدیر عمومی",
+          "positionGeneralManagerDesc": "نظارت بر تمام عملیات پنل کارمندان",
+          "employeeCodePlaceholder": "مثلاً EMP-2024-001",
+          "shiftTimingPlaceholder": "مثلاً صبح (8 صبح تا 2 بعد از ظهر)",
+          "highestQualPlaceholder": "مثلاً ماستری در علوم اسلامی",
+          "specializationPlaceholder": "مثلاً قرآن، حدیث، فقه",
+          "accountEmailPlaceholder": "employee@madrasa.edu",
+          "accountPasswordPlaceholder": "حداقل ۶ حرف",
+          "selectDepartment": "دیپارتمنت را انتخاب کنید",
+          "selectDesignation": "رتبه را انتخاب کنید",
+          "roleAdmin": "مدیر",
+          "roleTeacher": "معلم",
+          "roleStaff": "کارمند"
+        },
+        "fieldemployeeCode": "کد کارمند",
+        "fieldsecondaryPhone": "تلفن ثانوی",
+        "fieldpermanentAddress": "آدرس دایمی",
+        "fieldemergencyContactRelation": "رابطه",
+        "fieldshiftTiming": "زمان شیفت",
+        "fieldhighestQualification": "بالاترین مدرک",
+        "fieldspecialization": "تخصص / موضوع",
+        "fieldpreviousExperience": "تجربه قبلی (سال)",
+        "fieldaccountTitle": "عنوان حساب",
+        "fieldmaritalStatus": "وضعیت تأهل",
+        "fieldbloodGroup": "گروه خون",
+        "optionmaritalSingle": "مجرد",
+        "optionmaritalMarried": "متأهل",
+        "optionmaritalDivorced": "طلاق گرفته",
+        "optionmaritalWidowed": "بیوه"
+      },
+      "leaveTypes": {
+        "title": "انواع رخصتی",
+        "subtitle": "مدیریت پالیسی‌ها و تنظیمات رخصتی",
+        "colleaveCode": "کد",
+        "colleaveTypeName": "نوع رخصتی",
+        "colmaxDaysAllowed": "حداکثر روزها",
+        "colisPaid": "پرداخت",
+        "colcarryForward": "انتقال به آینده",
+        "colstatus": "وضعیت",
+        "fieldleaveTypeName": "نام نوع رخصتی",
+        "fieldleaveCode": "کد رخصتی",
+        "fieldmaxDaysAllowed": "حداکثر روزهای مجاز",
+        "fieldgenderSpecific": "مخصوص جنسیت",
+        "fieldpaidLeave": "رخصتی با معاش",
+        "fieldcarryForward": "انتقال به آینده",
+        "fieldmedicalCertificateRequired": "تصدیق طبی ضروری است",
+        "fieldstatus": "وضعیت",
+        "fielddescription": "توضیحات",
+        "optiongenderSpecificBoth": "هر دو",
+        "optiongenderSpecificMaleOnly": "مردانه",
+        "optiongenderSpecificFemaleOnly": "زنانه",
+        "optionpaidLeaveYes": "بلی",
+        "optionpaidLeaveNo": "خیر",
+        "optioncarryForwardYes": "بلی",
+        "optioncarryForwardNo": "خیر",
+        "optionstatusActive": "فعال",
+        "optionstatusInactive": "غیر فعال",
+        "createTitle": "ایجاد نوع رخصتی",
+        "editTitle": "ویرایش نوع رخصتی",
+        "viewTitle": "جزئیات نوع رخصتی",
+        "searchPlaceholder": "جستجوی انواع رخصتی..."
+      },
+      "payroll": {
+        "title": "معاش‌پردازی کارمندان",
+        "subtitle": "مدیریت پرداخت‌های معاش و سوابق معاش‌پردازی",
+        "colEmployee": "کارمند",
+        "colMonth": "ماه",
+        "colGrossSalary": "معاش ناخالص",
+        "colDeductions": "کسورات",
+        "colNetSalary": "معاش خالص",
+        "colMethod": "روش",
+        "colStatus": "وضعیت",
+        "amountDisbursed": "مبلغ پرداخت شده",
+        "paidThisMonth": "پرداخت شده این ماه",
+        "pendingPayments": "پرداخت‌های در انتظار",
+        "failedPayments": "پرداخت‌های ناکام",
+        "nextPayrollDate": "تاریخ معاش بعدی",
+        "noPendingPayroll": "معاش در انتظار نیست",
+        "paymentMethodChart": "توزیع روش پرداخت",
+        "paymentStatusBreakdown": "تجزیه وضعیت پرداخت",
+        "monthlyPayroll": "معاش ماهانه",
+        "payrollHistory": "تاریخچه معاش",
+        "searchPlaceholder": "جستجوی پرداخت‌های معاش...",
+        "loadingTitle": "معاش‌پردازی",
+        "loadingSubtitle": "سوابق پرداخت معاش کارمندان، مجموع پرداخت‌ها و نظارت بر وضعیت پرداخت.",
+        "months": [
+          "جنوری",
+          "فبروری",
+          "مارچ",
+          "اپریل",
+          "می",
+          "جون",
+          "جولای",
+          "اگست",
+          "سپتامبر",
+          "اکتوبر",
+          "نوامبر",
+          "دسمبر"
+        ]
+      },
+      "reports": {
+        "title": "گزارش‌های منابع بشری",
+        "subtitle": "خلاصه حاضری، رخصتی، معاش و کارمندان",
+        "daily": "روزانه",
+        "weekly": "هفته‌وار",
+        "monthly": "ماهانه",
+        "yearly": "سالانه",
+        "loadingReports": "در حال بارگذاری گزارش‌ها...",
+        "employeeOverview": "بررسی کارمندان",
+        "totalEmployees": "مجموع کارمندان",
+        "active": "فعال",
+        "inactive": "غیر فعال",
+        "departments": "دیپارتمنت‌ها",
+        "leaveSummary": "خلاصه رخصتی",
+        "totalRequests": "مجموع درخواست‌ها",
+        "pending": "در انتظار",
+        "approved": "تأیید شده",
+        "rejected": "رد شده",
+        "leaveStatusDistribution": "توزیع وضعیت رخصتی",
+        "payrollOverview": "بررسی معاش",
+        "netPaid": "خالص پرداخت",
+        "deductions": "کسورات",
+        "hrMetrics": "معیارهای منابع بشری",
+        "employees": "کارمندان",
+        "attendance": "حاضری",
+        "leaveRequests": "درخواست‌های رخصتی",
+        "payments": "پرداخت‌ها",
+        "attendanceSummary": "خلاصه حاضری",
+        "employee": "کارمند",
+        "code": "کد",
+        "present": "حاضر",
+        "absent": "غایب",
+        "late": "تأخیر",
+        "halfDay": "نیم روز",
+        "onLeave": "در رخصتی",
+        "noAttendanceData": "دیتای حاضری برای این دوره وجود ندارد",
+        "payrollSummary": "خلاصه معاش",
+        "employeesPaid": "کارمندان پرداخت شده",
+        "totalGross": "مجموع ناخالص",
+        "totalDeductions": "مجموع کسورات",
+        "totalNetPaid": "مجموع خالص پرداخت"
       }
     },
     "departments": "دیپارتمنت‌ها",
@@ -4704,7 +6160,13 @@
       "enterReason": "دلیل رخصتی را وارد کنید",
       "updateRequest": "به‌روزرسانی درخواست",
       "submitRequest": "ارسال درخواست",
-      "cancel": "لغو"
+      "cancel": "لغو",
+      "searchPlaceholder": "جستجو بر اساس کارمند، نوع رخصتی، وضعیت...",
+      "totalEntries": "مجموع ورودی‌ها",
+      "rejectionReason": "دلیل رد",
+      "enterRejectionReason": "دلیل رد را وارد کنید...",
+      "confirmReject": "تأیید رد",
+      "deleteConfirm": "آیا این درخواست رخصتی حذف شود؟"
     },
     "profile": {
       "label": "پروفایل",
@@ -4753,13 +6215,23 @@
       "details": "جزئیات",
       "review": "بازبینی",
       "stepN": "مرحله {{n}}",
+      "stepOf": "مرحله {{current}} از {{total}}",
       "onlyNumbers": "فقط اعداد مجاز است",
       "fieldRequired": "این فیلد ضروری است",
       "failedToLoad": "بارگذاری داده ناکام ماند",
       "recordNotFound": "ریکارد یافت نشد",
       "loadError": "خطا در بارگذاری داده",
       "saveFailed": "ذخیره تغییرات ناکام ماند",
-      "preview": "پیش‌نمایش"
+      "preview": "پیش‌نمایش",
+      "correctFields": "لطفاً فیلدهای برجسته را اصلاح کنید.",
+      "saveError": "خطا در ذخیره",
+      "editFlow": "جریان ویرایش",
+      "createFlow": "جریان ایجاد",
+      "flowSubtitle": "یک جریان ورودی مرحله‌ای ایجاد و ویرایش وظایف را آسان‌تر می‌کند.",
+      "nextStep": "مرحله بعدی",
+      "saveRecord": "ذخیره ریکارد",
+      "formError": "خطای فرم",
+      "imageSize": "اندازه تصویر باید کمتر از 5 مگابایت باشد"
     },
     "list": {
       "unknownError": "یک خطای ناشناس رخ داد",
@@ -4768,7 +6240,26 @@
       "typeToFilter": "برای فیلتر تایپ کنید...",
       "deletingRecord": "در حال حذف ریکارد...",
       "report": "گزارش",
-      "searchPlaceholder": "جستجو..."
+      "searchPlaceholder": "جستجو...",
+      "rowNum": "#",
+      "actions": "اقدامات",
+      "unableToLoad": "بارگذاری داده ناکام شد",
+      "noRecords": "ریکاردی یافت نشد",
+      "noMatch": "ریکارد مطابق یافت نشد",
+      "tryChanging": "معیارهای جستجو یا فیلتر خود را تغییر دهید.",
+      "loadingData": "در حال بارگذاری داده...",
+      "addNew": "افزودن جدید",
+      "export": "خروجی",
+      "exportPdf": "خروجی PDF",
+      "exportCsv": "خروجی CSV",
+      "searchAndFilter": "جستجو و فیلتر",
+      "filterBy": "فیلتر بر اساس",
+      "recordsTable": "جدول ریکاردها",
+      "confirmDelete": "آیا مطمئن هستید که می‌خواهید این ریکارد را حذف کنید؟",
+      "quickControls": "کنترل‌های سریع برای یافتن سریع‌تر ریکاردها.",
+      "allColumns": "همه ستون‌ها",
+      "filterValue": "مقدار فیلتر",
+      "tableDescription": "فیلتر، مرتب‌سازی، صفحه‌بندی و اقدامات ردیف یکپارچه."
     },
     "recordView": {
       "dash": "-",

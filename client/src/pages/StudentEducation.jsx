@@ -45,7 +45,7 @@ const StudentEducation = () => {
       setEducationHistory(records.length > 0 ? records : MOCK_EDUCATION);
     } catch (err) {
       console.error('Error fetching education data:', err);
-      setError(t('student.education.offlineData'));
+      setError(t('education.offlineData'));
       setEducationHistory(MOCK_EDUCATION);
     } finally {
       setLoading(false);
@@ -68,7 +68,7 @@ const StudentEducation = () => {
   if (error) return (
     <div className="py-20 text-center">
       <p className="text-red-500 mb-4">{error}</p>
-      <button onClick={fetchEducationData} className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm">{t('common.retry')}</button>
+      <button onClick={fetchEducationData} className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm">{t('common:retry')}</button>
     </div>
   );
 
@@ -77,29 +77,29 @@ const StudentEducation = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('student.education.academic')}</p>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('student.education.title')}</h1>
-          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('student.education.subtitle')}</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('education.academic')}</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('education.title')}</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('education.subtitle')}</p>
         </div>
         <Button 
           variant="outline" 
-          className="rounded-2xl border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-2 font-black text-xs uppercase tracking-widest"
+          className="rounded-2xl border-slate-200 hover:bg-slate-50 flex items-center gap-2 font-black text-xs uppercase tracking-widest"
           onClick={() => navigate('/student/communications')}
         >
-          <FiMessageSquare /> {t('student.education.contactRegistrar')}
+          <FiMessageSquare /> {t('education.contactRegistrar')}
         </Button>
       </div>
 
       {/* Info Banner */}
       <div className="p-8 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-200 rounded-[32px] relative overflow-hidden">
         <div className="flex items-start gap-6 relative z-10">
-          <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl text-amber-600 shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-transparent shadow-sm flex items-center justify-center text-2xl text-amber-600 shrink-0">
             <FiAlertCircle />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-black text-amber-900 mb-2">{t('student.education.readOnlyVerification')}</h3>
+            <h3 className="text-xl font-black text-amber-900 mb-2">{t('education.readOnlyVerification')}</h3>
             <p className="text-amber-800/80 font-medium leading-relaxed max-w-2xl">
-              {t('student.education.verificationBanner')}
+              {t('education.verificationBanner')}
             </p>
           </div>
         </div>
@@ -109,10 +109,10 @@ const StudentEducation = () => {
       {/* Stats Summary Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: t('student.education.totalRecords'), value: educationHistory.length, icon: <FiBook />, color: 'blue' },
-          { label: t('student.education.certifications'), value: certificationsCount, icon: <FiAward />, color: 'emerald' },
-          { label: t('student.education.institutions'), value: institutionsCount, icon: <FiTrendingUp />, color: 'purple' },
-          { label: t('student.education.verifiedStatus'), value: '100%', icon: <FiCheckCircle />, color: 'cyan' }
+          { label: t('education.totalRecords'), value: educationHistory.length, icon: <FiBook />, color: 'blue' },
+          { label: t('education.certifications'), value: certificationsCount, icon: <FiAward />, color: 'emerald' },
+          { label: t('education.institutions'), value: institutionsCount, icon: <FiTrendingUp />, color: 'purple' },
+          { label: t('education.verifiedStatus'), value: '100%', icon: <FiCheckCircle />, color: 'cyan' }
         ].map((stat, i) => (
           <div key={i} className="p-6 bg-white dark:bg-gray-800 rounded-[32px] border border-slate-100 dark:border-gray-700 shadow-xl shadow-slate-200/50">
             <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
@@ -127,14 +127,14 @@ const StudentEducation = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Education Records List */}
         <div className="lg:col-span-2">
-          <Card title={t('student.education.verifiedRecords')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('education.verifiedRecords')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <div className="space-y-6">
               {educationHistory.length > 0 ? (
                 educationHistory.map((edu, i) => (
                   <div key={i} className="group p-6 rounded-[32px] bg-slate-50 dark:bg-gray-700/50 border border-slate-100 dark:border-gray-700 hover:border-cyan-200 hover:bg-white dark:hover:bg-gray-700 transition-all duration-300">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl text-cyan-600 group-hover:scale-110 transition-transform">
+                        <div className="w-14 h-14 rounded-2xl bg-transparent shadow-sm flex items-center justify-center text-2xl text-cyan-600 group-hover:scale-110 transition-transform">
                           <FiAward />
                         </div>
                         <div>
@@ -144,35 +144,35 @@ const StudentEducation = () => {
                           </p>
                         </div>
                       </div>
-                      <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('common.verified')}</Badge>
+                      <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('common:verified')}</Badge>
                     </div>
                     
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400">
+                        <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center text-slate-400">
                           <FiMapPin />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('student.education.location')}</p>
-                          <p className="text-sm font-black text-slate-700 dark:text-gray-300">{edu.location || t('student.education.notSpecified')}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('education.location')}</p>
+                          <p className="text-sm font-black text-slate-700 dark:text-gray-300">{edu.location || t('education.notSpecified')}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400">
+                        <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center text-slate-400">
                           <FiCalendar />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('student.education.addedOn')}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('education.addedOn')}</p>
                           <p className="text-sm font-black text-slate-700 dark:text-gray-300">{formatDate(edu.createdAt)}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400">
+                        <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center text-slate-400">
                           <FiCheckCircle />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('common.status')}</p>
-                          <p className="text-sm font-black text-emerald-600">{t('student.education.documentVerified')}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('common:status')}</p>
+                          <p className="text-sm font-black text-emerald-600">{t('education.documentVerified')}</p>
                         </div>
                       </div>
                     </div>
@@ -181,7 +181,7 @@ const StudentEducation = () => {
               ) : (
                 <div className="text-center py-20">
                   <FiAward className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('student.education.noHistory')}</p>
+                  <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('education.noHistory')}</p>
                 </div>
               )}
             </div>
@@ -190,10 +190,10 @@ const StudentEducation = () => {
 
         {/* Sidebar Analytics */}
         <div className="space-y-8">
-          <Card title={t('student.education.institutionDistribution')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('education.institutionDistribution')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             <BarChartComponent 
               data={Array.from(new Set(educationHistory.map(e => e.previousInstitution))).map(inst => ({
-                name: inst?.substring(0, 15) || t('common.unknown'),
+                name: inst?.substring(0, 15) || t('common:unknown'),
                 value: educationHistory.filter(e => e.previousInstitution === inst).length
               }))}
               dataKey="value"
@@ -204,14 +204,14 @@ const StudentEducation = () => {
 
           <div className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 rounded-[32px] text-white shadow-2xl shadow-slate-200/50 relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="text-xl font-black mb-2">{t('student.education.academicSupport')}</h4>
-              <p className="text-slate-400 text-sm font-medium mb-6">{t('student.education.academicSupportDesc')}</p>
+              <h4 className="text-xl font-black mb-2">{t('education.academicSupport')}</h4>
+              <p className="text-slate-400 text-sm font-medium mb-6">{t('education.academicSupportDesc')}</p>
               <Button 
                 variant="primary" 
                 className="w-full rounded-2xl py-4 bg-cyan-600 hover:bg-cyan-700 font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-cyan-900/20"
                 onClick={() => navigate('/student/communications')}
               >
-                {t('student.education.getSupport')}
+                {t('education.getSupport')}
               </Button>
             </div>
             <FiBook className="absolute -right-6 -bottom-6 w-32 h-32 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />

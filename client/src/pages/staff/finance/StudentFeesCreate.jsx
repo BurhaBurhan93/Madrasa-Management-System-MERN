@@ -7,8 +7,8 @@ const StudentFeesCreate = () => {
   const { t } = useTranslation(['staff', 'common']);
   return (
     <FormPage
-      titleCreate={t('staff.finance.studentFees.create')}
-      titleEdit={t('staff.finance.studentFees.edit')}
+      titleCreate={t('finance.studentFees.create')}
+      titleEdit={t('finance.studentFees.edit')}
       endpoint={studentFeesConfig.endpoint}
       formFields={studentFeesConfig.formFields}
       initialForm={studentFeesConfig.initialForm}

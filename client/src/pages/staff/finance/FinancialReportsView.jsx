@@ -7,9 +7,10 @@ import financialReportsConfig from "./financialReportsConfig";
 const FinancialReportsView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
+  const resolvedTitle = t(financialReportsConfig.title);
   return (
     <RecordViewPage
-      title={t('staff.finance.financialReports.details', { title: financialReportsConfig.title })}
+      title={t('finance.financialReports.details', { title: resolvedTitle })}
       subtitle={financialReportsConfig.subtitle}
       endpoint={financialReportsConfig.endpoint}
       id={id}

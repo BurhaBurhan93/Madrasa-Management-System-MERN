@@ -236,6 +236,18 @@ exports.getAssignments = async (req, res) => {
   }
 };
 
+exports.getAssignmentById = async (req, res) => {
+  try {
+    const assignment = await Assignment.findById(req.params.id)
+      .populate("courseId", "name");
+    if (!assignment)
+      return res.status(404).json({ success: false, message: "Assignment not found" });
+    res.json({ success: true, data: assignment });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 exports.createAssignment = async (req, res) => {
   try {
     const assignment = await Assignment.create(req.body);

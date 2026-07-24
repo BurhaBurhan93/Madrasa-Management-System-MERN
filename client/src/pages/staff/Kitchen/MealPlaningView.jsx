@@ -10,7 +10,7 @@ const MealPlaningView = () => {
   const config = getBudgetsConfig(t);
   return (
     <RecordViewPage
-      title={t('staff.kitchen.mealPlaning.viewTitle', 'Budget Request Details')}
+      title={t('kitchen.mealPlaning.viewTitle', 'Budget Request Details')}
       subtitle={config.subtitle}
       endpoint={config.endpoint}
       id={id}

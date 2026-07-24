@@ -81,7 +81,7 @@ const HRAttendance = () => {
       const res = await api.post('/hr/attendance', payload);
       if (res.data.success) alert(res.data.message);
     } catch (error) {
-      alert(error.response?.data?.message || t('staff.hr.attendance.failedSave'));
+      alert(error.response?.data?.message || t('hr.attendance.failedSave'));
     } finally {
       setLoading(false);
     }
@@ -91,13 +91,13 @@ const HRAttendance = () => {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">{t('staff.hr.attendance.title')}</h1>
-          <p className="text-sm text-gray-500 mt-1">{t('staff.hr.attendance.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-800">{t('hr.attendance.title')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('hr.attendance.subtitle')}</p>
         </div>
         <div className="flex items-center gap-4">
-          <CalendarDatePicker value={date} onChange={(date) => setDate(date)} placeholder={t('staff.hr.attendance.selectDate')} />
+          <CalendarDatePicker value={date} onChange={(date) => setDate(date)} placeholder={t('hr.attendance.selectDate')} />
           <Button onClick={handleSubmit} disabled={loading} className="bg-cyan-500 hover:bg-cyan-600 text-white">
-            {loading ? t('common.saving') : t('staff.hr.attendance.saveAttendance')}
+            {loading ? t('common.saving') : t('hr.attendance.saveAttendance')}
           </Button>
         </div>
       </div>
@@ -109,17 +109,17 @@ const HRAttendance = () => {
           <table className="w-full">
             <thead className="bg-gray-50 text-gray-600 text-sm">
               <tr>
-                <th className="p-3 text-left">{t('staff.hr.attendance.tableEmployee')}</th>
-                <th className="p-3 text-left">{t('staff.hr.attendance.tableCode')}</th>
-                <th className="p-3 text-left">{t('staff.hr.attendance.tableStatus')}</th>
-                <th className="p-3 text-left">{t('staff.hr.attendance.tableCheckIn')}</th>
-                <th className="p-3 text-left">{t('staff.hr.attendance.tableCheckOut')}</th>
-                <th className="p-3 text-left">{t('staff.hr.attendance.tableRemarks')}</th>
+                <th className="p-3 text-left">{t('hr.attendance.tableEmployee')}</th>
+                <th className="p-3 text-left">{t('hr.attendance.tableCode')}</th>
+                <th className="p-3 text-left">{t('hr.attendance.tableStatus')}</th>
+                <th className="p-3 text-left">{t('hr.attendance.tableCheckIn')}</th>
+                <th className="p-3 text-left">{t('hr.attendance.tableCheckOut')}</th>
+                <th className="p-3 text-left">{t('hr.attendance.tableRemarks')}</th>
               </tr>
             </thead>
             <tbody>
               {employees.length === 0 ? (
-                <tr><td colSpan="6" className="p-8 text-center text-gray-500">{t('staff.hr.attendance.noEmployees')}</td></tr>
+                <tr><td colSpan="6" className="p-8 text-center text-gray-500">{t('hr.attendance.noEmployees')}</td></tr>
               ) : (
                 employees.map(emp => (
                   <tr key={emp._id} className="border-t hover:bg-gray-50">
@@ -131,7 +131,7 @@ const HRAttendance = () => {
                         onChange={e => handleChange(emp._id, 'status', e.target.value)}
                         className={`px-2 py-1 rounded-lg text-sm border-0 outline-none font-medium ${statusColors[records[emp._id]?.status] || ''}`}
                       >
-                        {statusOptions.map(s => <option key={s} value={s}>{t(`staff.hr.attendance.status.${s}`)}</option>)}
+                        {statusOptions.map(s => <option key={s} value={s}>{t(`hr.attendance.status.${s}`)}</option>)}
                       </select>
                     </td>
                     <td className="p-3">
@@ -155,7 +155,7 @@ const HRAttendance = () => {
                         type="text"
                         value={records[emp._id]?.remarks || ''}
                         onChange={e => handleChange(emp._id, 'remarks', e.target.value)}
-                        placeholder={t('staff.hr.attendance.remarksPlaceholder')}
+                        placeholder={t('hr.attendance.remarksPlaceholder')}
                         className="border rounded px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-cyan-500 w-full"
                       />
                     </td>

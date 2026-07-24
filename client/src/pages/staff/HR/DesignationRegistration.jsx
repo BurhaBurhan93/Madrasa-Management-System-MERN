@@ -66,14 +66,14 @@ const DesignationRegistration = () => {
   const { t } = useTranslation(['staff', 'common']);
   return (
     <ListPage
-      title={t('staff.hr.designations.title')}
-      subtitle={t('staff.hr.designations.subtitle')}
+      title={t('hr.designations.title')}
+      subtitle={t('hr.designations.subtitle')}
       endpoint={designationsConfig.endpoint}
-      columns={designationsConfig.columns.map(col => ({ ...col, header: t(`staff.hr.designations.col${col.key}`) }))}
+      columns={designationsConfig.columns.map(col => ({ ...col, header: t(`hr.designations.col${col.key}`) }))}
       createPath="/staff/hr/designations/create"
       editPathForRow={(row) => `/staff/hr/designations/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/hr/designations/view/${row._id}`}
-      searchPlaceholder={t('staff.hr.designations.searchPlaceholder')}
+      searchPlaceholder={t('hr.designations.searchPlaceholder')}
       clientSidePagination={true}
     />
   );

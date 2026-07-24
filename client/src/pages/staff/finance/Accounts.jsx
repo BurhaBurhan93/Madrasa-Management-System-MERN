@@ -6,26 +6,26 @@ import StaffAnalyticsContent, { fetchCollectionData, formatCurrency, groupCountB
 import { staffApi } from '../../../api/staffApi';
 
 export const accountsConfig = {
-  title: 'Financial Accounts',
-  subtitle: 'Manage account balances, status, and account-type distribution.',
+  title: 'finance.accounts.title',
+  subtitle: 'finance.accounts.subtitle',
   endpoint: staffApi.finance.accounts,
   columns: [
-    { key: 'accountCode', header: 'Account Code' },
-    { key: 'accountName', header: 'Account Name' },
-    { key: 'accountType', header: 'Type' },
-    { key: 'openingBalance', header: 'Opening Balance' },
-    { key: 'currentBalance', header: 'Current Balance' },
-    { key: 'currency', header: 'Currency' },
-    { key: 'status', header: 'Status' }
+    { key: 'accountCode', header: 'finance.accounts.column.accountCode' },
+    { key: 'accountName', header: 'finance.accounts.column.accountName' },
+    { key: 'accountType', header: 'finance.accounts.column.accountType' },
+    { key: 'openingBalance', header: 'finance.accounts.column.openingBalance' },
+    { key: 'currentBalance', header: 'finance.accounts.column.currentBalance' },
+    { key: 'currency', header: 'finance.accounts.column.currency' },
+    { key: 'status', header: 'finance.accounts.column.status' }
   ],
   formFields: [
-    { name: 'accountCode', label: 'Account Code' },
-    { name: 'accountName', label: 'Account Name' },
-    { name: 'accountType', label: 'Account Type', type: 'select', options: [{ value: 'cash', label: 'Cash' }, { value: 'petty_cash', label: 'Petty Cash' }] },
-    { name: 'openingBalance', label: 'Opening Balance', type: 'number' },
-    { name: 'currentBalance', label: 'Current Balance', type: 'number' },
-    { name: 'currency', label: 'Currency' },
-    { name: 'status', label: 'Status', type: 'select', options: [{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }] }
+    { name: 'accountCode', label: 'finance.accounts.formField.accountCode' },
+    { name: 'accountName', label: 'finance.accounts.formField.accountName' },
+    { name: 'accountType', label: 'finance.accounts.formField.accountType', type: 'select', options: [{ value: 'cash', label: 'finance.accounts.formField.accountType.cash' }, { value: 'petty_cash', label: 'finance.accounts.formField.accountType.petty_cash' }] },
+    { name: 'openingBalance', label: 'finance.accounts.formField.openingBalance', type: 'number' },
+    { name: 'currentBalance', label: 'finance.accounts.formField.currentBalance', type: 'number' },
+    { name: 'currency', label: 'finance.accounts.formField.currency' },
+    { name: 'status', label: 'finance.accounts.formField.status', type: 'select', options: [{ value: 'active', label: 'finance.accounts.formField.status.active' }, { value: 'inactive', label: 'finance.accounts.formField.status.inactive' }] }
   ],
   initialForm: {
     accountCode: '',
@@ -58,25 +58,25 @@ const Accounts = () => {
         setAnalytics({
           loading: false,
           stats: [
-            { label: t('staff.finance.accounts.statTotalAccounts'), value: accounts.length, helper: t('staff.finance.accounts.statTotalAccountsHelper'), tone: 'blue', icon: FiCreditCard },
-            { label: t('staff.finance.accounts.statActiveAccounts'), value: activeCount, helper: t('staff.finance.accounts.statActiveAccountsHelper'), tone: 'emerald', icon: FiCheckCircle },
-            { label: t('staff.finance.accounts.statInactiveAccounts'), value: inactiveCount, helper: t('staff.finance.accounts.statInactiveAccountsHelper'), tone: 'rose', icon: FiSlash },
-            { label: t('staff.finance.accounts.statTotalBalance'), value: formatCurrency(totalBalance), helper: t('staff.finance.accounts.statTotalBalanceHelper', { avg: formatCurrency(averageBalance) }), tone: 'violet', icon: FiDollarSign },
-            { label: t('staff.finance.accounts.statAccountTypes'), value: groupCountByKey(accounts, 'accountType').length, helper: t('staff.finance.accounts.statAccountTypesHelper'), tone: 'amber', icon: FiPieChart }
+            { label: t('finance.accounts.statTotalAccounts'), value: accounts.length, helper: t('finance.accounts.statTotalAccountsHelper'), tone: 'blue', icon: FiCreditCard },
+            { label: t('finance.accounts.statActiveAccounts'), value: activeCount, helper: t('finance.accounts.statActiveAccountsHelper'), tone: 'emerald', icon: FiCheckCircle },
+            { label: t('finance.accounts.statInactiveAccounts'), value: inactiveCount, helper: t('finance.accounts.statInactiveAccountsHelper'), tone: 'rose', icon: FiSlash },
+            { label: t('finance.accounts.statTotalBalance'), value: formatCurrency(totalBalance), helper: t('finance.accounts.statTotalBalanceHelper', { avg: formatCurrency(averageBalance) }), tone: 'violet', icon: FiDollarSign },
+            { label: t('finance.accounts.statAccountTypes'), value: groupCountByKey(accounts, 'accountType').length, helper: t('finance.accounts.statAccountTypesHelper'), tone: 'amber', icon: FiPieChart }
           ],
           charts: [
-            { title: t('staff.finance.accounts.chartAccountTypeDistribution'), type: 'pie', data: groupCountByKey(accounts, 'accountType') },
-            { title: t('staff.finance.accounts.chartAccountStatusDistribution'), type: 'bar', data: groupCountByKey(accounts, 'status') }
+            { title: t('finance.accounts.chart.accountTypeDistribution'), type: 'pie', data: groupCountByKey(accounts, 'accountType') },
+            { title: t('finance.accounts.chart.accountStatusDistribution'), type: 'bar', data: groupCountByKey(accounts, 'status') }
           ],
           insight: {
-            eyebrow: t('staff.finance.accounts.insightEyebrow'),
-            title: t('staff.finance.accounts.insightTitle'),
-            description: t('staff.finance.accounts.insightDescription')
+            eyebrow: t('finance.accounts.insight.eyebrow'),
+            title: t('finance.accounts.insight.title'),
+            description: t('finance.accounts.insight.description')
           }
         });
       } catch (error) {
         if (!active) return;
-        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('staff.finance.accounts.errorTitle'), description: error.message || t('staff.finance.accounts.errorDescription') } });
+        setAnalytics({ loading: false, stats: [], charts: [], insight: { title: t('finance.accounts.errorTitle'), description: error.message || t('finance.accounts.errorDescription') } });
       }
     };
 
@@ -88,7 +88,7 @@ const Accounts = () => {
 
   return (
     <ListPage
-      eyebrow={t('staff.finance.eyebrow')}
+      eyebrow={t('finance.eyebrow')}
       title={accountsConfig.title}
       subtitle={accountsConfig.subtitle}
       endpoint={accountsConfig.endpoint}
@@ -96,7 +96,7 @@ const Accounts = () => {
       createPath="/staff/finance/accounts/create"
       editPathForRow={(row) => `/staff/finance/accounts/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/finance/accounts/view/${row._id}`}
-      searchPlaceholder={t('staff.finance.accounts.searchPlaceholder')}
+      searchPlaceholder={t('finance.accounts.searchPlaceholder')}
       enableExport={true}
       headerContent={!analytics.loading ? <StaffAnalyticsContent stats={analytics.stats} charts={analytics.charts} insight={analytics.insight} /> : null}
     />

@@ -19,12 +19,12 @@ const mapRowToView = (row) => ({
 const StudentAdmissionsView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  const fields = studentAdmissionsConfig.formFields.map((field) => ({ name: field.name, label: t(`staff.registrar.studentAdmissions.fields.${field.name}`) }));
+  const fields = studentAdmissionsConfig.formFields.map((field) => ({ name: field.name, label: t(`registrar.studentAdmissions.fields.${field.name}`) }));
 
   return (
     <RecordViewPage
-      title={t('staff.registrar.studentAdmissions.view.title')}
-      subtitle={t('staff.registrar.studentAdmissions.view.subtitle')}
+      title={t('registrar.studentAdmissions.view.title')}
+      subtitle={t('registrar.studentAdmissions.view.subtitle')}
       endpoint={studentAdmissionsConfig.endpoint}
       id={id}
       fields={fields}

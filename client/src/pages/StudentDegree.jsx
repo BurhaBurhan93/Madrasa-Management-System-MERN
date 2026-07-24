@@ -61,7 +61,7 @@ const StudentDegree = () => {
       });
     } catch (err) {
       console.error('Error fetching degree data:', err);
-      setError(t('student.degree.offlineData'));
+      setError(t('degree.offlineData'));
       setEnrolledDegrees(MOCK_DEGREES);
       setStats({
         totalEnrolled: MOCK_DEGREES.length,
@@ -80,44 +80,44 @@ const StudentDegree = () => {
 
   const handleExportTranscript = useCallback(() => {
     const rows = enrolledDegrees.map(d => [
-      d.degree?.name || d.name || t('common.na'),
-      d.status || t('common.na'),
+      d.degree?.name || d.name || t('common:na'),
+      d.status || t('common:na'),
       d.degree?.credits || 0,
       d.progress || 0,
-      d.enrollmentDate ? new Date(d.enrollmentDate).toLocaleDateString() : t('common.na'),
-      d.expectedGraduation ? new Date(d.expectedGraduation).toLocaleDateString() : t('common.na')
+      d.enrollmentDate ? new Date(d.enrollmentDate).toLocaleDateString() : t('common:na'),
+      d.expectedGraduation ? new Date(d.expectedGraduation).toLocaleDateString() : t('common:na')
     ]);
     const doc = new jsPDF({ orientation: 'landscape' });
     doc.setFontSize(18);
-    doc.text(t('student.degree.transcriptTitle'), 14, 20);
+    doc.text(t('degree.transcriptTitle'), 14, 20);
     doc.setFontSize(10);
-    doc.text(t('student.degree.transcriptSummary', { programs: enrolledDegrees.length, credits: stats.totalCredits }), 14, 28);
+    doc.text(t('degree.transcriptSummary', { programs: enrolledDegrees.length, credits: stats.totalCredits }), 14, 28);
     doc.setFontSize(8);
-    doc.text(`${t('student.degree.transGenerated')} ${new Date().toLocaleDateString()}`, 14, 34);
+    doc.text(`${t('degree.transGenerated')} ${new Date().toLocaleDateString()}`, 14, 34);
     autoTable(doc, {
       startY: 40,
-      head: [[t('student.degree.transHeaderProgram'), t('student.degree.transHeaderStatus'), t('student.degree.transHeaderCredits'), t('student.degree.transHeaderProgress'), t('student.degree.transHeaderEnrolled'), t('student.degree.transHeaderGraduation')]],
+      head: [[t('degree.transHeaderProgram'), t('degree.transHeaderStatus'), t('degree.transHeaderCredits'), t('degree.transHeaderProgress'), t('degree.transHeaderEnrolled'), t('degree.transHeaderGraduation')]],
       body: rows,
       styles: { fontSize: 9, cellPadding: 4 },
       headStyles: { fillColor: [30, 41, 59], fontSize: 9, fontStyle: 'bold' },
       alternateRowStyles: { fillColor: [248, 250, 252] },
     });
-    doc.save(t('student.degree.transcriptFilename'));
+    doc.save(t('degree.transcriptFilename'));
   }, [enrolledDegrees, stats]);
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'active': return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('common.active')}</Badge>;
-      case 'completed': return <Badge variant="primary" className="font-black uppercase tracking-widest text-[10px]">{t('common.completed')}</Badge>;
-      case 'inactive': return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">{t('common.inactive')}</Badge>;
+      case 'active': return <Badge variant="success" className="font-black uppercase tracking-widest text-[10px]">{t('common:active')}</Badge>;
+      case 'completed': return <Badge variant="primary" className="font-black uppercase tracking-widest text-[10px]">{t('common:completed')}</Badge>;
+      case 'inactive': return <Badge variant="danger" className="font-black uppercase tracking-widest text-[10px]">{t('common:inactive')}</Badge>;
       default: return <Badge className="font-black uppercase tracking-widest text-[10px]">{status}</Badge>;
     }
   };
 
   const degreeStatusData = [
-    { name: t('common.active'), value: stats.activeDegrees, color: '#10B981' },
-    { name: t('common.completed'), value: stats.completedDegrees, color: '#3B82F6' },
-    { name: t('common.inactive'), value: stats.totalEnrolled - stats.activeDegrees - stats.completedDegrees, color: '#EF4444' }
+    { name: t('common:active'), value: stats.activeDegrees, color: '#10B981' },
+    { name: t('common:completed'), value: stats.completedDegrees, color: '#3B82F6' },
+    { name: t('common:inactive'), value: stats.totalEnrolled - stats.activeDegrees - stats.completedDegrees, color: '#EF4444' }
   ].filter(d => d.value > 0);
 
   if (loading) return <PageSkeleton variant="table" />;
@@ -125,7 +125,7 @@ const StudentDegree = () => {
   if (error) return (
     <div className="py-20 text-center">
       <p className="text-red-500 mb-4">{error}</p>
-      <button onClick={fetchDegreeData} className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm">{t('common.retry')}</button>
+      <button onClick={fetchDegreeData} className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm">{t('common:retry')}</button>
     </div>
   );
 
@@ -134,13 +134,13 @@ const StudentDegree = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('student.degree.academic')}</p>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('student.degree.title')}</h1>
-          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('student.degree.subtitle')}</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-600 mb-1">{t('degree.academic')}</p>
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{t('degree.title')}</h1>
+          <p className="text-slate-500 dark:text-gray-400 mt-1 font-medium italic">{t('degree.subtitle')}</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="rounded-2xl border-slate-200 bg-white flex items-center gap-2 font-black text-xs uppercase tracking-widest" onClick={handleExportTranscript}>
-            <FiFileText /> {t('student.degree.viewTranscript')}
+          <Button variant="outline" className="rounded-2xl border-slate-200 flex items-center gap-2 font-black text-xs uppercase tracking-widest" onClick={handleExportTranscript}>
+            <FiFileText /> {t('degree.viewTranscript')}
           </Button>
         </div>
       </div>
@@ -148,10 +148,10 @@ const StudentDegree = () => {
       {/* Stats Summary Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: t('student.degree.totalEnrolled'), value: stats.totalEnrolled, icon: <FiAward />, color: 'blue' },
-          { label: t('student.degree.activePrograms'), value: stats.activeDegrees, icon: <FiCheckCircle />, color: 'emerald' },
-          { label: t('student.degree.completed'), value: stats.completedDegrees, icon: <FiTrendingUp />, color: 'purple' },
-          { label: t('student.degree.totalCredits'), value: stats.totalCredits, icon: <FiBookOpen />, color: 'amber' }
+          { label: t('degree.totalEnrolled'), value: stats.totalEnrolled, icon: <FiAward />, color: 'blue' },
+          { label: t('degree.activePrograms'), value: stats.activeDegrees, icon: <FiCheckCircle />, color: 'emerald' },
+          { label: t('degree.completed'), value: stats.completedDegrees, icon: <FiTrendingUp />, color: 'purple' },
+          { label: t('degree.totalCredits'), value: stats.totalCredits, icon: <FiBookOpen />, color: 'amber' }
         ].map((stat, i) => (
           <div key={i} className="p-6 bg-white dark:bg-gray-800 rounded-[32px] border border-slate-100 dark:border-gray-700 shadow-xl shadow-slate-200/50">
             <div className={`w-12 h-12 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center text-xl mb-4`}>
@@ -166,11 +166,11 @@ const StudentDegree = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Enrolled Degrees List */}
         <div className="lg:col-span-2 space-y-6">
-          <Card title={t('student.degree.enrolledPrograms')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('degree.enrolledPrograms')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             {enrolledDegrees.length === 0 ? (
               <div className="text-center py-20">
                   <FiAward className="w-16 h-16 text-slate-100 dark:text-gray-700 mx-auto mb-4" />
-                  <p className="text-slate-400 dark:text-gray-500 font-bold text-sm uppercase tracking-widest">{t('student.degree.noPrograms')}</p>
+                  <p className="text-slate-400 dark:text-gray-500 font-bold text-sm uppercase tracking-widest">{t('degree.noPrograms')}</p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -178,13 +178,13 @@ const StudentDegree = () => {
                   <div key={enrollment._id} className="group p-6 rounded-[32px] bg-slate-50 dark:bg-gray-700/50 border border-slate-100 dark:border-gray-700 hover:border-cyan-200 hover:bg-white dark:hover:bg-gray-700 transition-all duration-300">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl text-cyan-600 group-hover:scale-110 transition-transform">
+                        <div className="w-14 h-14 rounded-2xl bg-transparent shadow-sm flex items-center justify-center text-2xl text-cyan-600 group-hover:scale-110 transition-transform">
                           <FiAward />
                         </div>
                         <div>
                           <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{enrollment.degree?.name}</h3>
                           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                            {[enrollment.degree?.code, enrollment.degree?.duration, enrollment.academicYear].filter(Boolean).join(' • ') || enrollment.academicYear || t('student.degree.enrolled')}
+                            {[enrollment.degree?.code, enrollment.degree?.duration, enrollment.academicYear].filter(Boolean).join(' • ') || enrollment.academicYear || t('degree.enrolled')}
                           </p>
                         </div>
                       </div>
@@ -193,26 +193,26 @@ const StudentDegree = () => {
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('student.degree.credits')}</p>
-                        <p className="text-sm font-black text-slate-700 dark:text-gray-300">{enrollment.degree?.credits || t('common.na')}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('degree.credits')}</p>
+                        <p className="text-sm font-black text-slate-700 dark:text-gray-300">{enrollment.degree?.credits || t('common:na')}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('student.degree.enrolled')}</p>
-                        <p className="text-sm font-black text-slate-700 dark:text-gray-300">{enrollment.enrollmentDate ? formatDate(enrollment.enrollmentDate) : t('common.na')}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('degree.enrolled')}</p>
+                        <p className="text-sm font-black text-slate-700 dark:text-gray-300">{enrollment.enrollmentDate ? formatDate(enrollment.enrollmentDate) : t('common:na')}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('student.degree.courses')}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('degree.courses')}</p>
                         <p className="text-sm font-black text-slate-700 dark:text-gray-300">{enrollment.completedCourses || 0} / {enrollment.totalCourses || 0}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('student.degree.academicYear')}</p>
-                        <p className="text-sm font-black text-emerald-600">{enrollment.academicYear || t('common.na')}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('degree.academicYear')}</p>
+                        <p className="text-sm font-black text-emerald-600">{enrollment.academicYear || t('common:na')}</p>
                       </div>
                     </div>
 
                     <div className="space-y-3">
                       <div className="flex justify-between items-end">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('student.degree.overallProgress')}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('degree.overallProgress')}</p>
                         <p className="text-sm font-black text-cyan-600">{enrollment.progress || 0}%</p>
                       </div>
                       <Progress value={enrollment.progress || 0} max={100} className="h-2 rounded-full" />
@@ -220,7 +220,7 @@ const StudentDegree = () => {
 
                     <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
                       <Button variant="outline" className="rounded-xl px-6 py-2.5 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 group/btn" onClick={() => navigate(`/student/courses?degreeId=${enrollment._id}`)}>
-                        {t('student.degree.viewCurriculum')} <FiArrowRight className="group-hover/btn:translate-x-1 transition-transform" />
+                        {t('degree.viewCurriculum')} <FiArrowRight className="group-hover/btn:translate-x-1 transition-transform" />
                       </Button>
                     </div>
                   </div>
@@ -232,7 +232,7 @@ const StudentDegree = () => {
 
         {/* Sidebar Distribution */}
         <div className="space-y-8">
-          <Card title={t('student.degree.programDistribution')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
+          <Card title={t('degree.programDistribution')} className="rounded-[32px] p-8 dark:bg-gray-800 dark:border-gray-700">
             {degreeStatusData.length > 0 ? (
               <PieChartComponent 
                 data={degreeStatusData}
@@ -243,17 +243,17 @@ const StudentDegree = () => {
             ) : (
               <div className="h-[250px] flex flex-col items-center justify-center text-slate-200">
                 <FiActivity className="w-12 h-12 mb-4" />
-                <p className="font-bold text-sm uppercase tracking-widest">{t('common.noData')}</p>
+                <p className="font-bold text-sm uppercase tracking-widest">{t('common:noData')}</p>
               </div>
             )}
           </Card>
 
           <div className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 rounded-[32px] text-white shadow-2xl shadow-slate-200/50 relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="text-xl font-black mb-2">{t('student.degree.graduationReady')}</h4>
-              <p className="text-slate-400 text-sm font-medium mb-6">{t('student.degree.graduationReadyDesc')}</p>
-              <Button variant="primary" className="w-full rounded-2xl py-4 bg-cyan-600 hover:bg-cyan-700 font-black text-xs uppercase tracking-widest transition-all" onClick={() => alert(t('student.degree.graduationApplied'))}>
-                {t('student.degree.applyGraduation')}
+              <h4 className="text-xl font-black mb-2">{t('degree.graduationReady')}</h4>
+              <p className="text-slate-400 text-sm font-medium mb-6">{t('degree.graduationReadyDesc')}</p>
+              <Button variant="primary" className="w-full rounded-2xl py-4 bg-cyan-600 hover:bg-cyan-700 font-black text-xs uppercase tracking-widest transition-all" onClick={() => alert(t('degree.graduationApplied'))}>
+                {t('degree.applyGraduation')}
               </Button>
             </div>
             <FiAward className="absolute -right-6 -bottom-6 w-32 h-32 text-white/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />

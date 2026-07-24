@@ -7,7 +7,7 @@ import { libraryPurchasesConfig } from './Purchases';
 const PurchasesView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.library.purchases.viewTitle')} subtitle={t('staff.library.purchases.subtitle')} endpoint={libraryPurchasesConfig.endpoint} id={id} fields={libraryPurchasesConfig.formFields} listPath="/staff/library/purchases" editPath={`/staff/library/purchases/edit/${id}`} />;
+  return <RecordViewPage title={t('library.purchases.viewTitle')} subtitle={t('library.purchases.subtitle')} endpoint={libraryPurchasesConfig.endpoint} id={id} fields={libraryPurchasesConfig.formFields} listPath="/staff/library/purchases" editPath={`/staff/library/purchases/edit/${id}`} />;
 };
 
 export default PurchasesView;

@@ -15,28 +15,28 @@ const getUnitOptions = (t) => ['kg', 'g', 'liter', 'ml', 'piece', 'box', 'bag', 
 export const getInventoryConfig = (t) => {
   const unitOptions = getUnitOptions(t);
   return {
-    title: t('staff.kitchen.inventory.title', 'Kitchen Inventory'),
-    subtitle: t('staff.kitchen.inventory.subtitle', 'Track stock levels with the same refined list and form design used across staff modules.'),
+    title: t('kitchen.inventory.title', 'Kitchen Inventory'),
+    subtitle: t('kitchen.inventory.subtitle', 'Track stock levels with the same refined list and form design used across staff modules.'),
     endpoint: staffApi.kitchen.inventory,
     columns: [
-      { key: 'itemName', header: t('staff.kitchen.inventory.itemName', 'Item Name') },
+      { key: 'itemName', header: t('kitchen.inventory.itemName', 'Item Name') },
       { key: 'category', header: t('common.category', 'Category') },
       { key: 'quantity', header: t('common.quantity', 'Quantity') },
       { key: 'unit', header: t('common.unit', 'Unit') },
-      { key: 'minimumStock', header: t('staff.kitchen.inventory.minimumStock', 'Minimum Stock') },
+      { key: 'minimumStock', header: t('kitchen.inventory.minimumStock', 'Minimum Stock') },
       { key: 'status', header: t('common.status', 'Status') }
     ],
     formFields: [
-      { name: 'itemName', label: t('staff.kitchen.inventory.itemName', 'Item Name') },
+      { name: 'itemName', label: t('kitchen.inventory.itemName', 'Item Name') },
       { name: 'category', label: t('common.category', 'Category') },
       { name: 'quantity', label: t('common.quantity', 'Quantity'), type: 'number' },
       { name: 'unit', label: t('common.unit', 'Unit'), type: 'select', options: unitOptions },
-      { name: 'minimumStock', label: t('staff.kitchen.inventory.minimumStock', 'Minimum Stock'), type: 'number' },
-      { name: 'unitPrice', label: t('staff.kitchen.inventory.unitPrice', 'Unit Price'), type: 'number' },
+      { name: 'minimumStock', label: t('kitchen.inventory.minimumStock', 'Minimum Stock'), type: 'number' },
+      { name: 'unitPrice', label: t('kitchen.inventory.unitPrice', 'Unit Price'), type: 'number' },
       { name: 'status', label: t('common.status', 'Status'), type: 'select', options: [
-        { value: 'available', label: t('staff.kitchen.inventory.available', 'Available') },
-        { value: 'low', label: t('staff.kitchen.inventory.lowStock', 'Low Stock') },
-        { value: 'out', label: t('staff.kitchen.inventory.outOfStock', 'Out Of Stock') }
+        { value: 'available', label: t('kitchen.inventory.available', 'Available') },
+        { value: 'low', label: t('kitchen.inventory.lowStock', 'Low Stock') },
+        { value: 'out', label: t('kitchen.inventory.outOfStock', 'Out Of Stock') }
       ] },
       { name: 'remarks', label: t('common.remarks', 'Remarks'), type: 'textarea', rows: 4 }
     ],
@@ -57,10 +57,10 @@ const Inventory = () => {
         setLoading(true);
         const res = await apiFetch(staffApi.kitchen.inventory);
         const data = await parseJsonSafe(res);
-        if (!res.ok || !data.success) throw new Error(data.message || t('staff.kitchen.inventory.failedToLoad', 'Failed to load inventory'));
+        if (!res.ok || !data.success) throw new Error(data.message || t('kitchen.inventory.failedToLoad', 'Failed to load inventory'));
         setItems(Array.isArray(data.data) ? data.data : []);
       } catch (error) {
-        console.error(t('staff.kitchen.inventory.failedToLoadInsights', 'Failed to load kitchen inventory insights:'), error);
+        console.error(t('kitchen.inventory.failedToLoadInsights', 'Failed to load kitchen inventory insights:'), error);
       } finally {
         setLoading(false);
       }
@@ -94,7 +94,7 @@ const Inventory = () => {
   if (loading) {
     const config = getInventoryConfig(t);
     return (
-      <StaffPageLayout eyebrow={t('staff.kitchen.inventory.eyebrow', 'Kitchen')} title={config.title} subtitle={t('staff.kitchen.inventory.loadingSubtitle', 'Stock health, inventory value, and reorder visibility for daily kitchen operations.')}>
+      <StaffPageLayout eyebrow={t('kitchen.inventory.eyebrow', 'Kitchen')} title={config.title} subtitle={t('kitchen.inventory.loadingSubtitle', 'Stock health, inventory value, and reorder visibility for daily kitchen operations.')}>
         <PageSkeleton type="dashboard" />
       </StaffPageLayout>
     );
@@ -106,11 +106,11 @@ const Inventory = () => {
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[
-          { label: t('staff.kitchen.inventory.itemsInStock', 'Items In Stock'), value: items.length, icon: FiPackage, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700', chipDark: 'dark:bg-sky-900/30 dark:text-sky-400' },
-          { label: t('staff.kitchen.inventory.lowStockAlerts', 'Low Stock Alerts'), value: insights.lowStock, icon: FiAlertTriangle, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700', chipDark: 'dark:bg-amber-900/30 dark:text-amber-400' },
-          { label: t('staff.kitchen.inventory.outOfStock', 'Out Of Stock'), value: insights.outOfStock, icon: FiArchive, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700', chipDark: 'dark:bg-rose-900/30 dark:text-rose-400' },
-          { label: t('staff.kitchen.inventory.inventoryValue', 'Inventory Value'), value: formatCurrency(insights.totalValue), icon: FiTrendingUp, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700', chipDark: 'dark:bg-emerald-900/30 dark:text-emerald-400' },
-          { label: t('staff.kitchen.inventory.itemsToReorder', 'Items To Reorder'), value: insights.reorderCount, icon: FiRefreshCcw, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700', chipDark: 'dark:bg-violet-900/30 dark:text-violet-400' }
+          { label: t('kitchen.inventory.itemsInStock', 'Items In Stock'), value: items.length, icon: FiPackage, tone: 'from-sky-50 to-cyan-50', chip: 'bg-sky-100 text-sky-700', chipDark: 'dark:bg-sky-900/30 dark:text-sky-400' },
+          { label: t('kitchen.inventory.lowStockAlerts', 'Low Stock Alerts'), value: insights.lowStock, icon: FiAlertTriangle, tone: 'from-amber-50 to-yellow-50', chip: 'bg-amber-100 text-amber-700', chipDark: 'dark:bg-amber-900/30 dark:text-amber-400' },
+          { label: t('kitchen.inventory.outOfStock', 'Out Of Stock'), value: insights.outOfStock, icon: FiArchive, tone: 'from-rose-50 to-red-50', chip: 'bg-rose-100 text-rose-700', chipDark: 'dark:bg-rose-900/30 dark:text-rose-400' },
+          { label: t('kitchen.inventory.inventoryValue', 'Inventory Value'), value: formatCurrency(insights.totalValue), icon: FiTrendingUp, tone: 'from-emerald-50 to-teal-50', chip: 'bg-emerald-100 text-emerald-700', chipDark: 'dark:bg-emerald-900/30 dark:text-emerald-400' },
+          { label: t('kitchen.inventory.itemsToReorder', 'Items To Reorder'), value: insights.reorderCount, icon: FiRefreshCcw, tone: 'from-violet-50 to-fuchsia-50', chip: 'bg-violet-100 text-violet-700', chipDark: 'dark:bg-violet-900/30 dark:text-violet-400' }
         ].map((item) => (
           <Card key={item.label} className={`rounded-[26px] border border-slate-200 bg-gradient-to-br ${item.tone} p-5 shadow-none dark:border-slate-700 dark:bg-none dark:bg-slate-800/50`}>
             <div className="flex items-start justify-between gap-4">
@@ -127,9 +127,9 @@ const Inventory = () => {
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <PieChartComponent title={t('staff.kitchen.inventory.itemsByCategory', 'Items By Category')} data={insights.byCategory} height={320} donut />
-        <PieChartComponent title={t('staff.kitchen.inventory.stockStatus', 'Stock Status')} data={insights.byStatus} height={320} />
-        <BarChartComponent title={t('staff.kitchen.inventory.topItemsByQuantity', 'Top Items By Quantity')} data={insights.byQuantity} dataKey="value" nameKey="name" height={320} horizontal />
+        <PieChartComponent title={t('kitchen.inventory.itemsByCategory', 'Items By Category')} data={insights.byCategory} height={320} donut />
+        <PieChartComponent title={t('kitchen.inventory.stockStatus', 'Stock Status')} data={insights.byStatus} height={320} />
+        <BarChartComponent title={t('kitchen.inventory.topItemsByQuantity', 'Top Items By Quantity')} data={insights.byQuantity} dataKey="value" nameKey="name" height={320} horizontal />
       </div>
     </>
   );
@@ -143,9 +143,9 @@ const Inventory = () => {
       createPath="/staff/kitchen/inventory/create"
       editPathForRow={(row) => `/staff/kitchen/inventory/edit/${row._id}`}
       viewPathForRow={(row) => `/staff/kitchen/inventory/view/${row._id}`}
-      searchPlaceholder={t('staff.kitchen.inventory.searchPlaceholder', 'Search kitchen inventory...')}
+      searchPlaceholder={t('kitchen.inventory.searchPlaceholder', 'Search kitchen inventory...')}
       clientSidePagination={true}
-      eyebrow={t('staff.kitchen.inventory.eyebrow', 'Kitchen')}
+      eyebrow={t('kitchen.inventory.eyebrow', 'Kitchen')}
       headerContent={headerContent}
       enableExport={true}
     />

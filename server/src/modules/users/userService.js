@@ -51,7 +51,7 @@ class UserService {
           gender: userData.gender || 'male',
           phoneNumber: user.phone || 'N/A',
           email: user.email,
-          employeeType: user.role === 'teacher' ? 'teacher' : 'support',
+          employeeType: user.role === 'teacher' ? 'teacher' : (userData.employeeType || 'support'),
           joiningDate: userData.joiningDate || new Date(),
           baseSalary: userData.baseSalary || 0,
           status: 'active'

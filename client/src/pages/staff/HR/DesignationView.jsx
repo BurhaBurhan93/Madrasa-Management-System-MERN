@@ -7,7 +7,7 @@ import { designationsConfig } from './DesignationRegistration';
 const DesignationView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.hr.designations.viewTitle')} subtitle={t('staff.hr.designations.subtitle')} endpoint={designationsConfig.endpoint} id={id} fields={designationsConfig.formFields} listPath="/staff/hr/designations" editPath={`/staff/hr/designations/edit/${id}`} />;
+  return <RecordViewPage title={t('hr.designations.viewTitle')} subtitle={t('hr.designations.subtitle')} endpoint={designationsConfig.endpoint} id={id} fields={designationsConfig.formFields} listPath="/staff/hr/designations" editPath={`/staff/hr/designations/edit/${id}`} />;
 };
 
 export default DesignationView;

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import Card from "../../../components/UIHelper/Card";
 import {
   PieChartComponent,
@@ -16,6 +17,7 @@ import { staffApi } from "../../../api/staffApi";
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 const HRReports = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const [attendanceSummary, setAttendanceSummary] = useState([]);
   const [leaveSummary, setLeaveSummary] = useState({ pending: 0, approved: 0, rejected: 0, total: 0 });
   const [payrollSummary, setPayrollSummary] = useState({ totalGross: 0, totalNet: 0, totalDeductions: 0, count: 0 });
@@ -121,8 +123,8 @@ const HRReports = () => {
     <div className="p-6 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">HR Reports</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">Attendance, leave, payroll and employee summary</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">{t('hr.reports.title')}</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{t('hr.reports.subtitle')}</p>
         </div>
 
         <div className="flex flex-wrap gap-3 items-center">
@@ -131,10 +133,10 @@ const HRReports = () => {
             onChange={(e) => setFilters({ ...filters, period: e.target.value })}
             className="border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200"
           >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
+            <option value="daily">{t('hr.reports.daily')}</option>
+            <option value="weekly">{t('hr.reports.weekly')}</option>
+            <option value="monthly">{t('hr.reports.monthly')}</option>
+            <option value="yearly">{t('hr.reports.yearly')}</option>
           </select>
 
           {filters.period === "daily" && (
@@ -175,21 +177,21 @@ const HRReports = () => {
       </div>
 
       {loading ? (
-        <div className="p-8 text-center text-gray-500 dark:text-slate-400">Loading reports...</div>
+        <div className="p-8 text-center text-gray-500 dark:text-slate-400">{t('hr.reports.loadingReports')}</div>
       ) : (
         <>
           {/* Employee Stats */}
           {employeeStats && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-3">Employee Overview</h2>
+              <h2 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-3">{t('hr.reports.employeeOverview')}</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                  { label: "Total Employees", value: employeeStats.totalEmployees, color: "text-gray-700 dark:text-slate-200" },
-                  { label: "Active", value: employeeStats.activeEmployees, color: "text-green-600" },
-                  { label: "Inactive", value: employeeStats.inactiveEmployees, color: "text-red-600" },
-                  { label: "Departments", value: (employeeStats.employeesByDepartment || []).length, color: "text-blue-600" },
+                  { label: t('hr.reports.totalEmployees'), value: employeeStats.totalEmployees, color: "text-gray-700 dark:text-slate-200" },
+                  { label: t('hr.reports.active'), value: employeeStats.activeEmployees, color: "text-green-600" },
+                  { label: t('hr.reports.inactive'), value: employeeStats.inactiveEmployees, color: "text-red-600" },
+                  { label: t('hr.reports.departments'), value: (employeeStats.employeesByDepartment || []).length, color: "text-blue-600" },
                 ].map((card) => (
-                  <div key={card.label} className="bg-white dark:bg-slate-800/50 rounded-xl shadow p-4">
+                  <div key={card.label} className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow p-4">
                     <p className="text-sm text-gray-500 dark:text-slate-400">{card.label}</p>
                     <p className={`text-3xl font-bold mt-1 ${card.color}`}>{card.value}</p>
                   </div>
@@ -200,15 +202,15 @@ const HRReports = () => {
 
           {/* Leave Summary */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-3">Leave Summary</h2>
+            <h2 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-3">{t('hr.reports.leaveSummary')}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { label: "Total Requests", value: leaveSummary.total, color: "text-gray-700 dark:text-slate-200" },
-                { label: "Pending", value: leaveSummary.pending, color: "text-yellow-600" },
-                { label: "Approved", value: leaveSummary.approved, color: "text-green-600" },
-                { label: "Rejected", value: leaveSummary.rejected, color: "text-red-600" },
+                { label: t('hr.reports.totalRequests'), value: leaveSummary.total, color: "text-gray-700 dark:text-slate-200" },
+                { label: t('hr.reports.pending'), value: leaveSummary.pending, color: "text-yellow-600" },
+                { label: t('hr.reports.approved'), value: leaveSummary.approved, color: "text-green-600" },
+                { label: t('hr.reports.rejected'), value: leaveSummary.rejected, color: "text-red-600" },
               ].map((card) => (
-                <div key={card.label} className="bg-white dark:bg-slate-800/50 rounded-xl shadow p-4">
+                <div key={card.label} className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow p-4">
                   <p className="text-sm text-gray-500 dark:text-slate-400">{card.label}</p>
                   <p className={`text-3xl font-bold mt-1 ${card.color}`}>{card.value}</p>
                 </div>
@@ -218,12 +220,12 @@ const HRReports = () => {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card title="Leave Status Distribution">
+            <Card title={t('hr.reports.leaveStatusDistribution')}>
               <PieChartComponent
                 data={[
-                  { name: "Pending", value: leaveSummary.pending, color: "#F59E0B" },
-                  { name: "Approved", value: leaveSummary.approved, color: "#10B981" },
-                  { name: "Rejected", value: leaveSummary.rejected, color: "#EF4444" },
+                  { name: t('hr.reports.pending'), value: leaveSummary.pending, color: "#F59E0B" },
+                  { name: t('hr.reports.approved'), value: leaveSummary.approved, color: "#10B981" },
+                  { name: t('hr.reports.rejected'), value: leaveSummary.rejected, color: "#EF4444" },
                 ].filter((d) => d.value > 0)}
                 dataKey="value"
                 nameKey="name"
@@ -231,11 +233,11 @@ const HRReports = () => {
               />
             </Card>
 
-            <Card title="Payroll Overview">
+            <Card title={t('hr.reports.payrollOverview')}>
               <PieChartComponent
                 data={[
-                  { name: "Net Paid", value: payrollSummary.totalNet, color: "#10B981" },
-                  { name: "Deductions", value: payrollSummary.totalDeductions, color: "#EF4444" },
+                  { name: t('hr.reports.netPaid'), value: payrollSummary.totalNet, color: "#10B981" },
+                  { name: t('hr.reports.deductions'), value: payrollSummary.totalDeductions, color: "#EF4444" },
                 ].filter((d) => d.value > 0)}
                 dataKey="value"
                 nameKey="name"
@@ -243,13 +245,13 @@ const HRReports = () => {
               />
             </Card>
 
-            <Card title="HR Metrics">
+            <Card title={t('hr.reports.hrMetrics')}>
               <BarChartComponent
                 data={[
-                  { name: "Employees", value: employeeStats?.totalEmployees || 0, color: "#3B82F6" },
-                  { name: "Attendance", value: attendanceSummary.length, color: "#10B981" },
-                  { name: "Leave Req", value: leaveSummary.total, color: "#F59E0B" },
-                  { name: "Payments", value: payrollSummary.count, color: "#8B5CF6" },
+                  { name: t('hr.reports.employees'), value: employeeStats?.totalEmployees || 0, color: "#3B82F6" },
+                  { name: t('hr.reports.attendance'), value: attendanceSummary.length, color: "#10B981" },
+                  { name: t('hr.reports.leaveRequests'), value: leaveSummary.total, color: "#F59E0B" },
+                  { name: t('hr.reports.payments'), value: payrollSummary.count, color: "#8B5CF6" },
                 ]}
                 dataKey="value"
                 nameKey="name"
@@ -260,27 +262,27 @@ const HRReports = () => {
 
           {/* Attendance Summary */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-3">
-              Attendance Summary ({monthsWithData.present || 0} present, {monthsWithData.absent || 0} absent, {monthsWithData.late || 0} late)
-            </h2>
-            <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow overflow-hidden">
+<h2 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-3">
+                {t('hr.reports.attendanceSummary')} ({monthsWithData.present || 0} {t('hr.reports.present')}, {monthsWithData.absent || 0} {t('hr.reports.absent')}, {monthsWithData.late || 0} {t('hr.reports.late')})
+              </h2>
+            <div className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-300 text-sm">
                   <tr>
-                    <th className="p-3 text-left">Employee</th>
-                    <th className="p-3 text-left">Code</th>
-                    <th className="p-3 text-center text-green-600">Present</th>
-                    <th className="p-3 text-center text-red-600">Absent</th>
-                    <th className="p-3 text-center text-yellow-600">Late</th>
-                    <th className="p-3 text-center text-orange-600">Half Day</th>
-                    <th className="p-3 text-center text-blue-600">On Leave</th>
+                    <th className="p-3 text-left">{t('hr.reports.employee')}</th>
+                    <th className="p-3 text-left">{t('hr.reports.code')}</th>
+                    <th className="p-3 text-center text-green-600">{t('hr.reports.present')}</th>
+                    <th className="p-3 text-center text-red-600">{t('hr.reports.absent')}</th>
+                    <th className="p-3 text-center text-yellow-600">{t('hr.reports.late')}</th>
+                    <th className="p-3 text-center text-orange-600">{t('hr.reports.halfDay')}</th>
+                    <th className="p-3 text-center text-blue-600">{t('hr.reports.onLeave')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {attendanceSummary.length === 0 ? (
                     <tr>
                       <td colSpan="7" className="p-8 text-center text-gray-500 dark:text-slate-400">
-                        No attendance data for this period
+                        {t('hr.reports.noAttendanceData')}
                       </td>
                     </tr>
                   ) : (
@@ -303,15 +305,15 @@ const HRReports = () => {
 
           {/* Payroll Summary */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-3">Payroll Summary</h2>
+            <h2 className="text-lg font-semibold text-gray-700 dark:text-slate-200 mb-3">{t('hr.reports.payrollSummary')}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { label: "Employees Paid", value: payrollSummary.count, color: "text-gray-700 dark:text-slate-200", prefix: "" },
-                { label: "Total Gross", value: payrollSummary.totalGross.toLocaleString(), color: "text-blue-600", prefix: "AFN " },
-                { label: "Total Deductions", value: payrollSummary.totalDeductions.toLocaleString(), color: "text-red-600", prefix: "AFN " },
-                { label: "Total Net Paid", value: payrollSummary.totalNet.toLocaleString(), color: "text-green-600", prefix: "AFN " },
+                { label: t('hr.reports.employeesPaid'), value: payrollSummary.count, color: "text-gray-700 dark:text-slate-200", prefix: "" },
+                { label: t('hr.reports.totalGross'), value: payrollSummary.totalGross.toLocaleString(), color: "text-blue-600", prefix: "AFN " },
+                { label: t('hr.reports.totalDeductions'), value: payrollSummary.totalDeductions.toLocaleString(), color: "text-red-600", prefix: "AFN " },
+                { label: t('hr.reports.totalNetPaid'), value: payrollSummary.totalNet.toLocaleString(), color: "text-green-600", prefix: "AFN " },
               ].map((card) => (
-                <div key={card.label} className="bg-white dark:bg-slate-800/50 rounded-xl shadow p-4">
+                <div key={card.label} className="bg-transparent dark:bg-slate-800/50 rounded-xl shadow p-4">
                   <p className="text-sm text-gray-500 dark:text-slate-400">{card.label}</p>
                   <p className={`text-2xl font-bold mt-1 ${card.color}`}>{card.prefix}{card.value}</p>
                 </div>

@@ -7,7 +7,7 @@ import { departmentsConfig } from './DepartmentRegistration';
 const DepartmentView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.hr.departments.viewTitle')} subtitle={t('staff.hr.departments.subtitle')} endpoint={departmentsConfig.endpoint} id={id} fields={departmentsConfig.formFields} listPath="/staff/hr/departments" editPath={`/staff/hr/departments/edit/${id}`} />;
+  return <RecordViewPage title={t('hr.departments.viewTitle')} subtitle={t('hr.departments.subtitle')} endpoint={departmentsConfig.endpoint} id={id} fields={departmentsConfig.formFields} listPath="/staff/hr/departments" editPath={`/staff/hr/departments/edit/${id}`} />;
 };
 
 export default DepartmentView;

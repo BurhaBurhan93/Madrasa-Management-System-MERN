@@ -14,7 +14,7 @@ const FinancialReports = () => {
       createPath="/staff/finance/reports/create"
       editPathForRow={(row) => `/staff/finance/reports/edit/${row._id}`}
       viewPathForRow={(row) => "/staff/finance/reports/view/" + row._id}
-      searchPlaceholder={t('staff.finance.financialReports.searchPlaceholder')}
+      searchPlaceholder={t('finance.financialReports.searchPlaceholder')}
     />
   );
 };

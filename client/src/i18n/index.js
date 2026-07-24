@@ -9,18 +9,16 @@ const NS = ['app', 'common', 'nav', 'student', 'teacher', 'admin', 'staff', 'att
 function toResources(data) {
   const r = {};
   for (const ns of NS) {
-    if (data[ns]) r[ns] = data[ns];
+    if (data[ns]) r[ns] = { ...data[ns], [ns]: data[ns] };
   }
   return r;
 }
-
-const savedLang = localStorage.getItem('i18nextLng') || 'en';
 
 i18n.use(initReactI18next).init({
   resources: { en: toResources(en), ps: toResources(ps), prs: toResources(prs) },
   ns: NS,
   defaultNS: 'common',
-  lng: savedLang,
+  lng: 'prs',
   fallbackLng: 'en',
   interpolation: { escapeValue: false },
   react: { useSuspense: false },

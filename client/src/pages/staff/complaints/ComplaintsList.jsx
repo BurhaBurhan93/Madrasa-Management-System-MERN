@@ -65,6 +65,15 @@ export const complaintsConfig = {
 
 const StaffComplaintsList = () => {
   const { t } = useTranslation(['staff', 'common']);
+  const columns = complaintsConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.complaints.list.columns.${col.key}`)
+  }));
+  const formFields = complaintsConfig.formFields.map(field => ({
+    ...field,
+    label: t(`staff.complaints.list.fields.${field.name}`),
+    options: field.options?.map(opt => ({ ...opt, label: t(`staff.complaints.list.options.${field.name}.${opt.value}`) }))
+  }));
   const [stats, setStats] = useState({
     totalComplaints: 0,
     openComplaints: 0,
@@ -235,11 +244,11 @@ const StaffComplaintsList = () => {
   if (loading) {
     return (
       <ListPage
-        eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.list.title')}
-        endpoint={complaintsConfig.endpoint} columns={complaintsConfig.columns}
+        eyebrow={t('staff.complaints.list.title')} title={t('staff.complaints.list.title')}
+        endpoint={complaintsConfig.endpoint} columns={columns}
         viewPathForRow={(row) => `/staff/complaints/view/${getId(row)}`}
         editPathForRow={(row) => `/staff/complaints/edit/${getId(row)}`}
-        searchPlaceholder={t('common.search', 'Search complaints...')}
+        searchPlaceholder={t('staff.complaints.list.searchPlaceholder')}
         clientSidePagination={true}
         deleteEnabled={false}
         extraActionItemsForRow={(row, refetch) => [
@@ -253,8 +262,8 @@ const StaffComplaintsList = () => {
 
   return (
     <ListPage
-      eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.list.title')} subtitle={t('staff.complaints.list.subtitle')}
-      endpoint={complaintsConfig.endpoint} columns={complaintsConfig.columns}
+      eyebrow={t('staff.complaints.list.title')} title={t('staff.complaints.list.title')} subtitle={t('staff.complaints.list.subtitle')}
+      endpoint={complaintsConfig.endpoint} columns={columns}
       viewPathForRow={(row) => `/staff/complaints/view/${getId(row)}`}
       editPathForRow={(row) => `/staff/complaints/edit/${getId(row)}`}
       searchPlaceholder={t('common.search', 'Search complaints...')}

@@ -1,0 +1,15 @@
+erDiagram
+    Department ||--o{ Degree : offers
+    Department ||--o{ Designation : has
+    Degree ||--o{ DegreeSubject : offers
+    Subject ||--o{ DegreeSubject : includes
+    StudentClass ||--o{ Timetable : schedules
+    Department { ObjectId _id PK String departmentName String departmentCode UK ObjectId departmentHead FK "ref: Employee" String status }
+    Designation { ObjectId _id PK String designationTitle ObjectId department FK "ref: Department" String jobLevel String status }
+    Degree { ObjectId _id PK String name UK String duration String level ObjectId department FK "ref: Department" }
+    Subject { ObjectId _id PK String name UK String field }
+    DegreeSubject { ObjectId _id PK ObjectId teacher FK "ref: User" ObjectId degree FK "ref: Degree" ObjectId subject FK "ref: Subject" String academicYear String status }
+    StudentClass { ObjectId _id PK String code UK String name String type ObjectId teacher FK "ref: User" Number maxStudents String status }
+    Timetable { ObjectId _id PK ObjectId classId FK "ref: StudentClass" String day String period String subject String teacher }
+    Syllabus { ObjectId _id PK String className String subject String topic Number order }
+    Grading { ObjectId _id PK String name Array grades }

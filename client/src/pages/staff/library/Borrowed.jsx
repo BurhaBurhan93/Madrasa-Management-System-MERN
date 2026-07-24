@@ -36,14 +36,14 @@ const StaffLibraryBorrowed = () => {
   const { t } = useTranslation(['staff', 'common']);
   const localizedConfig = useMemo(() => ({
     ...libraryBorrowedConfig,
-    title: t('staff.library.borrowed.title'),
-    subtitle: t('staff.library.borrowed.subtitle'),
-    columns: libraryBorrowedConfig.columns.map(col => ({ ...col, header: t(`staff.library.borrowed.column${col.key.charAt(0).toUpperCase() + col.key.slice(1)}`) })),
+    title: t('library.borrowed.title'),
+    subtitle: t('library.borrowed.subtitle'),
+    columns: libraryBorrowedConfig.columns.map(col => ({ ...col, header: t(`library.borrowed.column${col.key.charAt(0).toUpperCase() + col.key.slice(1)}`) })),
     formFields: libraryBorrowedConfig.formFields.map(f => ({
       ...f,
-      label: t(`staff.library.borrowed.field${f.name.charAt(0).toUpperCase() + f.name.slice(1)}`),
-      options: f.options ? f.options.map(o => ({ ...o, label: t(`staff.library.borrowed.option${o.value.charAt(0).toUpperCase() + o.value.slice(1)}`) })) : f.options,
-      relationLabel: f.name === 'book' ? (row) => `${row.title} (${row.stock || 0} ${t('staff.library.borrowed.inStock')})` : f.name === 'borrower' ? (row) => `${row.name || t('common.unknown')} (${row.studentCode || row.email || ''})` : f.relationLabel
+      label: t(`library.borrowed.field${f.name.charAt(0).toUpperCase() + f.name.slice(1)}`),
+      options: f.options ? f.options.map(o => ({ ...o, label: t(`library.borrowed.option${o.value.charAt(0).toUpperCase() + o.value.slice(1)}`) })) : f.options,
+      relationLabel: f.name === 'book' ? (row) => `${row.title} (${row.stock || 0} ${t('library.borrowed.inStock')})` : f.name === 'borrower' ? (row) => `${row.name || t('common.unknown')} (${row.studentCode || row.email || ''})` : f.relationLabel
     }))
   }), [t]);
   const [stats, setStats] = useState({
@@ -116,7 +116,7 @@ const StaffLibraryBorrowed = () => {
         });
       }
     } catch (err) {
-      console.error(t('staff.library.borrowed.errorFetching'), err);
+      console.error(t('library.borrowed.errorFetching'), err);
     } finally {
       setLoading(false);
     }
@@ -130,10 +130,10 @@ const StaffLibraryBorrowed = () => {
       createPath="/staff/library/borrowed/create"
       editPathForRow={(row) => `/staff/library/borrowed/edit/${getId(row)}`}
       viewPathForRow={(row) => `/staff/library/borrowed/view/${getId(row)}`}
-      searchPlaceholder={t('staff.library.borrowed.searchPlaceholder')}
+      searchPlaceholder={t('library.borrowed.searchPlaceholder')}
       clientSidePagination={true}
       deleteEnabled={false}
-      extraActionItemsForRow={(row, refetch) => row.status === 'borrowed' ? [{ label: t('staff.library.borrowed.markReturned'), className: 'text-emerald-700 hover:bg-emerald-50', onClick: async () => { await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/staff/library/borrowed/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'returned', returnDate: new Date().toISOString() }) }); refetch(); } }] : []}
+      extraActionItemsForRow={(row, refetch) => row.status === 'borrowed' ? [{ label: t('library.borrowed.markReturned'), className: 'text-emerald-700 hover:bg-emerald-50', onClick: async () => { await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/staff/library/borrowed/${getId(row)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ status: 'returned', returnDate: new Date().toISOString() }) }); refetch(); } }] : []}
     />
   );
 
@@ -143,7 +143,7 @@ const StaffLibraryBorrowed = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.library.borrowed.totalRecords')}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('library.borrowed.totalRecords')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.totalBorrowed}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -155,7 +155,7 @@ const StaffLibraryBorrowed = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.library.borrowed.currentlyBorrowed')}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('library.borrowed.currentlyBorrowed')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.currentlyBorrowed}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -167,7 +167,7 @@ const StaffLibraryBorrowed = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.library.borrowed.returned')}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('library.borrowed.returned')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.returned}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -179,7 +179,7 @@ const StaffLibraryBorrowed = () => {
         <Card className="rounded-2xl border border-slate-200 bg-gradient-to-br from-red-50 to-rose-50 p-5 dark:border-slate-700 dark:bg-none dark:bg-slate-800/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('staff.library.borrowed.overdue')}</p>
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">{t('library.borrowed.overdue')}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats.overdue}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -191,7 +191,7 @@ const StaffLibraryBorrowed = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
-          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('staff.library.borrowed.statusDistribution')}</h3>
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('library.borrowed.statusDistribution')}</h3>
           {stats.byStatus.length > 0 ? (
             <PieChartComponent data={stats.byStatus} height={250} />
           ) : (
@@ -200,7 +200,7 @@ const StaffLibraryBorrowed = () => {
         </Card>
         
         <Card className="rounded-[28px] border border-slate-200 p-6 dark:border-slate-700 dark:bg-slate-800/50">
-          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('staff.library.borrowed.monthlyTrend')}</h3>
+          <h3 className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-4">{t('library.borrowed.monthlyTrend')}</h3>
           {stats.monthlyTrend.length > 0 ? (
             <BarChartComponent data={stats.monthlyTrend} dataKey="value" nameKey="name" height={250} />
           ) : (

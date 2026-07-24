@@ -59,6 +59,10 @@ export const complaintActionsConfig = {
 
 const StaffComplaintActions = () => {
   const { t } = useTranslation(['staff', 'common']);
+  const columns = complaintActionsConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.complaints.actions.columns.${col.key}`)
+  }));
   const [stats, setStats] = useState({
     totalActions: 0,
     completed: 0,
@@ -189,11 +193,11 @@ const StaffComplaintActions = () => {
     return (
       <ListPage
         eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.actions.title')} subtitle={t('staff.complaints.actions.subtitle')}
-        endpoint={complaintActionsConfig.endpoint} columns={complaintActionsConfig.columns}
+        endpoint={complaintActionsConfig.endpoint} columns={columns}
         createPath="/staff/complaints/actions/create"
         editPathForRow={(row) => `/staff/complaints/actions/edit/${getId(row)}`}
         viewPathForRow={(row) => `/staff/complaints/actions/view/${getId(row)}`}
-        searchPlaceholder={t('common.search', 'Search complaint actions...')} clientSidePagination={true}
+        searchPlaceholder={t('staff.complaints.actions.searchPlaceholder')} clientSidePagination={true}
         headerContent={<PageSkeleton type="dashboard" />}
       />
     );
@@ -202,7 +206,7 @@ const StaffComplaintActions = () => {
   return (
     <ListPage
       eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.actions.title')} subtitle={t('staff.complaints.actions.subtitle')}
-      endpoint={complaintActionsConfig.endpoint} columns={complaintActionsConfig.columns}
+      endpoint={complaintActionsConfig.endpoint} columns={columns}
       createPath="/staff/complaints/actions/create"
       editPathForRow={(row) => `/staff/complaints/actions/edit/${getId(row)}`}
       viewPathForRow={(row) => `/staff/complaints/actions/view/${getId(row)}`}

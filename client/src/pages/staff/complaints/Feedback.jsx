@@ -52,6 +52,10 @@ export const complaintFeedbackConfig = {
 
 const StaffComplaintFeedback = () => {
   const { t } = useTranslation(['staff', 'common']);
+  const columns = complaintFeedbackConfig.columns.map(col => ({
+    ...col,
+    header: t(`staff.complaints.feedback.columns.${col.key}`)
+  }));
   const [stats, setStats] = useState({
     totalFeedback: 0,
     averageSatisfaction: 0,
@@ -204,12 +208,12 @@ const StaffComplaintFeedback = () => {
   if (loading) {
     return (
       <ListPage
-        eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.feedback.title')} subtitle={t('staff.complaints.feedback.subtitle')}
-        endpoint={complaintFeedbackConfig.endpoint} columns={complaintFeedbackConfig.columns}
+        eyebrow={t('staff.complaints.feedback.title')} title={t('staff.complaints.feedback.title')} subtitle={t('staff.complaints.feedback.subtitle')}
+        endpoint={complaintFeedbackConfig.endpoint} columns={columns}
         createPath="/staff/complaints/feedback/create"
         editPathForRow={(row) => `/staff/complaints/feedback/edit/${getId(row)}`}
         viewPathForRow={(row) => `/staff/complaints/feedback/view/${getId(row)}`}
-        searchPlaceholder={t('common.search', 'Search complaint feedback...')} clientSidePagination={true}
+        searchPlaceholder={t('staff.complaints.feedback.searchPlaceholder')} clientSidePagination={true}
         headerContent={<PageSkeleton type="dashboard" />}
       />
     );
@@ -217,12 +221,12 @@ const StaffComplaintFeedback = () => {
 
   return (
     <ListPage
-      eyebrow={t('staff.complaints.actions.eyebrow')} title={t('staff.complaints.feedback.title')} subtitle={t('staff.complaints.feedback.subtitle')}
-      endpoint={complaintFeedbackConfig.endpoint} columns={complaintFeedbackConfig.columns}
+      eyebrow={t('staff.complaints.feedback.title')} title={t('staff.complaints.feedback.title')} subtitle={t('staff.complaints.feedback.subtitle')}
+      endpoint={complaintFeedbackConfig.endpoint} columns={columns}
       createPath="/staff/complaints/feedback/create"
       editPathForRow={(row) => `/staff/complaints/feedback/edit/${getId(row)}`}
       viewPathForRow={(row) => `/staff/complaints/feedback/view/${getId(row)}`}
-      searchPlaceholder={t('common.search', 'Search complaint feedback...')} clientSidePagination={true}
+      searchPlaceholder={t('staff.complaints.feedback.searchPlaceholder')} clientSidePagination={true}
       headerContent={headerContent}
     />
   );

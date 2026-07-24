@@ -284,7 +284,7 @@ const Communications = () => {
               {messages.length > 0 ? (
                 messages.map(msg => (
                   <div key={msg.id} className={`p-6 rounded-3xl border-l-4 ${
-                    msg.status === 'unread' ? 'bg-blue-50 border-blue-500' : 'bg-slate-50 border-slate-300'
+                    msg.status === 'unread' ? 'bg-blue-50 border-blue-500' : 'bg-transparent border-slate-300'
                   } hover:shadow-md transition-shadow cursor-pointer`}>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                       <div className="flex-1">
@@ -304,7 +304,7 @@ const Communications = () => {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-12 bg-slate-50 rounded-3xl">
+                <div className="text-center py-12 bg-transparent rounded-3xl">
                   <p className="text-slate-400 font-medium">{t('noMessagesYet', 'No messages yet')}</p>
                 </div>
               )}
@@ -331,7 +331,7 @@ const Communications = () => {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-12 bg-slate-50 rounded-3xl">
+                <div className="text-center py-12 bg-transparent rounded-3xl">
                   <p className="text-slate-400 font-medium">{t('noAnnouncementsYet', 'No announcements at this time')}</p>
                 </div>
               )}
@@ -353,7 +353,7 @@ const Communications = () => {
                 value={message.recipient}
                 onChange={handleMessageChange}
                 placeholder="Enter recipient (teacher/admin)"
-                className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
+                className="rounded-2xl border-slate-100 bg-transparent focus:bg-white"
               />
               
               <Input
@@ -364,7 +364,7 @@ const Communications = () => {
                 value={message.title}
                 onChange={handleMessageChange}
                 placeholder="Enter subject"
-                className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
+                className="rounded-2xl border-slate-100 bg-transparent focus:bg-white"
               />
               
               <div className="space-y-2">
@@ -377,7 +377,7 @@ const Communications = () => {
                   rows={6}
                   value={message.content}
                   onChange={handleMessageChange}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-slate-50 font-medium resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-transparent font-medium resize-none"
                   placeholder="Write your message here..."
                 />
               </div>
@@ -418,7 +418,7 @@ const Communications = () => {
                   name="type"
                   value={feedback.type}
                   onChange={handleFeedbackChange}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-slate-50 font-medium"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-transparent font-medium"
                 >
                   <option value="complaint">Complaint</option>
                   <option value="suggestion">Suggestion</option>
@@ -435,7 +435,7 @@ const Communications = () => {
                 value={feedback.title}
                 onChange={handleFeedbackChange}
                 placeholder="Enter subject of your feedback"
-                className="rounded-2xl border-slate-100 bg-slate-50 focus:bg-white"
+                className="rounded-2xl border-slate-100 bg-transparent focus:bg-white"
               />
               
               <div className="space-y-2">
@@ -448,7 +448,7 @@ const Communications = () => {
                   rows={6}
                   value={feedback.content}
                   onChange={handleFeedbackChange}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-slate-50 font-medium resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none bg-transparent font-medium resize-none"
                   placeholder="Share your feedback or suggestions..."
                 />
               </div>
@@ -493,7 +493,7 @@ const Communications = () => {
             <div className="space-y-4">
               {(submittedFeedback.length > 0 ? submittedFeedback : MOCK_FEEDBACK).slice(0, 3).map(msg => (
                 <div key={msg.id} className={`p-6 rounded-3xl border-l-4 ${
-                  msg.status === 'unread' ? 'bg-blue-50 border-blue-500' : 'bg-slate-50 border-slate-300'
+                  msg.status === 'unread' ? 'bg-blue-50 border-blue-500' : 'bg-transparent border-slate-300'
                 }`}>
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                     <div className="flex-1">

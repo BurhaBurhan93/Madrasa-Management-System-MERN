@@ -7,7 +7,8 @@ import { expensesConfig } from './Expenses';
 const ExpensesView = () => {
   const { t } = useTranslation(['staff', 'common']);
   const { id } = useParams();
-  return <RecordViewPage title={t('staff.finance.expenses.details', { title: expensesConfig.title })} subtitle={expensesConfig.subtitle} endpoint={expensesConfig.endpoint} id={id} fields={expensesConfig.formFields} listPath="/staff/finance/expenses" editPath={'/staff/finance/expenses/edit/' + id} />;
+  const resolvedTitle = t(expensesConfig.title);
+  return <RecordViewPage title={t('finance.expenses.details', { title: resolvedTitle })} subtitle={expensesConfig.subtitle} endpoint={expensesConfig.endpoint} id={id} fields={expensesConfig.formFields} listPath="/staff/finance/expenses" editPath={'/staff/finance/expenses/edit/' + id} />;
 };
 
 export default ExpensesView;

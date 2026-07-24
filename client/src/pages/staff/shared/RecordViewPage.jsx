@@ -8,9 +8,9 @@ import { useTheme } from '../../../contexts/ThemeContext.jsx';
 import { useTranslation } from 'react-i18next';
 
 const formatDisplayValue = (value, t) => {
-  if (value === null || value === undefined || value === '') return t('staff.recordView.dash', { defaultValue: '-' });
-  if (typeof value === 'boolean') return value ? t('staff.recordView.yes', { defaultValue: 'Yes' }) : t('staff.recordView.no', { defaultValue: 'No' });
-  if (Array.isArray(value)) return value.length ? value.join(', ') : t('staff.recordView.dash', { defaultValue: '-' });
+  if (value === null || value === undefined || value === '') return t('recordView.dash', { defaultValue: '-' });
+  if (typeof value === 'boolean') return value ? t('recordView.yes', { defaultValue: 'Yes' }) : t('recordView.no', { defaultValue: 'No' });
+  if (Array.isArray(value)) return value.length ? value.join(', ') : t('recordView.dash', { defaultValue: '-' });
   if (typeof value === 'object') {
     if (value.name) return value.name;
     if (value.title) return value.title;
@@ -29,16 +29,16 @@ const loadRecordByMode = async ({ endpoint, id, readMode, readEndpoint }, t) => 
   if (readMode === 'collection') {
     const res = await apiFetch(targetEndpoint);
     const data = await parseJsonSafe(res);
-    if (!res.ok) throw new Error(data?.message || t('staff.recordView.failedToLoadRecord', { defaultValue: 'Failed to load record' }));
+    if (!res.ok) throw new Error(data?.message || t('recordView.failedToLoadRecord', { defaultValue: 'Failed to load record' }));
     const rows = Array.isArray(data) ? data : (data?.data || []);
     const match = rows.find((row) => String(row._id) === String(id));
-    if (!match) throw new Error(t('staff.recordView.recordNotFound', { defaultValue: 'Record not found' }));
+    if (!match) throw new Error(t('recordView.recordNotFound', { defaultValue: 'Record not found' }));
     return match;
   }
 
   const res = await apiFetch(`${targetEndpoint}/${id}`);
   const data = await parseJsonSafe(res);
-  if (!res.ok) throw new Error(data?.message || t('staff.recordView.failedToLoadRecord', { defaultValue: 'Failed to load record' }));
+  if (!res.ok) throw new Error(data?.message || t('recordView.failedToLoadRecord', { defaultValue: 'Failed to load record' }));
   return data?.data || data;
 };
 
@@ -60,7 +60,7 @@ const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, 
       if (mapRowToView) record = mapRowToView(record);
       setItem(record);
     } catch (err) {
-      setError(err.message || t('staff.recordView.loadError', { defaultValue: 'Load error' }));
+      setError(err.message || t('recordView.loadError', { defaultValue: 'Load error' }));
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, 
 
   if (loading) return (
     <StaffPageLayout eyebrow={t('common.recordView', { defaultValue: 'Record View' })} title={t(title, { defaultValue: title })} subtitle={subtitle ? t(subtitle, { defaultValue: subtitle }) : subtitle} tone={endpoint || title}>
-      <div className={`rounded-[26px] border p-8 text-sm shadow-sm ${isDark ? 'border-slate-700 bg-slate-900/80 text-slate-300' : 'border-slate-200 bg-white text-slate-500'}`}>
+      <div className={`rounded-[26px] border p-3 sm:p-4 lg:p-6 text-sm shadow-sm ${isDark ? 'border-slate-700 bg-slate-900/80 text-slate-300' : 'border-slate-200 bg-transparent text-slate-500'}`}>
         {t('common.loadingRecord', { defaultValue: 'Loading record...' })}
       </div>
     </StaffPageLayout>
@@ -78,7 +78,7 @@ const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, 
   if (error) return (
     <StaffPageLayout eyebrow={t('common.recordView', { defaultValue: 'Record View' })} title={t(title, { defaultValue: title })} subtitle={subtitle ? t(subtitle, { defaultValue: subtitle }) : subtitle} tone={endpoint || title}>
       <Card className="rounded-[28px] shadow-sm">
-        <div className="p-6">
+        <div className="p-3 sm:p-4 lg:p-6">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0">
               <svg className="h-6 w-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +94,7 @@ const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, 
                 </button>
                 <button
                   onClick={() => navigate(-1)}
-                  className={`inline-flex items-center rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${isDark ? 'border-rose-500/30 bg-slate-900 text-rose-200 hover:bg-slate-800' : 'border-rose-300 bg-white text-rose-700 hover:bg-rose-50'}`}
+                  className={`inline-flex items-center rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${isDark ? 'border-rose-500/30 bg-slate-900 text-rose-200 hover:bg-slate-800' : 'border-rose-300 bg-transparent text-rose-700 hover:bg-transparent'}`}
                 >
                   {t('common.goBack', { defaultValue: 'Go Back' })}
                 </button>
@@ -111,7 +111,7 @@ const RecordViewPage = ({ title, subtitle, endpoint, id, fields = [], editPath, 
       <Card className="rounded-[28px] shadow-sm">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {fields.map((field) => (
-            <div key={field.name} className={`rounded-2xl border p-4 ${isDark ? 'border-slate-700 bg-slate-950/60' : 'border-slate-100 bg-slate-50'}`}>
+            <div key={field.name} className={`rounded-2xl border p-3 sm:p-4 lg:p-6 ${isDark ? 'border-slate-700 bg-slate-950/60' : 'border-slate-100 bg-transparent'}`}>
               <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{field.label}</p>
               <p className={`mt-3 break-words text-sm font-medium leading-6 ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{field.renderView ? field.renderView(item?.[field.name], item) : formatDisplayValue(item?.[field.name], t)}</p>
             </div>

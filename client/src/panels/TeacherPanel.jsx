@@ -68,7 +68,13 @@ const TeacherPanelContent = () => {
     return () => { document.documentElement.dir = 'ltr'; };
   }, [lang, isRTL]);
 
-  useEffect(() => { i18n.changeLanguage(lang === 'dari' ? 'prs' : lang); }, [lang]);
+  useEffect(() => {
+    const validLangs = ['en', 'ps', 'prs'];
+    const targetLang = lang === 'dari' ? 'prs' : lang;
+    if (targetLang && validLangs.includes(targetLang)) {
+      i18n.changeLanguage(targetLang);
+    }
+  }, [lang]);
 
   useEffect(() => {
     fetchUserData();
@@ -93,6 +99,7 @@ const TeacherPanelContent = () => {
 
   useEffect(() => {
     let prevIsMobile = window.innerWidth < 768;
+    if (prevIsMobile) setSidebarOpen(false);
     const handleResize = () => {
       const nowMobile = window.innerWidth < 768;
       if (!prevIsMobile && nowMobile) setSidebarOpen(false);
@@ -107,7 +114,7 @@ const TeacherPanelContent = () => {
       id: "dashboard",
       icon: <FiHome size={19} />,
       path: "",
-      label: t('dashboard'),
+      label: t('dashboard.label'),
       type: "link",
     },
     {
@@ -126,12 +133,12 @@ const TeacherPanelContent = () => {
         { id: "subjects", label: t('mySubjects'), path: "subjects" },
         { id: "classes", label: t('myClasses'), path: "classes" },
         { id: "students", label: t('myStudents'), path: "students" },
-        { id: "syllabus", label: t('syllabus'), path: "syllabus" },
-        { id: "grading", label: t('grading'), path: "grading" },
-        { id: "assignments", label: t('assignments'), path: "assignments" },
+        { id: "syllabus", label: t('syllabus.label'), path: "syllabus" },
+        { id: "grading", label: t('grading.label'), path: "grading" },
+        { id: "assignments", label: t('assignments.label'), path: "assignments" },
         {
           id: "create-assignment",
-          label: t('createAssignment'),
+          label: t('createAssignment.label'),
           path: "create-assignments",
         },
       ],
@@ -139,10 +146,10 @@ const TeacherPanelContent = () => {
     {
       id: "attendance",
       icon: <FiCalendar size={19} />,
-      label: t('attendance'),
+      label: t('attendance.label'),
       type: "dropdown",
       items: [
-        { id: "sessions", label: t('sessions'), path: "sessions" },
+        { id: "sessions", label: t('sessions.label'), path: "sessions" },
         { id: "mark-attendance", label: t('markAttendance'), path: "attendance" },
         {
           id: "attendance-reports",
@@ -158,7 +165,7 @@ const TeacherPanelContent = () => {
       type: "dropdown",
       items: [
         { id: "exams-list", label: t('myExams'), path: "exams" },
-        { id: "create-exam", label: t('createExam'), path: "exams/create" },
+        { id: "create-exam", label: t('createExam.label'), path: "exams/create" },
       ],
     },
     {
@@ -167,10 +174,10 @@ const TeacherPanelContent = () => {
       label: t('results'),
       type: "dropdown",
       items: [
-        { id: "enter-marks", label: t('enterMarks'), path: "results/enter-marks" },
+        { id: "enter-marks", label: t('enterMarks.label'), path: "results/enter-marks" },
         {
           id: "view-results",
-          label: t('viewResults'),
+          label: t('viewResults.label'),
           path: "results/view-results",
         },
       ],
@@ -181,9 +188,9 @@ const TeacherPanelContent = () => {
       label: t('communications'),
       type: "dropdown",
       items: [
-        { id: "announcements", label: t('announcements'), path: "announcements" },
-        { id: "complaints", label: t('assignedComplaints'), path: "complaints" },
-        { id: "feedback", label: t('feedback'), path: "feedback" },
+        { id: "announcements", label: t('announcements.label'), path: "announcements" },
+        { id: "complaints", label: t('assignedComplaints.label'), path: "complaints" },
+        { id: "feedback", label: t('feedback.label'), path: "feedback" },
       ],
     },
     {
@@ -200,7 +207,7 @@ const TeacherPanelContent = () => {
       id: "payslips",
       icon: <FiClipboard size={19} />,
       path: "payslips",
-      label: t('payslips'),
+      label: t('payslips.label'),
       type: "link",
     },
   ];
@@ -327,7 +334,7 @@ const TeacherPanelContent = () => {
       className={`flex h-screen overflow-hidden ${theme === "dark" ? "bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.98),_rgba(15,23,42,0.96)_42%,_rgba(2,6,23,1)_100%)]" : "bg-[radial-gradient(circle_at_top,_rgba(207,250,254,0.96),_rgba(224,242,254,0.92)_42%,_rgba(219,234,254,0.96)_100%)]"}`}
     >
       <aside
-        className={`fixed z-30 h-screen border-r backdrop-blur-xl transition-all duration-300 md:relative ${theme === "dark" ? "border-slate-700/60 bg-slate-900/95" : "border-cyan-100/80 bg-cyan-50/80"} ${sidebarOpen ? "w-72" : "w-24"}`}
+        className={`panel-sidebar fixed z-30 h-screen border-r backdrop-blur-xl transition-all duration-300 md:relative ${theme === "dark" ? "border-slate-700/60 bg-slate-900/95" : "border-cyan-100/80 bg-cyan-50/80"} ${sidebarOpen ? "panel-sidebar-open w-[85vw] max-w-[300px] md:w-72" : "w-24"}`}
       >
         <div className="flex h-full flex-col">
           <div
@@ -561,25 +568,25 @@ const TeacherPanelContent = () => {
 
       <main className="flex-1 min-w-0 overflow-y-auto h-screen">
         <header
-          className={`sticky top-0 z-20 mx-3 mt-3 rounded-2xl border navbar-glass ${theme === "dark" ? "border-slate-700 bg-slate-900/80" : "border-cyan-100/70 bg-cyan-50/70"}`}
+          className={`sticky top-0 z-20 mx-2 md:mx-3 mt-2 md:mt-3 rounded-2xl border navbar-glass ${theme === "dark" ? "border-slate-700 bg-slate-900/80" : "border-cyan-100/70 bg-cyan-50/70"}`}
         >
-          <div className="flex items-center justify-between px-5 py-4 lg:px-8">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between px-3 py-2 md:px-5 md:py-4 lg:px-8">
+            <div className="flex items-center gap-2 md:gap-4 min-w-0">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 aria-label={t('toggleSidebar')}
-                className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
+                className={`flex h-9 w-9 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-xl md:rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
               >
-                <FiMenu size={20} />
+                <FiMenu size={18} />
               </button>
-              <div>
+              <div className="min-w-0 hidden sm:block">
                 <p
-                  className={`text-xs font-semibold uppercase tracking-[0.24em] ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`}
+                  className={`text-[10px] md:text-xs font-semibold uppercase tracking-[0.24em] ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`}
                 >
                   {t('console')}
                 </p>
                 <h1
-                  className={`mt-1 text-lg font-semibold lg:text-xl ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}
+                  className={`mt-0.5 md:mt-1 text-sm md:text-lg lg:text-xl font-semibold truncate ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}
                 >
                   {t('welcome')}{" "}
                   <span className="bg-gradient-to-r from-cyan-600 to-sky-600 bg-clip-text text-transparent">
@@ -587,37 +594,39 @@ const TeacherPanelContent = () => {
                   </span>
                 </h1>
                 <p
-                  className={`mt-1 text-xs lg:text-sm ${theme === "dark" ? "text-slate-500" : "text-slate-500"}`}
+                  className={`hidden lg:block mt-1 text-xs ${theme === "dark" ? "text-slate-500" : "text-slate-500"}`}
                 >
                   {t('subtitle')}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 md:gap-2 shrink-0">
               <div
-                className={`hidden items-center rounded-full border px-4 py-2.5 md:flex ${theme === "dark" ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}
+                className={`hidden items-center rounded-full border px-3 py-1.5 md:px-4 md:py-2.5 md:flex ${theme === "dark" ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}
               >
-                <FiSearch className="mr-2 text-slate-400" size={18} />
+                <FiSearch className="mr-2 text-slate-400" size={16} />
                 <input
                   type="text"
                   placeholder={t('search')}
-                  className={`w-48 bg-transparent text-sm outline-none ${theme === "dark" ? "text-slate-300 placeholder:text-slate-500" : "text-slate-600"}`}
+                  className={`w-32 lg:w-48 bg-transparent text-xs md:text-sm outline-none ${theme === "dark" ? "text-slate-300 placeholder:text-slate-500" : "text-slate-600"}`}
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 md:gap-2">
                 <button
                   onClick={toggleTheme}
                   title={t('theme')}
-                  className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
+                  className={`flex h-9 w-9 md:h-11 md:w-11 items-center justify-center rounded-xl md:rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
                 >
                   {theme === "dark" ? (
-                    <FiSun size={19} />
+                    <FiSun size={16} />
                   ) : (
-                    <FiMoon size={19} />
+                    <FiMoon size={16} />
                   )}
                 </button>
-                <LanguageSwitcher onChange={(code) => setLang(code === 'prs' ? 'dari' : code)} dark={theme === 'dark'} />
+                <div className="scale-90 md:scale-100 origin-right">
+                  <LanguageSwitcher onChange={(code) => setLang(code === 'prs' ? 'dari' : code)} dark={theme === 'dark'} />
+                </div>
                 <button
                   onClick={() => {
                     const sys = [
@@ -630,10 +639,10 @@ const TeacherPanelContent = () => {
                     setCalendarSystem("teacher", next);
                   }}
                   title={calendarLabels[lang]?.[calSys] || calSys}
-                  className={`flex h-11 items-center gap-1 rounded-2xl border px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
+                  className={`hidden md:flex h-9 md:h-11 items-center gap-1 rounded-xl md:rounded-2xl border px-2 md:px-3 transition-all duration-200 hover:-translate-y-0.5 ${theme === "dark" ? "border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-500 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"}`}
                 >
-                  <FiCalendar size={17} />
-                  <span className="text-[10px] font-semibold">
+                  <FiCalendar size={16} />
+                  <span className="text-[10px] font-semibold hidden lg:inline">
                     {calendarLabels[lang]?.[calSys] || calSys}
                   </span>
                 </button>
@@ -643,7 +652,7 @@ const TeacherPanelContent = () => {
           </div>
         </header>
 
-        <div className="p-4 lg:p-6" data-panel-print-content>
+        <div className="panel-content p-3 sm:p-4 lg:p-6" data-panel-print-content>
           <Suspense fallback={<PageSkeleton variant="table" />}>
             <Outlet />
           </Suspense>

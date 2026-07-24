@@ -27,7 +27,9 @@ const STUDENT_SPECIFIC_PATHS = [
   '/books',
   '/borrowed-books',
   '/purchases',
-  '/final-results'
+  '/final-results',
+  '/library/stats',
+  '/hostel'
 ];
 
 const STAFF_MANAGEMENT_METHODS = new Set(['POST', 'PUT', 'DELETE']);
@@ -200,6 +202,35 @@ router.get('/borrowed-books', ctrl.getBorrowedBooks);
 router.post('/books/:id/borrow', ctrl.borrowBook);
 router.post('/books/:id/return', ctrl.returnBook);
 router.post('/books/:id/renew', ctrl.renewBook);
+
+// Library stats route
+router.get('/library/stats', async (req, res) => {
+  try {
+    const Book = require('../../models/Book');
+    const BookCategory = require('../../models/BookCategory');
+    const TOTAL_STATS = { ebooks: 0, journals: 0, audiobooks: 0, videos: 0, labs: 0 };
+    const categories = await BookCategory.find({ deletedAt: null }).lean();
+    const counts = await Book.aggregate([
+      { $match: { deletedAt: null } },
+      { $group: { _id: '$category', count: { $sum: 1 } } }
+    ]);
+    const countMap = {};
+    counts.forEach(c => { countMap[String(c._id)] = c.count; });
+    categories.forEach(cat => {
+      const key = cat.name.toLowerCase().replace(/[^a-z]/g, '');
+      const count = countMap[String(cat._id)] || 0;
+      if (key.includes('ebook') || key.includes('digital')) TOTAL_STATS.ebooks += count;
+      else if (key.includes('journal') || key.includes('research')) TOTAL_STATS.journals += count;
+      else if (key.includes('audio') || key.includes('podcast')) TOTAL_STATS.audiobooks += count;
+      else if (key.includes('video') || key.includes('lecture')) TOTAL_STATS.videos += count;
+      else if (key.includes('lab') || key.includes('simulation')) TOTAL_STATS.labs += count;
+      else TOTAL_STATS.ebooks += count;
+    });
+    res.json(TOTAL_STATS);
+  } catch (error) {
+    res.json({ ebooks: 0, journals: 0, audiobooks: 0, videos: 0, labs: 0 });
+  }
+});
 
 // Purchase routes
 router.get('/purchases', ctrl.getStudentPurchases);
